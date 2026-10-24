@@ -491,7 +491,7 @@
   },
   "g13_judge_sample_redaction": {
     "date_kst": "2026-10-24",
-    "status": "SOURCE_PUSH_PENDING_CI",
+    "status": "MARKDOWN_ASSERTION_FIX_PENDING_NEW_CI",
     "rubric_primary_url": "https://ugreenhackathon.devpost.com/rules",
     "official_rubric_equal_weights": 4,
     "report": "docs/architecture/G13_ROUND1_JUDGE_REPORT_SAMPLE_20261024.md",
@@ -506,6 +506,19 @@
     "devpost": "NOT_SUBMITTED",
     "participant_approval": "PENDING",
     "actual_hours": null,
-    "incremental_spend_krw": 0
+    "incremental_spend_krw": 0,
+    "first_source_sha": "6a2cce0bcebb1d6943ff96cf8cfaf0ba7831e504",
+    "first_offline_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40082152946",
+    "first_offline_tests_ran": 205,
+    "first_offline_pass": 204,
+    "first_offline_failed": 1,
+    "first_failure": "TEST_EXPECTED_PLAIN_NOT_CHECKED_BUT_SKILL_MARKDOWN_HAS_BOLD_MARKUP",
+    "first_package_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40082152962",
+    "first_artifact_id": 12555447981,
+    "first_pdf_bytes": 5038,
+    "first_pdf_pages": 1,
+    "first_zip_bytes": 7097,
+    "next_fix": "Use exact Markdown bold markup in synthetic example test assertion; no Skill content change",
+    "new_ci": "PENDING"
   }
 }

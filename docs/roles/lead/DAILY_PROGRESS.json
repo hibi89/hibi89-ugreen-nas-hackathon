@@ -254,7 +254,7 @@
     },
     {
       "scope_id": "G13_JUDGING_VALUE_AND_RESTRICTED_PATH_REPORT",
-      "status": "SOURCE_CI_PENDING",
+      "status": "REGRESSION_ASSERTION_FIX_PENDING_CI",
       "master_days": [
         "UGR-D11_PARTIAL",
         "UGR-D16_PARTIAL",
@@ -268,7 +268,16 @@
       "official_validator": "NOT_RUN",
       "nas": "NOT_RUN",
       "devpost": "NOT_SUBMITTED",
-      "actual_work_hours": null
+      "actual_work_hours": null,
+      "first_source_sha": "6a2cce0bcebb1d6943ff96cf8cfaf0ba7831e504",
+      "first_test_count": 205,
+      "first_test_pass": 204,
+      "first_test_failure": 1,
+      "first_ci_url": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40082152946",
+      "first_bundle_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40082152962",
+      "first_pdf_bytes": 5038,
+      "first_zip_bytes": 7097,
+      "first_artifact_id": 12555447981
     }
   ],
   "overall_project_completion_percent": null,

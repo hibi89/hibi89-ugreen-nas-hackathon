@@ -58,7 +58,7 @@ class SkillDraftTests(unittest.TestCase):
         self.assertIn("display only `[restricted item]`", response)
         self.assertIn("never echo its original name", response)
         example = response.split("## Illustrative result", 1)[1]
-        for phrase in ("synthetic scenario, NOT an actual NAS scan", "NOT_CHECKED, not MISSING",
+        for phrase in ("synthetic scenario, NOT an actual NAS scan", "**NOT_CHECKED**, not MISSING",
                        "truncated", "VERSION_REVIEW", "NEEDS_REVIEW", "not READY",
                        "not a real file-agent reference"):
             self.assertIn(phrase, example)
