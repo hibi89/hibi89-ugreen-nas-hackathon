@@ -57,3 +57,6 @@
 - **원래 다음날 10/25 G1 공식 SDK 확인 과제:** 미착수 0%, 계획 1.5h + 별도 예비 1.5h=당일 상한 3h, 정확한 CLI/Expert Agent 확인 실제 완료 ETA 미정.
 - 11/01~02 G3c 실제 SDK·권한 호환성 검증, 11/03~04 실제 Uliya Skill 통합, 11/05 CORE/EDGE 공식 지원 환경 재검증, SDK 검증기·Devpost 제출은 **모두 미완료**. 오프라인 91 PASS로 대체할 수 없다.
 - 실제 개발시간 **미측정**. 추가 현금 지출 없음.
+
+
+**종료 인수인계 누락 방지:** 코드·테스트 변경 push는 [closeout 동기화 검사](../../../.github/workflows/closeout-synchronization.yml) 통과 필요. 본 10/24 당일은 **100% 완료 / 잔여 0h**, SDK 기술 게이트 차단을 별도 유지.

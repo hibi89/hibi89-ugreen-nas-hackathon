@@ -1,3 +1,5 @@
+> **마감 기록 GitHub Actions 누락 검사 등록(2026-10-24):** [`closeout-synchronization.yml`](../../../.github/workflows/closeout-synchronization.yml) / [`tools/check_handoff_sync.py`](../../../tools/check_handoff_sync.py). 향후 코드·테스트·도구·설계·Skill 변경 push는 **LIVE_HANDOFF/LIVE_STATE, ACTIVE_WORK, DAILY_PROGRESS(.md/.json), STATUS/HANDOFF, TO_HACKATHON_LEAD, WORK_TIME_LOG**를 **같은 push**에서 수정하지 않으면 자동 검사 실패. 이 검사는 파일 경로 동기화만 검증하며 내용 사실성·SDK/NAS 실제 동작을 보증하지 않는다. 사용자 시작 문구는 `[유그린 해커톤 깃헙 레포지토리 확인하고 작업하셈]`.
+
 # UGREEN ProjectReady NAS — LIVE HANDOFF (새 채팅 필독 정본)
 **마지막 작업 종료/인수인계 공시: 2026-10-24 KST.** 이 파일은 **새 채팅 첫 읽기**이며, 호출 때마다 최신 `lead/ugreen` 원격 HEAD와 실제 CI를 다시 확인한다. 옛 `STATUS.md`/본문에 남은 과거 '테스트 0건'·'75%' 등은 역사이고 본 파일·최신 코드보다 우선하지 않는다.
 
