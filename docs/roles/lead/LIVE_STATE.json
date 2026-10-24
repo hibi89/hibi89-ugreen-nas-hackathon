@@ -702,5 +702,26 @@
     "offline_synthetic_tests_passed": 224,
     "offline_ci": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40096040321",
     "verification_report": "docs/submission/G22_OFFICIAL_CREATOR_PREVIEW_VERIFIED_20261024.md"
+  },
+  "last_independent_submission_artifact_audit": {
+    "id": "G24_20261024",
+    "source_artifact_id": 12560941466,
+    "source_workflow": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40096040369",
+    "wrapper_sha256": "a05f5d404572a221fe93cbb963702c5e8edd8b7a4919a4101d74b213ac869941",
+    "exact_skill_sha256": "770e08c6eb5101785579eed7f2438547e0a0386d4c35aead860aab088e091169",
+    "exact_skill_bytes": 12397,
+    "inner_skill_zip_sha256": "3885182cb337fdeb66c6424ffb2ff242971b6bb75a1b55319ba2a7e53dbfd947",
+    "pdf_sha256": "df071504716c6121e7606cc1178ba7a3fdaa38856c3482b1b0864fc554088f80",
+    "pdf_visual": "ONE_PAGE_READABLE_NO_CLIPPING_OBSERVED",
+    "official_checker_for_exact_skill": "NOT_RUN",
+    "originality_and_license": "NOT_CLEARED",
+    "devpost": "NOT_SUBMITTED",
+    "report": "docs/submission/G24_INDEPENDENT_CREATOR_ARTIFACT_BYTE_AUDIT_20261024.md",
+    "master_counts_unchanged": true
+  },
+  "current_highest_value_release_gate": {
+    "status": "BLOCKED_PARTICIPANT_OFFICIAL_CODEX_CHECKER",
+    "scope": "Run installed official checker against exact staged Skill SHA 770e08c6eb5101785579eed7f2438547e0a0386d4c35aead860aab088e091169; do not reuse checker report from original source SHA 164e84fe...",
+    "no_auto_submission": true
   }
 }
