@@ -40,3 +40,10 @@
 - [공식 ZIP 임시 다운로드 검사 #40064613266](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40064613266) 성공: 26파일·37,575바이트·SHA256 `cf557e5a022e4297892f39768132855154232efdedeb726b2845450ccd70e1b3`. [29/29 원격 오프라인 테스트 #40064613228](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40064613228) 성공. **G1D SDK 명령/등록 Agent/라이선스 실제 확인은 여전히 BLOCKED.**
 - 이전 4×25% 하루 작업 분모는 바꾸지 않음. **완료 75% / 남은 25%**, 남은 명목 기준 배당 0.4h + 별도 예비 1.5h, **실제 완료시간은 SDK 상세 문서 권한 때문에 산정 불가**. 0.4h 완료 보장 아님. 실제 경과시간 미측정.
 - 다음 승인된 G1 Day2 기준 1.5h 계획+1.5h 예비=3h 상한; 참가자 PC 개인 검사 경로 또는 공식 Devpost 지원 확인. 원격 ZIP 검사 성공은 실제 NAS/SDK Skill 검수나 최종 제출과 다르다. 원본: [G1_ZIP_METADATA_RECOVERY](G1_ZIP_METADATA_RECOVERY_20261024.md).
+
+
+### 10/24 추가 선행 범위 — 별도 업무, 기존 일별 100% 분모 유지
+- **G2 증거 연결·파일 누락 보수적 엔진**: 코드·22개 합성 테스트 구현 → [문서](../../architecture/G2_EVIDENCE_CONTRACT_20261024.md) / [모듈](../../../src/projectready/presence.py).
+- **G3b 버전 후보 탐지**: 코드·15개 합성 테스트 구현 → [문서](../../architecture/G3B_VERSION_CANDIDATES_20261024.md) / [모듈](../../../src/projectready/version_candidates.py).
+- **최신 원격 CI:** [66/66 PASS](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40065337137). 공식 SDK/NAS/Expert Agent 검증 **0회**.
+- 사용자 허가로 별도 작업을 선행했지만 과거 10/24 G1-Day1 분모는 변경하지 않음: **완료 75% / 잔여 25%**. G1 잔여 비례 배당 **0.4h + 별도 예비 1.5h**는 *실제 완료 예상시간이 아님*; 실제 소요시간 미측정. G2/G3b 정식 출시까지 별도 SDK 적합성 검수 시간이 남아 있음.

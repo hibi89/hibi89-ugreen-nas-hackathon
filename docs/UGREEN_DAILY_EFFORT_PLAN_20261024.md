@@ -83,3 +83,7 @@
 ## 2026-10-24 — 사용자 지시: 매 종료 보고 당일 100% 기준 완료율·남은 시간 필수
 - [당일 진행률 및 남은 작업시간](roles/lead/DAILY_PROGRESS.md) / [완료율 판정·계산 규칙](roles/lead/DAILY_PROGRESS_REPORTING_PROTOCOL.md). 하루 작업의 증거 있는 소단위 합계는 정확히 100%, DONE만 완료율에 포함; 작업 후 `LEAD_ACTIVE_WORK`·상위 총괄 보고·실측 로그와 함께 기록.
 - 사후 1일차 75%/100% 완료, 잔여 25%, 기준 잔여작업 약 0.4h + 별도 예비 배정 1.5h, 외부 SDK 차단으로 **실제 완료 ETA 미정**. 1일차 실측은 미측정. 해당 수치가 11/16까지 전체 대회 완성률 또는 기술 게이트 통과율이 아님.
+
+
+### 2026-10-24 선행 진도 — 향후 일정에서 중복 구현 금지
+- [G2 임시 증거 계약](architecture/G2_EVIDENCE_CONTRACT_20261024.md) + [G3b 임시 버전 신호](architecture/G3B_VERSION_CANDIDATES_20261024.md)를 사용자 명시 지시로 미리 구현하고 [66/66 원격 CI](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40065337137) 확인. 10/27(G2), 10/28-29(G3a), 10/30-31(G3b) **일정에서 이 코드를 다시 처음부터 작성하지 말 것**. 해당 날짜의 남은 핵심은 공식 SDK adapter, 실제 지원 capability·권한, 안정성·패키징 검증이다. 정식 호환성이 불명이라 시간을 자동 공제하거나 공식 게이트 통과 주장 금지. 당일 75% G1 진행률은 별도 보존.

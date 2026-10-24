@@ -125,3 +125,12 @@
 - [오프라인 CI #40064613228](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40064613228) **29/29 PASS**(판정·진척률·ZIP 메타데이터 무결성), 실제 Uliya Tool validator, NAS, 등록 에이전트/CLI 호출 **NOT_RUN**.
 - 후속 단 한 과제: `tools/private_ugreen_sdk_inspection.ps1`로 참가자 소유 Windows PC에서 **공식 ZIP 개인 폴더 비공개 열람 및 명령/Agent/validator 실제 규격 확인**, 안되면 공식 지원처. 사용자에게 아직 실행 확인 받지 않음. SDK ZIP 연결 **해결**, **정확한 CLI 스키마 차단 유지**.
 - **같은 날짜의 당일 100% 분모 보존:** 75% DONE / 남은 25% BLOCKED. 추가 SDK 메타데이터 실증은 원래 미완료 G1D에 포함되므로 진행률 가중치 새로 만들지 않음. 기준 배당 약 0.4h+별도 예비 1.5h(완료 ETA 아님), 다음 배정 1.5h+예비 1.5h=3h 상한. 실측 시간 미측정, 외부 대기/권한 때문에 실제 완료시간 미정. 기타 대회/Devpost 상태 변화 없음.
+
+
+## 2026-10-24 KST — 사용자 선행 개발 승인: G2·G3b 오프라인 프로토타입 실제 구현
+- 원격 소스 증거: `lead/ugreen@a7cde1bb7493d7177294f8058cd2b88547dc6400`. [GitHub Actions #40065337137](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40065337137) **SUCCESS, 합성 테스트 66/66 PASS** (기존 판정/일별 진행률/ZIP 검사 + G2 22개 + G3b 15개).
+- **G2 선행:** [임시 증거 계약](../../architecture/G2_EVIDENCE_CONTRACT_20261024.md)·`src/projectready/presence.py`·`tests/test_presence.py`: 허가 스코프/출처/증거 ID/완전 수집/페이지 종료/파일 타입 검증, 누락/권한 실패를 `NOT_CHECKED`와 `FAIL`로 보수적으로 구분. **실제 공식 Uliya adapter 확인 전 SDK_COMPATIBILITY=UNVERIFIED, G2 최종 FROZEN 아님**.
+- **G3b 선행:** [버전 모호성 후보 검증](../../architecture/G3B_VERSION_CANDIDATES_20261024.md)·`src/projectready/version_candidates.py`·`tests/test_version_candidates.py`: 같은 폴더의 `design.pdf`/`design_v2.pdf` 등을 `CANDIDATES_REVIEW`; 이름으로 최신본·파일 동일성 확정 절대 금지. **모든 단일 이름 후보도 실제 버전 검증 PASS가 아님**.
+- **SDK 게이트 G1 유지:** 공식 KIT ZIP만 GitHub runner에서 SHA/26파일 메타데이터 확인, 내부 CLI/등록 Expert Agent/정확한 권한·검증기는 여전히 미검증. 무단 CLI 명령·원본 SDK 포함·실 NAS 성공·프라이버시 검사 성공 주장 금지. 재검토 뒤 실지원 인터페이스만 연동.
+- **일별 진도:** 원래 10/24 선행 G1-Day1의 분모 4×25% 고정 → **75% DONE / 25% SDK 내부 검증 차단** 그대로. 새 사용자가 선행을 승인한 G2/G3b는 *추가 업무 별도 프로토타입 범위*로 기록하며, 원래 25% 기술 차단을 희석하거나 전체 제품 완성도에 합산하지 않는다. 기준 잔여 배당 G1 약 **0.4h + 별도 예비 1.5h**, 실 소요·실제 완료 ETA 미측정/산정불가. G2/G3b 후속 SDK 적합성 검수 시간은 아직 불확정.
+- 사용자 구독 외 추가 비용 0원, Public GitHub에 사용자 파일·토큰·SDK 아카이브 없음. 다음 최우선은 공식 Tool 내부 사양 확보 혹은 참가자 로컬/공식 지원 기반 Adapter 실제 명세 확인. 기능 구현 결과를 문서 작성과 혼동하지 말 것.
