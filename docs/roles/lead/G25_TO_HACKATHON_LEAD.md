@@ -1,0 +1,7 @@
+# UGREEN G25 — central lead update (2026-10-24 KST)
+
+ACCEPTED/IMPLEMENTED_VERIFIED (offline artifact only): G22 GitHub original PDF 5,183 bytes SHA256 df071504716c6121e7606cc1178ba7a3fdaa38856c3482b1b0864fc554088f80 was altered by direct PDF attachment/export into a 30,144-byte different-SHA file. Separate authenticated GitHub wrapper remained unchanged. Recovered byte-identical original PDF inside local 4,438-byte ZIP (sha256 0ef56994107dadc31166df25bafd1ae2c7e8555debe0248eb66c638b39103760), independent extraction hash PASS. Root evidence: docs/submission/G25_PDF_EXPORT_BYTE_FIDELITY_CORRECTION_20261024.md.
+
+BLOCKED_EXTERNAL: exact staged SKILL.md SHA256 770e08c6eb5101785579eed7f2438547e0a0386d4c35aead860aab088e091169 still has NO official checker rerun. Prior reported static-pass used SHA 164e84fe... and cannot qualify the current candidate. No actual NAS, vendor terms/IP/entrant clearance, or Devpost submission. No payment, secrets or private data; original product source unchanged. Next one action requires participant-controlled installed Codex official checker on same exact SKILL.md SHA; no reinstallation, no repeated PDF audits. Do not auto-submit.
+
+Schedule source remains 24-day master DONE2/PARTIAL12/BLOCKED3/NOT_STARTED7, Oct24 original scope complete (100%, 0h planned remaining), actual labor NOT_MEASURED. Oct25 SDK Gate1 blocked, 1.5h base plus 1.5h reserved, ETA unknown. This supplement supersedes older G24 text where a direct PDF link was presumed byte-identical.
