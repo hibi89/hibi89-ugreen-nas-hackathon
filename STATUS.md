@@ -1,10 +1,13 @@
-# UGREEN STATUS — 초기 상태
+# UGREEN STATUS — feature/missing-files
 
-- 확인일: 2026-10-24 KST
-- 참가: 등록 후 Devpost 프로젝트 관리 화면 확인 (UGREEN은 별도 성공 배너), **작품 생성/최종 제출 미완료**.
-- 제품: **NAS 프로젝트 문서·파일 관리 AI Skill (잠정)**, 사용자 최종 승인 전.
-- GitHub: `hibi89/hibi89-ugreen-nas-hackathon` (Public). 초기 운영 문서와 역할 브랜치 구성 중; 현재 유효한 기능/실 API 호출/테스트/데모/CI/Production **없음**.
-- 공식 마감: **2026-11-16 16:45 KST**.
-- 위험: NAS Skill CLI/권한/개발 패키지 미확인. 실제 NAS 하드웨어 검증은 본선 진출 후 원격 테스트만 가능. 개인 데이터 외부 전송·무단 삭제 금지.
-- 다음: 각 총괄 AI가 기술 자료 확인 → 최소 기능·API POC → 2안 비교/사용자 승인 → 기능 담당자 작업 지시 → 테스트·최종 제출.
-- 제출물과 실제 API/브라우저 정상 여부는 근거 확보 전 **미검증**. 이 기록은 최초 스냅샷이며 자동 갱신되지 않는다.
+- 기준 시점: 2026-10-24 KST.
+- GitHub: `hibi89/hibi89-ugreen-nas-hackathon`, worker feature branch `feature/missing-files`; `lead/ugreen` dispatcher UGR-001 REVISION 1, requested BASELINE_SHA `9b3052bf82ad1a8a4844b1aeee699c0b759251dc` 확인.
+- **UGR-001: BLOCKED (public official documentation research delivered; exact SDK/CLI/registered Expert Agent validation blocked because official ZIP archive not retrieved).** Do not repeat this task automatically; await lead review/new revision.
+- 산출: `docs/roles/missing-files/SDK_CAPABILITY_MATRIX.md`: official Starter Kit/Devpost/SkillHub citations, CONFIRMED / UNSUPPORTED / UNVERIFIED decisions, two design candidates and zero-cost recovery.
+- 실제 검증: 공식 public web docs inspection 수행; kit download hyperlink present. ZIP bytes/SDK validator, CLI commands and NAS/device/Sandbox/API execution: **0**. No product features/production test/CI.
+- 실패 근거: web binary extraction internal error; container HTTP to official site DNS resolution failure. **Environment restriction only; CDN failure not asserted**.
+- 보안/비용: Public GitHub, newly spent 0 KRW; no credentials, PII, archive, proprietary package or user NAS data committed. Third-party model/data transfer and cost remain approval-gated.
+- 참가 등록: 이전 문서상 등록 완료, Devpost project submission 미완료. NAS 주제 및 MVP 기능 scope still provisional.
+- 외부 종속: exact `uliya-skill-kit` version/manifest/license/hash, CLI input/output, Agent registry, auth/ACL, rate/quota, AI locality all **UNVERIFIED**.
+- 다음: UGREEN 총괄 G2에서 UGR-001 blocker 판단/공식 문서 확보; new READY 없이는 UGR-002·other branches 작업하지 않음.
+- Production/Vercel: **미적용**.
