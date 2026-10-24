@@ -15,3 +15,10 @@
 - **완료**: 실제 GitHub 5개 브랜치, 총괄 보고서·세 역할 메시지함, 인수인계·운영 문서 직접 확인(빠진 파일 0). `main/docs/ROLE_COORDINATION.md`에 링크와 재개 규칙을 신설함.
 - **미완료**: 실제 총괄 AI 채팅 배정·기술 검증, 프로젝트 승인, 프로그램/Skill 코드, 테스트·CI·배포, 최종 제출. 현재 저장소 Public 유지, 접근 정책 변경 없음.
 - **다음**: 대회 총괄이 `lead/ugreen`의 `docs/roles/lead/HANDOFF.md`를 먼저 읽고 사용자 승인 하에 기술/설계·개발 담당 역할을 시작하도록 인계. 고정 보고 `docs/roles/lead/TO_HACKATHON_LEAD.md` 최신화 책임을 총괄이 맡는다.
+
+
+## 2026-10-24 KST — main 기본 진입점 단문화 공시 (현행)
+- 사용자 단문 `[유그 해커톤 깃헙 레포지토리 확인하고 작업하셈]`을 실행 지시로 인식한다. 이 브랜치 [START_HERE.md](START_HERE.md)를 열고 현행 작업 기준 `lead/ugreen`의 `START_HERE.md` 및 `docs/roles/lead/LEAD_ACTIVE_WORK.md`를 **최신 원격 HEAD에서** 읽는다.
+- 제품은 **ProjectReady NAS 단일 Skill로 확정**됐으며 UGREEN 총괄 혼자 직접 설계·코딩·테스트·검수한다. 과거 3개 기능별 채팅·작업자용 READY 디스패치는 종료(이력 보존). 세 feature 브랜치 원본/커밋 유지, 신규 실개발 기본 브랜치 `lead/ugreen`; `main` 코드 안정화 기준이다.
+- 이 main 루트 STATUS/HANDOFF는 초기 이력이며 매 개발 시 최신 원본으로 간주하지 않는다. **매 주요 작업 종료마다 lead의 활성 작업·STATUS/HANDOFF·상위 보고를 갱신하고 원격 SHA 확인**. 서류 전환은 제품 개발/CI/NAS/API/Devpost 제출 검증이 아님.
+- 이전 확인 `lead/ugreen@584583d930cb67c613c50fe004fd2106434cf38d`, `main@d8cd806cb2b3842a80a571fd09910ec370e2de17` (변경 전). 현시점 공식 CLI 내부 검증은 BLOCKED, 신규 지출 0원, 내부 11/10·공식 마감 2026-11-16 16:45 KST. 항상 실제 원격 SHA 재조회.

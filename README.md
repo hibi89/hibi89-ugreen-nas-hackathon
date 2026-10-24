@@ -1,3 +1,5 @@
+> **현행 단일 진입점 (2026-10-24 KST)**: 새 채팅에서 **`[유그 해커톤 깃헙 레포지토리 확인하고 작업하셈]`** 한 문장만 입력하면 [START_HERE.md](START_HERE.md) → 최신 **`lead/ugreen`** [실행 지침](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/blob/lead/ugreen/START_HERE.md) → [현재 작업](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/blob/lead/ugreen/docs/roles/lead/LEAD_ACTIVE_WORK.md)을 조회하고, UGREEN **총괄 본인이 직접 개발·테스트·검수**한다. **아래 기능별 AI 작업자 3명/디스패처 문구는 폐기된 과거 이력이다.** `main`은 기본 진입·검증된 통합 기준이며 최신 진행은 lead 브랜치가 권위 있다.
+
 # UGREEN NAS AI Hackathon
 > **3개 대회 전체 일정·충돌·제출 마감:** [docs/COMPETITION_SCHEDULE.md](docs/COMPETITION_SCHEDULE.md) (**2026-10-24 KST 공시**). 이 브랜치에서 작업을 시작할 때 마감과 내부 조기 제출 목표를 확인하며 공식 변경 시 대회 총괄에게 보고한다.
 
