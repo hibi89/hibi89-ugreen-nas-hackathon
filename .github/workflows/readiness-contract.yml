@@ -4,7 +4,8 @@ on:
     branches: ["lead/ugreen"]
     paths:
       - "src/projectready/**"
-      - "tests/test_readiness.py"
+      - "tests/test_*.py"
+      - "docs/roles/lead/DAILY_PROGRESS.json"
       - ".github/workflows/readiness-contract.yml"
   workflow_dispatch:
 jobs:
@@ -18,4 +19,4 @@ jobs:
         with:
           python-version: "3.11"
       - name: Execute synthetic offline tests only
-        run: python -m unittest discover -s tests -p 'test_readiness.py' -v
+        run: python -m unittest discover -s tests -p 'test_*.py' -v

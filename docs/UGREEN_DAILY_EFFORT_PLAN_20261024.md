@@ -78,3 +78,8 @@
 ## 2026-10-24 accelerated Day1 checkpoint (no time invented)
 - 10/25 original G1 official document recovery was started early on 10/24. [G1 evidence](roles/lead/G1_DAY1_EVIDENCE_20261024.md), offline engine 16/16 independent [remote CI success](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40063814809). Actual elapsed person/work duration **unmeasured**.
 - **10/25 remaining planned work**: participant-authorized official ZIP private extraction of Agent/CLI/validator/capability examples, otherwise official help channel. **1.5 planned+1.5 reserve=3h cap**, not promised completion. SDK gate G1 not cleared; G2 cannot truthfully be marked complete from synthetic tests alone.
+
+
+## 2026-10-24 — 사용자 지시: 매 종료 보고 당일 100% 기준 완료율·남은 시간 필수
+- [당일 진행률 및 남은 작업시간](roles/lead/DAILY_PROGRESS.md) / [완료율 판정·계산 규칙](roles/lead/DAILY_PROGRESS_REPORTING_PROTOCOL.md). 하루 작업의 증거 있는 소단위 합계는 정확히 100%, DONE만 완료율에 포함; 작업 후 `LEAD_ACTIVE_WORK`·상위 총괄 보고·실측 로그와 함께 기록.
+- 사후 1일차 75%/100% 완료, 잔여 25%, 기준 잔여작업 약 0.4h + 별도 예비 배정 1.5h, 외부 SDK 차단으로 **실제 완료 ETA 미정**. 1일차 실측은 미측정. 해당 수치가 11/16까지 전체 대회 완성률 또는 기술 게이트 통과율이 아님.

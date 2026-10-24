@@ -1,3 +1,9 @@
+
+
+## [2026-10-24 KST 최우선 사용자 상시 지시] 매 작업 종료 100% 기준 완료율 보고
+- **필독:** [DAILY_PROGRESS_REPORTING_PROTOCOL](DAILY_PROGRESS_REPORTING_PROTOCOL.md) · [당일 완료율·잔여시간](DAILY_PROGRESS.md) · [원본 JSON](DAILY_PROGRESS.json). 총괄은 시작 전에 해당 날짜의 작업 항목 가중치를 **합계 100%**로 정하고, 매 작업 끝날 때 **완료 XX% / 미완료 YY% / 남은 기준 배당시간 Xh / 별도 예비 Yh / 실제 완료 ETA(미정 가능)**를 GitHub 및 최종 사용자 보고에 표시한다.
+- 사용자 호출 없이 자동 진행하거나 시간을 소급으로 측정했다 주장하지 않는다. DONE에는 테스트·소스 SHA 등 실제 증거 필요, 차단 미완료는 그날도 0% 완료로 처리. **오늘 1일차 75% (25% SDK 내부 검증 BLOCKED), 남은 기준작업 약 0.4h + 별도 예비 배정 1.5h, SDK 접근 의존으로 실제 완료 ETA 산정 불가.** 이전 CI 16 PASS는 오프라인 합성 검증만.
+- 이전 날짜의 작업률이 본선 진출률이나 전체 제품 완성도 의미하지 않음. 현재 `lead/ugreen` G1 SDK 실증 차단 유지. 모든 중요 작업 뒤 원격 SHA·CI 확인하고 상위 총괄 메시지함 최신화.
 > **G1 1일차 원격 검증 완료, 2026-10-24:** `src/projectready/readiness.py` + `tests/test_readiness.py` 합성 테스트 **16/16 GitHub Actions PASS** ([실제 실행 #40063814809](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40063814809)), 소스 `b97b23a3`. **하지만 G1은 여전히 PARTIAL/BLOCKED**: `uliya-skill-kit-0.7.3-en.zip` 공식 URL만 확인, ZIP 본문/명령·Agent registry 0건 확보. **다음 G1 2일차: 참가자 승인된 개인 환경에서 공식 ZIP 비공개 확보·CLI 정확한 함수/파라미터·등록 Agent·검증기·라이선스·SHA 추출(계획 1.5h+예비 1.5h). 안되면 공식 지원 문서 요청.** G2/실 NAS 통합 작업은 사전 승인/명세 검증 전 착수하지 않는다.
 
 > **1일차 실행 결과 (2026-10-24 KST, 기존 10/25 할당을 조기 수행):** [실행 증거](G1_DAY1_EVIDENCE_20261024.md)와 `src/projectready/readiness.py` / `tests/test_readiness.py`(로컬 합성 테스트 16 PASS) 확인. 공식 CDN 아카이브 **0.7.3-en** 링크는 식별했으나, isolated CDN DNS 제한으로 ZIP 0바이트·내부 CLI **UNVERIFIED**. 따라서 현재 G1 **PARTIAL/BLOCKED**. **다음 한 작업: 참가자 승인된 개인 PC에서 공식 ZIP을 비공개 내려받아 내부 SDK CLI/등록 Expert Agent 문서·검수 도구/라이선스 확인; 불가하면 공식 UGREEN 지원처에서 CLI 공개 문서 요청.** 기존 같은 DNS/바이너리 웹뷰 시도 반복 금지. G2로 자동 전환 금지.

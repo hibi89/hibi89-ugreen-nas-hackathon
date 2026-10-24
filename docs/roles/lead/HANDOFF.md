@@ -111,3 +111,10 @@
 - Real code: `src/projectready/readiness.py`, `tests/test_readiness.py`, `.github/workflows/readiness-contract.yml`, documented at [G1_DAY1_EVIDENCE_20261024.md](G1_DAY1_EVIDENCE_20261024.md). CI validates synthetic pure-contract behavior **only**, not real NAS/Skill API support.
 - Official Kit URL resolved to archive basename **`uliya-skill-kit-0.7.3-en.zip`** using official site; actual ZIP bytes remained 0 due environment DNS restriction. Registered Expert Agent list, CLI syntax, model/permission schemas, SHA/license **NOT VERIFIED**. G1 **PARTIAL/BLOCKED**, do not claim SDK PASS. No cost/permission changes.
 - **Next work (G1 Day2, planned 10/25 1.5h + 1.5h reserve)**: private participant-authorized download of official archive and textual extraction of exact CLI/Agent/validator evidence; if inaccessible, official support/community for genuine reference. Never commit proprietary archive to Public GitHub. Do not repeatedly retry same failed sandbox DNS. Actual elapsed work time not instrumented; `WORK_TIME_LOG.md` records **미측정**.
+
+
+## [2026-10-24 KST] 사용자 상시 규칙: 작업 종료마다 당일 완료율/잔여시간
+- 공시 원본 [DAILY_PROGRESS.md](DAILY_PROGRESS.md), [DAILY_PROGRESS.json](DAILY_PROGRESS.json), [DAILY_PROGRESS_REPORTING_PROTOCOL.md](DAILY_PROGRESS_REPORTING_PROTOCOL.md).
+- **1일차(10/24에 10/25 G1 작업을 선행): 75% /100% 완료, 남은 25%.** 4개 종료 목표를 동일 가중치 25%로 **사후 분류**: 규정 확인, CDN 경로 진단, 오프라인 안전 검증 엔진·GitHub Actions [16/16 PASS](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40063814809) 세 항목 DONE; 실제 SDK ZIP 내부 문서/CLI/Agent/라이선스 검증 한 항목 **BLOCKED**.
+- **남은 기준 작업 배당 약 0.4h** (=1.5h 계획×25%, 완료 ETA 아님) + **별도 예비 배정 1.5h**(실사용 미측정). **실제 SDK 기술 게이트 완료까지 ETA 산정 불가**, 원격 대기/권한에 달림. 실제 소요시간 **미측정**, 내부 CLI/NAS 검증 **NOT_RUN**. 10/25 다음 작업 1.5h 계획 + 1.5h 예비.
+- 앞으로 **매 작업 종료 시** 증거 있는 DONE 가중치만 완료 계산, `DAILY_PROGRESS.md/json`·`LEAD_ACTIVE_WORK`·`STATUS/HANDOFF`·`TO_HACKATHON_LEAD`·실측 로그 동시 갱신 후 원격 커밋/CI 재확인. 본 공시는 보고 제도만 정한 것으로 개발 진척 추가 없음.

@@ -32,3 +32,9 @@ A chosen: direct lead development/verification on one `lead/ugreen` workline. B 
 
 ### Round 2 contingent plan
 If and only if a verifiable official finalist invitation arrives, read [conditional finalist schedule](../../UGREEN_FINALIST_DAILY_PLAN_20261024.md), confirm PT NAS assignment, convert to actual T/T+1 KST dates, rerun staffing/time risk. Without official invitation this file is **not active**; current Round1 G1 takes precedence.
+
+
+## [2026-10-24 KST 최우선 사용자 상시 지시] 매 작업 종료 100% 기준 완료율 보고
+- **필독:** [DAILY_PROGRESS_REPORTING_PROTOCOL](DAILY_PROGRESS_REPORTING_PROTOCOL.md) · [당일 완료율·잔여시간](DAILY_PROGRESS.md) · [원본 JSON](DAILY_PROGRESS.json). 총괄은 시작 전에 해당 날짜의 작업 항목 가중치를 **합계 100%**로 정하고, 매 작업 끝날 때 **완료 XX% / 미완료 YY% / 남은 기준 배당시간 Xh / 별도 예비 Yh / 실제 완료 ETA(미정 가능)**를 GitHub 및 최종 사용자 보고에 표시한다.
+- 사용자 호출 없이 자동 진행하거나 시간을 소급으로 측정했다 주장하지 않는다. DONE에는 테스트·소스 SHA 등 실제 증거 필요, 차단 미완료는 그날도 0% 완료로 처리. **오늘 1일차 75% (25% SDK 내부 검증 BLOCKED), 남은 기준작업 약 0.4h + 별도 예비 배정 1.5h, SDK 접근 의존으로 실제 완료 ETA 산정 불가.** 이전 CI 16 PASS는 오프라인 합성 검증만.
+- 이전 날짜의 작업률이 본선 진출률이나 전체 제품 완성도 의미하지 않음. 현재 `lead/ugreen` G1 SDK 실증 차단 유지. 모든 중요 작업 뒤 원격 SHA·CI 확인하고 상위 총괄 메시지함 최신화.

@@ -10,3 +10,5 @@
 | 2026-10-24 | G1-Day1 선행: 공식 CDN 경로 및 Uliya 가이드 조사 + 독립 오프라인 평가기 | 1.5 (원래 10/25 예정) | 1.5 | **미측정** | PARTIAL/BLOCKED (SDK ZIP 내부 미확보), 합성 16 PASS | `docs/roles/lead/G1_DAY1_EVIDENCE_20261024.md`; GitHub Actions 결과는 별도 검증; 다음: ZIP 비공개 확인/공식 지원 |
 
 **G1-Day1 remote test verification:** [GitHub Actions run 40063814809](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40063814809) — 16/16 PASS, actual time **미측정**; CI elapsed runtime 0.002s is **NOT developer work-time evidence**. Remaining SDK G1 gate blocked.
+
+**2026-10-24 1일차 종료 보고(사후 가중치):** [당일 완료율 75%·잔여 25%](DAILY_PROGRESS.md); 기준 잔여 배정 약 **0.4h** + 별도 예비 배정 **1.5h**, 실제 SDK 완료 시간 **산정 불가** (접근 차단), 실제 소요시간 **미측정**. 2026-10-25 2일차 별도 계획 1.5h+1.5h. 완료시간을 임의 측정/소급하지 않음.
