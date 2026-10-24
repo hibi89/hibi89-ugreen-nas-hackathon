@@ -118,6 +118,15 @@
       "verified_code_commit": "10f6ba8aeaf9895f50437b7aa87084161887982d",
       "test_ci_url": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40070572424",
       "actual_skill_folder_ci": "PASS_3_FILES"
+    },
+    {
+      "scope_id": "G1_PUBLIC_KIT_SEMANTIC_INDEX",
+      "status": "SOURCE_COMMITTED_CI_PENDING",
+      "official_sdk_compatible": "UNVERIFIED",
+      "source": "tools/sdk_semantic_index.py",
+      "report": "docs/roles/lead/G1_SDK_SEMANTIC_INDEX_20261024.md",
+      "tests_added": 7,
+      "actual_work_hours": null
     }
   ],
   "overall_project_completion_percent": null,
@@ -131,5 +140,5 @@
   "latest_repository_regression_ci_url": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40070572424",
   "latest_closeout_guard_verified": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40070572600",
   "notes_on_last_closeout": "One-line GitHub bootstrap and mandatory end-of-work handoff automated checks verified. No new SDK or NAS capability established.",
-  "notes_on_new_chat_execution": "G7 official-format offline preflight: actual 3-file Skill candidate PASS; 131/131 repository tests pass at source SHA 10f6ba8; handoff sync PASS. Official Uliya creation checker and real NAS NOT_RUN; G1 BLOCKED. Oct 24 finite daily completion still 100%, 0h remaining; next G1 Oct 25 plan 1.5h+reserve 1.5h, ETA unknown."
+  "notes_on_new_chat_execution": "10/24 G1 pinned semantic kit index via GitHub Actions queued (7 synthetic tests), output not yet verified. The original 10/24 daily 100% applies only to finished finite deliverables. G1 still blocked; next Oct25 1.5h+1.5h reserve, unknown ETA."
 }

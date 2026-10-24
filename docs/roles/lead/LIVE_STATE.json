@@ -28,7 +28,7 @@
     "id": "G1-SDK-DETAILS",
     "scheduled_kst": "2026-10-25",
     "status": "BLOCKED_EXTERNAL_EVIDENCE",
-    "scope": "Privately obtain verified official Uliya creation-tool CLI/Expert Agent/license details or first-party support, then run official validator on candidate Skill; do not repeat known failed DNS path",
+    "scope": "Review pinned official kit bounded semantic index results; exact registered CLI/Agent I-O and validator/license remain blocked without direct primary documentation or participant-approved private reading",
     "planned_hours": 1.5,
     "separate_reserve_hours": 1.5,
     "actual_completion_eta_hours": null
@@ -128,5 +128,20 @@
     "actual_skill_directory_test": "PASS_3_MARKDOWN_FILES",
     "tests_added": 15,
     "closeout_verified": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40070572600"
+  },
+  "g1_semantic_index": {
+    "id": "G1-SDK-SEMANTIC-INDEX-20261024",
+    "source": "tools/sdk_semantic_index.py",
+    "workflow": ".github/workflows/sdk-schema-index.yml",
+    "official_archive_sha256": "cf557e5a022e4297892f39768132855154232efdedeb726b2845450ccd70e1b3",
+    "status": "CI_PENDING",
+    "sdk_contents_redistributed": false,
+    "unit_tests_added": 7,
+    "exact_cli_schema_verified": false,
+    "official_creation_tool_executed": false,
+    "official_license_grant_confirmed": false,
+    "real_nas_test": "NOT_RUN",
+    "report": "docs/roles/lead/G1_SDK_SEMANTIC_INDEX_20261024.md",
+    "actual_work_hours": null
   }
 }

@@ -1,0 +1,24 @@
+name: Official public Uliya kit bounded schema index
+on:
+  push:
+    branches: ["lead/ugreen"]
+    paths:
+      - ".github/workflows/sdk-schema-index.yml"
+      - "tools/sdk_semantic_index.py"
+  workflow_dispatch:
+jobs:
+  bounded-index:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 3
+    env:
+      KIT_URL: https://cdn.shopify.com/s/files/1/0630/9416/1602/files/uliya-skill-kit-0.7.3-en.zip?v=1790578898
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Index verified public first-party SDK docs in memory (no raw source/ZIP logs)
+        run: python tools/sdk_semantic_index.py --official-url "$KIT_URL"
+      # Never publish raw docs, packages, downloaded archives or artifacts.
