@@ -1,3 +1,5 @@
+> **2026-10-24 최신 우선 규칙:** [MASTER_PROGRESS.md](MASTER_PROGRESS.md) = 날짜별 24건의 DONE/PARTIAL/BLOCKED/NOT_STARTED·선행 작업·테스트 증거·기본/별도 예비시간에 관한 **최신 진행 정본**. `lead/ugreen` 원격 HEAD 확인 후 이 문서를 **가장 먼저 읽고**, 이후 LIVE_HANDOFF/LIVE_STATE와 증거를 대조한다. **작업을 끝낼 때마다 MASTER를 포함한 필수 인수인계 파일을 같은 push로 갱신**하고 GitHub Actions 진행표 무결성 검사를 통과해야 한다. 아래 구형 읽기 순서는 MASTER 우선 원칙에 따라 해석한다.
+
 > **유그린 한 문장 자동 복원 — 최우선 규칙:** `[유그린 해커톤 깃헙 레포지토리 확인하고 작업하셈]` → `hibi89/hibi89-ugreen-nas-hackathon`의 **`lead/ugreen` 최신 원격 HEAD** 조회 → [`LIVE_HANDOFF.md`](docs/roles/lead/LIVE_HANDOFF.md)·[`LIVE_STATE.json`](docs/roles/lead/LIVE_STATE.json) 읽기 → [`LEAD_ACTIVE_WORK.md`](docs/roles/lead/LEAD_ACTIVE_WORK.md) 및 [종료 시마다 필수 동기화](docs/roles/lead/SESSION_CLOSEOUT.md)를 준수하며 **다음 실제 작업을 곧바로 실행**. 역할·진행·일정·차단을 사용자에게 다시 묻지 않는다. `main`·옛 worker/dispatcher 문서가 충돌하면 이 최신 규칙과 원격 확인이 우선.
 
 > **새 채팅 한 문장 진입:** `[해커톤총괄 깃헙 레포지토리 확인하고 작업하셈]` → [UGREEN CHAT_BOOTSTRAP.md](CHAT_BOOTSTRAP.md) (`lead/ugreen`). 원격 최신 HEAD 및 `LEAD_ACTIVE_WORK.md`로 실 작업 복원. 별도 작업자 채팅·구형 UGR 디스패치는 실행권 없음.

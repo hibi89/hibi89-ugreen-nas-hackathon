@@ -1,3 +1,5 @@
+> **우선 규칙 / MASTER:** 작업 종료 때마다 루트 [MASTER_PROGRESS.md](../../../MASTER_PROGRESS.md)부터 당일/선행 작업에 해당하는 원래 계획일 행을 갱신한다. 모든 push에 MASTER 파일 변경이 없으면 GitHub Actions 실패한다. 코드·테스트 변경 시 원래 9개 인수인계 파일 동시 변경도 유지. `python tools/check_master_progress.py`와 회귀 테스트로 원본 날짜·시간·증거 체크. 당일 100%와 전체 진도·공식 NAS 검증 절대 혼동 금지.
+
 # UGREEN — EVERY WORK SESSION CLOSEOUT (필수, 새 채팅 자동 복원용)
 
 **사용자 확정 단일 진입 문구:** `[유그린 해커톤 깃헙 레포지토리 확인하고 작업하셈]`.

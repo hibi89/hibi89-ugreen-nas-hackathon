@@ -22,3 +22,5 @@ jobs:
         run: |
           if [ -z "$BASE_SHA" ]; then BASE_SHA="$(git rev-parse HEAD^)"; fi
           python tools/check_handoff_sync.py --base "$BASE_SHA" --head "$HEAD_SHA"
+      - name: Verify MASTER_PROGRESS against 24-day original plan and statuses
+        run: python tools/check_master_progress.py
