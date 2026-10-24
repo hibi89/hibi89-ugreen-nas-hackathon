@@ -97,11 +97,11 @@
     "corrective_commit_sha": "4b6904224df8ab9ede913ec6e79787b61d941baa",
     "passed_guard_run_id": 40067647144
   },
-  "last_ci_verified_code_sha": "5ceb12c1e228f9ee8eba211dbd3f3d990cb1e1fb",
-  "repository_regression_tests_passed": 190,
-  "repository_regression_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40076525669",
+  "last_ci_verified_code_sha": "d666fc593a680ee357c0cc84aa20a5347924300b",
+  "repository_regression_tests_passed": 200,
+  "repository_regression_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40078079863",
   "closeout_sync_ci_status": "PASS",
-  "closeout_sync_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40075411508",
+  "closeout_sync_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40078079857",
   "early_skill_candidate": {
     "id": "G6_20261024",
     "path": "skill/projectready-nas/SKILL.md",
@@ -358,7 +358,7 @@
   },
   "round1_release_gate": {
     "id": "G9-ALL-TEN-ANSWERS-AND-RELEASE-GATES",
-    "state": "SOURCE_COMMITTED_CI_PENDING",
+    "state": "SOURCE_CI_VERIFIED_DRAFT_NOT_APPROVED",
     "source": "tools/round1_release_gate.py",
     "regression_tests_added": 10,
     "pdf_validation": "ALL_10_FULL_ANSWERS",
@@ -377,6 +377,20 @@
       "UGR-D16",
       "UGR-D17"
     ],
-    "actual_hours": null
+    "actual_hours": null,
+    "verified_source_sha": "d666fc593a680ee357c0cc84aa20a5347924300b",
+    "verified_suite_tests": 200,
+    "verified_suite_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40078079863",
+    "verified_bundle_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40078079879",
+    "verified_master_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40078079878",
+    "verified_handoff_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40078079857",
+    "pdf_bytes": 4722,
+    "pdf_pages": 1,
+    "zip_bytes": 6004,
+    "zip_markdown_files": 4,
+    "substantive_words": 351,
+    "artifact_id": 12553977616,
+    "artifact_expires_utc": "2026-10-31T08:27:14Z",
+    "all_pdf_answers_verified": true
   }
 }
