@@ -26,10 +26,10 @@ class Round1PackageTests(unittest.TestCase):
     def test_actual_repository_skill_candidate(self):
         candidate = Path(__file__).resolve().parents[1] / "skill" / "projectready-nas"
         result = audit_skill(candidate)
-        self.assertEqual(result["file_count"], 3)
+        self.assertEqual(result["file_count"], 4)
         self.assertEqual(result["official_validator"], "NOT_RUN")
         with zipfile.ZipFile(BytesIO(build_candidate_zip(candidate))) as z:
-            self.assertEqual(len(z.namelist()), 3)
+            self.assertEqual(len(z.namelist()), 4)
 
     def test_accept_minimum_markdown_package(self):
         self.assertEqual(audit_skill(self.root)["file_count"], 3)

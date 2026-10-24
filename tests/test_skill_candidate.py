@@ -15,15 +15,33 @@ class SkillDraftTests(unittest.TestCase):
 
     def test_markdown_only_layout(self):
         files = sorted(p.relative_to(DIR).as_posix() for p in DIR.rglob("*") if p.is_file())
-        self.assertEqual(files, ["SKILL.md", "references/attribution.md", "references/decision-policy.md"])
+        self.assertEqual(files, ["SKILL.md", "references/attribution.md", "references/catalog-actions.md", "references/decision-policy.md"])
 
     def test_direct_reference_resolves(self):
         refs = re.findall(r"\]\((references/[^)#]+\.md)\)", SKILL.read_text(encoding="utf-8"))
-        self.assertEqual(refs, ["references/decision-policy.md", "references/attribution.md"])
+        self.assertEqual(refs, ["references/catalog-actions.md", "references/decision-policy.md", "references/attribution.md"])
         for ref in refs:
             path = (DIR / ref).resolve()
             self.assertTrue(path.is_relative_to(DIR.resolve()))
             self.assertTrue(path.is_file())
+
+    def test_first_party_catalog_is_documented_but_not_runtime_authorized(self):
+        text = SKILL.read_text(encoding="utf-8")
+        official = (DIR / "references/catalog-actions.md").read_text(encoding="utf-8")
+        for term in ("ug-filesystem", "ug-document", "file-agent", "document-agent",
+                     "NOT live Agent registration", "NOT_CHECKED"):
+            self.assertIn(term, text)
+        for term in ("knowledgeStatus", "unknown", "effect=read", "approval=none",
+                     "NOT_RUN", "sha256sum"):
+            self.assertIn(term, official)
+
+    def test_catalog_hardens_exceptions_to_read_only(self):
+        text = SKILL.read_text(encoding="utf-8")
+        official = (DIR / "references/catalog-actions.md").read_text(encoding="utf-8")
+        self.assertIn("does NOT establish pagination/completeness", text)
+        self.assertIn("selected files", text)
+        self.assertIn("Never invoke", official)
+        self.assertIn("Do not upload, transmit, copy, modify, rename, move or delete files.", text)
 
     def test_no_placeholders(self):
         for p in DIR.rglob("*.md"):

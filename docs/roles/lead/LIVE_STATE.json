@@ -25,10 +25,10 @@
     "sdk_gate_distinct": true
   },
   "next_work": {
-    "id": "G1-SDK-DETAILS",
+    "id": "G1-RUNTIME-INVOCATION",
     "scheduled_kst": "2026-10-25",
-    "status": "BLOCKED_EXACT_ACTION_PARAMETERS_AND_OFFICIAL_CHECKER",
-    "scope": "Read first-party SHA-pinned nine-action parameter matrix CI; update Skill only on verified names and read-only behavior; runtime/agent registry and official checker remain blocked",
+    "status": "BLOCKED_EXTERNAL_RUNTIME_AND_OFFICIAL_VALIDATOR",
+    "scope": "Obtain first-party installed CLI invocation and evidence of registered file-agent/document-agent with exact permission and result semantics; no actual NAS/data access or official validator execution before safety and license check",
     "planned_hours": 1.5,
     "separate_reserve_hours": 1.5,
     "actual_completion_eta_hours": null
@@ -92,11 +92,11 @@
     "corrective_commit_sha": "4b6904224df8ab9ede913ec6e79787b61d941baa",
     "passed_guard_run_id": 40067647144
   },
-  "last_ci_verified_code_sha": "17c386e78ecdf238c6af2a351909baec859f5c65",
-  "repository_regression_tests_passed": 156,
-  "repository_regression_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40071626325",
+  "last_ci_verified_code_sha": "e06f3a2b3ec4a3f6ad2300c5f7505bcb4b6e819a",
+  "repository_regression_tests_passed": 163,
+  "repository_regression_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40072315400",
   "closeout_sync_ci_status": "PASS",
-  "closeout_sync_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40071626303",
+  "closeout_sync_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40072315343",
   "early_skill_candidate": {
     "id": "G6_20261024",
     "path": "skill/projectready-nas/SKILL.md",
@@ -213,12 +213,29 @@
   "g1_parameter_matrix": {
     "id": "G1-EXACT-PARAMETER-METADATA",
     "source": "tools/sdk_parameter_matrix.py",
-    "status": "CI_PENDING",
-    "source_archive_sha256": "cf557e5a022e4297892f39768132855154232efdedeb726b2845450ccd70e1b3",
-    "offline_fixture_tests_added": 7,
-    "runtime_validated": false,
-    "official_sdk_executed": false,
-    "license_approved": false,
-    "real_nas": "NOT_RUN"
+    "status": "VERIFIED_OFFICIAL_CATALOG_STATIC_ONLY",
+    "source_commit": "e06f3a2b3ec4a3f6ad2300c5f7505bcb4b6e819a",
+    "workflow": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40072315390",
+    "archive_sha256": "cf557e5a022e4297892f39768132855154232efdedeb726b2845450ccd70e1b3",
+    "selected_read_action_count": 9,
+    "declared_effect": "read",
+    "declared_approval": "none",
+    "effective_permission_knowledge_status": "unknown",
+    "exact_parameters_verified_in_catalog": true,
+    "real_command_syntax_verified": false,
+    "live_agent_registration_verified": false,
+    "official_validator": "NOT_RUN",
+    "nas_runtime": "NOT_RUN"
+  },
+  "g1_skill_catalog_binding": {
+    "id": "G1-SKILL-CATALOG-REFERENCES",
+    "status": "CODE_PUSH_PENDING_CI",
+    "skill": "skill/projectready-nas/SKILL.md",
+    "direct_reference": "skill/projectready-nas/references/catalog-actions.md",
+    "catalog_reference_status": "SOURCE_MATCH_VERIFIED",
+    "round1_expected_markdown_files": 4,
+    "added_skill_tests": 2,
+    "report": "docs/architecture/G1_PUBLIC_CATALOG_BINDING_20261024.md",
+    "official_checker": "NOT_RUN"
   }
 }
