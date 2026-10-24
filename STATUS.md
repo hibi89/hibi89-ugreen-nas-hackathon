@@ -1,3 +1,5 @@
+> **[G22 2026-10-24 — 공식 Creator 단일 Skill ZIP/영문 PDF 분리 초안 빌더 구현, CI 검증 대기](docs/submission/G22_OFFICIAL_CREATOR_ONE_FILE_PREVIEW_20261024.md)**: 참가자 Codex 리뷰 브랜치 `review/ugreen-official-creator@7af2cb750`/실물 SKILL.md SHA `164e84fe...`와 checker JSON SHA 확인 후, 구형 참고문서 없이 한 파일만 스테이징하고 AI 도구/제3자 권리/UGOS 데이터 흐름 고지 추가. 새로운 바이트는 공식 Uliya checker를 재실행하지 않았으므로 **static-pass 적용 대상 아님**. 기존 제안서 Q8은 독립 PDF 초안에서만 정정하고 원본 Skill·기존 PDF/ZIP·Devpost 접수 불변. 새 CI 상태는 실제 검증 전까지 PENDING. 라이선스·참가자 승인·NAS 검증 미완료.
+
 ## G15 — official UGREEN tool owner-side setup prepared (CI PENDING)
 - Added safe SHA-pinned vendor-kit ZIP preparation and opt-in copy to local Codex skills. No actual official tool generation, checker, NAS, license clearance, owner approval or Devpost submission. See docs/architecture/G15_OWNER_CODEX_OFFICIAL_TOOL_PREP_20261024.md.
 - Master DONE2/PARTIAL12/BLOCKED3/NOT_STARTED7; Oct24 fixed scope 100% with 0h scheduled remaining (actual labor unmeasured); Oct25 G1 1.5h+1.5h reserve and ETA unknown. No cost.

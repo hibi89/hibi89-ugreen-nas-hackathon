@@ -1,0 +1,72 @@
+name: UGREEN Creator one-file Round 1 PREVIEW (not submitted)
+on:
+  push:
+    branches: ["lead/ugreen"]
+    paths:
+      - "tools/round1_official_creator_preview.py"
+      - "tools/render_round1_proposal_pdf.py"
+      - "tests/test_round1_official_creator_preview.py"
+      - ".github/workflows/round1-official-creator-preview.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  isolated-creator-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Check out UGREEN lead for builder and original proposal
+        uses: actions/checkout@v4
+        with:
+          path: lead
+          persist-credentials: false
+      - name: Check out exact participant-reviewed official Creator output
+        uses: actions/checkout@v4
+        with:
+          ref: 7af2cb750b37826fb02a00e2d45cb73f3a85c239
+          path: creator-review
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install PDF build+inspection tools only (not bundled in Skill ZIP)
+        run: python -m pip install "reportlab>=4,<5" "pypdf>=6,<7"
+      - name: Unit tests of isolated, hash-pinned Creator bundle
+        working-directory: lead
+        run: python -m unittest discover -s tests -p test_round1_official_creator_preview.py -v
+      - name: Stage only Creator-reviewed SKILL.md and add publication-pending disclosures
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/ugreen-official-creator-preview"
+          python lead/tools/round1_official_creator_preview.py \
+            --review-skill "creator-review/skill/projectready-nas/SKILL.md" \
+            --review-checker "creator-review/docs/submission/G20_P1_OFFICIAL_CHECK_RESULT.json" \
+            --output-dir "$RUNNER_TEMP/ugreen-official-creator-preview"
+      - name: Verify manifest and ZIP contain exactly the augmented Skill
+        shell: bash
+        run: |
+          python - "$RUNNER_TEMP/ugreen-official-creator-preview" <<'PY'
+          import hashlib,json,pathlib,sys,zipfile
+          d=pathlib.Path(sys.argv[1])
+          m=json.loads((d/"ProjectReady_Creator_Preview_Manifest.json").read_text())
+          z=(d/"ProjectReady_Creator_Skill_DRAFT.zip").read_bytes()
+          p=(d/"ProjectReady_Creator_Proposal_DRAFT.pdf").read_bytes()
+          assert m["skill_zip_sha256"] == hashlib.sha256(z).hexdigest()
+          assert m["pdf"]["sha256"] == hashlib.sha256(p).hexdigest()
+          assert m["proposal_substantive_words"] <= 500
+          assert m["devpost"] == "NOT_SUBMITTED"
+          assert m["staged_skill_official_checker"] == "NOT_RERUN_AFTER_DISCLOSURE_AUGMENTATION"
+          with zipfile.ZipFile(d/"ProjectReady_Creator_Skill_DRAFT.zip") as f:
+            assert f.namelist() == ["projectready-nas/SKILL.md"]
+            raw=f.read(f.namelist()[0])
+            assert hashlib.sha256(raw).hexdigest()==m["staged_skill_with_disclosure_sha256"]
+            assert b"AI development tools:" in raw and b"Third-party platform and licenses:" in raw
+          print("CREATOR PREVIEW ZIP+PDF HASH/CONTENT PASS — NOT APPROVED, NOT SUBMITTED")
+          PY
+      - name: Upload draft-only ZIP, PDF, hashes and disclosures
+        uses: actions/upload-artifact@v4
+        with:
+          name: UGREEN-CREATOR-ONE-FILE-PREVIEW-NOT-SUBMITTED
+          path: ${{ runner.temp }}/ugreen-official-creator-preview/*
+          retention-days: 7
+          if-no-files-found: error

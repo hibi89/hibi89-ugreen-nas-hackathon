@@ -393,6 +393,19 @@
       "entrant_submission_approval": "PENDING",
       "nas_runtime": "NOT_RUN",
       "actual_work_hours": null
+    },
+    {
+      "scope_id": "G22_OFFICIAL_CREATOR_ONE_FILE_PREVIEW_BUILDER",
+      "status": "CODE_WRITTEN_CI_PENDING",
+      "report": "docs/submission/G22_OFFICIAL_CREATOR_ONE_FILE_PREVIEW_20261024.md",
+      "old_skill_original": "UNCHANGED",
+      "source_sha": "7af2cb750b37826fb02a00e2d45cb73f3a85c239",
+      "generated_skill_content_change": "DISCLOSURES_STAGING_ONLY_OFFICIAL_CHECKER_NOT_RERUN",
+      "official_pdf": "Q8_EPHEMERAL_CORRECTION",
+      "devpost": "NOT_SUBMITTED",
+      "rights": "NOT_CLEARED",
+      "real_nas": "NOT_RUN",
+      "actual_hours": null
     }
   ],
   "overall_project_completion_percent": null,

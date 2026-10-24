@@ -8,9 +8,9 @@ from __future__ import annotations
 import argparse,json
 from pathlib import Path
 from xml.sax.saxutils import escape
-from check_round1_proposal import JSON_PATH,MD_PATH,errors
+from check_round1_proposal import JSON_PATH,MD_PATH,errors,render_markdown
 
-def render(out:Path)->None:
+def render(out:Path, proposal:dict|None=None)->None:
     try:
         from reportlab.platypus import SimpleDocTemplate,Paragraph,Spacer,KeepTogether
         from reportlab.lib import colors
@@ -18,8 +18,9 @@ def render(out:Path)->None:
         from reportlab.lib.pagesizes import A4
     except ImportError as exc:
         raise RuntimeError("Optional local PDF generation requires ReportLab; not bundled with Skill ZIP") from exc
-    d=json.loads(JSON_PATH.read_text(encoding="utf8"))
-    faults=errors(d,MD_PATH.read_text(encoding="utf8"))
+    d=proposal if proposal is not None else json.loads(JSON_PATH.read_text(encoding="utf8"))
+    source_md=render_markdown(d) if proposal is not None else MD_PATH.read_text(encoding="utf8")
+    faults=errors(d,source_md)
     if faults:raise ValueError("; ".join(faults))
     styles={
       "title":ParagraphStyle("title",fontName="Helvetica-Bold",fontSize=19,leading=23,textColor=colors.HexColor("#123049"),spaceAfter=6),

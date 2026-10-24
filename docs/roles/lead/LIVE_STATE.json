@@ -419,7 +419,7 @@
     "words": 351,
     "round1_submission_gate": "NOT_APPROVED_FOR_SUBMISSION"
   },
-  "next_action_priority": "G21_PREPARE_COHERENT_ONE_FILE_RELEASE_PACKAGE_BUILDER_AND_RECONCILE_PROPOSAL_Q8_WITH_OWNER_SOURCE_APPROVAL; NEVER_AUTO_MERGE_REVIEW_BRANCH_OR_DEVPOST_SUBMIT",
+  "next_action_priority": "G22_CHECK_NEW_GITHUB_CI_ACTUAL_PDF_AND_ZIP_MANIFEST; FIX_IF_FAILED; KEEP_STATIC_CHECK_UNRERUN_ON_ADDED_DISCLOSURE; THEN_REQUEST_USER_REVIEW_AND_EXACT_CHECKER_RE-RUN_IF_DESIRED; NO_DEVPOST_OR_SKILLHUB",
   "g11_round1_disclosure_parity": {
     "date_kst": "2026-10-24",
     "status": "OFFLINE_VERIFIED_ONE_PAGE_VISUAL_PASS",
@@ -672,5 +672,28 @@
     "legal_rights": "PENDING",
     "publication": "NOT_SUBMITTED",
     "report": "docs/submission/G21_P1_REMOTE_BRANCH_INDEPENDENT_AUDIT_20261024.md"
+  },
+  "g22_creator_single_file_preview": {
+    "date_kst": "2026-10-24",
+    "state": "SOURCE_BUILDER_COMMITTED_PENDING_ACTUAL_CI",
+    "official_rules": "https://ugreenhackathon.devpost.com/rules",
+    "source_branch": "review/ugreen-official-creator",
+    "source_sha": "7af2cb750b37826fb02a00e2d45cb73f3a85c239",
+    "source_skill_sha256": "164e84fe2fd8bc14e421b5469cc862aa4971f71c9b46aea08cc2f281c7229ead",
+    "source_checker_json_sha256": "92a6891b0889a89cd09f16ed960e9f72a4df33f8114ce0ee22b9beefeff50140",
+    "source_checker_report": "CODEX_REPORTED_STATIC_PASS_MATCHED_ACTUAL_SKILL_BYTES",
+    "staging": "CLEAN_ONE_SKILL_MD_AND_APPEND_EXPLICIT_AI_THIRD_PARTY_IP_DATA_FLOW_DISCLOSURES",
+    "candidate_official_checker": "NOT_RERUN_ON_AUGMENTED_SKILL",
+    "original_canonical_skill": "UNCHANGED",
+    "original_canonical_proposal": "UNCHANGED",
+    "proposal_q8": "CORRECTED_IN_TEMPORARY_PREVIEW_ONLY",
+    "pdf_and_zip": "CI_PENDING",
+    "license": "PENDING_ENTRANT_REVIEW",
+    "approval": "NOT_GIVEN",
+    "devpost": "NOT_SUBMITTED",
+    "nas": "NOT_RUN",
+    "source_code": "tools/round1_official_creator_preview.py",
+    "workflow": ".github/workflows/round1-official-creator-preview.yml",
+    "report": "docs/submission/G22_OFFICIAL_CREATOR_ONE_FILE_PREVIEW_20261024.md"
   }
 }
