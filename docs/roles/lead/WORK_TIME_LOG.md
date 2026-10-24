@@ -8,3 +8,5 @@
 **작성 규칙:** 완료를 발표하기 전에 실제 시간을 기입한다. 사용자 호출 없이 시간이 흐른 것만으로 실측 추가 금지. 막힘 60~90분 또는 계획 1.5배 초과 시 `LEAD_ACTIVE_WORK.md`와 [일정표](../../UGREEN_DAILY_EFFORT_PLAN_20261024.md)를 재산정하고 상위 보고에 위험 전달.
 
 | 2026-10-24 | G1-Day1 선행: 공식 CDN 경로 및 Uliya 가이드 조사 + 독립 오프라인 평가기 | 1.5 (원래 10/25 예정) | 1.5 | **미측정** | PARTIAL/BLOCKED (SDK ZIP 내부 미확보), 합성 16 PASS | `docs/roles/lead/G1_DAY1_EVIDENCE_20261024.md`; GitHub Actions 결과는 별도 검증; 다음: ZIP 비공개 확인/공식 지원 |
+
+**G1-Day1 remote test verification:** [GitHub Actions run 40063814809](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40063814809) — 16/16 PASS, actual time **미측정**; CI elapsed runtime 0.002s is **NOT developer work-time evidence**. Remaining SDK G1 gate blocked.

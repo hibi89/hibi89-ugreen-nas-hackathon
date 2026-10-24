@@ -21,3 +21,10 @@ Date: **2026-10-24 KST** (advanced execution of scheduled 10/25 work), owner UGR
 **Next single task:** On an authorized participant computer, privately download official ZIP from the Starter Kit §3 and inspect its `SKILL.md`, references, CLI/agent definitions, checker instructions, license and SHA256. Preserve binary privately; never publish potentially proprietary package to Public GitHub. If an authorized GitHub-connected environment cannot obtain it, request **official UGREEN support/community** for textual documentation of exact registered agent IDs, read/list CLI schemas and validator. No repeated sandbox DNS retry. Only then integrate an official adapter and approve G2 contract.
 
 Source status: documentation PASS, local synthetic unit tests PASS (independent), network/download FAILED due tool environment, SDK/CLI/NAS validation NOT RUN. Planned day 10/25 effort **1.5h+1.5h** is a future budget, not verified actual elapsed time today. **Observed wall-clock duration not instrumented**; do not falsely convert prompt interactions to paid labor hours.
+
+
+## GitHub remote CI evidence (independently checked AFTER commit)
+- Source remote HEAD checked: `lead/ugreen@b97b23a302e6d7edc5c6013557e93c0b749ce8d0`.
+- GitHub Actions workflow **Offline readiness contract**, push run **#40063814809**: **completed / success**. CI job ID `120782734697`, step `Execute synthetic offline tests only` **success**. Decoded job logs explicitly end `Ran 16 tests in 0.002s / OK`.
+- Permalink: https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40063814809
+- This verifies the **remote checked-in source**, superseding the earlier local-only 16 PASS evidence. STILL not official UGREEN Tool validator, actual registered Expert Agent, SDK ZIP, or NAS real-user test.

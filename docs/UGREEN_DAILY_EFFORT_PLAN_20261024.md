@@ -73,3 +73,8 @@
 - UGREEN 이전 일정(변경 이력): [UGREEN_EXECUTION_PLAN_20261024.md](UGREEN_EXECUTION_PLAN_20261024.md)
 - 대회 간 공식 마감 스냅샷: [COMPETITION_SCHEDULE.md](COMPETITION_SCHEDULE.md)
 - 미해결 SDK 근거: `feature/missing-files:docs/roles/missing-files/SDK_CAPABILITY_MATRIX.md` 및 `TO_UGREEN_LEAD.md`.
+
+
+## 2026-10-24 accelerated Day1 checkpoint (no time invented)
+- 10/25 original G1 official document recovery was started early on 10/24. [G1 evidence](roles/lead/G1_DAY1_EVIDENCE_20261024.md), offline engine 16/16 independent [remote CI success](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40063814809). Actual elapsed person/work duration **unmeasured**.
+- **10/25 remaining planned work**: participant-authorized official ZIP private extraction of Agent/CLI/validator/capability examples, otherwise official help channel. **1.5 planned+1.5 reserve=3h cap**, not promised completion. SDK gate G1 not cleared; G2 cannot truthfully be marked complete from synthetic tests alone.
