@@ -419,7 +419,7 @@
     "words": 351,
     "round1_submission_gate": "NOT_APPROVED_FOR_SUBMISSION"
   },
-  "next_action_priority": "G11_REGENERATED_PDF_VISUAL_AND_SOURCE_DISCLOSURE_PARITY; OFFICIAL_CREATOR_PROVENANCE_AND_ENTRANT_APPROVAL",
+  "next_action_priority": "G12_OWNER_LOCAL_CODEX_OFFICIAL_CREATOR_GENERATION_PLUS_REVIEW; NO_RELEASE_BEFORE_IP_APPROVAL",
   "g11_round1_disclosure_parity": {
     "date_kst": "2026-10-24",
     "status": "OFFLINE_VERIFIED_ONE_PAGE_VISUAL_PASS",
@@ -467,5 +467,26 @@
     "all_four_disclosures_pdf_exact": true,
     "final_manifest_sha_check": "PASS",
     "final_visual_review": "PASS_SINGLE_PAGE_NO_OVERLAP_OR_CLIPPING"
+  },
+  "g12_creation_and_rights": {
+    "date_kst": "2026-10-24",
+    "status": "HANDOFF_PREPARED_OWNER_SUPPORTED_CODEX_ACTION_REQUIRED",
+    "official_rules_checked": "https://ugreenhackathon.devpost.com/rules",
+    "official_starter_kit": "https://ai.ugreen.com/pages/hackathon-starter-kit",
+    "official_codex_supported_by_vendor": true,
+    "official_creator_usage": "NOT_EVIDENCED",
+    "official_creation_tool_checker": "NOT_RUN",
+    "actual_nas_runtime": "NOT_RUN",
+    "entrant_originality_and_ip": "PENDING_ENTRANT",
+    "license_and_third_party_rights": "NOT_CLEARED",
+    "human_entry_consent": "PENDING",
+    "external_dataflow_truthfulness": "PENDING_REVIEW",
+    "actual_devpost_submission": "NOT_SUBMITTED",
+    "report": "docs/submission/G12_RIGHTS_AND_SUBMISSION_REVIEW.md",
+    "first_use_runbook": "docs/submission/G12_OFFICIAL_CREATOR_CODEX_RUNBOOK.md",
+    "incremental_spend_krw": 0,
+    "actual_hours": null,
+    "sdk_archive_sha256_prior_public": "cf557e5a022e4297892f39768132855154232efdedeb726b2845450ccd70e1b3",
+    "new_code_or_offline_tests": 0
   }
 }

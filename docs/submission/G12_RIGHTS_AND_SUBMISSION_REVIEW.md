@@ -1,0 +1,31 @@
+# G12 — Round 1 rights, AI assistance, source and submission approval ledger
+
+As of 2026-10-24 KST: **NOT CLEARED / NOT APPROVED FOR SUBMISSION**.
+Primary sources: [Devpost Rules](https://ugreenhackathon.devpost.com/rules), especially Project Requirements, Third Party Integrations and Intellectual Property; [Starter Kit](https://ai.ugreen.com/pages/hackathon-starter-kit) sections 1-7.
+This ledger is evidence bookkeeping, not legal advice and not an automated eligibility determination.
+
+| Subject | Facts supported by source or current repo | Open fact / required owner act | Current gate |
+| --- | --- | --- | --- |
+| Entrant ownership/originality | `projectready-nas` Skill is drafted as entrant-controlled new work; no vendor SDK/executables included in ZIP | Human entrant must confirm original new core work created during hackathon, solo/team eligibility, ownership and any external contributions; sponsor decides eligibility | PENDING_ENTRANT |
+| Official UGOS creator | Public vendor `uliya-skill-kit` catalog referenced, but static catalog read != official tool generation; documented tool supports Codex | Run official Creator in supported Codex/Claude/WorkBuddy with verified source and preserve safe generation proof | NOT_EVIDENCED |
+| UGREEN official platform docs | Public links and action names, not vendor text/code imported into ZIP | Review official tool usage terms and license; do not assert kit redistribution rights or live compatibility | REFERENCE_ONLY_LICENSE_UNVERIFIED |
+| ChatGPT assistance | `docs/submission/round1_proposal.json` and `references/attribution.md` disclose OpenAI ChatGPT design/drafting/offline-test assistance | Human entrant reviews and accepts accurate disclosures, edits and owns final submission; avoid unsupported assertion of sponsor approval of AI assistance | DISCLOSED_REVIEW_PENDING |
+| Other third-party software/data | No external executables, logos, model weights, screenshots, private customer data, or third-party SDK sources are in 4-file candidate ZIP; offline development uses Python/ReportLab/pypdf outside ZIP | Entrant checks all third-party components, source/license applicability and any usage restrictions; disclose if future materials added | INVENTORY_REVIEW_PENDING |
+| External services/privacy | Proposed read-only owner-authorized paths, no external endpoint intentionally configured; local/cloud Uliya routing not verified | Disclose as unknown; never say local-only/private-certified; verify installed dataflow and actual user consent before live calls | DECLARED_UNVERIFIED |
+| Round 1 artifacts | SHA-checked [draft CI 40080489067](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40080489067): PDF 1 page, 5038 bytes / 351 words; Skill ZIP 4 Markdown, 6562 bytes | Rebuild after any creator-driven change; participant visually checks final PDF/ZIP and Devpost fields | TECH_PREVIEW_ONLY |
+| Entrant release | No confirmed human acceptance or Devpost receipt | Exact-file participant review and explicit submission approval; independently verify Devpost receipt | NOT_APPROVED_NOT_SUBMITTED |
+
+### Critical rights clause
+Rules say entrant owns and authors the entry; properly licensed third-party components and technical assistance are allowed. They also say **a person outside the entrant team must not develop the Project or create submission materials**. The current workflow uses an AI assistant, not an added human team member. This does **not** itself prove eligibility or replace the human entrant's responsibility; keep AI assistance disclosed and do not present the assistant as a registered participant or authorized outside human contributor.
+
+### Scope boundaries
+No NAS access, installed Expert Agent, live privacy inspection or official checker run has been performed. Official checker use is recommended in the Starter Kit; real NAS runtime is finalist-only and not a Round 1 prerequisite. Official Creator tool **creation** is a distinct Round 1 required action. The released candidate remains a draft until all external gates are actually cleared.
+
+### Owner signoff (only record actual evidence)
+- [ ] Official creator installed/discovered and actually generated a new Skill, with evidence
+- [ ] Third-party rights/license and original-work claim reviewed and accepted
+- [ ] AI assistance and local/cloud unknowns honestly disclosed in exact PDF
+- [ ] Generated Markdown reviewed and integrated by entrant, no private data/scripts
+- [ ] Exact regenerated PDF/ZIP visual and SHA integrity reviewed by entrant
+- [ ] Authorized entrant explicitly approves Devpost submission
+- [ ] Devpost submission actually completed, receipt stored (not the same as GitHub Actions PASS)
