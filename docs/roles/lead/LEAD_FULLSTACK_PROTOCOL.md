@@ -17,3 +17,7 @@ A chosen: direct lead development/verification on one `lead/ugreen` workline. B 
 
 ## Resume and release evidence (binding)
 - At every major milestone update `LEAD_ACTIVE_WORK.md` (single next action, date, blockers), `STATUS.md`, `HANDOFF.md`, `TO_HACKATHON_LEAD.md` together. Source and testing evidence first, then git commit and remote SHA verification; do not recursively embed the same pending commit SHA into itself. When code actually changes, test/review code + CI/Production scope separately. New chats start with [START_HERE](../../../START_HERE.md) even when user supplied only the short Korean phrase. No background work or automatic sync without user invocation.
+
+## One-line new-chat restore and always-current handoff
+- `[해커톤총괄 깃헙 레포지토리 확인하고 작업하셈]` → `lead/ugreen/CHAT_BOOTSTRAP.md` → current remote HEAD + `LEAD_ACTIVE_WORK.md` → next authorized investigation/code/testing. Do not launch archived dispatcher/worker.
+- Major change/chat move requires STATUS/HANDOFF/TO_HACKATHON_LEAD and active-work synced with real evidence, commit/remote SHA checked; update stable bootstrap only if routes/roles change. No background sync or untested NAS completion claims.

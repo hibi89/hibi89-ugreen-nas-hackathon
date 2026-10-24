@@ -48,3 +48,8 @@
 - 새 채팅에 `[유그 해커톤 깃헙 레포지토리 확인하고 작업하셈]` 입력 시 **[START_HERE.md](START_HERE.md)**부터 GitHub 최신 `lead/ugreen`을 확인하고 총괄이 개발/테스트/검수를 직접 이어간다. 과거 별도 작업자 지시서·브랜치는 보존된 이력이며 활성 실행 권한이 아니다.
 - 2026-10-24 확인: 단일 ProjectReady NAS Skill, G1 공식 SDK 패키지 내부 확인 미완료, 이전 UGR-001 공개 기능 매트릭스만 작성(BLOCKED). `lead/ugreen` 최신 활성 작업은 `docs/roles/lead/LEAD_ACTIVE_WORK.md`. 내부 11/10·공식 11/16 16:45 KST, 신규 지출 0원.
 - 이 문서의 이전 초기·잠정 기록은 이력. 중요 작업 뒤 상태·인수인계·상위 총괄 보고·활성 작업을 함께 최신화하고 원격 SHA 확인. 문서만 바꾼 것을 Skill 실행 성공으로 간주하지 않는다.
+
+## 2026-10-24 KST — 고정 한 문장 재개와 인수인계 최신화 정책
+- `[해커톤총괄 깃헙 레포지토리 확인하고 작업하셈]`로 UGREEN 총괄 새 채팅을 시작할 때 `lead/ugreen/CHAT_BOOTSTRAP.md` → 최신 HEAD/실제 `LEAD_ACTIVE_WORK.md`·소스·CLI 증거 → 총괄이 현재 승인된 다음 실작업 직접 수행.
+- 주요 조사·개발·테스트·검수·차단 해소·제출, 새 채팅 이관 직전에는 `LEAD_ACTIVE_WORK.md`·`STATUS/HANDOFF`·`TO_HACKATHON_LEAD.md`와 실제 증거를 최신화해 원격 커밋 SHA 확인. 이 진입문서는 경로/역할/규칙 변경시에만 수정.
+- 공식 Kit/CLI 다운로드 차단과 SDK/NAS 실검증 미해결. 본 변경은 채팅 인수인계 경로 공시일 뿐 공식 SDK/제품 실행/제출 완료가 아님. 자동 백그라운드 갱신은 없다.

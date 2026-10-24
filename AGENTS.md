@@ -1,3 +1,5 @@
+> **새 채팅 한 문장 진입:** `[해커톤총괄 깃헙 레포지토리 확인하고 작업하셈]` → [UGREEN CHAT_BOOTSTRAP.md](CHAT_BOOTSTRAP.md) (`lead/ugreen`). 원격 최신 HEAD 및 `LEAD_ACTIVE_WORK.md`로 실 작업 복원. 별도 작업자 채팅·구형 UGR 디스패치는 실행권 없음.
+
 > **2026-10-24 KST · 현재 최우선 공시 / 한 문장 복원:** 사용자 명령 **`[유그 해커톤 깃헙 레포지토리 확인하고 작업하셈]`** → [START_HERE.md](START_HERE.md) 읽기 → 최신 `lead/ugreen` HEAD 및 [LEAD_ACTIVE_WORK](docs/roles/lead/LEAD_ACTIVE_WORK.md) 확인 → **총괄이 직접 작업**. 별도 작업자/구형 디스패치는 폐기. 본 문서 하단의 구형 설명은 이력이다.
 
 > **현행 운영 방식(2026-10-24 KST): UGREEN 총괄이 직접 개발·테스트·검수까지 맡는다.** 별도 UGREEN 작업자 채팅/UGR READY 디스패치 **종료**. [LEAD_ACTIVE_WORK](docs/roles/lead/LEAD_ACTIVE_WORK.md) / [LEAD_FULLSTACK_PROTOCOL](docs/roles/lead/LEAD_FULLSTACK_PROTOCOL.md)에서 매번 다음 실작업을 확인. `lead/ugreen`에서 직접 작업, 기존 세 feature 브랜치는 원본·이력으로 보존. 아래 과거 채팅 분담 규칙은 폐기된 이력이다.
