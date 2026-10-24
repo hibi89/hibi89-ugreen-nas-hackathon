@@ -1,0 +1,22 @@
+{
+  "checkFormatVersion": "2.0.0",
+  "status": "static-pass",
+  "target": {
+    "skillName": "projectready-nas"
+  },
+  "catalog": {
+    "checkedVersion": "2.0.0"
+  },
+  "files": [
+    {
+      "path": "SKILL.md",
+      "sha256": "164e84fe2fd8bc14e421b5469cc862aa4971f71c9b46aea08cc2f281c7229ead"
+    }
+  ],
+  "summary": {
+    "errors": 0,
+    "warnings": 0,
+    "info": 0
+  },
+  "diagnostics": []
+}

@@ -1,38 +1,81 @@
 ---
 name: projectready-nas
-description: Read-only evidence review of required delivery documents in a user-authorized NAS project folder.
+description: Read-only evidence review of owner-authorized project delivery folders; use when an owner needs required-file readiness and version uncertainty checks.
 ---
 
-# ProjectReady NAS
+# Goal
 
-## When to use
-Use when the owner asks whether a specific project-delivery folder contains an explicit checklist of required files, with version and permission uncertainties identified. This is a read-only review, not a privacy certification or NAS security scan.
+ProjectReady NAS compares one owner-authorized delivery folder with an owner-provided mandatory-file checklist. It reports per-item `PRESENT`, `MISSING`, `NOT_CHECKED`, or `VERSION_REVIEW`, and an overall `READY`, `BLOCKED`, or `NEEDS_REVIEW` only when the evidence supports that result. It does not modify files or certify NAS privacy or security.
 
-## Scope and permission
-1. Obtain the owner's exact folder and mandatory file checklist. Never invent required paths or infer access consent.
-2. Limit all requests to that folder. Do not enumerate other folders or follow links outside scope. Before invoking any listing or document tool, reject an owner folder or checklist entry that targets `.env`, `.git`, `config.json`, private key/certificate/SSH credential files, browser sessions, authentication tokens or similar secrets. UGREEN publishing policy prohibits searching for or transmitting these sensitive materials even when a checklist includes them. Do NOT probe a restricted path to verify that it exists; redact restricted details in output and mark that required check NOT_CHECKED (restricted), requesting a nonsensitive replacement checklist. If incidental restricted file names appear in an otherwise authorized listing, do not read, expand, quote or report their names. Never count an excluded path as a verified absence.
-3. The official public Uliya v0.7.3 capability catalog lists `file-agent` with `ug-filesystem` and `document-agent` with `ug-document` actions. Consult the [pinned catalog read-only action matrix](references/catalog-actions.md). This establishes only catalog declarations, NOT live Agent registration, actual command invocation or privileges. Before any call, verify the installed official runtime, permission and exact invocation instructions; permission knowledgeStatus is unknown. Do not invent Agent IDs, unsupported flags, command syntax or output fields. If unsupported, unavailable or unauthorized, report NOT_CHECKED and stop.
+# Required input
 
-## Audit flow
-1. Subject to actual installed Agent and owner-folder authorization, use the documented `ug-filesystem` read-action candidates `ls` (required `path`, optional `recursive`, `max-depth`, `limit`) and/or `find` (required `path`, optional `pattern`, `max-depth`, `limit`). Treat parameter names as catalog keys, NOT confirmed shell flags. Record actual returned paths and attributable references. A `limit` parameter does NOT establish pagination/completeness; partial, truncated or denied results cannot establish absence.
-2. Compare every mandatory path exactly against returned files. An observed file with a source reference is PRESENT. Only a demonstrably complete authorized listing can establish MISSING; otherwise use NOT_CHECKED.
-3. Identify candidate version conflicts when multiple similarly named files appear. Mark VERSION_REVIEW. Never select an approved final version solely from filename suffixes, date or size. Ask the owner for authoritative selection or verifiable content evidence.
-4. After a separately authorized document-content review, and ONLY if the actual supported runtime provides it, use `ug-document qa` or `extract` with required `query` and the exact owner-selected `file` references (catalog: `file` repeatable, but not mandatory); `reconcile` may compare authorized selected files. `ug-document metadata` must likewise be restricted to explicitly selected files even though its catalog `file` parameter is optional. `ug-filesystem cat` reads contents; use only after separate approval. Without validated installed capability, known safe data flow and explicit scope, mark CONTENT_NOT_CHECKED. Do not upload, transmit, copy, modify, rename, move or delete files.
-5. The official catalog calls these selected actions `effect=read`, `approval=none`, but their permissions knowledgeStatus is `unknown`; neither catalog label grants user consent, validates NAS rights, nor confirms local-only AI processing. Unless supported authorized checks produce evidence, mark access security and exposure of personal/sensitive content NOT_CHECKED. File names alone cannot prove confidentiality or permission safety.
-6. Orchestrate only actual registered-agent results: folder approval → Files Agent listing with completeness and attributable file evidence → conditional Documents Agent reading on separately approved files → deterministic missing/version/privacy uncertainty report. Any unavailable intermediate response is NOT_CHECKED; no fabricated fallback. Apply the [decision policy](references/decision-policy.md) using actual prior results only; never silently substitute similarly named content.
-7. Read [disclosures and data-flow boundaries](references/attribution.md), including AI tools, external components, unresolved Uliya model processing and missing official SDK license/validator evidence. Do not describe this provisional skill as NAS-certified.
+- One exact delivery folder chosen by the owner.
+- The exact required relative file paths and any owner-defined candidate patterns.
+- Explicit permission to use Uliya read-only expert agents for this folder.
+- Separate explicit approval before reviewing the contents of any document, with the exact file references selected.
 
-## Response
-Report the authorized nonsensitive folder, each **permitted** required path, PRESENT/MISSING/NOT_CHECKED status and its actual observed source reference, version concerns, listing completeness, permission and privacy gaps, final READY/BLOCKED/NEEDS_REVIEW status, and the precise human review needed. For a restricted checklist item or incidentally listed sensitive path, display only `[restricted item]` plus NOT_CHECKED; never echo its original name in the report, logs, citations or human follow-up prompt. If no result appears, state the authorized nonsensitive scope and whether the scan was complete, then stop.
+The public catalog does not establish whether Uliya processes data locally or remotely. Before any delegation, explain that this is unknown and ask whether the owner still authorizes the requested scoped review. If the owner requires verified local-only processing, stop without delegating. Do not access any NAS data without this authorization.
 
-## Illustrative result (synthetic scenario, NOT an actual NAS scan)
-- Authorized sample folder: `/demo-handoff`; required: `brief.pdf`, `handoff.pdf`, one owner-confirmed final artwork.
-- `brief.pdf`: **PRESENT** — only because the *hypothetical* Files Agent returned `synthetic:item-1` inside the authorized folder.
-- `handoff.pdf`: **NOT_CHECKED**, not MISSING — the *hypothetical* folder listing was truncated, so absence cannot be proved.
-- Artwork: **VERSION_REVIEW** — two *hypothetical* candidates `art-v2.png` and `art-final.png`; no trustworthy final-version approval exists.
-- Completeness: **NOT_VERIFIED**; file permissions/content privacy: **NOT_CHECKED**.
-- **Overall: NEEDS_REVIEW** (not READY). Next owner steps: approve the authoritative artwork version, grant an authorized complete rescan for `handoff.pdf`, and separately review any required privacy/permissions evidence. Never infer confirmation from names.
-- This sample is invented for explanation; `synthetic:*` is **not a real file-agent reference or command syntax**. On a real run, only actually observed and authorized references may appear in output.
+Before delegation, screen the folder and checklist for restricted targets such as `.env`, `.git`, `config.json`, private keys, certificates, SSH credentials, browser sessions, or authentication tokens. Do not probe restricted targets. Mark them `NOT_CHECKED (restricted)` and display only `[restricted item]`; do not include their names in a delegation or report. If a restricted name appears incidentally in a listing, do not read or repeat it. Never count an excluded item as absent.
 
-## Safety
-No mutation or external sharing is authorized by this Skill. Ask the user for explicit consent before any high-risk action, even if a tool offers it. Do not declare READY with unresolved mandatory checks, guessed versions, unverifiable tool output, or privacy marked NOT_CHECKED.
+# Generation-time capability evidence
+
+The local official Uliya Skill Kit v0.7.3-en catalog declares these unique CLI-to-expert mappings. This is catalog-level support evidence only; it does not prove live registration, effective permissions, completeness reporting, or data-processing location.
+
+- `ug-filesystem` → `file-agent`
+- `ug-document` → `document-agent`
+
+The catalog declares `ug-filesystem ls`, `find`, `stat`, and `sha256sum` as `effect=read` with `approval=none`. `ls` and `find` require `path`; the optional `limit` value does not prove complete or paginated results. The catalog declares `ug-document metadata`, `qa`, `extract`, and `reconcile` as read actions with `approval=none`. For all selected actions, `permissions.knowledgeStatus` is `unknown`. Do not claim a permission, complete scan, or supported return field unless the actual expert result establishes it.
+
+# Orchestration
+
+The parent Skill only delegates NAS work to the catalog-mapped experts. Do not directly call `cli.invoke` from the parent Skill. The second delegation must use only the real references and business results returned by the first delegation; it must not independently discover or invent inputs.
+
+## Required delegation payload construction
+
+Before a real delegation, build the complete instruction from validated, owner-approved values. Do not rely on the expert seeing the parent conversation. Never send phrases such as “supplied in this request,” “returned by the previous step,” “the files above,” or unresolved placeholders in place of actual values.
+
+- For `file-agent`, include the exact approved folder path, every exact mandatory relative path, every owner-defined candidate version pattern and its intended requirement, and the read-only limits. Confirm every path and pattern remains within the approved folder. If a value or the required authorization is missing, do not delegate; ask only for the missing owner input and classify the check as `NOT_CHECKED` until supplied.
+- For `document-agent`, include the exact in-scope file references actually returned by `file-agent`, the exact version-candidate references to compare, the explicit owner approval covering each reference, and the owner question verbatim. Include only nonsensitive values. If the question or any reference includes restricted material, redact it and request a safe replacement instead of forwarding it.
+- Keep each child instruction self-contained: scope, exact inputs, permitted action, prohibited actions, output evidence, completeness and error reporting, and stop conditions must all be present in that instruction. If the supported action cannot accept the approved references or question, stop rather than widening scope or changing the question.
+
+The following one-line delegates are fully populated **synthetic examples only**. Never use their sample paths as real authorization. For every real call, construct a new one-line instruction containing the actual values validated above.
+
+1. After confirming the owner understands that Uliya data processing may be local or remote, validating folder/checklist authorization, and screening all inputs for restricted targets, request a folder-bounded listing and exact-path checks. Keep this step read-only and do not read document contents.
+
+   `delegate --target file-agent --instruction 'SYNTHETIC EXAMPLE ONLY. Authorized folder: /demo-handoff. Mandatory relative paths: brief.pdf and handoff.pdf. Owner-approved candidate version pattern for the required artwork: final-artwork-*.png. Inspect only /demo-handoff using catalog-declared read actions ug-filesystem ls, find, or stat. Check those exact requirements and return actual in-scope references for matching candidates. Do not follow links, inspect other locations, or read file contents. Return each requirement, candidates, attributable references, listing completeness or truncation, permission state, and errors. Mark MISSING only when a complete authorized listing proves the exact requirement absent; otherwise mark NOT_CHECKED. If folder, checklist, or pattern approval is missing, stop with waiting_user. Do not probe or repeat restricted names; use [restricted item].'
+
+2. Only after the first expert returns exact references and the owner separately approves content review of each exact reference, prepare a new self-contained instruction. Copy the exact references and any version candidates from the actual first result into that instruction, and include the owner question verbatim. Pass only approved references through the supported `file` parameter when available, and pass the exact question as `query` when the selected catalog action requires it. Do not delegate if the chosen action cannot preserve those exact bounds.
+
+   `delegate --target document-agent --instruction 'SYNTHETIC EXAMPLE ONLY. Authorized folder: /demo-handoff. The owner separately approved content review of exactly these returned references: /demo-handoff/brief.pdf and /demo-handoff/handoff.pdf. The owner question is: Which required deliverable and deadline does each reference explicitly state? Use this exact question as query when the selected action requires query. The exact version candidates returned by file-agent and separately approved for this question are /demo-handoff/release-v1.pdf and /demo-handoff/release-v2.pdf. Review only the listed references and candidates using a catalog-declared ug-document metadata, qa, extract, or reconcile read action as supported. Do not discover or read anything else, and do not select an authoritative final by name, date, size, or hash. Return attributable evidence for each answer and candidate, coverage, permission state, partial or denied status, and errors. If any reference, separate content approval, or owner question is missing or outside /demo-handoff, stop with waiting_user; do not widen scope.'`
+
+If the first expert returns no results, say that no results were returned and stop; do not widen the scope or substitute similar files. If it returns a partial listing, do not treat unobserved paths as missing. Skip the document delegation if there are no exact references or separate content approval.
+
+# Result classification
+
+- `PRESENT`: an exact required path has an attributable reference in an authorized expert result.
+- `MISSING`: an exact required path is absent from an authorized listing that the expert explicitly verifies is complete.
+- `NOT_CHECKED`: the scan is partial, truncated, denied, unsupported, unverifiable, or otherwise lacks evidence for presence or absence.
+- `VERSION_REVIEW`: multiple plausible candidates exist and the owner has not identified the authoritative version. Never select a final version from filename, date, size, or hash alone.
+- `CONTENT_NOT_CHECKED`: document contents were not separately approved or the approved review did not return verifiable evidence.
+
+A confirmed missing mandatory item makes the overall result `BLOCKED`. Use `NEEDS_REVIEW` for unresolved permissions, privacy, completeness, content, or version questions. Use `READY` only when every mandatory item is evidenced as present and all required completeness, authorization, privacy, and version checks have actual supported evidence. Catalog declarations alone cannot establish `READY`.
+
+Report each non-restricted requirement with its status, actual reference, limitation, and next owner action. Redact restricted details as `[restricted item]`. Keep file names and document content to the minimum needed for the owner’s checklist.
+
+# Completion and failure
+
+Handle every expert delegation state explicitly:
+
+- `completed`: report only business results supported by the returned evidence. If the result is partial, classify unresolved items as `NOT_CHECKED`.
+- `failed`: stop dependent work and report the failure without fabricating a fallback.
+- `cancelled`: report that the review was cancelled; do not present partial output as completion.
+- `waiting_user`: ask only for the missing scope, checklist, or required approval.
+- `waiting_approval`: wait for the approval result; do not treat the request itself as approval.
+
+Never describe a missing or empty response as a successful scan. Do not infer NAS execution from local authoring or static checking.
+
+# Safety
+
+This is an independent ProjectReady NAS Skill concept, not a UGREEN-provided or UGREEN-certified product. Do not write, rename, move, delete, copy, tag, upload, or externally share user files. Do not access credentials or other private data. Never call the workflow a privacy certification or claim that Uliya processing is local. If the actual expert, permission, result, or data-flow condition cannot be verified, stop the dependent step and report `NOT_CHECKED` or `NEEDS_REVIEW`.
+
