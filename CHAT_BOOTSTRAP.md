@@ -19,3 +19,6 @@
 
 ## 정본/이력 우선순위
 사용자 최신 지시 → **`lead/ugreen` 현재 원격 소스·테스트/CI** → `LIVE_HANDOFF.md` + `LIVE_STATE.json` → `LEAD_ACTIVE_WORK.md` → 날짜별 공시 → 과거 회의록/옛 UGR dispatcher·worker 문서. 구형 `[유그 ...]`·`[해커톤총괄 ...]`는 **과거 별칭이고 사용자에게 권장하지 않는다**.
+
+
+**전체 24일 통합 체크표:** [MASTER_PROGRESS.md](MASTER_PROGRESS.md) / [JSON 정본](data/master_progress.json). 기존 LIVE_STATE·당일 DAILY_PROGRESS는 복원 및 상세 증거로 유지하고, 새로운 작업 매번 정본 JSON→MD 자동 생성→CI 검증을 추가한다.

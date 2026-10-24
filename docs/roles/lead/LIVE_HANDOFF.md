@@ -130,3 +130,6 @@
 - **진행률:** [`DAILY_PROGRESS.md`](DAILY_PROGRESS.md)와 JSON
 - **시간·미완료·선행 이월:** [`WORK_TIME_LOG.md`](WORK_TIME_LOG.md), [회수 일정](CARRYOVER_TASK_SCHEDULE_20261024.md)
 - **전체 총괄 전달:** [`TO_HACKATHON_LEAD.md`](TO_HACKATHON_LEAD.md)
+
+
+> **2026-10-24 전체 24일 마스터 진척표 도입(제품 진척 변화 없음):** [MASTER_PROGRESS.md](../../../MASTER_PROGRESS.md)와 단일 [JSON 정본](../../../data/master_progress.json). 10/24 일일 산출물 100%, 10/25 공식 G1 SDK/CLI·Agent 0% BLOCKED, G2~G6 합성 선행 결과와 정식 SDK 실증은 분리. 작업이 끝날 때마다 JSON→`python render_master_progress.py --write`→CI `--check`를 같은 GitHub 커밋으로 반영. 실제 작업시간 미계측.

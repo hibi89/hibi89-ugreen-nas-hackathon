@@ -77,7 +77,8 @@
     "docs/roles/lead/STATUS.md",
     "docs/roles/lead/HANDOFF.md",
     "docs/roles/lead/TO_HACKATHON_LEAD.md",
-    "docs/roles/lead/WORK_TIME_LOG.md"
+    "docs/roles/lead/WORK_TIME_LOG.md",
+    "data/master_progress.json"
   ],
   "next_chat_must_refetch_live_head": true,
   "new_commit_sha_must_be_verified_after_write": true,
@@ -266,5 +267,7 @@
     "devpost_submitted": false,
     "actual_work_hours": null
   },
-  "closeout_enforces_master_on_every_push": true
+  "closeout_enforces_master_on_every_push": true,
+  "master_progress_ref": "data/master_progress.json",
+  "master_progress_dashboard": "MASTER_PROGRESS.md"
 }

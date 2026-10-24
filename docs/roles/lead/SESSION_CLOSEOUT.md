@@ -20,3 +20,6 @@
 - `LIVE_HANDOFF.md`와 `LIVE_STATE.json`은 이후 모든 새 채팅의 **최신 현황 정본**이다. 원격 커밋 전에 [`tests/test_handoff_bootstrap.py`](../../../tests/test_handoff_bootstrap.py) 검증을 실행할 수 있도록 파일 경로·필수 키·표시한 확인 결과를 유지한다.
 - **SDK는 단순 URL/ZIP 해시만 알 뿐 내부 정확한 명령은 미검증**. SDK ZIP/소스나 비밀키/고객 정보·권한 없는 NAS 데이터를 Public GitHub에 올리지 않는다. 허구 명령을 만들지 않는다.
 - 개발 종료를 선언하기 전에 인수인계를 완성하여 **새 채팅에 한 문장만 보내도 동일 지점에서 계속 가능**한지 스스로 교차 확인한다.
+
+
+> **2026-10-24 전체 24일 마스터 진척표 도입(제품 진척 변화 없음):** [MASTER_PROGRESS.md](../../../MASTER_PROGRESS.md)와 단일 [JSON 정본](../../../data/master_progress.json). 10/24 일일 산출물 100%, 10/25 공식 G1 SDK/CLI·Agent 0% BLOCKED, G2~G6 합성 선행 결과와 정식 SDK 실증은 분리. 작업이 끝날 때마다 JSON→`python render_master_progress.py --write`→CI `--check`를 같은 GitHub 커밋으로 반영. 실제 작업시간 미계측.

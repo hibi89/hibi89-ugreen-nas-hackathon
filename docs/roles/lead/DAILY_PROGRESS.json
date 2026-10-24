@@ -213,5 +213,7 @@
     "estimated_remaining_hours": null,
     "actual_development_time": null
   },
-  "last_verified_ci_before_master": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40072583689"
+  "last_verified_ci_before_master": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40072583689",
+  "master_progress_ref": "data/master_progress.json",
+  "master_progress_dashboard": "MASTER_PROGRESS.md"
 }

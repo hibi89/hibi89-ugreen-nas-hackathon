@@ -276,3 +276,6 @@
 - 새 채팅 시작은 `lead/ugreen` HEAD → MASTER_PROGRESS.md → LIVE_HANDOFF/LIVE_STATE → LEAD_ACTIVE_WORK → DAILY_PROGRESS 순. 매 끝나는 작업마다 원래 계획일 체크 행을 실제 증거로 갱신하고 같은 커밋에 인수인계 동기화한다. 선행 코드는 중복 개발 금지.
 - 다음 작업은 G1 공식 설치 환경 호출 규격·등록 Agent 권한/안전·validator 근거 확인 (10/25 기본 1.5h + 별도 예비 1.5h, 실제 완료 ETA 미정). 예산 추가 0원. 공식 SDK 네트워크 패턴 미해소면 실행하지 않는다.
 
+
+
+> **2026-10-24 전체 24일 마스터 진척표 도입(제품 진척 변화 없음):** [MASTER_PROGRESS.md](../../../MASTER_PROGRESS.md)와 단일 [JSON 정본](../../../data/master_progress.json). 10/24 일일 산출물 100%, 10/25 공식 G1 SDK/CLI·Agent 0% BLOCKED, G2~G6 합성 선행 결과와 정식 SDK 실증은 분리. 작업이 끝날 때마다 JSON→`python render_master_progress.py --write`→CI `--check`를 같은 GitHub 커밋으로 반영. 실제 작업시간 미계측.
