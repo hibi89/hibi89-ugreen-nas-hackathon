@@ -723,5 +723,21 @@
     "status": "BLOCKED_PARTICIPANT_OFFICIAL_CODEX_CHECKER",
     "scope": "Run installed official checker against exact staged Skill SHA 770e08c6eb5101785579eed7f2438547e0a0386d4c35aead860aab088e091169; do not reuse checker report from original source SHA 164e84fe...",
     "no_auto_submission": true
+  },
+  "g25_pdf_export_correction": {
+    "date_kst": "2026-10-24",
+    "status": "INDEPENDENT_SOURCE_PDF_SHA_PASS_DIRECT_ATTACHMENT_SHA_MISMATCH",
+    "source_artifact_id": 12560941466,
+    "source_pdf_sha256": "df071504716c6121e7606cc1178ba7a3fdaa38856c3482b1b0864fc554088f80",
+    "source_pdf_bytes": 5183,
+    "previous_direct_attachment_sha256": "460f5f9adbfc7b7ffe43a5f3ea01459e77ed2917ab91fa8482ae31b164742627",
+    "previous_direct_attachment_bytes": 30144,
+    "corrective_transport_zip_sha256": "0ef56994107dadc31166df25bafd1ae2c7e8555debe0248eb66c638b39103760",
+    "corrective_transport_zip_bytes": 4438,
+    "correction": "EXACT_ORIGINAL_PDF_EMBEDDED_IN_ZIP_VERIFIED",
+    "repo_report": "docs/submission/G25_PDF_EXPORT_BYTE_FIDELITY_CORRECTION_20261024.md",
+    "official_checker_for_staged_skill": "NOT_RUN",
+    "devpost": "NOT_SUBMITTED",
+    "master_status_changed": false
   }
 }
