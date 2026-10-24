@@ -161,3 +161,11 @@
 - G5 `tests/test_core_edge_scenarios.py`: CORE1 전체 항목 있음(전체 NEEDS_REVIEW), CORE2 필수 항목 누락(전체 BLOCKED), EDGE1 권한 거부(전체 NEEDS_REVIEW) 합성 회귀. [시나리오](../../architecture/G5_CORE_EDGE_SCENARIOS_20261024.md).
 - **검증:** [GitHub Actions 40066529848](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40066529848)에서 **91 tests / OK**, 실제 Uliya SDK CLI/등록 Agent/NAS 접속/공식 검사 **NOT_RUN**. 공개 SDK ZIP 원본이나 민감자료 게시 없음.
 - **10/24 당일 마감 100% / 미완료 0% / 잔여 0h** (새 선행 묶음도 오프라인 범위 DONE). 경과 작업시간 미측정. **G1 SDK 기술 게이트 계속 BLOCKED**이고 **10/25 별도 예정** 계획 1.5h+예비 1.5h, 외부 의존성 때문에 실제 완료 ETA 산정 불가. 11월 공식 연동·검증은 미완료 유지.
+
+### 2026-10-24 G7 independent advance: Round 1 packaging preflight (pending GitHub CI)
+- Official rules refreshed: Round 1 may submit a non-operational Skill, but must provide a valid Markdown-only package, direct references, correct YAML name/description and disclosures. Source: https://ugreenhackathon.devpost.com/rules and https://ai.ugreen.com/pages/hackathon-starter-kit .
+- New candidate additions: developer-only tools/round1_package_audit.py, tests/test_round1_package_audit.py (14 offline tests), skill/projectready-nas/references/attribution.md, direct reference in SKILL.md, and amended earlier draft tests. Architecture/evidence at docs/architecture/G7_ROUND1_PACKAGE_PREFLIGHT_20261024.md.
+- G1 technical gate still BLOCKED: exact official registered Expert Agent/UGOS CLI/validator/license I/O not observed; real NAS/PII verification NOT_RUN. This is not the official Uliya validator and no Devpost submission was made. CI results PENDING until queried after push.
+- Existing Oct 24 100% completed daily deliverables/0h remaining is unchanged; G7 is separate early work originally scheduled in Nov 7–9 release readiness and must not be counted twice. Actual labor time NOT_MEASURED. Oct 25 G1 remains plan 1.5h + separate reserve 1.5h, real SDK ETA unknown.
+- Next single gate: inspect official kit details privately under entrant control or obtain actual first-party support reference, verify exact registered-agent schema, then run official Skill checker before any final Round 1 ZIP/Devpost submission. No known failed DNS route repetition; no unknown SDK commands, NAS access, external sending, or new spend.
+

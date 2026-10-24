@@ -15,11 +15,11 @@ class SkillDraftTests(unittest.TestCase):
 
     def test_markdown_only_layout(self):
         files = sorted(p.relative_to(DIR).as_posix() for p in DIR.rglob("*") if p.is_file())
-        self.assertEqual(files, ["SKILL.md", "references/decision-policy.md"])
+        self.assertEqual(files, ["SKILL.md", "references/attribution.md", "references/decision-policy.md"])
 
     def test_direct_reference_resolves(self):
         refs = re.findall(r"\]\((references/[^)#]+\.md)\)", SKILL.read_text(encoding="utf-8"))
-        self.assertEqual(refs, ["references/decision-policy.md"])
+        self.assertEqual(refs, ["references/decision-policy.md", "references/attribution.md"])
         for ref in refs:
             path = (DIR / ref).resolve()
             self.assertTrue(path.is_relative_to(DIR.resolve()))

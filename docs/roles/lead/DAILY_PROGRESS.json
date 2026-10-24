@@ -104,6 +104,17 @@
       "verified_test_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40069126450",
       "tests_added": 6,
       "official_validator": "NOT_RUN"
+    },
+    {
+      "scope_id": "G7_ROUND1_MARKDOWN_PACKAGING_PREFLIGHT",
+      "status": "CODE_STAGED_GITHUB_CI_PENDING",
+      "official_sdk_compatible": "UNVERIFIED",
+      "source": "tools/round1_package_audit.py",
+      "tests_added": 14,
+      "disclosures": "skill/projectready-nas/references/attribution.md",
+      "report": "docs/architecture/G7_ROUND1_PACKAGE_PREFLIGHT_20261024.md",
+      "official_validator": "NOT_RUN",
+      "actual_work_hours": null
     }
   ],
   "overall_project_completion_percent": null,
@@ -117,5 +128,5 @@
   "latest_repository_regression_ci_url": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40069126450",
   "latest_closeout_guard_verified": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40069126414",
   "notes_on_last_closeout": "One-line GitHub bootstrap and mandatory end-of-work handoff automated checks verified. No new SDK or NAS capability established.",
-  "notes_on_new_chat_execution": "G6 advance Markdown skill candidate static CI 6 tests new, repository suite 116 PASS at 22c75f3a. G1 official SDK blocked and separate 10/25 plan. Fixed 10/24 day completion 100%."
+  "notes_on_new_chat_execution": "G7 14 test preflight and AI disclosure staged on Oct 24, pending CI. Fixed same-calendar day 100% stays 100%, no double count. Official G1 blocked and next day 1.5+1.5h budget unchanged."
 }

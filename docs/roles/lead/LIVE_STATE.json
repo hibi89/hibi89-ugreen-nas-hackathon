@@ -28,7 +28,7 @@
     "id": "G1-SDK-DETAILS",
     "scheduled_kst": "2026-10-25",
     "status": "BLOCKED_EXTERNAL_EVIDENCE",
-    "scope": "Privately verify the exact official kit CLI/registered Agent/validator/license, then check G6 Markdown draft against supported commands; no imagined API",
+    "scope": "Privately obtain verified official Uliya creation-tool CLI/Expert Agent/license details or first-party support, then run official validator on candidate Skill; do not repeat known failed DNS path",
     "planned_hours": 1.5,
     "separate_reserve_hours": 1.5,
     "actual_completion_eta_hours": null
@@ -110,5 +110,18 @@
     "actual_nas_test": "NOT_RUN",
     "actual_work_hours": null,
     "planned_real_integration_kst": "2026-11-03/04"
+  },
+  "round1_package_preflight": {
+    "id": "G7_20261024",
+    "status": "OFFLINE_SOURCE_STAGED_CI_PENDING",
+    "source": "tools/round1_package_audit.py",
+    "new_tests": 14,
+    "skill_disclosures": "skill/projectready-nas/references/attribution.md",
+    "report": "docs/architecture/G7_ROUND1_PACKAGE_PREFLIGHT_20261024.md",
+    "official_uliya_validator": "NOT_RUN",
+    "official_sdk_cli": "BLOCKED_UNVERIFIED",
+    "nas_run": "NOT_RUN",
+    "devpost": "NOT_SUBMITTED",
+    "actual_hours": null
   }
 }

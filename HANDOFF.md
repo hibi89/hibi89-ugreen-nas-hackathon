@@ -68,3 +68,11 @@
 - [116/116 오프라인 합성/정적 테스트 PASS](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40069126450), [16개 변경 파일 종료 동기화 PASS](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40069126414); 두 CI 모두 위 소스 SHA를 대상으로 실제 완료 확인.
 - **제품 출시/공식 Uliya SDK validator·등록 CLI·Expert Agent·NAS·PII 검사·Devpost 제출 0건/미완료**. G1 기술 규격 여전히 BLOCKED. 10/24 정식 당일 산출물 100%/남은 0h; 이 G6는 선행 완료로 별도 공시. 실측시간 미측정, 10/25 기본 1.5h+별도 예비 1.5h, 외부 의존 실제 ETA 미정.
 - 이 확인은 변경 없는 다른 해커톤 저장소나 KIC/PayPal의 배포/제출 상태를 검증하지 않는다.
+
+### 2026-10-24 G7 independent advance: Round 1 packaging preflight (pending GitHub CI)
+- Official rules refreshed: Round 1 may submit a non-operational Skill, but must provide a valid Markdown-only package, direct references, correct YAML name/description and disclosures. Source: https://ugreenhackathon.devpost.com/rules and https://ai.ugreen.com/pages/hackathon-starter-kit .
+- New candidate additions: developer-only tools/round1_package_audit.py, tests/test_round1_package_audit.py (14 offline tests), skill/projectready-nas/references/attribution.md, direct reference in SKILL.md, and amended earlier draft tests. Architecture/evidence at docs/architecture/G7_ROUND1_PACKAGE_PREFLIGHT_20261024.md.
+- G1 technical gate still BLOCKED: exact official registered Expert Agent/UGOS CLI/validator/license I/O not observed; real NAS/PII verification NOT_RUN. This is not the official Uliya validator and no Devpost submission was made. CI results PENDING until queried after push.
+- Existing Oct 24 100% completed daily deliverables/0h remaining is unchanged; G7 is separate early work originally scheduled in Nov 7–9 release readiness and must not be counted twice. Actual labor time NOT_MEASURED. Oct 25 G1 remains plan 1.5h + separate reserve 1.5h, real SDK ETA unknown.
+- Next single gate: inspect official kit details privately under entrant control or obtain actual first-party support reference, verify exact registered-agent schema, then run official Skill checker before any final Round 1 ZIP/Devpost submission. No known failed DNS route repetition; no unknown SDK commands, NAS access, external sending, or new spend.
+
