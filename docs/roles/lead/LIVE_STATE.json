@@ -419,7 +419,7 @@
     "words": 351,
     "round1_submission_gate": "NOT_APPROVED_FOR_SUBMISSION"
   },
-  "next_action_priority": "Review remaining submission rights/AI/data-flow disclosures and Article 2.5 synthetic examples; separately recover safe official CLI/Expert Agent runtime permission evidence. Do NOT rerun official checker unless source is edited. Devpost remains NOT_SUBMITTED until explicit participant release approval.",
+  "next_action_priority": "Verify new G28 editorial one-file ZIP/PDF CI and manifest, collect exact SHA; then request participant official checker on NEW candidate only. Rights/license and final approval remain pending; G1 live expert-agent runtime gate separately BLOCKED.",
   "g11_round1_disclosure_parity": {
     "date_kst": "2026-10-24",
     "status": "OFFLINE_VERIFIED_ONE_PAGE_VISUAL_PASS",
@@ -778,5 +778,24 @@
     "article_2_5_examples": "REVIEW_REQUIRED",
     "devpost": "NOT_SUBMITTED",
     "report": "docs/submission/G27_EXACT_CANDIDATE_OFFICIAL_STATIC_CHECK_REPORTED_20261025.md"
+  },
+  "g28_editorial_candidate": {
+    "advance_work_date_kst": "2026-10-25",
+    "original_work_days": [
+      "UGR-D16",
+      "UGR-D17"
+    ],
+    "source_g22_static_checker": "PARTICIPANT_REPORTED_STATIC_PASS_EXACT_SHA_0_0_0",
+    "old_skill_sha256": "770e08c6eb5101785579eed7f2438547e0a0386d4c35aead860aab088e091169",
+    "builder": "tools/round1_editorial_release_preview.py",
+    "test": "tests/test_round1_editorial_release_preview.py",
+    "ci": ".github/workflows/round1-editorial-release-preview.yml",
+    "ci_status": "PENDING",
+    "new_candidate_sha256": null,
+    "new_candidate_official_checker": "NOT_RUN",
+    "rights_license": "PENDING",
+    "devpost": "NOT_SUBMITTED",
+    "no_original_source_mutation": true,
+    "report": "docs/submission/G28_EDITORIAL_RELEASE_CANDIDATE_20261025.md"
   }
 }

@@ -577,5 +577,22 @@
     "devpost": "NOT_SUBMITTED",
     "affects_2026_10_24_daily_completion": false,
     "actual_hours": null
+  },
+  "g28_editorial_early_work": {
+    "date_kst": "2026-10-25",
+    "scheduled_original_days": [
+      "UGR-D16",
+      "UGR-D17"
+    ],
+    "status": "CI_PENDING_NEW_EDITORIAL_PREVIEW_ONLY",
+    "source_g22_pass": "PARTICIPANT_REPORTED_SHA_MATCH",
+    "new_checker": "NOT_RUN",
+    "full_daily_2026_10_24_percent_unchanged": 100,
+    "current_g1_cli_agent_runtime": "BLOCKED",
+    "current_g1_original_base_hours": 1.5,
+    "current_g1_separate_reserve_hours": 1.5,
+    "actual_hours": null,
+    "report": "docs/submission/G28_EDITORIAL_RELEASE_CANDIDATE_20261025.md",
+    "devpost": "NOT_SUBMITTED"
   }
 }

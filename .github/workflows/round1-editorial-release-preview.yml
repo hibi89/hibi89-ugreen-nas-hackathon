@@ -1,0 +1,61 @@
+name: UGREEN G28 editorial Creator Round 1 candidate (not submitted)
+on:
+  push:
+    branches: ["lead/ugreen"]
+    paths:
+      - "tools/round1_editorial_release_preview.py"
+      - "tests/test_round1_editorial_release_preview.py"
+      - ".github/workflows/round1-editorial-release-preview.yml"
+      - "docs/submission/evidence/G27_PARTICIPANT_OFFICIAL_CHECKER_RESULT_20261025.json"
+      - "docs/submission/checker_inputs/G22_20261024/projectready-nas/SKILL.md"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build-editorial-candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install PDF build libraries only, not bundled into Skill
+        run: python -m pip install "reportlab>=4,<5" "pypdf>=6,<7"
+      - name: Verify source receipt and safety edit with independent unit tests
+        run: python -m unittest discover -s tests -p test_round1_editorial_release_preview.py -v
+      - name: Build editorial-only PDF and exact one-file ZIP
+        run: python tools/round1_editorial_release_preview.py --output-dir "$RUNNER_TEMP/ugreen-g28-editorial"
+      - name: Cross-check bytes, status and ZIP contents
+        run: |
+          python - "$RUNNER_TEMP/ugreen-g28-editorial" <<'PY'
+          import hashlib,json,pathlib,sys,zipfile
+          folder=pathlib.Path(sys.argv[1])
+          m=json.loads((folder/"ProjectReady_Editorial_Manifest.json").read_text())
+          zbytes=(folder/"ProjectReady_Editorial_Skill_NOT_SUBMITTED.zip").read_bytes()
+          pbytes=(folder/"ProjectReady_Editorial_Proposal_NOT_SUBMITTED.pdf").read_bytes()
+          assert m["devpost"] == "NOT_SUBMITTED"
+          assert m["candidate_official_checker"] == "NOT_RUN_NEW_SHA"
+          assert m["g22_checked_sha256"] != m["candidate_skill_sha256"]
+          assert m["removed_synthetic_examples"] == 2
+          assert m["proposal_answer_words"] <= 500
+          assert m["zip_sha256"] == hashlib.sha256(zbytes).hexdigest()
+          assert m["pdf"]["sha256"] == hashlib.sha256(pbytes).hexdigest()
+          with zipfile.ZipFile(folder/"ProjectReady_Editorial_Skill_NOT_SUBMITTED.zip") as z:
+              assert z.namelist() == ["projectready-nas/SKILL.md"]
+              skill=z.read("projectready-nas/SKILL.md")
+              assert m["candidate_skill_sha256"] == hashlib.sha256(skill).hexdigest()
+              assert b"SYNTHETIC EXAMPLE ONLY" not in skill
+              assert b"delegate --target" not in skill
+              assert b"additional editorial revision" in skill
+          print("G28 ZIP/PDF PASS; OFFICIAL CHECKER NOT_RUN; NOT SUBMITTED")
+          PY
+      - name: Upload draft-only preview
+        uses: actions/upload-artifact@v4
+        with:
+          name: UGREEN-G28-EDITORIAL-PREVIEW-NOT-SUBMITTED
+          path: ${{ runner.temp }}/ugreen-g28-editorial/*
+          retention-days: 7
+          if-no-files-found: error
