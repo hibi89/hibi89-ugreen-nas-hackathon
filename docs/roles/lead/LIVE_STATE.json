@@ -97,9 +97,9 @@
     "corrective_commit_sha": "4b6904224df8ab9ede913ec6e79787b61d941baa",
     "passed_guard_run_id": 40067647144
   },
-  "last_ci_verified_code_sha": "d82541c38dfda2f966049bf2872755f976de63d3",
-  "repository_regression_tests_passed": 211,
-  "repository_regression_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40085452321",
+  "last_ci_verified_code_sha": "1ce2f9a605e9f09465e896098de31ccac4c0ae35",
+  "repository_regression_tests_passed": 219,
+  "repository_regression_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40091570530",
   "closeout_sync_ci_status": "PASS",
   "closeout_sync_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40080489079",
   "early_skill_candidate": {
@@ -621,12 +621,17 @@
     "tool": "tools/review_creator_source.py",
     "tests": "tests/test_creator_source_review.py",
     "tests_added": 8,
-    "tests_execution": "CI_PENDING",
+    "tests_execution": "GITHUB_CI_VERIFIED_219_219_PASS",
     "status": "READ_ONLY_INSPECTION_TOOL_CREATED_GENERATED_FILE_NOT_RECEIVED",
     "participant_reported_sha256": "e1b071666b836cc464147821d7823bc3061c757434697d9a64250d4a9abd5b4a",
     "generated_file_independently_verified": false,
     "existing_draft_modified": false,
     "devpost": "NOT_SUBMITTED",
-    "next_step": "Receive newly created SKILL.md and direct Markdown references for SHA/content/rights audit; do not import automatically"
+    "next_step": "Receive newly created SKILL.md and direct Markdown references for SHA/content/rights audit; do not import automatically",
+    "verified_source_sha": "1ce2f9a605e9f09465e896098de31ccac4c0ae35",
+    "offline_test_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40091570530",
+    "master_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40091570583",
+    "handoff_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40091570555",
+    "draft_bundle_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40091570581"
   }
 }

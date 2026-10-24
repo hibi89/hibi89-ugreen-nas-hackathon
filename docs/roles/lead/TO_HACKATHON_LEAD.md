@@ -1,3 +1,8 @@
+## G19 CI 검증 답신 — IMPLEMENTED_VERIFIED (2026-10-24 KST)
+- 실제 GitHub source 1ce2f9a의 오프라인 **219/219 PASS** (run 40091570530), MASTER/인수인계/기존 PDF-ZIP 초안 workflow 3건도 SUCCESS. 총괄 지시 P0 수용.
+- 참가자 Codex 공식 Creator 사용/정적 checker 0/0 성공은 참가자 보고만; 신규 SKILL.md 실물 미접수라 실제 해시·문서·상대 참조·권리·데이터 흐름 독립 미검증. 기술 테스트의 PASS를 제출 적격성 승인으로 간주하지 않음.
+- 다음 외부 게이트는 **참가자 생성 Markdown 실물 확보** 하나. 승인 전 통합·공개/Devpost 제출 없음. 10/24 일일 100%/0h 계획잔량, 실제 시간 미계측, 24일 2 DONE/12 PARTIAL/3 BLOCKED/7 NOT_STARTED, G1 10/25 기본1.5h+별도예비1.5h.
+
 ## G19 — 통합 수뇌부 P0 응답 (2026-10-24 KST)
 - **ACCEPTED**: 공식 Creator 실생성·정적 checker 0 오류/0 경고는 참가자 Codex 보고로 접수. 실제 생성 파일은 새 대화의 GitHub 환경에 없으므로 독립 검증 보류.
 - **IMPLEMENTED (CI PENDING)**: 기존 4 Markdown 원본과 제출 PDF/ZIP 불변. 새 참가자 생성본을 읽기 전용으로 검사할 SHA/참조/비밀/비정상 파일 차단 도구 및 합성 회귀 8개 소스를 GitHub에 추가. 실제 파일에 도구 미실행, 공식 생성 증거 확정 아님.
