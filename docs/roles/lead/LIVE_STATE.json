@@ -269,5 +269,6 @@
   },
   "closeout_enforces_master_on_every_push": true,
   "master_progress_ref": "data/master_progress.json",
-  "master_progress_dashboard": "MASTER_PROGRESS.md"
+  "master_progress_dashboard": "MASTER_PROGRESS.md",
+  "master_progress_consistency_check": "master JSON plus generated MD checked in GitHub CI; offline synthetic evidence only"
 }

@@ -137,3 +137,5 @@
 
 
 > **2026-10-24 전체 24일 마스터 진척표 도입(제품 진척 변화 없음):** [MASTER_PROGRESS.md](../../../MASTER_PROGRESS.md)와 단일 [JSON 정본](../../../data/master_progress.json). 10/24 일일 산출물 100%, 10/25 공식 G1 SDK/CLI·Agent 0% BLOCKED, G2~G6 합성 선행 결과와 정식 SDK 실증은 분리. 작업이 끝날 때마다 JSON→`python render_master_progress.py --write`→CI `--check`를 같은 GitHub 커밋으로 반영. 실제 작업시간 미계측.
+
+> **2026-10-24 마스터표 검증 규칙 교정:** 기존 이중형식 검사와 충돌 해결. 정본 `data/master_progress.json` → 자동 생성 `MASTER_PROGRESS.md`를 실제 24일 원본 일정과 비교, 새 CI는 날짜·예비시간·증거·차단 상태 검증. 완료율·G1 차단·실측시간 변화 없음.
