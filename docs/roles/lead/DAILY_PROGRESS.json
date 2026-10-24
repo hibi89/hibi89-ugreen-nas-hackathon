@@ -107,14 +107,17 @@
     },
     {
       "scope_id": "G7_ROUND1_MARKDOWN_PACKAGING_PREFLIGHT",
-      "status": "CODE_STAGED_GITHUB_CI_PENDING",
+      "status": "OFFLINE_TESTS_130_PASS_ACTUAL_SKILL_CHECK_CI_PENDING",
       "official_sdk_compatible": "UNVERIFIED",
       "source": "tools/round1_package_audit.py",
       "tests_added": 14,
       "disclosures": "skill/projectready-nas/references/attribution.md",
       "report": "docs/architecture/G7_ROUND1_PACKAGE_PREFLIGHT_20261024.md",
       "official_validator": "NOT_RUN",
-      "actual_work_hours": null
+      "actual_work_hours": null,
+      "verified_code_commit": "b674c3d070c5f0ee5be254f24cdb4056ffa3022a",
+      "test_ci_url": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40070438833",
+      "actual_skill_folder_ci": "PENDING"
     }
   ],
   "overall_project_completion_percent": null,
@@ -124,9 +127,9 @@
   "closeout_sync_enforcement_active": true,
   "closeout_sync_quality_issue": "2026-10-24 CI #40067541841 detected stale daily JSON in previous policy commit; correcting in next commit",
   "closeout_sync_guard_tested_status": "PENDING_RECHECK",
-  "latest_repository_regression_tests_passed": 116,
-  "latest_repository_regression_ci_url": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40069126450",
-  "latest_closeout_guard_verified": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40069126414",
+  "latest_repository_regression_tests_passed": 130,
+  "latest_repository_regression_ci_url": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40070438833",
+  "latest_closeout_guard_verified": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40070438881",
   "notes_on_last_closeout": "One-line GitHub bootstrap and mandatory end-of-work handoff automated checks verified. No new SDK or NAS capability established.",
-  "notes_on_new_chat_execution": "G7 14 test preflight and AI disclosure staged on Oct 24, pending CI. Fixed same-calendar day 100% stays 100%, no double count. Official G1 blocked and next day 1.5+1.5h budget unchanged."
+  "notes_on_new_chat_execution": "G7 130/130 unit tests PASS on source b674c3d0. New real candidate preflight coverage added, awaiting new CI. G1 still BLOCKED. Daily 10/24 100% not product completion."
 }
