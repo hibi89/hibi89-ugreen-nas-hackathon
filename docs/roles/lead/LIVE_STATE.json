@@ -62,6 +62,7 @@
   ],
   "current_priority_documents": [
     "MASTER_PROGRESS.md",
+    "docs/architecture/G9_ROUND1_RELEASE_GATES_20261024.md",
     "docs/architecture/G8_ROUND1_DRAFT_BUNDLE_20261024.md",
     "docs/roles/lead/LIVE_HANDOFF.md",
     "docs/roles/lead/LEAD_ACTIVE_WORK.md",
@@ -354,5 +355,28 @@
     "closeout_fix_status": "NEW_CI_PENDING",
     "real_nas": "NOT_RUN",
     "license": "NOT_CLEARED"
+  },
+  "round1_release_gate": {
+    "id": "G9-ALL-TEN-ANSWERS-AND-RELEASE-GATES",
+    "state": "SOURCE_COMMITTED_CI_PENDING",
+    "source": "tools/round1_release_gate.py",
+    "regression_tests_added": 10,
+    "pdf_validation": "ALL_10_FULL_ANSWERS",
+    "output_files": [
+      "Round1_DRAFT_Release_Gates.json",
+      "Round1_DRAFT_Release_Checklist.md"
+    ],
+    "release_decision": "NOT_APPROVED_FOR_SUBMISSION",
+    "entrant_approval": "PENDING",
+    "sdk_license": "NOT_CLEARED",
+    "privacy": "NOT_CLEARED",
+    "official_checker": "NOT_RUN",
+    "nas": "NOT_RUN",
+    "devpost": "NOT_SUBMITTED",
+    "original_plan_days": [
+      "UGR-D16",
+      "UGR-D17"
+    ],
+    "actual_hours": null
   }
 }

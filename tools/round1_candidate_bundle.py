@@ -49,6 +49,22 @@ def validate_candidate_zip(skill_folder: Path, raw_zip: bytes) -> list[dict]:
         return files
 
 
+def missing_pdf_sections(extracted: str, questions: list[dict]) -> list[str]:
+    """Cross-check ALL questions and answers, including middle answers.
+
+    Fail closed if text extraction is truncated, edited or unsearchable.
+    """
+    cleaned = re.sub(r"\s+", " ", extracted.replace("\u00ad", "")).strip()
+    missing = []
+    for item in questions:
+        number = item["number"]
+        for field in ("prompt", "answer"):
+            expected = re.sub(r"\s+", " ", item[field].replace("\u00ad", "")).strip()
+            if not expected or expected not in cleaned:
+                missing.append(f"{number}:{field}")
+    return missing
+
+
 def validate_pdf(pdf: Path, questions: list[dict]) -> dict:
     content = pdf.read_bytes()
     if len(content) > PDF_LIMIT or not content.startswith(b"%PDF-") or b"%%EOF" not in content[-1024:]:
@@ -65,14 +81,10 @@ def validate_pdf(pdf: Path, questions: list[dict]) -> dict:
         text = re.sub(r"\s+", " ", " ".join(p.extract_text() or "" for p in doc.pages))
     except Exception as exc:
         raise ValueError("PDF cannot be parsed and searched") from exc
-    for q in questions:
-        prompt = re.sub(r"\s+", " ", q["prompt"])
-        if prompt not in text:
-            raise ValueError(f"Proposal PDF question {q['number']} absent; stale draft?")
-    for q in (questions[0], questions[-1]):
-        prefix = re.sub(r"\s+", " ", q["answer"])[:35]
-        if prefix not in text:
-            raise ValueError("PDF does not carry the current authored answer")
+    missing = missing_pdf_sections(text, questions)
+    if missing:
+        raise ValueError("Proposal PDF missing exact current question/answer sections: "
+                         + ", ".join(missing))
     if "DRAFT" not in text or "NOT SUBMITTED" not in text:
         raise ValueError("Draft PDF missing non-submission disclosure")
     return {"name": pdf.name, "pages": len(doc.pages),

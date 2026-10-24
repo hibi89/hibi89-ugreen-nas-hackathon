@@ -377,7 +377,7 @@
       "blocker": null,
       "recovery_date_kst": null,
       "recovery_condition": null,
-      "advance_note": "ZIP 구조/재현성 도구 선행; 제출 영문 PDF 미생성. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음. 2026-10-24 provisional A4 PDF locally rendered (one page, 4,484 bytes) and readable; source renderer tools/render_round1_proposal_pdf.py; still PARTIAL because approved final PDF and packaged ZIP/receipt are absent. G8 2026-10-24: automated Round1 PDF/ZIP/manifest DRAFT generation and artifact-upload workflow added; awaiting remote CI proof. Final participant-approved PDF/ZIP, official validation and Devpost submission still NOT_DONE. VERIFIED: GitHub Actions 40076525716 succeeded, created PDF 4722 bytes/1 page and ZIP 6004 bytes/4 directly-linked Markdown members. CI artifact ID 12553276854, PREVIEW_NOT_SUBMITTED. D16 remains PARTIAL pending participant approval/final package/real Devpost receipt."
+      "advance_note": "ZIP 구조/재현성 도구 선행; 제출 영문 PDF 미생성. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음. 2026-10-24 provisional A4 PDF locally rendered (one page, 4,484 bytes) and readable; source renderer tools/render_round1_proposal_pdf.py; still PARTIAL because approved final PDF and packaged ZIP/receipt are absent. G8 2026-10-24: automated Round1 PDF/ZIP/manifest DRAFT generation and artifact-upload workflow added; awaiting remote CI proof. Final participant-approved PDF/ZIP, official validation and Devpost submission still NOT_DONE. VERIFIED: GitHub Actions 40076525716 succeeded, created PDF 4722 bytes/1 page and ZIP 6004 bytes/4 directly-linked Markdown members. CI artifact ID 12553276854, PREVIEW_NOT_SUBMITTED. D16 remains PARTIAL pending participant approval/final package/real Devpost receipt. G9 2026-10-24: PDF validator now checks all ten entire question/answer bodies, not only first/last answer; offline release gate independently reconciles PDF+ZIP SHA256 against generated manifest; new CI run pending."
     },
     {
       "day_id": "UGR-D17",
@@ -395,13 +395,14 @@
       "evidence": [
         "docs/architecture/G7_ROUND1_PACKAGE_PREFLIGHT_20261024.md",
         "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/commit/5772a8a97364a26155c238ea7af576bdd400dc1a",
-        "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40076525716"
+        "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40076525716",
+        "tools/round1_release_gate.py"
       ],
       "verified_sha": "5772a8a97364a26155c238ea7af576bdd400dc1a",
       "blocker": null,
       "recovery_date_kst": null,
       "recovery_condition": null,
-      "advance_note": "출시 ZIP 구조·비밀 패턴 오프라인 사전검사; 공식 라이선스·PII·validator 최종 검수 미실행. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음. G8 ZIP SHA256 + per-member hashes, PDF searchable questions, size, 4-Markdown entries checked by candidate bundle script; automated result pending CI. License/privacy review remains unverified. Candidate ZIP manifest includes archive SHA256, file hashes, file/size and PDF searchable ten-heading checks; offline-only, no official validator or license/PII attestation."
+      "advance_note": "출시 ZIP 구조·비밀 패턴 오프라인 사전검사; 공식 라이선스·PII·validator 최종 검수 미실행. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음. G8 ZIP SHA256 + per-member hashes, PDF searchable questions, size, 4-Markdown entries checked by candidate bundle script; automated result pending CI. License/privacy review remains unverified. Candidate ZIP manifest includes archive SHA256, file hashes, file/size and PDF searchable ten-heading checks; offline-only, no official validator or license/PII attestation. G9 2026-10-24: machine-readable DRAFT release checklist records editorial PENDING, license/privacy NOT_CLEARED, official checker NOT_RUN, NAS NOT_RUN and Devpost NOT_SUBMITTED. Release remains PARTIAL / NOT_APPROVED even if ZIP/PDF hashes pass. New CI pending."
     },
     {
       "day_id": "UGR-D18",
@@ -544,5 +545,5 @@
       "advance_note": null
     }
   ],
-  "source_reconciliation_note": "Latest G8 offline source 5ceb12c1e228f9ee8eba211dbd3f3d990cb1e1fb 190/190 tests PASS. PDF/ZIP candidate workflow #40076525716 SUCCESS; preview artifact ID 12553276854; initial closeout failed due master Markdown path not changed in previous corrective push, fixed by this regenerated D16 visible evidence update. G1 blocked, official Uliya/NAS/Devpost not done."
+  "source_reconciliation_note": "G9 pre-submission hardening advances D16 and D17: all 10 PDF answers cross-checked and byte-level ZIP/PDF manifests with explicit non-approval. Source/CI pending. Original schedule and statuses unchanged: 2 DONE/12 PARTIAL/3 BLOCKED/7 NOT_STARTED. G1 runtime/official validator blocked."
 }

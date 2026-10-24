@@ -267,5 +267,18 @@
     "artifact_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40076525716",
     "official_checker": "NOT_RUN",
     "devpost": "NOT_SUBMITTED"
+  },
+  "round1_release_gate_advance": {
+    "as_of_kst": "2026-10-24",
+    "original_plan": [
+      "UGR-D16",
+      "UGR-D17"
+    ],
+    "status": "SOURCE_COMMITTED_CI_PENDING",
+    "tests_added": 10,
+    "development_hours": null,
+    "official_checker": "NOT_RUN",
+    "devpost": "NOT_SUBMITTED",
+    "release_decision": "NOT_APPROVED_FOR_SUBMISSION"
   }
 }

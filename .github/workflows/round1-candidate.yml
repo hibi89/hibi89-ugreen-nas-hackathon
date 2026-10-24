@@ -4,6 +4,7 @@ on:
     branches: ["lead/ugreen"]
     paths:
       - "tools/round1_candidate_bundle.py"
+      - "tools/round1_release_gate.py"
       - "tools/render_round1_proposal_pdf.py"
       - "tools/check_round1_proposal.py"
       - "tools/round1_package_audit.py"
@@ -32,6 +33,14 @@ jobs:
           mkdir -p "$RUNNER_TEMP/ugreen-round1"
           python tools/render_round1_proposal_pdf.py --output "$RUNNER_TEMP/ugreen-round1/ProjectReady_Proposal_DRAFT.pdf"
           python tools/round1_candidate_bundle.py --pdf "$RUNNER_TEMP/ugreen-round1/ProjectReady_Proposal_DRAFT.pdf" --output-dir "$RUNNER_TEMP/ugreen-round1"
+      - name: Independent byte-hash release-gate audit (always NOT_APPROVED)
+        shell: bash
+        run: |
+          python tools/round1_release_gate.py \
+            --manifest "$RUNNER_TEMP/ugreen-round1/Round1_DRAFT_Manifest.json" \
+            --zip "$RUNNER_TEMP/ugreen-round1/ProjectReady_NAS_Skill_DRAFT.zip" \
+            --pdf "$RUNNER_TEMP/ugreen-round1/ProjectReady_Proposal_DRAFT.pdf" \
+            --output-dir "$RUNNER_TEMP/ugreen-round1"
       - name: Upload only DRAFT PDF/ZIP/manifest as downloadable preview
         uses: actions/upload-artifact@v4
         with:

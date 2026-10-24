@@ -8,7 +8,7 @@ from pathlib import Path
 from unittest.mock import patch
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"tools"))
-from round1_candidate_bundle import draft_bundle,sha256,validate_candidate_zip,validate_pdf
+from round1_candidate_bundle import draft_bundle,sha256,validate_candidate_zip,validate_pdf,missing_pdf_sections
 from round1_package_audit import PackageError
 
 
@@ -24,6 +24,17 @@ class CandidateBundleTests(unittest.TestCase):
         self.assertEqual(manifest["devpost_submission"],"NOT_SUBMITTED")
         self.assertEqual(manifest["proposal_answer_words"],351)
         self.assertIsNone(manifest["pdf"])
+    def test_middle_answer_removed_is_detected(self):
+        q=[{"number":i,"prompt":"Question "+str(i),"answer":"Answer "+str(i)+" uniquely verified."}
+           for i in range(1,11)]
+        source=" ".join(x["prompt"]+" "+x["answer"] for x in q)
+        self.assertEqual([],missing_pdf_sections(source,q))
+        changed=source.replace(q[5]["answer"],"AI generated altered paragraph")
+        self.assertIn("6:answer",missing_pdf_sections(changed,q))
+    def test_missing_question_heading_detected(self):
+        q=[{"number":1,"prompt":"Official first prompt?","answer":"Answer intact."}]
+        self.assertIn("1:prompt",missing_pdf_sections("Answer intact.",q))
+
     def test_reproducible_binary(self):
         a,_=draft_bundle(self.skill)
         b,_=draft_bundle(self.skill)
