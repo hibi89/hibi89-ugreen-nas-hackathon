@@ -1,0 +1,30 @@
+{
+  "checkFormatVersion": "2.0.0",
+  "status": "static-pass-needs-target-validation",
+  "target": {
+    "skillName": "projectready-nas"
+  },
+  "catalog": {
+    "checkedVersion": "2.0.0"
+  },
+  "files": [
+    {
+      "path": "SKILL.md",
+      "sha256": "c29317909544676b407e8c9cb92ab9c5ed80d2003a54d2e33c31ff4ffcb53764"
+    }
+  ],
+  "summary": {
+    "errors": 0,
+    "warnings": 1,
+    "info": 0
+  },
+  "diagnostics": [
+    {
+      "code": "DELEGATION_WORKFLOW_STATIC_VALIDATION_INCOMPLETE",
+      "severity": "warning",
+      "file": "SKILL.md",
+      "message": "正文中没有可机械识别的标准 delegate 命令。",
+      "suggestion": "人工确认该 Skill 是否无需 NAS 专家；需要时补充标准 delegate 命令。"
+    }
+  ]
+}

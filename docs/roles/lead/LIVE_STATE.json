@@ -11,7 +11,7 @@
   "official_sdk_cli_schema": "BLOCKED_UNVERIFIED",
   "registered_expert_agents": "BLOCKED_UNVERIFIED",
   "nas_runtime": "NOT_RUN",
-  "official_skill_validator": "PARTICIPANT_REPORTED_STATIC_PASS_EXACT_G22_SHA_0_ERRORS_0_WARNINGS_0_INFO",
+  "official_skill_validator": "G22_PARTICIPANT_STATIC_PASS_EXACT_SHA;G29_PARTICIPANT_WARNING_1_NEEDS_TARGET_VALIDATION;G31_NOT_RUN",
   "pii_safety": "NOT_CHECKED",
   "devpost_final_submission": "NOT_SUBMITTED",
   "round2_finalist_status": "NOT_CONFIRMED",
@@ -419,7 +419,7 @@
     "words": 351,
     "round1_submission_gate": "NOT_APPROVED_FOR_SUBMISSION"
   },
-  "next_action_priority": "ASK PARTICIPANT TO RUN INSTALLED ULIYA OFFICIAL CHECKER ON EXACT G29 SHA c29317909544676b407e8c9cb92ab9c5ed80d2003a54d2e33c31ff4ffcb53764, return JSON, exit and postrun SHA; do not edit source. Then review owner original work, vendor rights and publish data flow before release approval. Separate G1 Expert Agent runtime BLOCKED.",
+  "next_action_priority": "Request installed first-party Uliya checker on exact G31 SHA cb69afb6525d1ca530f72b83ad26965c411ca02dfdbab97aa762d612d34d25a2; verify full result JSON/exit/pre-post SHA. Do not bypass manual delegate validation or claim no expert needed. Human license/dataflow signoff and Devpost approval pending; official live G1 separate BLOCKED.",
   "g11_round1_disclosure_parity": {
     "date_kst": "2026-10-24",
     "status": "OFFLINE_VERIFIED_ONE_PAGE_VISUAL_PASS",
@@ -840,5 +840,44 @@
     "devpost": "NOT_SUBMITTED",
     "actual_hours": null,
     "master_states_unchanged": true
+  },
+  "g31_delegation_warning_recovery": {
+    "date_kst": "2026-10-25",
+    "participant_report_g29": {
+      "skill_sha256": "c29317909544676b407e8c9cb92ab9c5ed80d2003a54d2e33c31ff4ffcb53764",
+      "status": "static-pass-needs-target-validation",
+      "exit_code": 0,
+      "errors": 0,
+      "warnings": 1,
+      "info": 0,
+      "warning_code": "DELEGATION_WORKFLOW_STATIC_VALIDATION_INCOMPLETE",
+      "reported_local_execution": true,
+      "report_json_path": "docs/submission/evidence/G31_G29_PARTICIPANT_CHECKER_WARNING_20261025.json"
+    },
+    "new_g31": {
+      "skill_sha256": "cb69afb6525d1ca530f72b83ad26965c411ca02dfdbab97aa762d612d34d25a2",
+      "skill_bytes": 13103,
+      "zip_sha256": "d916e01634c7f1f5a1cd29e7cd473c233dd10543d812c6bb4da844435682a965",
+      "zip_bytes": 5317,
+      "repo_snapshot": "docs/submission/checker_inputs/G31_20261025/projectready-nas/SKILL.md",
+      "official_checker": "NOT_RUN",
+      "standard_delegate_signatures": [
+        "file-agent",
+        "document-agent"
+      ],
+      "requires_runtime_full_inputs": true,
+      "registered_agent_runtime": "UNVERIFIED",
+      "real_nas": "NOT_RUN",
+      "devpost": "NOT_SUBMITTED"
+    },
+    "rights_license": "PENDING",
+    "human_approval": "PENDING",
+    "original_schedule_days": [
+      "UGR-D16",
+      "UGR-D17"
+    ],
+    "change_to_original_daily_completion": false,
+    "actual_hours": null,
+    "report": "docs/submission/G31_DELEGATE_WARNING_RECOVERY_20261025.md"
   }
 }
