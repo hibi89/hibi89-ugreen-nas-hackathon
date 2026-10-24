@@ -92,11 +92,11 @@
     "corrective_commit_sha": "4b6904224df8ab9ede913ec6e79787b61d941baa",
     "passed_guard_run_id": 40067647144
   },
-  "last_ci_verified_code_sha": "10f6ba8aeaf9895f50437b7aa87084161887982d",
-  "repository_regression_tests_passed": 131,
-  "repository_regression_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40070572424",
+  "last_ci_verified_code_sha": "136ae578f726606c1fc0001facfdf21dd2fca5f0",
+  "repository_regression_tests_passed": 138,
+  "repository_regression_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40071026723",
   "closeout_sync_ci_status": "PASS",
-  "closeout_sync_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40070572600",
+  "closeout_sync_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40071026659",
   "early_skill_candidate": {
     "id": "G6_20261024",
     "path": "skill/projectready-nas/SKILL.md",
@@ -134,7 +134,7 @@
     "source": "tools/sdk_semantic_index.py",
     "workflow": ".github/workflows/sdk-schema-index.yml",
     "official_archive_sha256": "cf557e5a022e4297892f39768132855154232efdedeb726b2845450ccd70e1b3",
-    "status": "CI_PENDING",
+    "status": "CI_VERIFIED_BOUNDED_INDEX_NO_EXACT_SCHEMA",
     "sdk_contents_redistributed": false,
     "unit_tests_added": 7,
     "exact_cli_schema_verified": false,
@@ -142,6 +142,25 @@
     "official_license_grant_confirmed": false,
     "real_nas_test": "NOT_RUN",
     "report": "docs/roles/lead/G1_SDK_SEMANTIC_INDEX_20261024.md",
-    "actual_work_hours": null
+    "actual_work_hours": null,
+    "index_workflow_url": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40071026738",
+    "verified_source_commit": "136ae578f726606c1fc0001facfdf21dd2fca5f0",
+    "source_files_detected": [
+      "data/capability-catalog.json",
+      "schemas/capability-catalog.schema.json",
+      "docs/skill-development-standard.md",
+      "scripts/check-skill.mjs",
+      "scripts/check-lib.mjs"
+    ],
+    "registered_agent_registry_verified": false
+  },
+  "g1_static_contract_probe": {
+    "id": "G1-STATIC-CHECKER-20261024",
+    "status": "CI_PENDING",
+    "source": "tools/sdk_static_contract_probe.py",
+    "tests_added": 6,
+    "official_validator_executed": false,
+    "nas_runtime_executed": false,
+    "report": "docs/roles/lead/G1_SDK_SEMANTIC_INDEX_20261024.md"
   }
 }

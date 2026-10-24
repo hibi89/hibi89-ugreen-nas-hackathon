@@ -1,0 +1,25 @@
+name: Pinned Uliya static checker and catalog scan
+on:
+  push:
+    branches: ["lead/ugreen"]
+    paths:
+      - "tools/sdk_static_contract_probe.py"
+      - ".github/workflows/sdk-static-contract.yml"
+  workflow_dispatch:
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 3
+    env:
+      KIT_URL: https://cdn.shopify.com/s/files/1/0630/9416/1602/files/uliya-skill-kit-0.7.3-en.zip?v=1790578898
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Bounded static parser — absolutely no SDK code execution
+        run: python tools/sdk_static_contract_probe.py --official-url "$KIT_URL"
