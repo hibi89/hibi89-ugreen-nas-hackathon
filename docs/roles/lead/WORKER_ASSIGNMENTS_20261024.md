@@ -32,3 +32,9 @@
 - 개별 담당의 검수 실패·중단 시 다른 담당자를 병렬로 켜지 않는다. 원인/재시도 1회/대안 보고 후 사용자 승인으로 일정 조정.
 - 총괄은 세 담당자 메시지함을 읽을 수 있으나 **작업자 활성화는 항상 한 명씩**.
 - [최신 전용 일정](../../UGREEN_EXECUTION_PLAN_20261024.md) 및 [상위 보고](TO_HACKATHON_LEAD.md) 참조.
+
+## [최신 2026-10-24] 실제 실행 명령은 공통 디스패처
+- 기존 W1/W2/W3 날짜·담당 설명은 참고용이다. 각 역할마다 별도 AI 채팅을 만들지 않는다.
+- 공통 작업자 채팅의 유일한 실행 지시는 [CURRENT_TASK](../../dispatcher/CURRENT_TASK.md)이며, 매번 지정된 TARGET_BRANCH에서만 작업한다. 사용자가 같은 채팅을 재사용한다.
+- 최초 UGR-001 기술능력 조사 READY, feature/missing-files. [WORKER_START_HERE](../../WORKER_START_HERE.md)와 [BACKLOG](../../dispatcher/BACKLOG.md) 참조.
+- 각 Task 수락/새 Task 배정은 총괄만 담당한다. 신규 유료 서비스 사용 금지, 개인정보 보호 및 Skill 개발 실검증 구분 유지.

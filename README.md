@@ -35,3 +35,11 @@
 - [3 worker assignments and acceptance criteria](docs/roles/lead/WORKER_ASSIGNMENTS_20261024.md)
 - Early final submission target **2026-11-10 KST**; official **2026-11-16 16:45 KST**.
 - User-approved evidence-based client delivery Go/No-Go Skill, not three separate submissions. Product and NAS/CLI operation unverified; no new paid tools.
+
+
+## [최신 운영] 하나의 UGREEN 작업자 채팅
+- **UGREEN 총괄 채팅 + 공통 작업자 채팅 = 2개 채팅**. 이전의 작업자별 별도 대화 3개는 필요하지 않음.
+- 공통 담당자 시작: [WORKER_START_HERE](docs/WORKER_START_HERE.md) → 매번 [CURRENT_TASK](docs/dispatcher/CURRENT_TASK.md)를 읽고 지정된 feature 브랜치에서 실제 작업.
+- 총괄은 [BACKLOG](docs/dispatcher/BACKLOG.md)와 [DISPATCH_PROTOCOL](docs/roles/lead/DISPATCH_PROTOCOL.md)을 따라 각 단계 검수 후 다음 업무를 게시. 작업자 채팅은 그대로 재사용.
+- 현재 READY UGR-001 공식 Skill Kit 조사, 대상 feature/missing-files. 다른 두 작업은 대기. 실제 작업자 실행/SDK 검증/Skill 구현은 아직 미확인.
+- 내부 조기 제출 11/10 KST; 공식 예선 11/16 16:45 KST; 신규 현금 지출 0원 목표.

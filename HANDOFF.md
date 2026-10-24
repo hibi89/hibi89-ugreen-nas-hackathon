@@ -35,3 +35,12 @@
 - 계획된 제품 ProjectReady NAS 단일 Skill, 기존 feature 브랜치 3개, 공식 마감 **11/16 16:45 KST**, 추가 현금 지출 **0원 목표**는 그대로 유지한다.
 - 공식 지원 CLI 미확인, 실제 실행·NAS·CI·작품 제출 미완료. 순차 작업으로 위험해지는 경우 **일정 또는 범위 변경 대안을 먼저 사용자에게 승인받는다**. 사용자 승인 없이 기능/품질 축소 금지.
 - 운영 기준: [최신 일정](docs/UGREEN_EXECUTION_PLAN_20261024.md), [순차 담당 지시](docs/roles/lead/WORKER_ASSIGNMENTS_20261024.md). 과거 병렬 표기보다 본 최신 지시가 우선이다.
+
+
+## [최신 2026-10-24 KST] 단일 공통 작업자 채팅 + GitHub 작업 디스패치
+- 사용자 운영 결정: UGREEN 총괄 채팅 1개 + **기능 3역할을 순차 수행하는 공통 작업자 채팅 1개**. 더는 담당자별 채팅 3개를 만들지 않는다. 기능별 GitHub 브랜치 3개는 유지한다.
+- **총괄이 다음 업무를 게시할 유일한 위치**: lead/ugreen의 **docs/dispatcher/CURRENT_TASK.md**. 작업자 채팅은 매번 최신 TASK_ID, STATUS, TARGET_BRANCH를 확인해 지정 브랜치에서만 수행한다.
+- **최초 UGR-001 READY**: 공식 Uliya Skill Developer Package 실제 지원기능·CLI/Expert Agent/권한·모델·비용 조사, 대상 브랜치 **feature/missing-files**, 현재 베이스 SHA **9b3052bf82ad1a8a4844b1aeee699c0b759251dc**. 실제 실행/완료 미확인.
+- 작업자는 자기 feature 브랜치에 증거·TO_UGREEN_LEAD.md의 DONE_FOR_REVIEW 또는 BLOCKED 보고만 작성, 리드·다른 브랜치 수정 금지. **총괄이 원격 SHA와 증거를 검수/수락한 뒤 새 ID/REVISION을 READY로 게시**할 때만 다음 역할로 전환.
+- 시작 지침: [공통 작업자 입문](docs/WORKER_START_HERE.md) / [현재 작업](docs/dispatcher/CURRENT_TASK.md) / [예정 업무](docs/dispatcher/BACKLOG.md) / [검수 규약](docs/roles/lead/DISPATCH_PROTOCOL.md). 이 최신 운영 규칙이 이전 '3개 독립 채팅' 및 '세 명 동시 작업' 문구보다 우선한다.
+- 기술 개발/SDK 실검증·CI/NAS·Devpost 제출은 아직 완료되지 않았다. UGREEN 11/10 조기 제출, 11/16 16:45 KST 공식 마감, 신규 현금 비용 0원 목표 유지. GitHub 문서만으로 AI 채팅 자동 실행·통지/잠금 기능을 제공하지 않는다.

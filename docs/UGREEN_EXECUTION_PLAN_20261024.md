@@ -71,3 +71,10 @@ Existing subscriptions, electricity, internet, own labor, prize taxes/transfer f
 Verified: registration screen provided by entrant, official contest requirements, GitHub branches and original planning documents. Still UNVERIFIED: actual downloaded package internal CLI, PII/version functionality, API, skill running on NAS, Devpost project creation and final submission, CI and deployment.
 Official rules: https://ugreenhackathon.devpost.com/rules
 Official package: https://ai.ugreen.com/pages/hackathon-starter-kit
+
+
+## [LATEST 2026-10-24 KST] Single reusable worker chat / rotating branch assignment
+- Within UGREEN, ONE worker chat reads lead/ugreen/docs/dispatcher/CURRENT_TASK.md each turn and switches role/feature branch according to the one READY Task. Three worker roles do NOT require separate chat rooms.
+- Current READY UGR-001, feature/missing-files, official Uliya Skill Kit evidence inventory by Oct 26. Then lead G2 architecture check; UGR-002 missing-files, UGR-003 version-conflicts, UGR-004 privacy are WAITING. The worker never executes BACKLOG just because the date arrives.
+- Worker reports evidence/commit SHA in its own feature TO_UGREEN_LEAD, then lead reviews and issues next READY. The same worker chat can continue. No automatic alert, unattended execution or hard GitHub mutex.
+- References: [worker start](WORKER_START_HERE.md) / [current task](dispatcher/CURRENT_TASK.md) / [backlog](dispatcher/BACKLOG.md). Schedule/internal 11/10 and official 11/16 unchanged.

@@ -9,3 +9,10 @@
 - 원본·기존 정상 기능·데이터 보존. 설계 2안 비교 후 사용자 승인. 유료 API/결제·개인정보 외부 전송·권한/공개 설정 변경·기존 원본 변경은 승인 필요.
 - 토큰·.env·비밀번호·개인정보·비공개 원본 업로드 금지(**저장소 Public**). API Sandbox 성공/합성 테스트/CI/Production 실제 동작을 구분한다.
 - 이 운영 문서는 코드 개발 완성의 근거가 아니다. 대회 공식 규정은 https://ugreenhackathon.devpost.com/rules.
+
+
+## [2026-10-24 최신 우선규정] 단일 공통 실행 담당자
+- 과거 기능별 AI 채팅방 3개 가정 폐기. **UGREEN은 총괄 채팅 1개 + 하나의 공통 작업자 채팅 1개**. 같은 담당자 채팅이 최신 업무에 맞춰 feature 브랜치를 변경한다.
+- 실행 전 lead/ugreen의 [CURRENT_TASK](docs/dispatcher/CURRENT_TASK.md) 최신 TASK_ID/STATUS/TARGET_BRANCH를 조회한다. **하나의 READY만 실행**, BACKLOG 임의 착수 금지.
+- 작업자는 지정 feature 브랜치만 수정하고 그 브랜치의 TO_UGREEN_LEAD에 Task ID, DONE_FOR_REVIEW/BLOCKED, 증거/검증/원격 SHA 보고. 총괄 승인 후에만 새 READY로 전환한다. 리드/main 브랜치는 총괄 관리.
+- [공통 작업자 시작 안내](docs/WORKER_START_HERE.md) 참조. 이 최신 규정이 위의 과거 '각자 독립 대화'보다 우선. 채팅 간 자동 알림/실행은 없다.

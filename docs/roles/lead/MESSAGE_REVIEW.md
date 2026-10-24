@@ -22,3 +22,10 @@
 - feature/version-conflicts HEAD f1aaf9f28800c9fb563d846622583314f6be6c85: initial message only; no reported implementation or new blocker.
 - feature/privacy HEAD cbd7f2ac866ad338d2006dcc1337a5c44f029423: initial message only; no reported implementation or new blocker.
 - User approved the strengthened ProjectReady NAS and dates; worker brief is on lead/ugreen ONLY. Worker branches unchanged, delivery to worker chats unconfirmed. Recheck their messages before integration.
+
+
+## 2026-10-24 KST — 단일 작업자 지시 등록 전 최신 브랜치 보고 확인
+- feature/missing-files @ 9b3052bf82ad1a8a4844b1aeee699c0b759251dc: 초기 미착수 TO_UGREEN_LEAD, 신규 보고/차단 없음. UGR-001 READY 배정 대상.
+- feature/version-conflicts @ f1aaf9f28800c9fb563d846622583314f6be6c85: 초기 미착수, 후속 UGR-003까지 대기.
+- feature/privacy @ cbd7f2ac866ad338d2006dcc1337a5c44f029423: 초기 미착수, 후속 UGR-004까지 대기.
+- CURRENT_TASK REVISION 1만 실행 가능하며, 담당자는 자기 feature 브랜치에 완료/차단 기록 후 총괄 검수 대기. 세 브랜치 직접 변경 없음.

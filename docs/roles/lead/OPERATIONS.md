@@ -34,3 +34,10 @@
 - 활성화 전 3개 TO_UGREEN_LEAD 메시지함·SHA 읽기 → ACTIVE_WORKER 상태 확인 → **완료 증거 + 총괄 검수 + HANDOFF/STATUS** 뒤에만 다음 작업자 지시.
 - 현재 ACTIVE_WORKER=none (G1/G2 리드가 먼저). 기능 브랜치는 그대로 두고 새 브랜치·자동 작업기 등록 없음.
 - 이전 '3개 병렬 설계' 지시 및 10/28~31 한꺼번에 수행 일정은 본 운영 규칙으로 대체. 비용 0원·공식 마감·단일 제품 그대로.
+
+
+## [최신 총괄 프로토콜] 공통 작업자 채팅 배정
+- 작업자 채팅방 하나는 최신 CURRENT_TASK의 Task ID와 TARGET_BRANCH로만 일한다. 새 메시지나 날짜만으로 Task 전환하지 않는다.
+- 총괄은 작업 종료 보고 후 [DISPATCH_PROTOCOL](DISPATCH_PROTOCOL.md)에 따라 지정 브랜치의 HEAD/실제 증거/TO_UGREEN_LEAD와 세 보고서를 확인, [REVIEW_LOG](../../dispatcher/REVIEW_LOG.md) 및 STATUS/HANDOFF/상위 보고 갱신, 다음 REVISION을 CURRENT_TASK에 게시한다.
+- 현재 UGR-001 READY/feature/missing-files, 미실행. G2 검수 뒤 UGR-002/3/4 순차 개방. 작업자 3명 동시 접속/별도 채팅 필요 없음.
+- 신규 결제/원본 변경/비밀정보 외부 전송/권한 확대는 사전 사용자 승인. 자동 채팅 알림·GitHub 락 없음.

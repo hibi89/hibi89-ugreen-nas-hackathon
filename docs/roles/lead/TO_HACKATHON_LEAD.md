@@ -55,3 +55,13 @@
 - UGREEN 내 현재 ACTIVE_WORKER=none; 작업자에게 개별 전달·수신·개발 시작은 미확인. KIT/CLI·모델/기능 실검증 0건; Devpost 공식 작품 미생성·미제출.
 - 신규 유료 비용 0원 목표 유지. 일정/기능 충돌 시 사용자 승인 없이 범위를 줄이지 않는다. KIC/PayPal 저장소는 UGREEN 총괄이 수정하지 않음.
 - 상세 [UGREEN 일정](../../UGREEN_EXECUTION_PLAN_20261024.md) / [순차 작업 지시](WORKER_ASSIGNMENTS_20261024.md). 전체 총괄은 이 보고를 읽어 교차 진행 정책을 동기화할 수 있음.
+
+
+## [최신 2026-10-24 KST] UGREEN 전용 동적 단일 작업자 시스템 구축 보고
+- 사용자 확정 운영: 총괄 채팅방 1개와 **공통 담당자 채팅방 1개**만 사용. 세 기능 브랜치의 역할을 순차 변경하며 3개 별도 AI 채팅방 불필요.
+- 리드 전용 공개 지시: [CURRENT_TASK](../../dispatcher/CURRENT_TASK.md), [공통 WORKER_START_HERE](../../WORKER_START_HERE.md), [미래 업무](../../dispatcher/BACKLOG.md), [승인/전환 프로토콜](DISPATCH_PROTOCOL.md).
+- **지금 배정된 단 하나의 Task: UGR-001 READY**, feature/missing-files, 공식 Kit 내부 Uliya CLI/등록 Expert Agent/권한/보안/무료 가능성 조사. Deadline target 10/26 KST. 작업자 수행/인수/완료는 아직 미확인.
+- 이어서 총괄 G2 데이터 계약 승인, UGR-002 missing-files → UGR-003 version-conflicts → UGR-004 privacy 순차 예정. 과거 기능별 한 개 AI 채팅 가정/병렬 작업 지시는 폐기.
+- 작업자 결과는 자기 브랜치 TO_UGREEN_LEAD에 TASK_ID·SHA·테스트/미검증 기재, 총괄이 직접 검수한 뒤에만 차기 Task를 게시. 자동 실행/실시간 동기화/자동 잠금 없음.
+- GitHub의 3 feature 및 main 브랜치, 통합 총괄 저장소는 수정하지 않음. 이번 변경은 lead/ugreen의 문서·작업 할당 체계만. Skill 구현/CLI 확인·CI/실 NAS·Devpost 제출은 미검증.
+- 11/10 내부 제출 목표, 11/16 16:45 KST 공식 마감, 추가 현금 지출 0원 목표 유지.

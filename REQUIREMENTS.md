@@ -30,3 +30,12 @@
 - **Zero incremental cash spending target**; new paid models/API/server/NAS not authorized. Existing subscriptions and work time excluded.
 - Source of truth: [approved execution plan](docs/UGREEN_EXECUTION_PLAN_20261024.md) and [worker instruction](docs/roles/lead/WORKER_ASSIGNMENTS_20261024.md). This approval supersedes old 'tentative product' and 11/14 target statements above.
 - **Actual execution:** Devpost registered, not created/submitted. No actual Uliya CLI archive internal study, SDK/NAS run, product tests or CI yet. Do not claim success until verified. Worker chats not automatically assigned.
+
+
+## [최신 2026-10-24 KST] 단일 공통 작업자 채팅 + GitHub 작업 디스패치
+- 사용자 운영 결정: UGREEN 총괄 채팅 1개 + **기능 3역할을 순차 수행하는 공통 작업자 채팅 1개**. 더는 담당자별 채팅 3개를 만들지 않는다. 기능별 GitHub 브랜치 3개는 유지한다.
+- **총괄이 다음 업무를 게시할 유일한 위치**: lead/ugreen의 **docs/dispatcher/CURRENT_TASK.md**. 작업자 채팅은 매번 최신 TASK_ID, STATUS, TARGET_BRANCH를 확인해 지정 브랜치에서만 수행한다.
+- **최초 UGR-001 READY**: 공식 Uliya Skill Developer Package 실제 지원기능·CLI/Expert Agent/권한·모델·비용 조사, 대상 브랜치 **feature/missing-files**, 현재 베이스 SHA **9b3052bf82ad1a8a4844b1aeee699c0b759251dc**. 실제 실행/완료 미확인.
+- 작업자는 자기 feature 브랜치에 증거·TO_UGREEN_LEAD.md의 DONE_FOR_REVIEW 또는 BLOCKED 보고만 작성, 리드·다른 브랜치 수정 금지. **총괄이 원격 SHA와 증거를 검수/수락한 뒤 새 ID/REVISION을 READY로 게시**할 때만 다음 역할로 전환.
+- 시작 지침: [공통 작업자 입문](docs/WORKER_START_HERE.md) / [현재 작업](docs/dispatcher/CURRENT_TASK.md) / [예정 업무](docs/dispatcher/BACKLOG.md) / [검수 규약](docs/roles/lead/DISPATCH_PROTOCOL.md). 이 최신 운영 규칙이 이전 '3개 독립 채팅' 및 '세 명 동시 작업' 문구보다 우선한다.
+- 기술 개발/SDK 실검증·CI/NAS·Devpost 제출은 아직 완료되지 않았다. UGREEN 11/10 조기 제출, 11/16 16:45 KST 공식 마감, 신규 현금 비용 0원 목표 유지. GitHub 문서만으로 AI 채팅 자동 실행·통지/잠금 기능을 제공하지 않는다.
