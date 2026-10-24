@@ -557,5 +557,25 @@
     "actual_hours": null,
     "changes_to_2026_10_24_daily_progress": false,
     "devpost": "NOT_SUBMITTED"
+  },
+  "g27_official_checker_exact_candidate": {
+    "date_kst": "2026-10-25",
+    "participant_time_kst": "00:33",
+    "participant_reported": true,
+    "candidate_sha256": "770e08c6eb5101785579eed7f2438547e0a0386d4c35aead860aab088e091169",
+    "official_checker_status": "static-pass",
+    "errors": 0,
+    "warnings": 0,
+    "info": 0,
+    "exit_code_reported": 0,
+    "source_unchanged_after_check": true,
+    "json_path": "docs/submission/evidence/G27_PARTICIPANT_OFFICIAL_CHECKER_RESULT_20261025.json",
+    "report_path": "docs/submission/G27_EXACT_CANDIDATE_OFFICIAL_STATIC_CHECK_REPORTED_20261025.md",
+    "static_checker_previous_blocker_resolved": true,
+    "g1_cli_agent_runtime": "BLOCKED",
+    "rights_license": "PENDING",
+    "devpost": "NOT_SUBMITTED",
+    "affects_2026_10_24_daily_completion": false,
+    "actual_hours": null
   }
 }

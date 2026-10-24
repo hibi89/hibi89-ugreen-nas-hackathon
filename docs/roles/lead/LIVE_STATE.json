@@ -11,7 +11,7 @@
   "official_sdk_cli_schema": "BLOCKED_UNVERIFIED",
   "registered_expert_agents": "BLOCKED_UNVERIFIED",
   "nas_runtime": "NOT_RUN",
-  "official_skill_validator": "PARTICIPANT_REPORTED_OFFICIAL_STATIC_CHECK_PASS_NOT_INDEPENDENTLY_VERIFIED",
+  "official_skill_validator": "PARTICIPANT_REPORTED_STATIC_PASS_EXACT_G22_SHA_0_ERRORS_0_WARNINGS_0_INFO",
   "pii_safety": "NOT_CHECKED",
   "devpost_final_submission": "NOT_SUBMITTED",
   "round2_finalist_status": "NOT_CONFIRMED",
@@ -27,8 +27,8 @@
   "next_work": {
     "id": "G1-RUNTIME-INVOCATION",
     "scheduled_kst": "2026-10-25",
-    "status": "BLOCKED_EXTERNAL_RUNTIME_AND_OFFICIAL_VALIDATOR",
-    "scope": "Obtain first-party installed CLI invocation and evidence of registered file-agent/document-agent with exact permission and result semantics; no actual NAS/data access or official validator execution before safety and license check",
+    "status": "BLOCKED_OFFICIAL_CLI_EXPERT_AGENT_RUNTIME_AND_EFFECTIVE_PERMISSIONS",
+    "scope": "Obtain first-party CLI invocation and registered expert-agent effective-permission evidence; separate G22 SKILL.md official static checker reported PASS exact SHA, without real NAS execution or license/owner consent yet",
     "planned_hours": 1.5,
     "separate_reserve_hours": 1.5,
     "actual_completion_eta_hours": null
@@ -419,7 +419,7 @@
     "words": 351,
     "round1_submission_gate": "NOT_APPROVED_FOR_SUBMISSION"
   },
-  "next_action_priority": "G23_ENTRANT_RIGHTS_EDITORIAL_AND_OFFICIAL_CHECKER_OF_DISCLOSURE_AUGMENTED_ONE_FILE_SKILL; EXACT_FINAL_PDF_ZIP_APPROVAL_ONLY_AFTER; NO_AUTO_DEVPOST_SKILLHUB",
+  "next_action_priority": "Review remaining submission rights/AI/data-flow disclosures and Article 2.5 synthetic examples; separately recover safe official CLI/Expert Agent runtime permission evidence. Do NOT rerun official checker unless source is edited. Devpost remains NOT_SUBMITTED until explicit participant release approval.",
   "g11_round1_disclosure_parity": {
     "date_kst": "2026-10-24",
     "status": "OFFLINE_VERIFIED_ONE_PAGE_VISUAL_PASS",
@@ -754,5 +754,29 @@
     "devpost": "NOT_SUBMITTED",
     "master_progress": "UNCHANGED",
     "report_path": "docs/submission/G26_CHECKER_INPUT_RECOVERY_20261025.md"
+  },
+  "g27_exact_candidate_checker_evidence": {
+    "date_kst": "2026-10-25",
+    "reported_time_kst": "00:33",
+    "evidence_source": "PARTICIPANT_SUPPLIED_LOCAL_CODEX_REPORT_AND_EXACT_JSON",
+    "checker": "uliya-skill-kit/scripts/check-skill.mjs",
+    "candidate_sha256": "770e08c6eb5101785579eed7f2438547e0a0386d4c35aead860aab088e091169",
+    "repo_snapshot_path": "docs/submission/checker_inputs/G22_20261024/projectready-nas/SKILL.md",
+    "checker_result_json": "docs/submission/evidence/G27_PARTICIPANT_OFFICIAL_CHECKER_RESULT_20261025.json",
+    "checker_format": "2.0.0",
+    "checker_catalog_version": "2.0.0",
+    "checker_status": "static-pass",
+    "process_exit_code_reported": 0,
+    "errors": 0,
+    "warnings": 0,
+    "info": 0,
+    "independent_source_sha_verified": true,
+    "independent_local_checker_reexecution": false,
+    "nas_runtime": "NOT_RUN",
+    "expert_agent_permissions": "UNVERIFIED",
+    "ip_license": "PENDING",
+    "article_2_5_examples": "REVIEW_REQUIRED",
+    "devpost": "NOT_SUBMITTED",
+    "report": "docs/submission/G27_EXACT_CANDIDATE_OFFICIAL_STATIC_CHECK_REPORTED_20261025.md"
   }
 }
