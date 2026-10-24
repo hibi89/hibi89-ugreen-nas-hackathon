@@ -1,0 +1,44 @@
+name: UGREEN synthetic five-case walkthrough (NOT NAS)
+on:
+  push:
+    branches: ["lead/ugreen"]
+    paths:
+      - "src/projectready/**"
+      - "tools/offline_demo_walkthrough.py"
+      - "tests/test_offline_demo_walkthrough.py"
+      - ".github/workflows/offline-demo.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  reproducible-example:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run five-case real-Python-engine offline verification
+        run: python -m unittest discover -s tests -p 'test_offline_demo_walkthrough.py' -v
+      - name: Generate simulated walkthrough from existing core engine
+        shell: bash
+        run: |
+          python tools/offline_demo_walkthrough.py --output-dir "$RUNNER_TEMP/projectready-offline-demo"
+          python - "$RUNNER_TEMP/projectready-offline-demo/demo_report.json" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1],encoding="utf8"))
+          assert d["kind"]=="PROJECTREADY_OFFLINE_SYNTHETIC_DEMO"
+          assert d["real_nas"]=="NOT_RUN" and d["official_ugos_creator"]=="NOT_EVIDENCED"
+          assert len(d["cases"])==5
+          assert all(c["is_real_nas_validation"] is False for c in d["cases"])
+          assert all(c["privacy_gate"]=="NOT_CHECKED" for c in d["cases"])
+          print("5 SYNTHETIC CASE OUTPUTS VERIFIED; NOT UGREEN NAS VALIDATION")
+          PY
+      - name: Upload DEMO ONLY (NOT submission ZIP)
+        uses: actions/upload-artifact@v4
+        with:
+          name: UGREEN-OFFLINE-SYNTHETIC-DEMO-NOT-SUBMITTED
+          path: ${{ runner.temp }}/projectready-offline-demo/
+          retention-days: 7
+          if-no-files-found: error

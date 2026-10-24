@@ -419,7 +419,7 @@
     "words": 351,
     "round1_submission_gate": "NOT_APPROVED_FOR_SUBMISSION"
   },
-  "next_action_priority": "G12_OWNER_SUPPORTED_CODEX_OFFICIAL_UGOS_SKILL_CREATOR_GENERATION_AND_LICENSE_REVIEW; BLOCKED_OUTSIDE_OWNER_ENVIRONMENT",
+  "next_action_priority": "G14_VERIFY_CI_AND_DOWNLOAD_SYNTHETIC_REPORT; G12_OFFICIAL_CREATOR_REQUIRES_OWNER_LOCAL_CODEX",
   "g11_round1_disclosure_parity": {
     "date_kst": "2026-10-24",
     "status": "OFFLINE_VERIFIED_ONE_PAGE_VISUAL_PASS",
@@ -533,5 +533,24 @@
     "final_draft_markdown_members": 4,
     "first_failed_ci_remediated": true,
     "approved_for_submission": false
+  },
+  "g14_executable_offline_demo": {
+    "date_kst": "2026-10-24",
+    "scope": "G4/G5 deterministic offline reports; five fully synthetic scenarios",
+    "status": "SOURCE_CI_PENDING",
+    "source": "tools/offline_demo_walkthrough.py",
+    "test": "tests/test_offline_demo_walkthrough.py",
+    "workflow": ".github/workflows/offline-demo.yml",
+    "report": "docs/architecture/G14_EXECUTABLE_SYNTHETIC_WALKTHROUGH_20261024.md",
+    "cases": 5,
+    "offline_cases_validation": "PENDING_NEW_CI",
+    "is_real_nas_validation": false,
+    "official_creator": "NOT_EVIDENCED",
+    "official_checker": "NOT_RUN",
+    "live_nas": "NOT_RUN",
+    "entrant_signoff": "PENDING",
+    "devpost": "NOT_SUBMITTED",
+    "actual_work_hours": null,
+    "incremental_spend_krw": 0
   }
 }
