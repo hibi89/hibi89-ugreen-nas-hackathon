@@ -12,3 +12,5 @@
 **G1-Day1 remote test verification:** [GitHub Actions run 40063814809](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40063814809) — 16/16 PASS, actual time **미측정**; CI elapsed runtime 0.002s is **NOT developer work-time evidence**. Remaining SDK G1 gate blocked.
 
 **2026-10-24 1일차 종료 보고(사후 가중치):** [당일 완료율 75%·잔여 25%](DAILY_PROGRESS.md); 기준 잔여 배정 약 **0.4h** + 별도 예비 배정 **1.5h**, 실제 SDK 완료 시간 **산정 불가** (접근 차단), 실제 소요시간 **미측정**. 2026-10-25 2일차 별도 계획 1.5h+1.5h. 완료시간을 임의 측정/소급하지 않음.
+
+**2026-10-24 동일 날짜 G1 후속 작업:** 추가 공식 ZIP 메타데이터 조사 [#40064613266](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40064613266), 29/29 offline [CI #40064613228](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40064613228). 당일 75/25 **그대로**; 공시 중단점은 정확한 CLI/Agent 스키마. 실제 작업시간 미측정, 실제 완료 ETA 산정 불가. [G1_ZIP_METADATA_RECOVERY_20261024.md](G1_ZIP_METADATA_RECOVERY_20261024.md).

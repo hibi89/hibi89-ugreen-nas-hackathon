@@ -34,3 +34,9 @@
 - 새로운 날이 시작하면 이 문서의 **현재 스냅샷**을 갱신하되 이전 날 성적표는 일자별 기록 섹션/별도 로그로 보존한다.
 
 **고정 기준:** [DAILY_PROGRESS_REPORTING_PROTOCOL.md](DAILY_PROGRESS_REPORTING_PROTOCOL.md) / [실측 로그](WORK_TIME_LOG.md) / [일별 시간 예산](../../UGREEN_DAILY_EFFORT_PLAN_20261024.md).
+
+
+### 2026-10-24 같은 날 추가 G1 조사 (분모·퍼센트 유지)
+- [공식 ZIP 임시 다운로드 검사 #40064613266](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40064613266) 성공: 26파일·37,575바이트·SHA256 `cf557e5a022e4297892f39768132855154232efdedeb726b2845450ccd70e1b3`. [29/29 원격 오프라인 테스트 #40064613228](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40064613228) 성공. **G1D SDK 명령/등록 Agent/라이선스 실제 확인은 여전히 BLOCKED.**
+- 이전 4×25% 하루 작업 분모는 바꾸지 않음. **완료 75% / 남은 25%**, 남은 명목 기준 배당 0.4h + 별도 예비 1.5h, **실제 완료시간은 SDK 상세 문서 권한 때문에 산정 불가**. 0.4h 완료 보장 아님. 실제 경과시간 미측정.
+- 다음 승인된 G1 Day2 기준 1.5h 계획+1.5h 예비=3h 상한; 참가자 PC 개인 검사 경로 또는 공식 Devpost 지원 확인. 원격 ZIP 검사 성공은 실제 NAS/SDK Skill 검수나 최종 제출과 다르다. 원본: [G1_ZIP_METADATA_RECOVERY](G1_ZIP_METADATA_RECOVERY_20261024.md).

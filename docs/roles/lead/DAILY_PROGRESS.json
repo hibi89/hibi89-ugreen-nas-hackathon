@@ -44,13 +44,18 @@
   "remaining_plan_allocation_hours_approx": 0.4,
   "remaining_reserve_allocation_hours": 1.5,
   "remaining_total_completion_eta_hours": null,
-  "remaining_total_completion_eta_reason": "OFFICIAL_SDK_ARCHIVE_ACCESS_BLOCKED; external access/support elapsed time unpredictable",
+  "remaining_total_completion_eta_reason": "ZIP download solved, but exact official registered Agent/CLI/license permissions still not inspected. Requires private authorized SDK docs or official support",
   "carryover_date_kst": "2026-10-25",
   "carryover_plan_hours": 1.5,
   "carryover_reserve_hours": 1.5,
-  "g1_technical_gate": "BLOCKED",
+  "g1_technical_gate": "PARTIAL_BLOCKED_EXACT_CLI_SCHEMA",
   "sdk_cli_runtime_tests": "NOT_RUN",
   "production_and_submission": "NOT_DONE",
-  "last_verified_source_commit": "b97b23a302e6d7edc5c6013557e93c0b749ce8d0",
-  "updated_kst_note": "2026-10-24 KST; documentation policy update does not increase engineering completion"
+  "last_verified_source_commit": "9f64d3b0f86af103ab75c475495ea259fbce8dc9",
+  "updated_kst_note": "2026-10-24 KST; additional same-day G1D activity confirmed public ZIP SHA and 26-file metadata only; exact CLI still BLOCKED; daily 75/25 unchanged",
+  "sdk_archive_public_zip_downloaded_in_ephemeral_ci": true,
+  "sdk_archive_sha256": "cf557e5a022e4297892f39768132855154232efdedeb726b2845450ccd70e1b3",
+  "sdk_archive_metadata_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40064613266",
+  "offline_ci_latest_test_count": 29,
+  "offline_ci_latest_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40064613228"
 }

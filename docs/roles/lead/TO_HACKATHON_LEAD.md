@@ -129,3 +129,10 @@
 - **1일차(10/24에 10/25 G1 작업을 선행): 75% /100% 완료, 남은 25%.** 4개 종료 목표를 동일 가중치 25%로 **사후 분류**: 규정 확인, CDN 경로 진단, 오프라인 안전 검증 엔진·GitHub Actions [16/16 PASS](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40063814809) 세 항목 DONE; 실제 SDK ZIP 내부 문서/CLI/Agent/라이선스 검증 한 항목 **BLOCKED**.
 - **남은 기준 작업 배당 약 0.4h** (=1.5h 계획×25%, 완료 ETA 아님) + **별도 예비 배정 1.5h**(실사용 미측정). **실제 SDK 기술 게이트 완료까지 ETA 산정 불가**, 원격 대기/권한에 달림. 실제 소요시간 **미측정**, 내부 CLI/NAS 검증 **NOT_RUN**. 10/25 다음 작업 1.5h 계획 + 1.5h 예비.
 - 앞으로 **매 작업 종료 시** 증거 있는 DONE 가중치만 완료 계산, `DAILY_PROGRESS.md/json`·`LEAD_ACTIVE_WORK`·`STATUS/HANDOFF`·`TO_HACKATHON_LEAD`·실측 로그 동시 갱신 후 원격 커밋/CI 재확인. 본 공시는 보고 제도만 정한 것으로 개발 진척 추가 없음.
+
+
+## [2026-10-24 KST] G1 추가 실행: 공식 ZIP 메타데이터 확보, 정확한 CLI는 아직 미검증
+- [G1 후속 실증](G1_ZIP_METADATA_RECOVERY_20261024.md) / [공식 ZIP GitHub Actions #40064613266](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40064613266): ephemeral runner에서 **실제 공식 공개 ZIP 다운로드 성공**, 26파일·37,575바이트, SHA256 `cf557e5a022e4297892f39768132855154232efdedeb726b2845450ccd70e1b3`. SDK 아카이브 자체·내부 문서 원문·실행 스크립트를 공개 GitHub에 업로드/추출/실행하지 않았고, 메뉴얼 원문 미확인. `license_filename_present=false`는 라이선스 부재 판단이 아님.
+- [오프라인 CI #40064613228](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40064613228) **29/29 PASS**(판정·진척률·ZIP 메타데이터 무결성), 실제 Uliya Tool validator, NAS, 등록 에이전트/CLI 호출 **NOT_RUN**.
+- 후속 단 한 과제: `tools/private_ugreen_sdk_inspection.ps1`로 참가자 소유 Windows PC에서 **공식 ZIP 개인 폴더 비공개 열람 및 명령/Agent/validator 실제 규격 확인**, 안되면 공식 지원처. 사용자에게 아직 실행 확인 받지 않음. SDK ZIP 연결 **해결**, **정확한 CLI 스키마 차단 유지**.
+- **같은 날짜의 당일 100% 분모 보존:** 75% DONE / 남은 25% BLOCKED. 추가 SDK 메타데이터 실증은 원래 미완료 G1D에 포함되므로 진행률 가중치 새로 만들지 않음. 기준 배당 약 0.4h+별도 예비 1.5h(완료 ETA 아님), 다음 배정 1.5h+예비 1.5h=3h 상한. 실측 시간 미측정, 외부 대기/권한 때문에 실제 완료시간 미정. 기타 대회/Devpost 상태 변화 없음.

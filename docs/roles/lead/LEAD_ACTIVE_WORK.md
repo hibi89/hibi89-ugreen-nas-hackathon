@@ -1,3 +1,5 @@
+> **2026-10-24 G1 추가 실증:** [공식 ZIP 메타데이터 회수](G1_ZIP_METADATA_RECOVERY_20261024.md). GitHub-runner 다운로드 성공·SHA256 확정·26개 내부 파일 메타데이터 관찰; [원격 합성 29/29 PASS](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40064613228). **기존 DNS 차단은 우회했지만 CLI/등록 Agent/검수기/라이선스 본문 분석은 여전히 BLOCKED.** 다음 일 하나: 안전한 참가자 소유 로컬 환경에서 [PowerShell 비공개 SDK 검사](../../../tools/private_ugreen_sdk_inspection.ps1)로 실제 문서를 확인하거나 공식 지원을 통해 정확한 명령/Agent 스키마 확보. 퍼블릭 원본 재배포·스크립트 임의 실행 금지. **오늘 75% 완료/25% 남음, 명목 잔여 배당 약 0.4h+별도 예비 1.5h, 실제 완료시간 산정 불가.**
+
 
 
 ## [2026-10-24 KST 최우선 사용자 상시 지시] 매 작업 종료 100% 기준 완료율 보고
