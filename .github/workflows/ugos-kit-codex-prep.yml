@@ -1,0 +1,44 @@
+name: First-party UGOS kit Codex preparation smoke check (NO tool execution)
+on:
+  push:
+    branches: ["lead/ugreen"]
+    paths:
+      - "tools/prepare_ugos_codex_kit.ps1"
+      - ".github/workflows/ugos-kit-codex-prep.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  prepare-without-executing-vendor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect official ZIP hash/layout and copy only into private scratch Codex skills
+        shell: pwsh
+        run: |
+          ./tools/prepare_ugos_codex_kit.ps1 -PrivateRoot "$env:RUNNER_TEMP/ugreen-private-kit" -CodexSkillsRoot "$env:RUNNER_TEMP/ugreen-codex-skills" -InstallForCodex
+          $kit = Join-Path $env:RUNNER_TEMP 'ugreen-codex-skills/uliya-skill-kit/SKILL.md'
+          if (-not (Test-Path -LiteralPath $kit -PathType Leaf)) { throw 'Official kit SKILL.md not installed' }
+          Write-Host 'OFFICIAL_KIT_SAFE_COPY_SMOKE_PASS; CREATION_NOT_RUN; CHECKER_NOT_RUN'
+      - name: Reject duplicate kit target (must never overwrite)
+        shell: pwsh
+        run: |
+          $script = './tools/prepare_ugos_codex_kit.ps1'
+          $root = Join-Path $env:RUNNER_TEMP 'ugreen-private-kit'
+          $skills = Join-Path $env:RUNNER_TEMP 'ugreen-codex-skills'
+          try {
+            & $script -PrivateRoot $root -CodexSkillsRoot $skills -InstallForCodex
+            throw 'OVERWRITE_GUARD_FAILED'
+          } catch {
+            if ($_.Exception.Message -match 'Existing Codex kit directory') {
+              Write-Host 'EXISTING_INSTALL_OVERWRITE_GUARD_PASS'
+            } else { throw }
+          }
+      - name: No SDK source or private archive may be retained as public artifacts
+        if: always()
+        shell: pwsh
+        run: |
+          Remove-Item -LiteralPath "$env:RUNNER_TEMP/ugreen-private-kit" -Recurse -Force -ErrorAction SilentlyContinue
+          Remove-Item -LiteralPath "$env:RUNNER_TEMP/ugreen-codex-skills" -Recurse -Force -ErrorAction SilentlyContinue
+          Write-Host 'EPHEMERAL_VENDOR_ZIP_AND_KIT_REMOVED_NO_UPLOAD'

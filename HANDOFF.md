@@ -1,3 +1,7 @@
+## G15 — official UGREEN tool owner-side setup prepared (CI PENDING)
+- Added safe SHA-pinned vendor-kit ZIP preparation and opt-in copy to local Codex skills. No actual official tool generation, checker, NAS, license clearance, owner approval or Devpost submission. See docs/architecture/G15_OWNER_CODEX_OFFICIAL_TOOL_PREP_20261024.md.
+- Master DONE2/PARTIAL12/BLOCKED3/NOT_STARTED7; Oct24 fixed scope 100% with 0h scheduled remaining (actual labor unmeasured); Oct25 G1 1.5h+1.5h reserve and ETA unknown. No cost.
+
 ## 2026-10-24 G14 — real executable offline demo verified (DO NOT CLAIM NAS)
 - Python combined-report engine reused as five-case **fully synthetic** demo; generated actual two-file ZIP artifact 12556421327, JSON 6,835B + MD 2,234B, all outcomes examined, fake provenance explicitly labeled. Full offline suite **211/211 PASS** CI 40083630790, demonstration test **6/6 PASS** and artifact CI 40083631042; master CI 40083630878 and closeout CI 40083630804 both success. Implementation SHA c02b8d24f57732b99af56280cc430374a8bc212c. No Devpost PDF/Skill ZIP modification; demo is supplemental evidence only.
 - Files: `tools/offline_demo_walkthrough.py`, `tests/test_offline_demo_walkthrough.py`, `.github/workflows/offline-demo.yml`, `docs/architecture/G14_EXECUTABLE_SYNTHETIC_WALKTHROUGH_20261024.md`. Using `SDK_VERIFIED` in mock fixture is expressly NOT official SDK provenance; output `is_real_nas_validation=false` always. Official Creator NOT_EVIDENCED; real NAS and official checker NOT_RUN, rights and participant review OPEN, submission NOT_SUBMITTED.

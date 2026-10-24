@@ -311,6 +311,24 @@
       "verified_demo_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40083631042",
       "artifact_id": 12556421327,
       "artifact_manual_read": "PASS"
+    },
+    {
+      "scope_id": "G15_OFFICIAL_CODEX_SKILL_TOOL_PREPARATION",
+      "status": "SOURCE_CI_PENDING",
+      "master_days": [
+        "UGR-D02_BLOCKED",
+        "UGR-D03_BLOCKED",
+        "UGR-D16_PARTIAL",
+        "UGR-D17_PARTIAL"
+      ],
+      "source": "tools/prepare_ugos_codex_kit.ps1",
+      "workflow": ".github/workflows/ugos-kit-codex-prep.yml",
+      "report": "docs/architecture/G15_OWNER_CODEX_OFFICIAL_TOOL_PREP_20261024.md",
+      "official_creator_use": "NOT_EVIDENCED",
+      "official_checker": "NOT_RUN",
+      "real_nas": "NOT_RUN",
+      "devpost": "NOT_SUBMITTED",
+      "actual_work_hours": null
     }
   ],
   "overall_project_completion_percent": null,

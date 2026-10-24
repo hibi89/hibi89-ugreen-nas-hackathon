@@ -419,7 +419,7 @@
     "words": 351,
     "round1_submission_gate": "NOT_APPROVED_FOR_SUBMISSION"
   },
-  "next_action_priority": "G12_OWNER_LOCAL_CODEX_OFFICIAL_CREATOR_FIRST_REAL_GENERATION; ONLY_INTEGRATE_VERIFIED_ARTIFACT_WHEN_AVAILABLE",
+  "next_action_priority": "G15_OFFICIAL_ARCHIVE_EPHEMERAL_COPY_SMOKE_VERIFICATION; THEN_OWNER_RUN_REAL_SUPPORTED_CODEX_CREATOR",
   "g11_round1_disclosure_parity": {
     "date_kst": "2026-10-24",
     "status": "OFFLINE_VERIFIED_ONE_PAGE_VISUAL_PASS",
@@ -566,5 +566,23 @@
     "master_ci": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40083630878",
     "closeout_ci": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40083630804",
     "real_nas": "NOT_RUN"
+  },
+  "g15_official_codex_preparation": {
+    "date_kst": "2026-10-24",
+    "status": "SOURCE_AND_CI_PENDING",
+    "source": "tools/prepare_ugos_codex_kit.ps1",
+    "workflow": ".github/workflows/ugos-kit-codex-prep.yml",
+    "report": "docs/architecture/G15_OWNER_CODEX_OFFICIAL_TOOL_PREP_20261024.md",
+    "official_archive_sha256": "cf557e5a022e4297892f39768132855154232efdedeb726b2845450ccd70e1b3",
+    "official_creation_tool_used": "NOT_EVIDENCED",
+    "official_creation_executed": "NOT_RUN",
+    "official_tool_checker": "NOT_RUN",
+    "real_nas": "NOT_RUN",
+    "owner_codex_install": "NOT_PERFORMED",
+    "human_review_and_rights": "NOT_CLEARED",
+    "devpost": "NOT_SUBMITTED",
+    "new_offline_python_tests": 0,
+    "incremental_spend_krw": 0,
+    "actual_hours": null
   }
 }
