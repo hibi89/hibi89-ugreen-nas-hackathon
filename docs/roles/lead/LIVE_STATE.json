@@ -419,7 +419,7 @@
     "words": 351,
     "round1_submission_gate": "NOT_APPROVED_FOR_SUBMISSION"
   },
-  "next_action_priority": "Verify new G28 editorial one-file ZIP/PDF CI and manifest, collect exact SHA; then request participant official checker on NEW candidate only. Rights/license and final approval remain pending; G1 live expert-agent runtime gate separately BLOCKED.",
+  "next_action_priority": "Confirm G29 new candidate CI, exact SHA, ZIP and visually inspected PDF; issue one local participant official checker request on that new SHA. Then verify rights and explicit final submission consent. Runtime G1 separate BLOCKED.",
   "g11_round1_disclosure_parity": {
     "date_kst": "2026-10-24",
     "status": "OFFLINE_VERIFIED_ONE_PAGE_VISUAL_PASS",
@@ -797,5 +797,25 @@
     "devpost": "NOT_SUBMITTED",
     "no_original_source_mutation": true,
     "report": "docs/submission/G28_EDITORIAL_RELEASE_CANDIDATE_20261025.md"
+  },
+  "g29_evergreen_checker_wording": {
+    "executed_kst": "2026-10-25",
+    "report": "docs/submission/G29_PERSISTENT_VERIFICATION_WORDING_20261025.md",
+    "g28_original_editorial_ci": "SUCCESS_40109705431",
+    "original_editorial_skill_sha256": "cfbee5563b84c82b75abc83a67568bd6b428dcdeb87353113a657f3e83e24705",
+    "original_editorial_candidate": "SUPERSEDED_SELF_EXPIRING_STATEMENT",
+    "p1": "Evergreen SHA-bound static checker reporting in Skill and PDF Q8",
+    "new_candidate_sha256": null,
+    "new_candidate_ci": "PENDING",
+    "new_candidate_official_checker": "NOT_RUN",
+    "unchanged_verified_g22_sha256": "770e08c6eb5101785579eed7f2438547e0a0386d4c35aead860aab088e091169",
+    "nas": "NOT_RUN",
+    "owner_approval": "PENDING",
+    "devpost": "NOT_SUBMITTED",
+    "actual_work_hours": null,
+    "scheduled_original_days": [
+      "UGR-D16",
+      "UGR-D17"
+    ]
   }
 }

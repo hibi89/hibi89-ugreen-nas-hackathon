@@ -30,8 +30,9 @@ STALE = (
 CORRECTED = (
     "The previous disclosure-augmented G22 Skill (SHA-256 " + G22_SHA +
     ") passed the official static checker in a participant-reported Codex run with "
-    "zero errors, warnings and information messages. This additional editorial "
-    "revision has **not** been officially rechecked and must not inherit that pass."
+    "zero errors, warnings and information messages. That result applies only "
+    "to the exact G22 SHA. Validation of a later revision requires its own "
+    "file SHA and separate official checker evidence; never infer a pass."
 )
 PROCEDURE = """## Real-input delegation procedure (no sample commands)
 
@@ -66,8 +67,8 @@ required but unverified, stop and report NOT_CHECKED.
 Q8 = (
     "The official UGOS Skill Creation Tool generated the initial Skill. A "
     "disclosure-augmented revision passed the official static checker in Codex "
-    "(zero diagnostics and exact source SHA verified). This further editorial "
-    "revision needs its own official recheck. Registered Agent calls, effective "
+    "(zero diagnostics and exact source SHA verified). Every edited Skill "
+    "requires checker evidence for its exact SHA. Registered Agent calls, effective "
     "permissions, data-processing location, and live NAS execution are unverified."
 )
 

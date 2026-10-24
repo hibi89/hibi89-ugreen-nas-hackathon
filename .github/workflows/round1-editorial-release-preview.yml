@@ -49,7 +49,7 @@ jobs:
               assert m["candidate_skill_sha256"] == hashlib.sha256(skill).hexdigest()
               assert b"SYNTHETIC EXAMPLE ONLY" not in skill
               assert b"delegate --target" not in skill
-              assert b"additional editorial revision" in skill
+              assert b"separate official checker evidence" in skill
           print("G28 ZIP/PDF PASS; OFFICIAL CHECKER NOT_RUN; NOT SUBMITTED")
           PY
       - name: Upload draft-only preview

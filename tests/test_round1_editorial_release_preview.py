@@ -26,7 +26,7 @@ class G28EditorTests(unittest.TestCase):
         self.assertNotIn(b"SYNTHETIC EXAMPLE ONLY", changed)
         self.assertNotIn(b"delegate --target", changed)
         self.assertNotIn(editor.STALE.encode("utf-8"), changed)
-        self.assertIn(b"has **not** been officially rechecked", changed)
+        self.assertIn(b"separate official checker evidence", changed)
         self.assertIn(b"waiting_user", changed)
         self.assertEqual(editor.digest(base), editor.G22_SHA)
 
@@ -53,7 +53,7 @@ class G28EditorTests(unittest.TestCase):
         p=editor.editorial_proposal()
         self.assertEqual(len(p["questions"]),10)
         self.assertLessEqual(p["substantive_words"],500)
-        self.assertIn("own official recheck",p["questions"][7]["answer"])
+        self.assertIn("checker evidence for its exact SHA",p["questions"][7]["answer"])
 
     def test_one_markdown_zip_reproducible(self):
         b=editor.editorial_bytes(editor.verified_input())
