@@ -1,3 +1,8 @@
+## G11 2026-10-24 PDF visual QA fix (CI pending)
+- First G11 76cdefec (204 tests PASS; CI 40080095791, PDF/ZIP CI 40080095846) regenerated PDF with all 4 canonical JSON declarations. Visual inspection found 2 pages, second largely empty; first PDF 5675 bytes / two pages; ZIP 4 Markdown /6562 bytes.
+- Pending typography-only amendment to renderer tightens spaces/leading without text/font-size/scope changes and requires new CI plus visual verification. The earlier PDF is NOT final accepted. Official UGOS creation tool usage/rights remain UNVERIFIED; reviewer approval and actual submission PENDING. Real NAS and official checker NOT_RUN.
+- 24-day DONE2 PARTIAL12 BLOCKED3 NOT_STARTED7; D16/D17 advance PARTIAL; Oct24 scheduled finite-day 100%/0h remaining, actual developer hours NOT_MEASURED. G1 Oct25 1.5h+reserve1.5h, real ETA unknown.
+
 ## 2026-10-24 G11 early D16/D17 — source disclosure parity and Round1 gate differentiation (new CI PENDING)
 - Verified downloaded PRIOR draft artifact 12554397827 (PDF one readable page/4722 bytes/351 answer words; ZIP 6562 bytes/4 Markdown files; manifest SHA checked). Visual inspection applies to prior artifact only.
 - Fixed hardcoded AI/source/dataflow PDF footer to derive all four disclosures from authoritative proposal JSON; new PDF is rejected when declared texts mismatch. New synthetic regression cases + release gate distinguishes mandatory official Skill Creation Tool usage proof (still NOT_EVIDENCED) from optional checker run/finalist NAS validation.

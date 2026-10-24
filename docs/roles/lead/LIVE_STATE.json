@@ -97,9 +97,9 @@
     "corrective_commit_sha": "4b6904224df8ab9ede913ec6e79787b61d941baa",
     "passed_guard_run_id": 40067647144
   },
-  "last_ci_verified_code_sha": "256a766d63eac38a1c6b181d29e3d74e20f9709a",
-  "repository_regression_tests_passed": 201,
-  "repository_regression_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40079252331",
+  "last_ci_verified_code_sha": "76cdefec3647f0cc734a4c2039220d43714480f8",
+  "repository_regression_tests_passed": 204,
+  "repository_regression_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40080095791",
   "closeout_sync_ci_status": "PASS",
   "closeout_sync_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40079252300",
   "early_skill_candidate": {
@@ -422,7 +422,7 @@
   "next_action_priority": "G11_REGENERATED_PDF_VISUAL_AND_SOURCE_DISCLOSURE_PARITY; OFFICIAL_CREATOR_PROVENANCE_AND_ENTRANT_APPROVAL",
   "g11_round1_disclosure_parity": {
     "date_kst": "2026-10-24",
-    "status": "CODE_PUSH_PENDING_CI",
+    "status": "FIRST_CI_PASS_VISUAL_LAYOUT_CORRECTION_PENDING",
     "source": [
       "tools/render_round1_proposal_pdf.py",
       "tools/round1_candidate_bundle.py",
@@ -441,6 +441,17 @@
     "real_nas": "NOT_RUN",
     "devpost": "NOT_SUBMITTED",
     "participant_approval": "PENDING",
-    "actual_hours": null
+    "actual_hours": null,
+    "first_source_sha": "76cdefec3647f0cc734a4c2039220d43714480f8",
+    "first_tests_passed": 204,
+    "first_ci_url": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40080095791",
+    "first_bundle_url": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40080095846",
+    "first_generated_pdf_pages": 2,
+    "first_generated_pdf_bytes": 5675,
+    "first_generated_zip_bytes": 6562,
+    "first_artifact_id": 12554751949,
+    "first_visual_issue": "SECOND_PAGE_HAS_ONLY_DATAFLOW_AND_SOURCE_LINES",
+    "fix": "Tighten paragraph spacing while keeping font sizes and complete canonical disclosures",
+    "revised_layout_ci": "PENDING"
   }
 }

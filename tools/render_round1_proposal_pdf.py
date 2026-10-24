@@ -23,16 +23,16 @@ def render(out:Path)->None:
     if faults:raise ValueError("; ".join(faults))
     styles={
       "title":ParagraphStyle("title",fontName="Helvetica-Bold",fontSize=19,leading=23,textColor=colors.HexColor("#123049"),spaceAfter=6),
-      "subtitle":ParagraphStyle("subtitle",fontName="Helvetica",fontSize=8.3,leading=12,textColor=colors.HexColor("#475F72"),spaceAfter=16),
-      "question":ParagraphStyle("question",fontName="Helvetica-Bold",fontSize=9,leading=11.5,spaceBefore=6,spaceAfter=2,textColor=colors.HexColor("#143D55")),
-      "answer":ParagraphStyle("answer",fontName="Helvetica",fontSize=8.75,leading=12.5,spaceAfter=3,textColor=colors.HexColor("#243746")),
-      "footer":ParagraphStyle("footer",fontName="Helvetica",fontSize=7,leading=9,textColor=colors.HexColor("#506273"),spaceBefore=6)}
+      "subtitle":ParagraphStyle("subtitle",fontName="Helvetica",fontSize=8.3,leading=12,textColor=colors.HexColor("#475F72"),spaceAfter=12),
+      "question":ParagraphStyle("question",fontName="Helvetica-Bold",fontSize=9,leading=11.5,spaceBefore=4,spaceAfter=1,textColor=colors.HexColor("#143D55")),
+      "answer":ParagraphStyle("answer",fontName="Helvetica",fontSize=8.75,leading=12.2,spaceAfter=2,textColor=colors.HexColor("#243746")),
+      "footer":ParagraphStyle("footer",fontName="Helvetica",fontSize=7,leading=9,textColor=colors.HexColor("#506273"),spaceBefore=3)}
     story=[Paragraph("ProjectReady NAS",styles["title"]),Paragraph(
       f"UGREEN AI NAS Hackathon | Round 1 proposal | DRAFT - NOT SUBMITTED | {d['substantive_words']}/500 answer words",styles["subtitle"])]
     for item in d["questions"]:
         story.append(KeepTogether([Paragraph(f"{item['number']:02d}  {item['prompt']}",styles["question"]),
                                    Paragraph(item["answer"],styles["answer"])]))
-    story += [Spacer(1,8), Paragraph("Disclosures (separate from ten substantive answers)",styles["question"])]
+    story += [Spacer(1,4), Paragraph("Disclosures (separate from ten substantive answers)",styles["question"])]
     disclosure_labels = (
         ("ai_assistance", "AI assistance"),
         ("platform", "Platform and third-party source"),

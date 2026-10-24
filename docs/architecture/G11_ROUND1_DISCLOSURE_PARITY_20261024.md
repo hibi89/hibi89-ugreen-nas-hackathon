@@ -23,3 +23,8 @@
 - G11 early independent submission-document review maps to UGR-D16 (PDF/ZIP) and UGR-D17 (rights/release). Both remain PARTIAL; global 24-day tally stays DONE 2 / PARTIAL 12 / BLOCKED 3 / NOT_STARTED 7.
 - Oct24 original finite day was already 100%/0h assigned remainder; G11 is additional advance without double-counting. G1 official runtime/Agent gate on Oct25 remains 1.5h base + 1.5h separate reserve, real ETA unknown.
 - **Next single work item**: verify newly generated PDF's source-parity and visual layout in GitHub artifact; obtain official creator provenance without unsafe execution, then present exact PDF/ZIP/rights and disclosure checklist for entrant approval. No Devpost submit without approval.
+
+## First regenerated source verified; visual regression found (2026-10-24 KST)
+- Source 76cdefec3647f0cc734a4c2039220d43714480f8 completed 204/204 offline tests PASS in CI 40080095791, Round1 PDF/ZIP manifest/source-disclosures audit PASS in CI 40080095846; master progress and handoff CI also PASS.
+- Downloaded new real artifact ID 12554751949 and rendered PDF. It is readable and includes all four canonical disclosures, but now has **2 pages**, with only dataflow and source text on page 2. This is an actual aesthetic QA issue despite valid PDF and byte hashes. Final quality acceptance is withheld.
+- Minimal typography correction pending: shrink vertical paragraph spacing/leading without changing answer text, disclosures or font sizes. New visual inspection and CI must pass. Mandatory official creator-use provenance and license/entrant review are independent OPEN gates.
