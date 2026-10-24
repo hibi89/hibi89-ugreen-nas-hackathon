@@ -1,3 +1,5 @@
+> **[G18 2026-10-24 20:23 KST — 참가자 Codex의 공식 UGOS Creator 실생성·static-pass 보고 접수](docs/submission/G18_CODEX_CREATOR_RESULT_REPORTED_20261024.md)**: 신규 ProjectReady NAS `SKILL.md` 생성 SHA256 `e1b071666b836cc464147821d7823bc3061c757434697d9a64250d4a9abd5b4a`, 필수 제목 수정 후 공식 정적 checker `static-pass` 오류 0/경고 0이라는 **사용자 전달 Codex 보고**. 새 파일 실물은 GitHub에 없으므로 파일 해시·본문/참조·권리·보안 **독립 검수 미완료**. NAS/실 Agent 미실행, 원본 Skill 불변, 최종 PDF/ZIP 승인·Devpost·SkillHub 게시 미실시. 다음 최우선: 생성된 `SKILL.md`와 직접 참조 Markdown 수신 후 검수. MASTER 상태는 증거 수신까지 보수적으로 유지.
+
 ## G15 verified 2026-10-24 — owner action remains
 - Source d82541c38dfda2f966049bf2872755f976de63d3: official kit copy CI 40085452383 PASS, offline suite 211/211 CI 40085452321 PASS, master CI 40085452312 PASS and handoff CI 40085452304 PASS. Vendor archive hash matched; ephemeral Codex copy and overwrite refusal verified; no vendor code run. Official tool-guided entrant Skill creation has NOT happened; rights review and entrant approval pending, no Devpost submission. Supervisor P0 accepted, exact local Codex procedure in G12/G15. Other 24-day states unchanged.
 
