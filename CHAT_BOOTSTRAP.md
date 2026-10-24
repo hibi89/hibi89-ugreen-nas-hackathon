@@ -1,3 +1,5 @@
+> **최신 사용자 작업 방식 승인(2026-10-24):** [선행 개발·순서 유연화 규약](docs/WORK_ORDER_FLEX_POLICY_20261024.md) 필독. 오늘 완료 게이트 충족 뒤 다음 날짜/순번의 독립 READY 작업으로 선행 가능. 공식 SDK/Agent/NAS BLOCKED를 완료 취급하지 않고 달력일 100%·선행 완료율을 분리. 기존 '순차 실행만' 구형 문구보다 이 정책 우선.
+
 > **최우선 정정 (2026-10-24):** UGREEN 10/24 달력일 실제 수행 작업은 **100% 완료/잔여 0시간**이며 10/25로 넘어간 G1 SDK CLI/Agent 검증은 **아직 BLOCKED**. 예전 75% 보고는 25일 G1을 24일 달력일 분모와 혼동한 오류로 이력 보존. [현재 하루 보고](docs/roles/lead/DAILY_PROGRESS.md) 및 [보고 규칙](docs/roles/lead/DAILY_PROGRESS_REPORTING_PROTOCOL.md)을 읽고 작업한다. 전체 제품 완료율이나 실제 NAS/SDK 동작을 100%로 해석하지 않는다.
 
 # UGREEN ProjectReady NAS — 한 문장 새 채팅 복원
