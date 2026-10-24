@@ -28,7 +28,7 @@
     "id": "G1-SDK-DETAILS",
     "scheduled_kst": "2026-10-25",
     "status": "BLOCKED_EXTERNAL_EVIDENCE",
-    "scope": "Review pinned official kit bounded semantic index results; exact registered CLI/Agent I-O and validator/license remain blocked without direct primary documentation or participant-approved private reading",
+    "scope": "Verify exact catalog CLI/Agent identifiers against primary first-party documentation; do not execute flagged SDK checker without safety resolution",
     "planned_hours": 1.5,
     "separate_reserve_hours": 1.5,
     "actual_completion_eta_hours": null
@@ -92,11 +92,11 @@
     "corrective_commit_sha": "4b6904224df8ab9ede913ec6e79787b61d941baa",
     "passed_guard_run_id": 40067647144
   },
-  "last_ci_verified_code_sha": "136ae578f726606c1fc0001facfdf21dd2fca5f0",
-  "repository_regression_tests_passed": 138,
-  "repository_regression_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40071026723",
+  "last_ci_verified_code_sha": "19fbe3d39f9e18643ac3d356999c3db86e40a4ef",
+  "repository_regression_tests_passed": 144,
+  "repository_regression_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40071244498",
   "closeout_sync_ci_status": "PASS",
-  "closeout_sync_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40071026659",
+  "closeout_sync_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40071244467",
   "early_skill_candidate": {
     "id": "G6_20261024",
     "path": "skill/projectready-nas/SKILL.md",
@@ -156,11 +156,24 @@
   },
   "g1_static_contract_probe": {
     "id": "G1-STATIC-CHECKER-20261024",
-    "status": "CI_PENDING",
+    "status": "CI_PASS_SAFE_UNEXECUTED_NETWORK_MARKER",
     "source": "tools/sdk_static_contract_probe.py",
     "tests_added": 6,
-    "official_validator_executed": false,
-    "nas_runtime_executed": false,
-    "report": "docs/roles/lead/G1_SDK_SEMANTIC_INDEX_20261024.md"
+    "verified_workflow": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40071244496",
+    "source_commit": "19fbe3d39f9e18643ac3d356999c3db86e40a4ef",
+    "catalog_cli_groups": 9,
+    "catalog_domains": 7,
+    "checker_source_network_pattern": true,
+    "checker_executed": false,
+    "license_scope_verified": false
+  },
+  "g1_catalog_digest": {
+    "id": "G1-OFFICIAL-CATALOG-IDENTIFIERS-20261024",
+    "status": "CI_PENDING",
+    "source": "tools/sdk_catalog_digest.py",
+    "test_count_added": 7,
+    "exact_cli_i_o_verified": false,
+    "real_nas_runtime": "NOT_RUN",
+    "official_validator": "NOT_RUN"
   }
 }
