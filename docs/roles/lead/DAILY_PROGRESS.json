@@ -220,12 +220,23 @@
   "master_progress_reconciled": {
     "date_kst": "2026-10-24",
     "status_counts": {
-      "DONE": 1,
+      "DONE": 2,
       "PARTIAL": 12,
       "BLOCKED": 3,
-      "NOT_STARTED": 8
+      "NOT_STARTED": 7
     },
     "finite_day_deliverables_completed_percent": 100,
     "note": "Master schedule advances reflect offline prework, not changes to the 10/24 finite-day denominator or verified runtime readiness."
+  },
+  "round1_proposal_advance": {
+    "executed_kst": "2026-10-24",
+    "original_scheduled_kst": "2026-11-07",
+    "day_id": "UGR-D15",
+    "status": "DRAFT_DONE_NOT_SUBMITTED",
+    "answer_words": 351,
+    "pdf_local_verified": true,
+    "pdf_size_bytes": 4484,
+    "actual_hours": null,
+    "provisional_test_count_added": 9
   }
 }

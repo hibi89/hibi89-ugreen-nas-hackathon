@@ -335,18 +335,21 @@
       "acceptance": "실현 기능/미구현 구분, 500단어 이하 목표",
       "estimated_total_hours": 2,
       "safe_total_hours": 2,
-      "estimated_remaining_hours": 2,
-      "safe_remaining_hours": 2,
-      "progress_state": "NOT_STARTED",
-      "percent_complete": 0,
-      "executed_date_kst": null,
+      "estimated_remaining_hours": 0,
+      "safe_remaining_hours": 0,
+      "progress_state": "DONE",
+      "percent_complete": 100,
+      "executed_date_kst": "2026-10-24",
       "actual_elapsed_hours": null,
-      "evidence": [],
+      "evidence": [
+        "docs/submission/round1_proposal.json",
+        "docs/submission/ROUND1_PROPOSAL_DRAFT.md"
+      ],
       "verified_sha": null,
       "blocker": null,
       "recovery_date_kst": null,
       "recovery_condition": null,
-      "advance_note": null
+      "advance_note": "2026-10-24 10 official Devpost Round 1 questions answered in original English draft with 351/500 words and disclosable AI/platform sources. Local 1-page 4,484-byte PDF draft generated and visually checked; file regeneration tool committed, official form submission and final approval NOT_DONE."
     },
     {
       "day_id": "UGR-D16",
@@ -363,13 +366,14 @@
       "actual_elapsed_hours": null,
       "evidence": [
         "docs/architecture/G7_ROUND1_PACKAGE_PREFLIGHT_20261024.md",
-        "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/commit/5772a8a97364a26155c238ea7af576bdd400dc1a"
+        "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/commit/5772a8a97364a26155c238ea7af576bdd400dc1a",
+        "tools/render_round1_proposal_pdf.py"
       ],
       "verified_sha": "5772a8a97364a26155c238ea7af576bdd400dc1a",
       "blocker": null,
       "recovery_date_kst": null,
       "recovery_condition": null,
-      "advance_note": "ZIP 구조/재현성 도구 선행; 제출 영문 PDF 미생성. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음."
+      "advance_note": "ZIP 구조/재현성 도구 선행; 제출 영문 PDF 미생성. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음. 2026-10-24 provisional A4 PDF locally rendered (one page, 4,484 bytes) and readable; source renderer tools/render_round1_proposal_pdf.py; still PARTIAL because approved final PDF and packaged ZIP/receipt are absent."
     },
     {
       "day_id": "UGR-D17",
@@ -535,5 +539,5 @@
       "advance_note": null
     }
   ],
-  "source_reconciliation_note": "2026-10-24 verified offline advances mapped back to original 24-day date rows. PARTIAL zero percent means unweighted full acceptance still not certified; formal runtime/Agent gates BLOCKED."
+  "source_reconciliation_note": "Round1 English draft pulled forward 2026-10-24. UGR-D15 draft itself DONE (10 official questions 351 words), while UGR-D16 final approved PDF/ZIP and Devpost remain PARTIAL/NOT_SUBMITTED. No official NAS run; D02/D03/D04 remain BLOCKED."
 }

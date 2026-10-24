@@ -276,10 +276,10 @@
     "source": "data/master_progress.json",
     "generated_dashboard": "MASTER_PROGRESS.md",
     "statuses": {
-      "DONE": 1,
+      "DONE": 2,
       "PARTIAL": 12,
       "BLOCKED": 3,
-      "NOT_STARTED": 8
+      "NOT_STARTED": 7
     },
     "prework_execution_date": "2026-10-24",
     "remaining_actual_hours": null,
@@ -288,6 +288,26 @@
     "nas": "NOT_RUN",
     "devpost": "NOT_SUBMITTED",
     "baseline_plan_hours": 34.25,
-    "separate_reserve_hours": 26.75
+    "separate_reserve_hours": 26.75,
+    "as_of_kst": "2026-10-24",
+    "note": "UGR-D15 English 10-question draft completed early; UGR-D16 final PDF/ZIP remains PARTIAL; runtime G1 blocked"
+  },
+  "round1_proposal": {
+    "id": "UGR-D15_ROUND1_ENGLISH_DRAFT",
+    "status": "DRAFT_AUTHORED_CI_PENDING_NOT_SUBMITTED",
+    "dated_kst": "2026-10-24",
+    "canonical_json": "docs/submission/round1_proposal.json",
+    "generated_markdown": "docs/submission/ROUND1_PROPOSAL_DRAFT.md",
+    "renderer": "tools/render_round1_proposal_pdf.py",
+    "pdf_local_artifact_verified": true,
+    "pdf_file_size_bytes": 4484,
+    "pdf_page_count": 1,
+    "substantive_words": 351,
+    "substantive_word_limit": 500,
+    "answers": 10,
+    "official_nas": "NOT_RUN",
+    "devpost": "NOT_SUBMITTED",
+    "offline_tests_added": 9,
+    "actual_development_hours": null
   }
 }
