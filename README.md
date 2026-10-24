@@ -25,3 +25,6 @@
 - [브랜치 운영](docs/BRANCH_WORKFLOW.md)
 
 **중요:** 어떤 비밀값·고객 개인정보도 공개 저장소에 저장하지 않는다. 개발·범위·권한·비용 확장은 사전 승인 대상이다.
+
+## UGREEN 총괄의 독립 실행 계획 (2026-10-24)
+[ProjectReady NAS — 일정·역할·검수·0원 비용 계획](docs/UGREEN_EXECUTION_PLAN_20261024.md) (lead/ugreen 브랜치). 내부 조기 제출 11/10, 공식 예선 11/16 16:45 KST.
