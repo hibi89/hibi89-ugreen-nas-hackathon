@@ -1,3 +1,5 @@
+> **[G23 2026-10-24 — 공식 UGREEN 약관/게시기준 추가 검수, 출시 게이트 유지](docs/submission/G23_FIRST_PARTY_TERMS_AND_RELEASE_GATE_AUDIT_20261024.md)**: Starter Kit와 SkillHub User Agreement/Publication Standards 공식 원문 대조. 새 G22 1파일 ZIP·370단어 PDF는 초안 CI PASS이지만 **고지 추가 후 SKILL.md 공식 재검사 NOT_RUN**. P1 본문에 명시된 두 개의 `SYNTHETIC EXAMPLE ONLY` 예시는 게시기준 2.5의 미정리 템플릿 예시 금지와 해석상 충돌 가능성이 있어 **REVIEW RISK(확정 위반 아님)** 표시. Devpost 예선과 SkillHub 게시를 구분하고, 참가자 저작권/제3자 권리·라이선스, 동일 SHA 공식 검사, 최종 편집/제출 승인 전까지 NOT_APPROVED/NOT_SUBMITTED 유지. 코드·SKILL/원본 제출 후보 변경 없음, 마스터 2 DONE/12 PARTIAL/3 BLOCKED/7 NOT_STARTED 불변, 10/24 작업시간 미측정.
+
 > **[G22 2026-10-24 — 공식 Creator 단일 Skill ZIP/영문 PDF 분리 초안 빌더 구현, CI 검증 대기](docs/submission/G22_OFFICIAL_CREATOR_ONE_FILE_PREVIEW_20261024.md)**: 참가자 Codex 리뷰 브랜치 `review/ugreen-official-creator@7af2cb750`/실물 SKILL.md SHA `164e84fe...`와 checker JSON SHA 확인 후, 구형 참고문서 없이 한 파일만 스테이징하고 AI 도구/제3자 권리/UGOS 데이터 흐름 고지 추가. 새로운 바이트는 공식 Uliya checker를 재실행하지 않았으므로 **static-pass 적용 대상 아님**. 기존 제안서 Q8은 독립 PDF 초안에서만 정정하고 원본 Skill·기존 PDF/ZIP·Devpost 접수 불변. 새 CI 상태는 실제 검증 전까지 PENDING. 라이선스·참가자 승인·NAS 검증 미완료.
 
 ## G15 — official UGREEN tool owner-side setup prepared (CI PENDING)
