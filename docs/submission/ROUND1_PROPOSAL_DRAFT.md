@@ -51,3 +51,4 @@ Official runtime support, Agent permissions, result completeness, content proces
 
 **Official prompt source:** https://ugreenhackathon.devpost.com/rules
 **Production decision:** Submission requires participant review, verified external rights, approved PDF and final ZIP; neither official NAS validation nor Devpost submission has occurred.
+

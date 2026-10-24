@@ -318,7 +318,7 @@
   },
   "round1_draft_bundle": {
     "task_id": "G8-ROUND1-CANDIDATE-PREVIEW-20261024",
-    "status": "SOURCE_COMMITTED_CI_PENDING",
+    "status": "G8_CORRECTIVE_SOURCE_CI_PENDING",
     "original_plan_ids": [
       "UGR-D16",
       "UGR-D17"
@@ -333,6 +333,12 @@
     "nas_runtime": "NOT_RUN",
     "entrant_approval": "PENDING",
     "devpost": "NOT_SUBMITTED",
-    "actual_hours": null
+    "actual_hours": null,
+    "initial_source_sha": "351419436a7bf7b36ffbab4fff683972bfad3318",
+    "initial_workflow": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40076308841",
+    "initial_workflow_status": "FAIL_MARKDOWN_RENDER_MISMATCH",
+    "initial_offline_suite": "190_TESTS_2_FAIL_5_ERROR",
+    "corrective_action": "JSON-generated draft MD corrected; invalid PDF parse failure normalized",
+    "validated_pdf_artifact": false
   }
 }

@@ -542,5 +542,5 @@
       "advance_note": null
     }
   ],
-  "source_reconciliation_note": "G8 official ten prompt strings corrected and a reproducible draft PDF+ZIP+manifest bundle introduced (CI pending). D15 draft DONE; D16/D17 PARTIAL; G1 D02-D04 BLOCKED. Never imply official validator, runtime NAS or Devpost submitted."
+  "source_reconciliation_note": "G8 correction: GitHub source 35141943 initial proposal exact prompts changed but Markdown generation left one trailing blank-line mismatch, offline CI failed 7 tests, candidate workflow did not build artifacts. Source regenerated and invalid-PDF exceptions hardened. New corrective CI pending. D15 draft DONE / D16-D17 PARTIAL, G1 blocked; no release or submission."
 }

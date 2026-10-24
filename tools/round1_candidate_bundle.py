@@ -58,10 +58,13 @@ def validate_pdf(pdf: Path, questions: list[dict]) -> dict:
         from pypdf import PdfReader
     except ImportError as exc:
         raise RuntimeError("pypdf required to verify PDF pages and official questions") from exc
-    doc = PdfReader(io.BytesIO(content), strict=True)
-    if not 1 <= len(doc.pages) <= 5 or doc.is_encrypted:
-        raise ValueError("Bad page count or encrypted PDF")
-    text = re.sub(r"\s+", " ", " ".join(p.extract_text() or "" for p in doc.pages))
+    try:
+        doc = PdfReader(io.BytesIO(content), strict=True)
+        if not 1 <= len(doc.pages) <= 5 or doc.is_encrypted:
+            raise ValueError("Bad page count or encrypted PDF")
+        text = re.sub(r"\s+", " ", " ".join(p.extract_text() or "" for p in doc.pages))
+    except Exception as exc:
+        raise ValueError("PDF cannot be parsed and searched") from exc
     for q in questions:
         prompt = re.sub(r"\s+", " ", q["prompt"])
         if prompt not in text:

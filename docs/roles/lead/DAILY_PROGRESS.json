@@ -248,13 +248,15 @@
       "UGR-D16",
       "UGR-D17"
     ],
-    "status": "G8_CODE_SUBMITTED_CI_PENDING",
+    "status": "SOURCE_CORRECTION_CI_PENDING",
     "source": "tools/round1_candidate_bundle.py",
     "workflow": ".github/workflows/round1-candidate.yml",
     "answer_words": 351,
     "tests_added": 7,
     "actual_work_hours": null,
     "official_validator": "NOT_RUN",
-    "devpost_submission": "NOT_SUBMITTED"
+    "devpost_submission": "NOT_SUBMITTED",
+    "initial_failure_cause": "one trailing newline mismatch between source JSON and proposal Markdown",
+    "downloadable_pdf_zip_available": false
   }
 }
