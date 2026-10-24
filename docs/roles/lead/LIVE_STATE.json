@@ -419,7 +419,7 @@
     "words": 351,
     "round1_submission_gate": "NOT_APPROVED_FOR_SUBMISSION"
   },
-  "next_action_priority": "G20_FIX_DYNAMIC_SELF_CONTAINED_FILE_AGENT_AND_DOCUMENT_AGENT_DELEGATION_WITH_SCOPE_CHECKLIST_CANDIDATE_PATTERNS_EXACT_REFERENCES_AND_QUERY; RERUN_OFFICIAL_CODEX_CHECKER; RE-UPLOAD_NEW_SKILL_SHA; UPDATE_PDF_Q8_AFTER_APPROVAL; NO_AUTO_PUBLISH_OR_SUBMIT",
+  "next_action_priority": "G21_PREPARE_COHERENT_ONE_FILE_RELEASE_PACKAGE_BUILDER_AND_RECONCILE_PROPOSAL_Q8_WITH_OWNER_SOURCE_APPROVAL; NEVER_AUTO_MERGE_REVIEW_BRANCH_OR_DEVPOST_SUBMIT",
   "g11_round1_disclosure_parity": {
     "date_kst": "2026-10-24",
     "status": "OFFLINE_VERIFIED_ONE_PAGE_VISUAL_PASS",
@@ -653,5 +653,24 @@
     "nas": "NOT_RUN",
     "human_release_approval": "PENDING",
     "report": "docs/submission/G20_UPLOADED_REVIEW_ZIP_INDEPENDENT_AUDIT_20261024.md"
+  },
+  "g21_remote_review": {
+    "reviewed_at_kst": "2026-10-24",
+    "review_branch": "review/ugreen-official-creator",
+    "review_commit": "7af2cb750b37826fb02a00e2d45cb73f3a85c239",
+    "branch_files_changed_against_lead": 3,
+    "skill_sha256_verified": "164e84fe2fd8bc14e421b5469cc862aa4971f71c9b46aea08cc2f281c7229ead",
+    "skill_bytes": 10481,
+    "checker_json_sha256_verified": "92a6891b0889a89cd09f16ed960e9f72a4df33f8114ce0ee22b9beefeff50140",
+    "static_checker_json": "static-pass errors=0 warnings=0 info=0",
+    "checker_actual_execution": "CODEX_REPORTED_NOT_INDEPENDENTLY_RERUN",
+    "delegation_p1_fix": "SOURCE_REVIEW_PASS",
+    "release_package": "BLOCKED_ORPHAN_3_INHERITED_REFERENCE_MARKDOWN_AND_EXISTING_4FILE_BUILDER_REQUIREMENTS",
+    "pdf_q8": "STALE_MUST_AMEND_IF_SELECTED",
+    "official_tool_initial_generation": "PARTICIPANT_REPORTED_AND_PREVIOUS_GENERATED_SOURCE_HASH_VERIFIED",
+    "actual_nas": "NOT_RUN",
+    "legal_rights": "PENDING",
+    "publication": "NOT_SUBMITTED",
+    "report": "docs/submission/G21_P1_REMOTE_BRANCH_INDEPENDENT_AUDIT_20261024.md"
   }
 }

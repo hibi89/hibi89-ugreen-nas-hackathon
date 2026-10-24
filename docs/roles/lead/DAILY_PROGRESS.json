@@ -379,6 +379,20 @@
       "live_nas": "NOT_RUN",
       "devpost": "NOT_SUBMITTED",
       "actual_work_hours": null
+    },
+    {
+      "scope_id": "G21_INDEPENDENT_REVIEW_GITHUB_G20_P1",
+      "status": "DELEGATION_SOURCE_FIX_VERIFIED_RELEASE_PACKAGING_BLOCKED",
+      "review_commit": "7af2cb750b37826fb02a00e2d45cb73f3a85c239",
+      "new_skill_sha256_independently_verified": "164e84fe2fd8bc14e421b5469cc862aa4971f71c9b46aea08cc2f281c7229ead",
+      "checker_json_sha256_independently_verified": "92a6891b0889a89cd09f16ed960e9f72a4df33f8114ce0ee22b9beefeff50140",
+      "checker_json": "static-pass_0_errors_0_warnings",
+      "reference_package_blocker": "UNLINKED_LEGACY_REFERENCES_IN_REVIEW_BRANCH",
+      "report": "docs/submission/G21_P1_REMOTE_BRANCH_INDEPENDENT_AUDIT_20261024.md",
+      "original_skill_unchanged": true,
+      "entrant_submission_approval": "PENDING",
+      "nas_runtime": "NOT_RUN",
+      "actual_work_hours": null
     }
   ],
   "overall_project_completion_percent": null,
