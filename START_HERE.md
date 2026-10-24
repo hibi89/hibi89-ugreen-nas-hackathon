@@ -1,3 +1,5 @@
+> **UGREEN 단독 새 채팅 한 문장 (최우선·2026-10-24):** `[유그린 해커톤 깃헙 레포지토리 확인하고 작업하셈]`. 새 대화는 `hibi89/hibi89-ugreen-nas-hackathon`의 **`lead/ugreen` 최신 원격 HEAD**를 조회하고, [현행 START_HERE](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/blob/lead/ugreen/START_HERE.md) → [최신 LIVE_HANDOFF](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/blob/lead/ugreen/docs/roles/lead/LIVE_HANDOFF.md) → [LIVE_STATE.json](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/blob/lead/ugreen/docs/roles/lead/LIVE_STATE.json) → [LEAD_ACTIVE_WORK](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/blob/lead/ugreen/docs/roles/lead/LEAD_ACTIVE_WORK.md) 순으로 복원해서 **실제 작업부터 이어간다**. 기본 `main`의 과거 요약·`[유그 ...]`·`[해커톤총괄 ...]`은 이 정확한 UGREEN 전용 명령보다 우선하지 않는다. **종료할 때마다** [필수 GitHub 인수인계 절차](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/blob/lead/ugreen/docs/roles/lead/SESSION_CLOSEOUT.md)를 끝내야 한다.
+
 # UGREEN NAS AI Hackathon — 새 채팅 1문장 시작
 
 사용자가 ChatGPT **새 채팅**에 아래 문장만 남기는 것은 UGREEN 총괄 겸 개발자로서 **저장소 최신 상태를 확인하고 다음 실질 작업을 직접 수행하라**는 지시이다.
