@@ -1,3 +1,5 @@
+> **ARCHIVED / NON-EXECUTABLE — 2026-10-24 KST:** Old single-worker-chat queue is retired by participant decision. The READY/BACKLOG/REVISION instructions appearing below are historic; DO NOT launch or continue a separate worker chat from these instructions. UGREEN lead executes the work itself in `lead/ugreen` using `docs/roles/lead/LEAD_ACTIVE_WORK.md` and `LEAD_FULLSTACK_PROTOCOL.md`. Worker report UGR-001 was BLOCKED at latest observed feature HEAD; no auto release of UGR-002.
+
 # UGREEN 공통 담당자 — START_HERE
 **기능별 3개 채팅 대신, UGREEN 공통 작업자 채팅 하나만 사용한다.** 총괄이 작업을 배정하면 같은 채팅에서 역할·브랜치를 전환한다.
 

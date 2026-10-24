@@ -1,0 +1,13 @@
+# UGREEN — single lead / direct development protocol (CURRENT)
+Effective 2026-10-24 KST. Precedence: participant decision > this current protocol > lead active work > historical dispatch notes.
+
+- UGREEN lead is the ONLY active UGREEN AI chat: owns official SDK research, architecture, code/Skill authoring, tests, security review, ZIP/PDF and submission. No separate worker chat; user `ㄱ` means this lead takes next actual step immediately.
+- Read `lead/ugreen` latest remote HEAD, `LEAD_ACTIVE_WORK.md`, `STATUS.md`, `HANDOFF.md`, official source/previous evidence. Prior three functional roles are design areas (missing deliverables, final-version conflicts, privacy/permission), not independent executors.
+- New source and documentation default to **`lead/ugreen`**; main is stable release gate and three old `feature/*` refs historical evidence. Do not delete/force-push or replace any. Import reviewed feature artifacts selectively after actual diff/constraints assessment, not wholesale unsupervised merging.
+- Old dispatcher `docs/dispatcher/CURRENT_TASK.md`, `BACKLOG.md`, `REVIEW_LOG.md`, `DISPATCH_PROTOCOL.md`, `docs/WORKER_START_HERE.md` are archival only. Even old READY/IN_PROGRESS does not authorize a new chat or code.
+- One current lead task in `LEAD_ACTIVE_WORK.md`; execute as far as available tools/permissions allow, report CONFIRMED / UNVERIFIED / BLOCKED distinctly, avoid two identical failed approaches. Full SDK archive contents, exact supported CLI syntax, Expert Agent names, rights, version hashing, privacy checks and model locality must be proven by first-party source before writing allegedly runnable Skill CLI steps.
+- Before edits: examine supported tools, permission, zero-cost API limits, data locality, file scope, recovery and validation. Read-only and no external PII transmission. Need explicit user approval for spending, public/privacy permissions, irreversible data changes, scope degradation. ZIP only recognized `SKILL.md` and directly linked Markdown references under official Round 1 rules.
+- On meaningful implementation: run supportable synthetic/official-tool tests, identify omitted NAS runtime/CI, check source unchanged and reproducibility; commit lead STATUS/HANDOFF/TO_HACKATHON_LEAD and active work with SHA; verify remote and (if any) CI, and main only after validated integration.
+- Deadline internal Nov 10 KST, official Nov 16 16:45 KST. Only actual Devpost receipt proves submission. GitHub activity is not product success.
+## Choice
+A chosen: direct lead development/verification on one `lead/ugreen` workline. B retired: rotate feature branches and 2-chat READY + manual acceptance. A removes handoff overhead while retaining the archived three branch refs, security and release gates.

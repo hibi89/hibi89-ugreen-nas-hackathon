@@ -1,3 +1,5 @@
+> **현행 운영 방식(2026-10-24 KST): UGREEN 총괄이 직접 개발·테스트·검수까지 맡는다.** 별도 UGREEN 작업자 채팅/UGR READY 디스패치 **종료**. [LEAD_ACTIVE_WORK](docs/roles/lead/LEAD_ACTIVE_WORK.md) / [LEAD_FULLSTACK_PROTOCOL](docs/roles/lead/LEAD_FULLSTACK_PROTOCOL.md)에서 매번 다음 실작업을 확인. `lead/ugreen`에서 직접 작업, 기존 세 feature 브랜치는 원본·이력으로 보존. 아래 과거 채팅 분담 규칙은 폐기된 이력이다.
+
 # UGREEN AI 역할 및 공통 운영 규칙
 
 - 실제 참가자: 사용자 **1명**. AI 담당자들은 각자 독립 대화와 GitHub 브랜치에서 작업한다.
