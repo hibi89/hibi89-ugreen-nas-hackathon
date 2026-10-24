@@ -1,3 +1,6 @@
+> **통합 공통 한 줄 명령 (2026-10-24):** `[해커톤총괄 깃헙 레포지토리 확인하고 작업하셈]`  
+> UGREEN 단독 명령과 함께 사용 가능. [`lead/ugreen`의 CHAT_BOOTSTRAP.md](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/blob/lead/ugreen/CHAT_BOOTSTRAP.md)에서 최신 HEAD·현재 총괄 직접 개발 작업을 확인한다. [통합 상황실](https://github.com/hibi89/hackathon-command-center-2026/blob/main/CHAT_BOOTSTRAP.md)에서도 동일 문장을 인식한다.
+
 > **현행 단일 진입점 (2026-10-24 KST)**: 새 채팅에서 **`[유그 해커톤 깃헙 레포지토리 확인하고 작업하셈]`** 한 문장만 입력하면 [START_HERE.md](START_HERE.md) → 최신 **`lead/ugreen`** [실행 지침](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/blob/lead/ugreen/START_HERE.md) → [현재 작업](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/blob/lead/ugreen/docs/roles/lead/LEAD_ACTIVE_WORK.md)을 조회하고, UGREEN **총괄 본인이 직접 개발·테스트·검수**한다. **아래 기능별 AI 작업자 3명/디스패처 문구는 폐기된 과거 이력이다.** `main`은 기본 진입·검증된 통합 기준이며 최신 진행은 lead 브랜치가 권위 있다.
 
 # UGREEN NAS AI Hackathon
