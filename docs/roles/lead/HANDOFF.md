@@ -141,3 +141,11 @@
 - 이전 '75% 완료·25% SDK 차단'은 **10/25 일정의 G1 기술 게이트를 10/24 일일 작업 분모에 섞은 사후 공시 오류**. 원본 [역사 스냅샷](history/20261024_G1_EARLY_75_PERCENT_SNAPSHOT.json)을 보존하고 설명 없이 삭제·조작하지 않음.
 - **공식 SDK/등록 Agent·CLI 실제 기술 게이트는 계속 BLOCKED**. 10/25의 후속 G1 검증을 새 날짜 별도 분모 **0% START / 100% REMAIN**, **계획 1.5h+별도 예비 1.5h=최대 3h**, 실제 완료 ETA 미정으로 관리. 완료 산출물과 게이트를 명확히 구분.
 - GitHub CI는 합성 66 PASS이고 공식 Uliya/NAS 실행 0건, 최종 작품 제출 0건. 새로운 제품 기능·CLI 연동은 이 정정 커밋에 없음. 상태/인수인계/상위 총괄에 동일 기준 적용, 실제 경과시간 미측정.
+
+
+## 2026-10-24 KST — 추가 선행 G3c/G4/G5 완료, 공식 SDK 작업 이월은 유지
+- G3c `src/projectready/policy_guard.py`: read-only scope/consent policy, 문서 내용 별도 승인, 변경/외부 전송 사용 금지. `sensitive_content_check=NOT_CHECKED`; **실제 NAS 권한 검사/PII 스캔 아님**.
+- G4 `src/projectready/combined_report.py`: G2 누락 + G3b 버전 신호 + G3c 허가 조건을 하나의 보수적 판정으로 통합. 진짜 SDK 데이터 검증 이전에는 `READY`를 내지 않음. [설계](../../architecture/G4_COMBINED_REPORT_OFFLINE_20261024.md).
+- G5 `tests/test_core_edge_scenarios.py`: CORE1 전체 항목 있음(전체 NEEDS_REVIEW), CORE2 필수 항목 누락(전체 BLOCKED), EDGE1 권한 거부(전체 NEEDS_REVIEW) 합성 회귀. [시나리오](../../architecture/G5_CORE_EDGE_SCENARIOS_20261024.md).
+- **검증:** [GitHub Actions 40066529848](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40066529848)에서 **91 tests / OK**, 실제 Uliya SDK CLI/등록 Agent/NAS 접속/공식 검사 **NOT_RUN**. 공개 SDK ZIP 원본이나 민감자료 게시 없음.
+- **10/24 당일 마감 100% / 미완료 0% / 잔여 0h** (새 선행 묶음도 오프라인 범위 DONE). 경과 작업시간 미측정. **G1 SDK 기술 게이트 계속 BLOCKED**이고 **10/25 별도 예정** 계획 1.5h+예비 1.5h, 외부 의존성 때문에 실제 완료 ETA 산정 불가. 11월 공식 연동·검증은 미완료 유지.

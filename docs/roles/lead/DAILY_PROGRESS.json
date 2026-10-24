@@ -51,13 +51,13 @@
   "g1_technical_gate": "BLOCKED_EXACT_OFFICIAL_CLI_AGENT_SCHEMA",
   "sdk_cli_runtime_tests": "NOT_RUN",
   "production_and_submission": "NOT_DONE",
-  "last_verified_source_commit": "a7cde1bb7493d7177294f8058cd2b88547dc6400",
-  "updated_kst_note": "2026-10-24 KST: 10/24 calendar delivered work retrospectively closed 100%; official G1 schema remains blocked for 10/25. New day's future 0% not yet activated.",
+  "last_verified_source_commit": "1134d0b2b221a7be02aad5e0708af07e8d7236d2",
+  "updated_kst_note": "2026-10-24 completed calendar work remains 100%; additional G3c/G4/G5 advance engineering 91 synthetic tests pass. G1 official SDK integration still blocked. Next day budget unchanged.",
   "sdk_archive_public_zip_downloaded_in_ephemeral_ci": true,
   "sdk_archive_sha256": "cf557e5a022e4297892f39768132855154232efdedeb726b2845450ccd70e1b3",
   "sdk_archive_metadata_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40064613266",
-  "offline_ci_latest_test_count": 66,
-  "offline_ci_latest_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40065337137",
+  "offline_ci_latest_test_count": 91,
+  "offline_ci_latest_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40066529848",
   "additional_approved_same_day_work": [
     {
       "scope_id": "G2_PROVISIONAL_EVIDENCE_CONTRACT",
@@ -72,6 +72,27 @@
       "official_sdk_compatible": "UNVERIFIED",
       "source": "src/projectready/version_candidates.py",
       "report": "docs/architecture/G3B_VERSION_CANDIDATES_20261024.md"
+    },
+    {
+      "scope_id": "G3C_PRELIM_READ_ONLY_POLICY_GUARD",
+      "status": "OFFLINE_CODE_AND_TESTS_DONE",
+      "official_sdk_compatible": "UNVERIFIED",
+      "source": "src/projectready/policy_guard.py",
+      "report": "docs/architecture/G3C_POLICY_GUARD_20261024.md"
+    },
+    {
+      "scope_id": "G4_PRELIM_COMBINED_REPORT",
+      "status": "OFFLINE_CODE_AND_TESTS_DONE",
+      "official_sdk_compatible": "UNVERIFIED",
+      "source": "src/projectready/combined_report.py",
+      "report": "docs/architecture/G4_COMBINED_REPORT_OFFLINE_20261024.md"
+    },
+    {
+      "scope_id": "G5_CORE_EDGE_SCENARIOS_SYNTHETIC",
+      "status": "OFFLINE_TEST_SCENARIOS_DONE",
+      "official_sdk_compatible": "UNVERIFIED",
+      "source": "tests/test_core_edge_scenarios.py",
+      "report": "docs/architecture/G5_CORE_EDGE_SCENARIOS_20261024.md"
     }
   ],
   "overall_project_completion_percent": null,

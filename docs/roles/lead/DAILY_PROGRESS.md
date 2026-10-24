@@ -41,3 +41,19 @@
 **정정된 보고 규칙:** 매일의 `100%`는 실측/증거 있는 **당일 작업 목표**를 뜻한다. 전체 해커톤 완료율·G1 기술 게이트·SDK/NAS 실제 성공률은 별도 상태로 표기한다. 위 `0시간`은 **당일 남은 작업 배당 0**이라는 뜻이지 SDK 기술문제 해결시간 0이라는 뜻이 아니다.
 
 **관련 문서:** [기계 검증 가능한 데이터](DAILY_PROGRESS.json), [보고 규약](DAILY_PROGRESS_REPORTING_PROTOCOL.md), [실측](WORK_TIME_LOG.md), [일별 사전 계획](../../UGREEN_DAILY_EFFORT_PLAN_20261024.md).
+
+
+## 2026-10-24 후속 선행 작업 (당일 마감 100% 유지)
+이번 사용자 승인 선행 지시에 따라 아래 **추가 작업 묶음**도 완료했다. 이는 *향후 공식 SDK/NAS 통합을 끝냈다는 뜻이 아니다*.
+
+| 선행 묶음 | 증거 및 결과 | 완료 |
+|---|---|---|
+| G3c 권한·동의 보수적 정책 | [설계](../../architecture/G3C_POLICY_GUARD_20261024.md) · `src/projectready/policy_guard.py` | 오프라인 구현 DONE |
+| G4 누락·버전·권한 통합 결과 | [설계](../../architecture/G4_COMBINED_REPORT_OFFLINE_20261024.md) · `src/projectready/combined_report.py` | 오프라인 구현 DONE |
+| G5 CORE1·CORE2·EDGE1 | [시나리오 기록](../../architecture/G5_CORE_EDGE_SCENARIOS_20261024.md) · `tests/test_core_edge_scenarios.py` | 합성 시나리오 DONE |
+
+- **최신 원격 검증:** [GitHub Actions #40066529848](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40066529848) **91/91 PASS**.
+- **10/24 실제 완료 100%, 당일 잔여 0%/0시간** 그대로. 기존 4개 산출물의 비중을 임의 수정하지 않았으며 이 추가 작업은 `DAILY_PROGRESS.json.additional_approved_same_day_work`에 별도 증거로 기록한다.
+- **원래 다음날 10/25 G1 공식 SDK 확인 과제:** 미착수 0%, 계획 1.5h + 별도 예비 1.5h=당일 상한 3h, 정확한 CLI/Expert Agent 확인 실제 완료 ETA 미정.
+- 11/01~02 G3c 실제 SDK·권한 호환성 검증, 11/03~04 실제 Uliya Skill 통합, 11/05 CORE/EDGE 공식 지원 환경 재검증, SDK 검증기·Devpost 제출은 **모두 미완료**. 오프라인 91 PASS로 대체할 수 없다.
+- 실제 개발시간 **미측정**. 추가 현금 지출 없음.

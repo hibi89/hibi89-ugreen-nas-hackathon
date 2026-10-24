@@ -91,3 +91,7 @@
 
 ### 2026-10-24 선행 진도 — 향후 일정에서 중복 구현 금지
 - [G2 임시 증거 계약](architecture/G2_EVIDENCE_CONTRACT_20261024.md) + [G3b 임시 버전 신호](architecture/G3B_VERSION_CANDIDATES_20261024.md)를 사용자 명시 지시로 미리 구현하고 [66/66 원격 CI](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40065337137) 확인. 10/27(G2), 10/28-29(G3a), 10/30-31(G3b) **일정에서 이 코드를 다시 처음부터 작성하지 말 것**. 해당 날짜의 남은 핵심은 공식 SDK adapter, 실제 지원 capability·권한, 안정성·패키징 검증이다. 정식 호환성이 불명이라 시간을 자동 공제하거나 공식 게이트 통과 주장 금지. 당일 75% G1 진행률은 별도 보존.
+
+
+### 2026-10-24 추가 선행 작업: 11월 일정에서 코드 재작성 금지
+- G3c read-only policy guard + G4 검사 통합보고 + G5 CORE1/CORE2/EDGE1 **독립 합성 검증 선행 완료**, [91/91 원격 테스트 PASS](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40066529848). 다음 [미완료 업무 회수 일정](roles/lead/CARRYOVER_TASK_SCHEDULE_20261024.md)을 준수하며, 11/01~05 예정된 **실제 SDK/Skill/권한/시험 검증**은 계속 남는다. 안전한 일정 시간을 사전 근거 없이 차감하지 않는다.

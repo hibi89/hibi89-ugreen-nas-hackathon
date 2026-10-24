@@ -157,3 +157,11 @@
 ## 2026-10-24 KST — 미완료 작업 회수 날짜 공시
 - [날짜별 남은 G1·G2·G3b·G3c 연결/통합 일정](CARRYOVER_TASK_SCHEDULE_20261024.md) 기록. 10/25~26 SDK/Expert Agent 확인, 10/27 G1/G2 근거 판정, 10/28~31 선행 프로토타입 공식 SDK 연동 검증, 11/01~02 권한/개인정보, 11/03~04 단일 Skill 통합. 기존 시간표의 상한시간/대회 마감 변경 없음.
 - 10/24 당일 100% 완료와 G1 SDK 기술 차단 별도. 실 공식 SDK/NAS 검증 성과 **0건**. 10/27까지 해결 약속 아님. 공식 차단 지속 시 즉시 지원 채널·대안·위험 보고.
+
+
+## 2026-10-24 KST — 추가 선행 G3c/G4/G5 완료, 공식 SDK 작업 이월은 유지
+- G3c `src/projectready/policy_guard.py`: read-only scope/consent policy, 문서 내용 별도 승인, 변경/외부 전송 사용 금지. `sensitive_content_check=NOT_CHECKED`; **실제 NAS 권한 검사/PII 스캔 아님**.
+- G4 `src/projectready/combined_report.py`: G2 누락 + G3b 버전 신호 + G3c 허가 조건을 하나의 보수적 판정으로 통합. 진짜 SDK 데이터 검증 이전에는 `READY`를 내지 않음. [설계](../../architecture/G4_COMBINED_REPORT_OFFLINE_20261024.md).
+- G5 `tests/test_core_edge_scenarios.py`: CORE1 전체 항목 있음(전체 NEEDS_REVIEW), CORE2 필수 항목 누락(전체 BLOCKED), EDGE1 권한 거부(전체 NEEDS_REVIEW) 합성 회귀. [시나리오](../../architecture/G5_CORE_EDGE_SCENARIOS_20261024.md).
+- **검증:** [GitHub Actions 40066529848](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40066529848)에서 **91 tests / OK**, 실제 Uliya SDK CLI/등록 Agent/NAS 접속/공식 검사 **NOT_RUN**. 공개 SDK ZIP 원본이나 민감자료 게시 없음.
+- **10/24 당일 마감 100% / 미완료 0% / 잔여 0h** (새 선행 묶음도 오프라인 범위 DONE). 경과 작업시간 미측정. **G1 SDK 기술 게이트 계속 BLOCKED**이고 **10/25 별도 예정** 계획 1.5h+예비 1.5h, 외부 의존성 때문에 실제 완료 ETA 산정 불가. 11월 공식 연동·검증은 미완료 유지.

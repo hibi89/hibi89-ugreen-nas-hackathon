@@ -1,3 +1,5 @@
+> **최신 10/24 선행 코드:** G3c 정책 가드·G4 통합 결과·G5 CORE/EDGE 합성 테스트 작성, [GitHub Actions 91/91 PASS](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40066529848). [실제 다음 일](docs/roles/lead/LEAD_ACTIVE_WORK.md)은 **G1 등록 Agent/CLI 내부 명세 확인**이며, 공식 Skill/NAS 호환성을 검증했다고 주장하면 안 된다. [오늘 100%/잔여 0h](docs/roles/lead/DAILY_PROGRESS.md), 10/25 별도 1.5h+예비1.5h.
+
 > **최우선 정정 (2026-10-24):** UGREEN 10/24 달력일 실제 수행 작업은 **100% 완료/잔여 0시간**이며 10/25로 넘어간 G1 SDK CLI/Agent 검증은 **아직 BLOCKED**. 예전 75% 보고는 25일 G1을 24일 달력일 분모와 혼동한 오류로 이력 보존. [현재 하루 보고](docs/roles/lead/DAILY_PROGRESS.md) 및 [보고 규칙](docs/roles/lead/DAILY_PROGRESS_REPORTING_PROTOCOL.md)을 읽고 작업한다. 전체 제품 완료율이나 실제 NAS/SDK 동작을 100%로 해석하지 않는다.
 
 > **매 작업 후 당일 100% 기준 진척률/잔여시간 의무 공시:** [DAILY_PROGRESS.md](docs/roles/lead/DAILY_PROGRESS.md) · [실행 규약](docs/roles/lead/DAILY_PROGRESS_REPORTING_PROTOCOL.md) · [기계검증 가능한 진행률 원본](docs/roles/lead/DAILY_PROGRESS.json). 새 채팅도 현재 1일차 75%/25% 및 G1 SDK 차단·시간 산정 불가를 복원한다. 완료 후 GitHub와 사용자에게 **금일 XX% 완료/남은 YY%, 남은 작업시간, 별도 예비, 실제 ETA/차단 및 SHA**를 반드시 표시한다.

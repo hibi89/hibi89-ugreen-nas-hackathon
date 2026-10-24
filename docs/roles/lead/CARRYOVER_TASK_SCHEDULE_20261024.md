@@ -30,3 +30,10 @@
 **2026-10-24 검증 기준:** `lead/ugreen`의 독립 코드와 [GitHub Actions 68 PASS](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40065789384). 실제 공식 등록 Expert Agent 호출, NAS 실제 실행, ZIP/PDF 최종 제출 영수증은 **미검증/미완료**.
 
 이 문서는 [기존 마스터 일별 시간표](../../UGREEN_DAILY_EFFORT_PLAN_20261024.md)의 일자·기준 계획시간을 바꾸지 않고, **건너뛰었다고 인식되기 쉬운 날짜의 복귀 작업**만 명시한다.
+
+
+## 2026-10-24 추가 선행 개발로 업데이트된 이월 업무
+- 11/01~02: [G3c 권한 정책은 오프라인 코드 검증 완료](../../architecture/G3C_POLICY_GUARD_20261024.md); **실제 UGOS 권한 허용범위·PII 지원범위 검증, 오류/승인 테스트**만 남음. 지원되지 않으면 검증되지 않음 유지.
+- 11/03~04: [G4 통합 보고 엔진은 오프라인 합성 검증 완료](../../architecture/G4_COMBINED_REPORT_OFFLINE_20261024.md); **공식 `SKILL.md`/참조 Markdown, 등록 CLI/Agent 연결, 실제 검증된 데이터 흐름**이 남음.
+- 11/05: [G5 합성 3개 시나리오 선행 검증 완료](../../architecture/G5_CORE_EDGE_SCENARIOS_20261024.md); **공식 Skill 실행/검증 도구 지원되는 환경에서 재현·근거 확보** 남음.
+- 새 선행 작업 테스트 총 [91 PASS](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40066529848)이지 공식 NAS 테스트 91회가 아니다. 10/25 G1 공식 명세 게이트 및 모든 날짜별 시간 상한은 변경하지 않는다.
