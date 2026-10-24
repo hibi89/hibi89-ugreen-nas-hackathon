@@ -5,29 +5,29 @@
 > 시간은 예상 작업·별도 안전 예비의 **미사용 작업 배정량**입니다. 외부 승인 대기 및 미계측 실투입시간은 포함하지 않습니다.
 
 > **외부 차단과 합성 선행개발은 실제 SDK·NAS 사용 가능 판정이 아닙니다.**
-**전체 24일 / 완료 1 / 부분 0 / 차단 1 / 미착수 22**
+**전체 24일 / 완료 1 / 부분 12 / 차단 3 / 미착수 8**
 
 **다음 실행 포인터: `UGR-D02`** · 원래 일정: `docs/UGREEN_DAILY_EFFORT_PLAN_20261024.md`
 
 | ID | 예정일(KST) | 원래 작업 | 상태 | 해당 일 완료율 | 남은 기본 | 남은 예비 | 실제 수행일 | 증거(경로·CI) | 검증 SHA | 회수 목표일 |
 |---|---|---|---|---:|---:|---:|---|---|---|---|
 | UGR-D01 | 2026-10-24 | 운영 문서 전환은 이미 진행. 과거 실측시간 없음 | DONE | 100% | 0h | 0h | 2026-10-24 | docs/roles/lead/DAILY_PROGRESS.json | 5772a8a97364a26155c238ea7af576bdd400dc1a | — |
-| UGR-D02 | 2026-10-25 | G1 공식 Kit 재접근: 기존 실패와 다른 합법적 경로 한 가지 | BLOCKED | 0% | 1.5h | 1.5h | — | docs/roles/lead/LIVE_STATE.json | — | 2026-10-26 |
-| UGR-D03 | 2026-10-26 | 공식 CLI·등록 Expert Agent·권한 자료 추출 또는 무료 문의 | NOT_STARTED | 0% | 1.5h | 1.5h | — | — | — | — |
-| UGR-D04 | 2026-10-27 | G1 게이트와 G2 데이터 계약 초안·기술 선택 | NOT_STARTED | 0% | 2h | 1h | — | — | — | — |
-| UGR-D05 | 2026-10-28 | 필수 납품 목록/허가 폴더/증거 연결 규칙 구현 | NOT_STARTED | 0% | 2h | 1h | — | — | — | — |
-| UGR-D06 | 2026-10-29 | 누락 탐지 합성 케이스·회귀 테스트·수정 | NOT_STARTED | 0% | 2h | 1h | — | — | — | — |
-| UGR-D07 | 2026-10-30 | 서로 다른 최종본 후보 판정 규칙 | NOT_STARTED | 0% | 2h | 1h | — | — | — | — |
-| UGR-D08 | 2026-10-31 | 버전 충돌·모호성 합성 테스트 및 정리 | NOT_STARTED | 0% | 2h | 2h | — | — | — | — |
-| UGR-D09 | 2026-11-01 | 권한/외부 전송/개인정보 정보흐름 위협모델 | NOT_STARTED | 0% | 2h | 2h | — | — | — | — |
-| UGR-D10 | 2026-11-02 | 권한 거부·부분조회·PII 미지원 에지 테스트 | NOT_STARTED | 0% | 2h | 1h | — | — | — | — |
-| UGR-D11 | 2026-11-03 | 단일 SKILL.md와 참조문서 골격 통합 | NOT_STARTED | 0% | 2h | 1h | — | — | — | — |
-| UGR-D12 | 2026-11-04 | 오케스트레이션 연결 및 I/O 계약 재점검 | NOT_STARTED | 0% | 2h | 1h | — | — | — | — |
-| UGR-D13 | 2026-11-05 | CORE1·CORE2·EDGE1 합성 시나리오 실행 | NOT_STARTED | 0% | 2h | 1h | — | — | — | — |
-| UGR-D14 | 2026-11-06 | 지원 도구 검증(가능한 경우)과 ZIP 사전 검사 | NOT_STARTED | 0% | 2h | 1h | — | — | — | — |
+| UGR-D02 | 2026-10-25 | G1 공식 Kit 재접근: 기존 실패와 다른 합법적 경로 한 가지 | BLOCKED | 0% | 1.5h | 1.5h | 2026-10-24 | docs/roles/lead/G1_ZIP_METADATA_RECOVERY_20261024.md | e06f3a2b3ec4a3f6ad2300c5f7505bcb4b6e819a | 2026-10-26 |
+| UGR-D03 | 2026-10-26 | 공식 CLI·등록 Expert Agent·권한 자료 추출 또는 무료 문의 | BLOCKED | 0% | 1.5h | 1.5h | 2026-10-24 | docs/architecture/G1_PUBLIC_CATALOG_BINDING_20261024.md | 5772a8a97364a26155c238ea7af576bdd400dc1a | 2026-10-27 |
+| UGR-D04 | 2026-10-27 | G1 게이트와 G2 데이터 계약 초안·기술 선택 | BLOCKED | 0% | 2h | 1h | 2026-10-24 | docs/architecture/G2_EVIDENCE_CONTRACT_20261024.md | 5772a8a97364a26155c238ea7af576bdd400dc1a | 2026-10-27 |
+| UGR-D05 | 2026-10-28 | 필수 납품 목록/허가 폴더/증거 연결 규칙 구현 | PARTIAL | 0% | 2h | 1h | 2026-10-24 | docs/architecture/G2_EVIDENCE_CONTRACT_20261024.md | 5772a8a97364a26155c238ea7af576bdd400dc1a | — |
+| UGR-D06 | 2026-10-29 | 누락 탐지 합성 케이스·회귀 테스트·수정 | PARTIAL | 0% | 2h | 1h | 2026-10-24 | docs/architecture/G5_CORE_EDGE_SCENARIOS_20261024.md | 5772a8a97364a26155c238ea7af576bdd400dc1a | — |
+| UGR-D07 | 2026-10-30 | 서로 다른 최종본 후보 판정 규칙 | PARTIAL | 0% | 2h | 1h | 2026-10-24 | docs/architecture/G3B_VERSION_CANDIDATES_20261024.md | 5772a8a97364a26155c238ea7af576bdd400dc1a | — |
+| UGR-D08 | 2026-10-31 | 버전 충돌·모호성 합성 테스트 및 정리 | PARTIAL | 0% | 2h | 2h | 2026-10-24 | docs/architecture/G3B_VERSION_CANDIDATES_20261024.md | 5772a8a97364a26155c238ea7af576bdd400dc1a | — |
+| UGR-D09 | 2026-11-01 | 권한/외부 전송/개인정보 정보흐름 위협모델 | PARTIAL | 0% | 2h | 2h | 2026-10-24 | docs/architecture/G3C_POLICY_GUARD_20261024.md | 5772a8a97364a26155c238ea7af576bdd400dc1a | — |
+| UGR-D10 | 2026-11-02 | 권한 거부·부분조회·PII 미지원 에지 테스트 | PARTIAL | 0% | 2h | 1h | 2026-10-24 | docs/architecture/G5_CORE_EDGE_SCENARIOS_20261024.md | 5772a8a97364a26155c238ea7af576bdd400dc1a | — |
+| UGR-D11 | 2026-11-03 | 단일 SKILL.md와 참조문서 골격 통합 | PARTIAL | 0% | 2h | 1h | 2026-10-24 | skill/projectready-nas/SKILL.md | 5772a8a97364a26155c238ea7af576bdd400dc1a | — |
+| UGR-D12 | 2026-11-04 | 오케스트레이션 연결 및 I/O 계약 재점검 | PARTIAL | 0% | 2h | 1h | 2026-10-24 | docs/architecture/G4_COMBINED_REPORT_OFFLINE_20261024.md | 5772a8a97364a26155c238ea7af576bdd400dc1a | — |
+| UGR-D13 | 2026-11-05 | CORE1·CORE2·EDGE1 합성 시나리오 실행 | PARTIAL | 0% | 2h | 1h | 2026-10-24 | docs/architecture/G5_CORE_EDGE_SCENARIOS_20261024.md | 5772a8a97364a26155c238ea7af576bdd400dc1a | — |
+| UGR-D14 | 2026-11-06 | 지원 도구 검증(가능한 경우)과 ZIP 사전 검사 | PARTIAL | 0% | 2h | 1h | 2026-10-24 | docs/architecture/G7_ROUND1_PACKAGE_PREFLIGHT_20261024.md | 5772a8a97364a26155c238ea7af576bdd400dc1a | — |
 | UGR-D15 | 2026-11-07 | 영문 제안서 10개 답변 초안 | NOT_STARTED | 0% | 2h | 2h | — | — | — | — |
-| UGR-D16 | 2026-11-08 | PDF 편집·렌더 검수와 SKILL 패키징 | NOT_STARTED | 0% | 2h | 2h | — | — | — | — |
-| UGR-D17 | 2026-11-09 | 라이선스·PII·비밀·용량·링크·재현성 출시 검수 | NOT_STARTED | 0% | 1.5h | 1.5h | — | — | — | — |
+| UGR-D16 | 2026-11-08 | PDF 편집·렌더 검수와 SKILL 패키징 | PARTIAL | 0% | 2h | 2h | 2026-10-24 | docs/architecture/G7_ROUND1_PACKAGE_PREFLIGHT_20261024.md | 5772a8a97364a26155c238ea7af576bdd400dc1a | — |
+| UGR-D17 | 2026-11-09 | 라이선스·PII·비밀·용량·링크·재현성 출시 검수 | PARTIAL | 0% | 1.5h | 1.5h | 2026-10-24 | docs/architecture/G7_ROUND1_PACKAGE_PREFLIGHT_20261024.md | 5772a8a97364a26155c238ea7af576bdd400dc1a | — |
 | UGR-D18 | 2026-11-10 | UGREEN 조기 제출 시도 조건부 / KIC 조기 제출 보호 | NOT_STARTED | 0% | 1h | 0.5h | — | — | — | — |
 | UGR-D19 | 2026-11-11 | PayPal 조기 제출 보호 / UGREEN 필수 오류만 | NOT_STARTED | 0% | 0.5h | 0.5h | — | — | — | — |
 | UGR-D20 | 2026-11-12 | KIC 공식 마감 보호 — UGREEN 신규 개발 금지 | NOT_STARTED | 0% | 0h | 0.5h | — | — | — | — |
@@ -38,21 +38,28 @@
 
 ## 보류·차단 / 다시 확인할 일
 
-- **UGR-D02 (2026-10-25, 0%):** UGREEN 공식 Kit 내부 CLI/Expert Agent 실제 런타임/권한 스키마 확보 미완료 / 재검토: 주최자 공식 문서·기술지원 또는 허가된 참가자 환경에서 정확한 실행 근거 확보 / 회수일: 2026-10-26
+- **UGR-D02 (2026-10-25, 0%):** 실제 SDK/등록 Agent/권한/정식 validator 미검증 / 재검토: 주최자 공식 문서·기술지원 또는 허가된 참가자 환경에서 정확한 실행 근거 확보 / 회수일: 2026-10-26
+- **UGR-D03 (2026-10-26, 0%):** 실제 Expert Agent 등록·권한·라이선스/응답 근거 부재 / 재검토: 공식 설치 환경에서 실제 명령·권한/응답 검증 또는 주최 측 지원 근거, 없으면 BLOCKED 유지 / 회수일: 2026-10-27
+- **UGR-D04 (2026-10-27, 0%):** 실지원 SDK 계약 미확정으로 G2 승인 게이트 차단 / 재검토: 공식 설치 환경에서 실제 명령·권한/응답 검증 또는 주최 측 지원 근거, 없으면 BLOCKED 유지 / 회수일: 2026-10-27
 
 ## 이미 선행한 작업과 검증 경계
 
 - UGR-D01 (2026-10-24): 10/24 실제 오프라인 G2/G3b/G3c/G4/G5/G6 선행 구현은 합성 검증; 원래 10/24 제품 개발 배당 0h, 실제 시간 미계측. 공식 SDK/CLI/NAS 미검증.
-- UGR-D05 (2026-10-28): 합성 G2/G3b/G3c/G4/G5 및 Markdown Skill 초안 선행됨. 해당 날짜 공식 SDK 연동·실 NAS·검증 수락은 미완료; 작업 중복 금지.
-- UGR-D06 (2026-10-29): 합성 G2/G3b/G3c/G4/G5 및 Markdown Skill 초안 선행됨. 해당 날짜 공식 SDK 연동·실 NAS·검증 수락은 미완료; 작업 중복 금지.
-- UGR-D07 (2026-10-30): 합성 G2/G3b/G3c/G4/G5 및 Markdown Skill 초안 선행됨. 해당 날짜 공식 SDK 연동·실 NAS·검증 수락은 미완료; 작업 중복 금지.
-- UGR-D08 (2026-10-31): 합성 G2/G3b/G3c/G4/G5 및 Markdown Skill 초안 선행됨. 해당 날짜 공식 SDK 연동·실 NAS·검증 수락은 미완료; 작업 중복 금지.
-- UGR-D09 (2026-11-01): 합성 G2/G3b/G3c/G4/G5 및 Markdown Skill 초안 선행됨. 해당 날짜 공식 SDK 연동·실 NAS·검증 수락은 미완료; 작업 중복 금지.
-- UGR-D10 (2026-11-02): 합성 G2/G3b/G3c/G4/G5 및 Markdown Skill 초안 선행됨. 해당 날짜 공식 SDK 연동·실 NAS·검증 수락은 미완료; 작업 중복 금지.
-- UGR-D11 (2026-11-03): 합성 G2/G3b/G3c/G4/G5 및 Markdown Skill 초안 선행됨. 해당 날짜 공식 SDK 연동·실 NAS·검증 수락은 미완료; 작업 중복 금지.
-- UGR-D12 (2026-11-04): 합성 G2/G3b/G3c/G4/G5 및 Markdown Skill 초안 선행됨. 해당 날짜 공식 SDK 연동·실 NAS·검증 수락은 미완료; 작업 중복 금지.
-- UGR-D13 (2026-11-05): 합성 G2/G3b/G3c/G4/G5 및 Markdown Skill 초안 선행됨. 해당 날짜 공식 SDK 연동·실 NAS·검증 수락은 미완료; 작업 중복 금지.
-- UGR-D14 (2026-11-06): 합성 G2/G3b/G3c/G4/G5 및 Markdown Skill 초안 선행됨. 해당 날짜 공식 SDK 연동·실 NAS·검증 수락은 미완료; 작업 중복 금지.
+- UGR-D02 (2026-10-25): 공식 공개 SDK ZIP/SHA, CLI 카탈로그 9개 read 동작의 파라미터를 10/24 선행 정적 확인. 실제 Agent 호출·validator는 차단. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음.
+- UGR-D03 (2026-10-26): file-agent/document-agent 이름·read 파라미터는 카탈로그 확인; 실제 등록·권한·라이선스 미검증. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음.
+- UGR-D04 (2026-10-27): G2 임시 증거/미검증 계약 선행 완료. 실제 공식 Agent I/O 근거 없어 계약 동결 불가. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음.
+- UGR-D05 (2026-10-28): presence.py 합성 구현·테스트 완료; 공식 NAS read adapter와 권한/완전성 미검증. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음.
+- UGR-D06 (2026-10-29): 누락·부분 결과·권한 거부 합성 테스트 선행; 실제 API 테스트 미실행. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음.
+- UGR-D07 (2026-10-30): version_candidates.py 합성 구현 선행; 실제 NAS 메타데이터/해시 연동 미검증. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음.
+- UGR-D08 (2026-10-31): 버전 후보 모호성 합성 검증 선행; 실제 최종본 승인/지원 범위 미확인. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음.
+- UGR-D09 (2026-11-01): policy_guard.py 읽기 전용·권한 정책 선행; 실 NAS/PII 데이터흐름 미검증. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음.
+- UGR-D10 (2026-11-02): 권한 거부·불완전 조회 합성 테스트 선행; 실제 사용자/PII 검증 미실행. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음.
+- UGR-D11 (2026-11-03): 4개 Markdown Skill 후보 오프라인 preflight PASS; 공식 Uliya validator·Agent 연결 미실행. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음.
+- UGR-D12 (2026-11-04): combined_report.py 합성 통합 보고 선행; 실제 Agent I/O 연결 미실행. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음.
+- UGR-D13 (2026-11-05): CORE1/CORE2/EDGE1 합성 검증 완료; 실제 NAS 실행 미실행. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음.
+- UGR-D14 (2026-11-06): Skill 4개 Markdown 파일 사전검사 선행; 공식 validator 미실행. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음.
+- UGR-D16 (2026-11-08): ZIP 구조/재현성 도구 선행; 제출 영문 PDF 미생성. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음.
+- UGR-D17 (2026-11-09): 출시 ZIP 구조·비밀 패턴 오프라인 사전검사; 공식 라이선스·PII·validator 최종 검수 미실행. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음.
 
 ## 운영 의무
 

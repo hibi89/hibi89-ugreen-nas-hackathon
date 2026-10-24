@@ -270,5 +270,24 @@
   "closeout_enforces_master_on_every_push": true,
   "master_progress_ref": "data/master_progress.json",
   "master_progress_dashboard": "MASTER_PROGRESS.md",
-  "master_progress_consistency_check": "master JSON plus generated MD checked in GitHub CI; offline synthetic evidence only"
+  "master_progress_consistency_check": "master JSON plus generated MD checked in GitHub CI; offline synthetic evidence only",
+  "master_progress_reconciled": {
+    "date_kst": "2026-10-24",
+    "source": "data/master_progress.json",
+    "generated_dashboard": "MASTER_PROGRESS.md",
+    "statuses": {
+      "DONE": 1,
+      "PARTIAL": 12,
+      "BLOCKED": 3,
+      "NOT_STARTED": 8
+    },
+    "prework_execution_date": "2026-10-24",
+    "remaining_actual_hours": null,
+    "overall_completion_percent": null,
+    "official_uliya_validator": "NOT_RUN",
+    "nas": "NOT_RUN",
+    "devpost": "NOT_SUBMITTED",
+    "baseline_plan_hours": 34.25,
+    "separate_reserve_hours": 26.75
+  }
 }

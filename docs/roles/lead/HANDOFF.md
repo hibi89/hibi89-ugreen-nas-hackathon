@@ -256,3 +256,10 @@
 > **2026-10-24 전체 24일 마스터 진척표 도입(제품 진척 변화 없음):** [MASTER_PROGRESS.md](../../../MASTER_PROGRESS.md)와 단일 [JSON 정본](../../../data/master_progress.json). 10/24 일일 산출물 100%, 10/25 공식 G1 SDK/CLI·Agent 0% BLOCKED, G2~G6 합성 선행 결과와 정식 SDK 실증은 분리. 작업이 끝날 때마다 JSON→`python render_master_progress.py --write`→CI `--check`를 같은 GitHub 커밋으로 반영. 실제 작업시간 미계측.
 
 > **2026-10-24 마스터표 검증 규칙 교정:** 기존 이중형식 검사와 충돌 해결. 정본 `data/master_progress.json` → 자동 생성 `MASTER_PROGRESS.md`를 실제 24일 원본 일정과 비교, 새 CI는 날짜·예비시간·증거·차단 상태 검증. 완료율·G1 차단·실측시간 변화 없음.
+
+## 2026-10-24 KST — MASTER_PROGRESS 실제 선행 작업·원 계획일 대조 정정
+- `lead/ugreen` 최신 소스 재검토 기준 commit `d0fa6830d4d4b94065972814acba0009c831992a`의 JSON 정본 `data/master_progress.json` 및 생성 `MASTER_PROGRESS.md` 24일 원본 계획. 기존 모든 날짜 미래 작업을 NOT_STARTED로 둔 항목 중 GitHub 검증된 오프라인 선행을 원래 날짜별로 적시 반영: **DONE 1 / PARTIAL 12 / BLOCKED 3 / NOT_STARTED 8**. 원래 24일 일정·기본 34.25h·별도 예비 26.75h 보존; 실제 선행일 2026-10-24 및 개별 근거 SHA 기록. 원래 미래 날짜의 정식 완료 조건(실 NAS/SDK)은 통과한 것으로 표시하지 않음.
+- PARTIAL 날짜의 `percent_complete=0`은 **원래 날짜의 정식 완료가중치가 정의되지 않아 임의 퍼센트를 발명하지 않았기 때문**. 스냅샷 10/24 유한한 당일 작업 100% / 잔여 당일 기본 0h·예비 0h는 그대로; 전체 대회 완료 퍼센트는 산정 불가. 원래 미래시간 잔여 기본/예비 배정은 불확실한 선행 시간 절감분을 허위 계산하지 않기 위해 원본 그대로; 실제 개발시간 NOT_MEASURED.
+- G1 정확한 호출, 설치된 파일/문서 Agent 권한·라이선스·공식 검사기/NAS/PII는 BLOCKED/NOT_RUN, Devpost 최종 제출 NOT_SUBMITTED. 165/165 원격 오프라인 CI 증거 [#40072583689](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40072583689) (실 NAS 성공이 아님). 이전 `d0fa...` 커밋에서 master generation, offline and closeout 3가지 CI SUCCESS. **이번 상태 정정 커밋의 새 CI는 PENDING**; 성공으로 미리 표기 금지.
+- 현재 공식 작업 단일 포인터 `UGR-D02`; 다음 10/25 SDK 명령/등록 Agent 실권한 확인 기본 1.5h+예비 1.5h; 실제 완료 ETA 미정. 동일 기능 재작성 금지. JSON 정본 수정 시 `python render_master_progress.py --write`로 MASTER 동시 갱신 후 `--check`, 24일 원본검사/원격 Actions 확인 필수. 다른 대회·민감정보·공식 ZIP 원본 무단 변경 없음.
+

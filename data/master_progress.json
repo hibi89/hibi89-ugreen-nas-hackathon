@@ -40,16 +40,17 @@
       "safe_remaining_hours": 1.5,
       "progress_state": "BLOCKED",
       "percent_complete": 0,
-      "executed_date_kst": null,
+      "executed_date_kst": "2026-10-24",
       "actual_elapsed_hours": null,
       "evidence": [
-        "docs/roles/lead/LIVE_STATE.json"
+        "docs/roles/lead/G1_ZIP_METADATA_RECOVERY_20261024.md",
+        "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/commit/e06f3a2b3ec4a3f6ad2300c5f7505bcb4b6e819a"
       ],
-      "verified_sha": null,
-      "blocker": "UGREEN 공식 Kit 내부 CLI/Expert Agent 실제 런타임/권한 스키마 확보 미완료",
+      "verified_sha": "e06f3a2b3ec4a3f6ad2300c5f7505bcb4b6e819a",
+      "blocker": "실제 SDK/등록 Agent/권한/정식 validator 미검증",
       "recovery_date_kst": "2026-10-26",
       "recovery_condition": "주최자 공식 문서·기술지원 또는 허가된 참가자 환경에서 정확한 실행 근거 확보",
-      "advance_note": null
+      "advance_note": "공식 공개 SDK ZIP/SHA, CLI 카탈로그 9개 read 동작의 파라미터를 10/24 선행 정적 확인. 실제 Agent 호출·validator는 차단. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음."
     },
     {
       "day_id": "UGR-D03",
@@ -60,16 +61,19 @@
       "safe_total_hours": 1.5,
       "estimated_remaining_hours": 1.5,
       "safe_remaining_hours": 1.5,
-      "progress_state": "NOT_STARTED",
+      "progress_state": "BLOCKED",
       "percent_complete": 0,
-      "executed_date_kst": null,
+      "executed_date_kst": "2026-10-24",
       "actual_elapsed_hours": null,
-      "evidence": [],
-      "verified_sha": null,
-      "blocker": null,
-      "recovery_date_kst": null,
-      "recovery_condition": null,
-      "advance_note": null
+      "evidence": [
+        "docs/architecture/G1_PUBLIC_CATALOG_BINDING_20261024.md",
+        "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/commit/5772a8a97364a26155c238ea7af576bdd400dc1a"
+      ],
+      "verified_sha": "5772a8a97364a26155c238ea7af576bdd400dc1a",
+      "blocker": "실제 Expert Agent 등록·권한·라이선스/응답 근거 부재",
+      "recovery_date_kst": "2026-10-27",
+      "recovery_condition": "공식 설치 환경에서 실제 명령·권한/응답 검증 또는 주최 측 지원 근거, 없으면 BLOCKED 유지",
+      "advance_note": "file-agent/document-agent 이름·read 파라미터는 카탈로그 확인; 실제 등록·권한·라이선스 미검증. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음."
     },
     {
       "day_id": "UGR-D04",
@@ -80,16 +84,19 @@
       "safe_total_hours": 1,
       "estimated_remaining_hours": 2,
       "safe_remaining_hours": 1,
-      "progress_state": "NOT_STARTED",
+      "progress_state": "BLOCKED",
       "percent_complete": 0,
-      "executed_date_kst": null,
+      "executed_date_kst": "2026-10-24",
       "actual_elapsed_hours": null,
-      "evidence": [],
-      "verified_sha": null,
-      "blocker": null,
-      "recovery_date_kst": null,
-      "recovery_condition": null,
-      "advance_note": null
+      "evidence": [
+        "docs/architecture/G2_EVIDENCE_CONTRACT_20261024.md",
+        "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/commit/5772a8a97364a26155c238ea7af576bdd400dc1a"
+      ],
+      "verified_sha": "5772a8a97364a26155c238ea7af576bdd400dc1a",
+      "blocker": "실지원 SDK 계약 미확정으로 G2 승인 게이트 차단",
+      "recovery_date_kst": "2026-10-27",
+      "recovery_condition": "공식 설치 환경에서 실제 명령·권한/응답 검증 또는 주최 측 지원 근거, 없으면 BLOCKED 유지",
+      "advance_note": "G2 임시 증거/미검증 계약 선행 완료. 실제 공식 Agent I/O 근거 없어 계약 동결 불가. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음."
     },
     {
       "day_id": "UGR-D05",
@@ -100,16 +107,19 @@
       "safe_total_hours": 1,
       "estimated_remaining_hours": 2,
       "safe_remaining_hours": 1,
-      "progress_state": "NOT_STARTED",
+      "progress_state": "PARTIAL",
       "percent_complete": 0,
-      "executed_date_kst": null,
+      "executed_date_kst": "2026-10-24",
       "actual_elapsed_hours": null,
-      "evidence": [],
-      "verified_sha": null,
+      "evidence": [
+        "docs/architecture/G2_EVIDENCE_CONTRACT_20261024.md",
+        "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/commit/5772a8a97364a26155c238ea7af576bdd400dc1a"
+      ],
+      "verified_sha": "5772a8a97364a26155c238ea7af576bdd400dc1a",
       "blocker": null,
       "recovery_date_kst": null,
       "recovery_condition": null,
-      "advance_note": "합성 G2/G3b/G3c/G4/G5 및 Markdown Skill 초안 선행됨. 해당 날짜 공식 SDK 연동·실 NAS·검증 수락은 미완료; 작업 중복 금지."
+      "advance_note": "presence.py 합성 구현·테스트 완료; 공식 NAS read adapter와 권한/완전성 미검증. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음."
     },
     {
       "day_id": "UGR-D06",
@@ -120,16 +130,19 @@
       "safe_total_hours": 1,
       "estimated_remaining_hours": 2,
       "safe_remaining_hours": 1,
-      "progress_state": "NOT_STARTED",
+      "progress_state": "PARTIAL",
       "percent_complete": 0,
-      "executed_date_kst": null,
+      "executed_date_kst": "2026-10-24",
       "actual_elapsed_hours": null,
-      "evidence": [],
-      "verified_sha": null,
+      "evidence": [
+        "docs/architecture/G5_CORE_EDGE_SCENARIOS_20261024.md",
+        "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/commit/5772a8a97364a26155c238ea7af576bdd400dc1a"
+      ],
+      "verified_sha": "5772a8a97364a26155c238ea7af576bdd400dc1a",
       "blocker": null,
       "recovery_date_kst": null,
       "recovery_condition": null,
-      "advance_note": "합성 G2/G3b/G3c/G4/G5 및 Markdown Skill 초안 선행됨. 해당 날짜 공식 SDK 연동·실 NAS·검증 수락은 미완료; 작업 중복 금지."
+      "advance_note": "누락·부분 결과·권한 거부 합성 테스트 선행; 실제 API 테스트 미실행. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음."
     },
     {
       "day_id": "UGR-D07",
@@ -140,16 +153,19 @@
       "safe_total_hours": 1,
       "estimated_remaining_hours": 2,
       "safe_remaining_hours": 1,
-      "progress_state": "NOT_STARTED",
+      "progress_state": "PARTIAL",
       "percent_complete": 0,
-      "executed_date_kst": null,
+      "executed_date_kst": "2026-10-24",
       "actual_elapsed_hours": null,
-      "evidence": [],
-      "verified_sha": null,
+      "evidence": [
+        "docs/architecture/G3B_VERSION_CANDIDATES_20261024.md",
+        "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/commit/5772a8a97364a26155c238ea7af576bdd400dc1a"
+      ],
+      "verified_sha": "5772a8a97364a26155c238ea7af576bdd400dc1a",
       "blocker": null,
       "recovery_date_kst": null,
       "recovery_condition": null,
-      "advance_note": "합성 G2/G3b/G3c/G4/G5 및 Markdown Skill 초안 선행됨. 해당 날짜 공식 SDK 연동·실 NAS·검증 수락은 미완료; 작업 중복 금지."
+      "advance_note": "version_candidates.py 합성 구현 선행; 실제 NAS 메타데이터/해시 연동 미검증. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음."
     },
     {
       "day_id": "UGR-D08",
@@ -160,16 +176,19 @@
       "safe_total_hours": 2,
       "estimated_remaining_hours": 2,
       "safe_remaining_hours": 2,
-      "progress_state": "NOT_STARTED",
+      "progress_state": "PARTIAL",
       "percent_complete": 0,
-      "executed_date_kst": null,
+      "executed_date_kst": "2026-10-24",
       "actual_elapsed_hours": null,
-      "evidence": [],
-      "verified_sha": null,
+      "evidence": [
+        "docs/architecture/G3B_VERSION_CANDIDATES_20261024.md",
+        "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/commit/5772a8a97364a26155c238ea7af576bdd400dc1a"
+      ],
+      "verified_sha": "5772a8a97364a26155c238ea7af576bdd400dc1a",
       "blocker": null,
       "recovery_date_kst": null,
       "recovery_condition": null,
-      "advance_note": "합성 G2/G3b/G3c/G4/G5 및 Markdown Skill 초안 선행됨. 해당 날짜 공식 SDK 연동·실 NAS·검증 수락은 미완료; 작업 중복 금지."
+      "advance_note": "버전 후보 모호성 합성 검증 선행; 실제 최종본 승인/지원 범위 미확인. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음."
     },
     {
       "day_id": "UGR-D09",
@@ -180,16 +199,19 @@
       "safe_total_hours": 2,
       "estimated_remaining_hours": 2,
       "safe_remaining_hours": 2,
-      "progress_state": "NOT_STARTED",
+      "progress_state": "PARTIAL",
       "percent_complete": 0,
-      "executed_date_kst": null,
+      "executed_date_kst": "2026-10-24",
       "actual_elapsed_hours": null,
-      "evidence": [],
-      "verified_sha": null,
+      "evidence": [
+        "docs/architecture/G3C_POLICY_GUARD_20261024.md",
+        "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/commit/5772a8a97364a26155c238ea7af576bdd400dc1a"
+      ],
+      "verified_sha": "5772a8a97364a26155c238ea7af576bdd400dc1a",
       "blocker": null,
       "recovery_date_kst": null,
       "recovery_condition": null,
-      "advance_note": "합성 G2/G3b/G3c/G4/G5 및 Markdown Skill 초안 선행됨. 해당 날짜 공식 SDK 연동·실 NAS·검증 수락은 미완료; 작업 중복 금지."
+      "advance_note": "policy_guard.py 읽기 전용·권한 정책 선행; 실 NAS/PII 데이터흐름 미검증. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음."
     },
     {
       "day_id": "UGR-D10",
@@ -200,16 +222,19 @@
       "safe_total_hours": 1,
       "estimated_remaining_hours": 2,
       "safe_remaining_hours": 1,
-      "progress_state": "NOT_STARTED",
+      "progress_state": "PARTIAL",
       "percent_complete": 0,
-      "executed_date_kst": null,
+      "executed_date_kst": "2026-10-24",
       "actual_elapsed_hours": null,
-      "evidence": [],
-      "verified_sha": null,
+      "evidence": [
+        "docs/architecture/G5_CORE_EDGE_SCENARIOS_20261024.md",
+        "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/commit/5772a8a97364a26155c238ea7af576bdd400dc1a"
+      ],
+      "verified_sha": "5772a8a97364a26155c238ea7af576bdd400dc1a",
       "blocker": null,
       "recovery_date_kst": null,
       "recovery_condition": null,
-      "advance_note": "합성 G2/G3b/G3c/G4/G5 및 Markdown Skill 초안 선행됨. 해당 날짜 공식 SDK 연동·실 NAS·검증 수락은 미완료; 작업 중복 금지."
+      "advance_note": "권한 거부·불완전 조회 합성 테스트 선행; 실제 사용자/PII 검증 미실행. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음."
     },
     {
       "day_id": "UGR-D11",
@@ -220,16 +245,19 @@
       "safe_total_hours": 1,
       "estimated_remaining_hours": 2,
       "safe_remaining_hours": 1,
-      "progress_state": "NOT_STARTED",
+      "progress_state": "PARTIAL",
       "percent_complete": 0,
-      "executed_date_kst": null,
+      "executed_date_kst": "2026-10-24",
       "actual_elapsed_hours": null,
-      "evidence": [],
-      "verified_sha": null,
+      "evidence": [
+        "skill/projectready-nas/SKILL.md",
+        "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/commit/5772a8a97364a26155c238ea7af576bdd400dc1a"
+      ],
+      "verified_sha": "5772a8a97364a26155c238ea7af576bdd400dc1a",
       "blocker": null,
       "recovery_date_kst": null,
       "recovery_condition": null,
-      "advance_note": "합성 G2/G3b/G3c/G4/G5 및 Markdown Skill 초안 선행됨. 해당 날짜 공식 SDK 연동·실 NAS·검증 수락은 미완료; 작업 중복 금지."
+      "advance_note": "4개 Markdown Skill 후보 오프라인 preflight PASS; 공식 Uliya validator·Agent 연결 미실행. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음."
     },
     {
       "day_id": "UGR-D12",
@@ -240,16 +268,19 @@
       "safe_total_hours": 1,
       "estimated_remaining_hours": 2,
       "safe_remaining_hours": 1,
-      "progress_state": "NOT_STARTED",
+      "progress_state": "PARTIAL",
       "percent_complete": 0,
-      "executed_date_kst": null,
+      "executed_date_kst": "2026-10-24",
       "actual_elapsed_hours": null,
-      "evidence": [],
-      "verified_sha": null,
+      "evidence": [
+        "docs/architecture/G4_COMBINED_REPORT_OFFLINE_20261024.md",
+        "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/commit/5772a8a97364a26155c238ea7af576bdd400dc1a"
+      ],
+      "verified_sha": "5772a8a97364a26155c238ea7af576bdd400dc1a",
       "blocker": null,
       "recovery_date_kst": null,
       "recovery_condition": null,
-      "advance_note": "합성 G2/G3b/G3c/G4/G5 및 Markdown Skill 초안 선행됨. 해당 날짜 공식 SDK 연동·실 NAS·검증 수락은 미완료; 작업 중복 금지."
+      "advance_note": "combined_report.py 합성 통합 보고 선행; 실제 Agent I/O 연결 미실행. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음."
     },
     {
       "day_id": "UGR-D13",
@@ -260,16 +291,19 @@
       "safe_total_hours": 1,
       "estimated_remaining_hours": 2,
       "safe_remaining_hours": 1,
-      "progress_state": "NOT_STARTED",
+      "progress_state": "PARTIAL",
       "percent_complete": 0,
-      "executed_date_kst": null,
+      "executed_date_kst": "2026-10-24",
       "actual_elapsed_hours": null,
-      "evidence": [],
-      "verified_sha": null,
+      "evidence": [
+        "docs/architecture/G5_CORE_EDGE_SCENARIOS_20261024.md",
+        "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/commit/5772a8a97364a26155c238ea7af576bdd400dc1a"
+      ],
+      "verified_sha": "5772a8a97364a26155c238ea7af576bdd400dc1a",
       "blocker": null,
       "recovery_date_kst": null,
       "recovery_condition": null,
-      "advance_note": "합성 G2/G3b/G3c/G4/G5 및 Markdown Skill 초안 선행됨. 해당 날짜 공식 SDK 연동·실 NAS·검증 수락은 미완료; 작업 중복 금지."
+      "advance_note": "CORE1/CORE2/EDGE1 합성 검증 완료; 실제 NAS 실행 미실행. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음."
     },
     {
       "day_id": "UGR-D14",
@@ -280,16 +314,19 @@
       "safe_total_hours": 1,
       "estimated_remaining_hours": 2,
       "safe_remaining_hours": 1,
-      "progress_state": "NOT_STARTED",
+      "progress_state": "PARTIAL",
       "percent_complete": 0,
-      "executed_date_kst": null,
+      "executed_date_kst": "2026-10-24",
       "actual_elapsed_hours": null,
-      "evidence": [],
-      "verified_sha": null,
+      "evidence": [
+        "docs/architecture/G7_ROUND1_PACKAGE_PREFLIGHT_20261024.md",
+        "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/commit/5772a8a97364a26155c238ea7af576bdd400dc1a"
+      ],
+      "verified_sha": "5772a8a97364a26155c238ea7af576bdd400dc1a",
       "blocker": null,
       "recovery_date_kst": null,
       "recovery_condition": null,
-      "advance_note": "합성 G2/G3b/G3c/G4/G5 및 Markdown Skill 초안 선행됨. 해당 날짜 공식 SDK 연동·실 NAS·검증 수락은 미완료; 작업 중복 금지."
+      "advance_note": "Skill 4개 Markdown 파일 사전검사 선행; 공식 validator 미실행. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음."
     },
     {
       "day_id": "UGR-D15",
@@ -320,16 +357,19 @@
       "safe_total_hours": 2,
       "estimated_remaining_hours": 2,
       "safe_remaining_hours": 2,
-      "progress_state": "NOT_STARTED",
+      "progress_state": "PARTIAL",
       "percent_complete": 0,
-      "executed_date_kst": null,
+      "executed_date_kst": "2026-10-24",
       "actual_elapsed_hours": null,
-      "evidence": [],
-      "verified_sha": null,
+      "evidence": [
+        "docs/architecture/G7_ROUND1_PACKAGE_PREFLIGHT_20261024.md",
+        "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/commit/5772a8a97364a26155c238ea7af576bdd400dc1a"
+      ],
+      "verified_sha": "5772a8a97364a26155c238ea7af576bdd400dc1a",
       "blocker": null,
       "recovery_date_kst": null,
       "recovery_condition": null,
-      "advance_note": null
+      "advance_note": "ZIP 구조/재현성 도구 선행; 제출 영문 PDF 미생성. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음."
     },
     {
       "day_id": "UGR-D17",
@@ -340,16 +380,19 @@
       "safe_total_hours": 1.5,
       "estimated_remaining_hours": 1.5,
       "safe_remaining_hours": 1.5,
-      "progress_state": "NOT_STARTED",
+      "progress_state": "PARTIAL",
       "percent_complete": 0,
-      "executed_date_kst": null,
+      "executed_date_kst": "2026-10-24",
       "actual_elapsed_hours": null,
-      "evidence": [],
-      "verified_sha": null,
+      "evidence": [
+        "docs/architecture/G7_ROUND1_PACKAGE_PREFLIGHT_20261024.md",
+        "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/commit/5772a8a97364a26155c238ea7af576bdd400dc1a"
+      ],
+      "verified_sha": "5772a8a97364a26155c238ea7af576bdd400dc1a",
       "blocker": null,
       "recovery_date_kst": null,
       "recovery_condition": null,
-      "advance_note": null
+      "advance_note": "출시 ZIP 구조·비밀 패턴 오프라인 사전검사; 공식 라이선스·PII·validator 최종 검수 미실행. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음."
     },
     {
       "day_id": "UGR-D18",
@@ -491,5 +534,6 @@
       "recovery_condition": null,
       "advance_note": null
     }
-  ]
+  ],
+  "source_reconciliation_note": "2026-10-24 verified offline advances mapped back to original 24-day date rows. PARTIAL zero percent means unweighted full acceptance still not certified; formal runtime/Agent gates BLOCKED."
 }
