@@ -602,9 +602,9 @@
     "original_editorial_skill_sha256": "cfbee5563b84c82b75abc83a67568bd6b428dcdeb87353113a657f3e83e24705",
     "original_editorial_candidate": "SUPERSEDED_SELF_EXPIRING_STATEMENT",
     "p1": "Evergreen SHA-bound static checker reporting in Skill and PDF Q8",
-    "new_candidate_sha256": null,
-    "new_candidate_ci": "PENDING",
-    "new_candidate_official_checker": "NOT_RUN",
+    "new_candidate_sha256": "c29317909544676b407e8c9cb92ab9c5ed80d2003a54d2e33c31ff4ffcb53764",
+    "new_candidate_ci": "SUCCESS_40110183321",
+    "new_candidate_official_checker": "NOT_RUN_NEW_SHA",
     "unchanged_verified_g22_sha256": "770e08c6eb5101785579eed7f2438547e0a0386d4c35aead860aab088e091169",
     "nas": "NOT_RUN",
     "owner_approval": "PENDING",
@@ -614,5 +614,28 @@
       "UGR-D16",
       "UGR-D17"
     ]
+  },
+  "g30_independently_verified_candidate": {
+    "verified_kst": "2026-10-25",
+    "report": "docs/submission/G30_INDEPENDENT_G29_ARTIFACT_AUDIT_20261025.md",
+    "g28_g29_ci": "SUCCESS_40110183321",
+    "g29_new_skill_sha256": "c29317909544676b407e8c9cb92ab9c5ed80d2003a54d2e33c31ff4ffcb53764",
+    "new_skill_size": 11266,
+    "zip_bytes": 4633,
+    "zip_sha256": "f504f0e31934e20b30571559f0bca6f193ebf97f03efdba812c2cc9c03427c5d",
+    "pdf_bytes": 5136,
+    "pdf_sha256": "418a81aa56b47d8fe33a442414e2e76d711dc1bfd1cdb2a0df313073a8a5da77",
+    "pdf_pages": 1,
+    "english_words": 362,
+    "visual_inspection": "PASS_NO_CLIPPING",
+    "persistent_snapshot": "docs/submission/checker_inputs/G29_20261025/projectready-nas/SKILL.md",
+    "exact_sha_official_checker": "NOT_RUN",
+    "g22_previous_checker": "PARTICIPANT_REPORTED_PASS_OTHER_SHA",
+    "rights_license": "PENDING",
+    "participant_approval": "PENDING",
+    "nas": "NOT_RUN",
+    "devpost": "NOT_SUBMITTED",
+    "actual_hours": null,
+    "master_states_unchanged": true
   }
 }
