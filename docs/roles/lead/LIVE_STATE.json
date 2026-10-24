@@ -28,7 +28,7 @@
     "id": "G1-SDK-DETAILS",
     "scheduled_kst": "2026-10-25",
     "status": "BLOCKED_EXACT_ACTION_PARAMETERS_AND_OFFICIAL_CHECKER",
-    "scope": "Extract exact read-only action parameter names/type/required/effect/approval from pinned official catalog and corroborate documented Agent CLI; do not run network-pattern flagged SDK checker or real NAS; preserve G1 blocked unless safety and license established",
+    "scope": "Read first-party SHA-pinned nine-action parameter matrix CI; update Skill only on verified names and read-only behavior; runtime/agent registry and official checker remain blocked",
     "planned_hours": 1.5,
     "separate_reserve_hours": 1.5,
     "actual_completion_eta_hours": null
@@ -209,5 +209,16 @@
     "live_agent_registry_verified": false,
     "checker_execution": "NOT_RUN",
     "nas": "NOT_RUN"
+  },
+  "g1_parameter_matrix": {
+    "id": "G1-EXACT-PARAMETER-METADATA",
+    "source": "tools/sdk_parameter_matrix.py",
+    "status": "CI_PENDING",
+    "source_archive_sha256": "cf557e5a022e4297892f39768132855154232efdedeb726b2845450ccd70e1b3",
+    "offline_fixture_tests_added": 7,
+    "runtime_validated": false,
+    "official_sdk_executed": false,
+    "license_approved": false,
+    "real_nas": "NOT_RUN"
   }
 }

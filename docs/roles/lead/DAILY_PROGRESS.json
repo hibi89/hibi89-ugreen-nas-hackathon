@@ -162,6 +162,15 @@
       "verified_workflow": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40071626348",
       "offline_suite_passed": 156,
       "parameter_names_verified": false
+    },
+    {
+      "scope_id": "G1_PARAMETER_MATRIX_PINNED_PUBLIC_KIT",
+      "status": "SOURCE_COMMITTED_CI_PENDING",
+      "source": "tools/sdk_parameter_matrix.py",
+      "offline_tests_added": 7,
+      "actual_work_hours": null,
+      "official_validator": "NOT_RUN",
+      "real_nas": "NOT_RUN"
     }
   ],
   "overall_project_completion_percent": null,
@@ -175,5 +184,5 @@
   "latest_repository_regression_ci_url": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40071626325",
   "latest_closeout_guard_verified": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40071626303",
   "notes_on_last_closeout": "One-line GitHub bootstrap and mandatory end-of-work handoff automated checks verified. No new SDK or NAS capability established.",
-  "notes_on_new_chat_execution": "Official pinned SDK static catalogue confirmed 9 selected action structures/param counts; 156/156 offline CI PASS at 17c386e78. Exact parameter names/permissions, script safety, official validator and live NAS still BLOCKED/NOT_RUN. Oct24 finite work 100% completed/0h remaining with extra advances outside denominator. Next G1 Oct25 1.5h plan+1.5h reserve, actual ETA unknown."
+  "notes_on_new_chat_execution": "G1 source matrix for exact pinned public CLI parameter names/required flags in new GitHub CI pending. Original 10/24 finite completion 100%, 0 hours to originally allocated day; no double count. G1 SDK real runtime remains blocked. Next 10/25 basic 1.5h + reserve 1.5h."
 }

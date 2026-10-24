@@ -1,0 +1,25 @@
+name: Official Uliya pinned parameter matrix
+on:
+  push:
+    branches: ["lead/ugreen"]
+    paths:
+      - "tools/sdk_parameter_matrix.py"
+      - ".github/workflows/sdk-parameter-matrix.yml"
+  workflow_dispatch:
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 3
+    env:
+      KIT_URL: https://cdn.shopify.com/s/files/1/0630/9416/1602/files/uliya-skill-kit-0.7.3-en.zip?v=1790578898
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Inspect first-party catalog identifiers in memory without executing SDK
+        run: python tools/sdk_parameter_matrix.py --official-url "$KIT_URL"
