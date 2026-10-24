@@ -82,5 +82,12 @@
   "complete_until_official_sdk_confirmed": false,
   "closeout_ci_enforcement": ".github/workflows/closeout-synchronization.yml",
   "closeout_enforces_same_push_document_updates": true,
-  "closeout_content_truthfulness_requires_human_test_evidence": true
+  "closeout_content_truthfulness_requires_human_test_evidence": true,
+  "last_closeout_guard_issue": {
+    "date_kst": "2026-10-24",
+    "workflow_run": 40067541841,
+    "observed_status": "FAILED_MISSING_DAILY_PROGRESS_JSON",
+    "corrective_commit_status": "PENDING_REMOTE_CI_VERIFICATION",
+    "effect_on_product_progress": "NONE"
+  }
 }

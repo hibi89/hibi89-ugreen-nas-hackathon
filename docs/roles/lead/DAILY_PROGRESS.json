@@ -98,5 +98,8 @@
   "overall_project_completion_percent": null,
   "overall_official_skill_sdk_compatible": false,
   "correction_note": "Former 75% was a forward-started 10/25 G1 milestone snapshot mislabeled as Oct 24 daily completion. Historical record preserved separately, not converted to passed SDK tests. 10/24 original planned engineering hours = 0 and no elapsed time was measured.",
-  "previous_snapshot_archive": "docs/roles/lead/history/20261024_G1_EARLY_75_PERCENT_SNAPSHOT.json"
+  "previous_snapshot_archive": "docs/roles/lead/history/20261024_G1_EARLY_75_PERCENT_SNAPSHOT.json",
+  "closeout_sync_enforcement_active": true,
+  "closeout_sync_quality_issue": "2026-10-24 CI #40067541841 detected stale daily JSON in previous policy commit; correcting in next commit",
+  "closeout_sync_guard_tested_status": "PENDING_RECHECK"
 }

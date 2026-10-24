@@ -25,6 +25,10 @@ class HandoffSyncTests(unittest.TestCase):
         self.assertTrue(mod.closeout_errors({"docs/architecture/G6.md"}))
     def test_official_skill_change_requires_handoff(self):
         self.assertTrue(mod.closeout_errors({"SKILL.md"}))
+    def test_only_textual_handoff_changes_do_not_require_source_gate(self):
+        self.assertEqual([],mod.closeout_errors({"docs/roles/lead/LIVE_HANDOFF.md",
+                                                 "docs/roles/lead/DAILY_PROGRESS.json"}))
+
     def test_workflow_only_ignored(self):
         self.assertEqual([],mod.closeout_errors({".github/workflows/closeout-synchronization.yml"}))
     def test_single_missing_document_fails(self):

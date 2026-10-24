@@ -60,3 +60,6 @@
 
 
 **종료 인수인계 누락 방지:** 코드·테스트 변경 push는 [closeout 동기화 검사](../../../.github/workflows/closeout-synchronization.yml) 통과 필요. 본 10/24 당일은 **100% 완료 / 잔여 0h**, SDK 기술 게이트 차단을 별도 유지.
+
+
+**2026-10-24 인수인계 CI 시정:** 종료 갱신 누락(`DAILY_PROGRESS.json`)을 자동검사에서 탐지하여 JSON 동시 갱신. 당일 100%/잔여 0h 그대로; G1 실제 CLI·NAS 미검증과 별도.
