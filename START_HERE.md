@@ -1,3 +1,5 @@
+> **일별 작업시간을 먼저 확인:** [보수적 일자별 일정표](docs/UGREEN_DAILY_EFFORT_PLAN_20261024.md)는 총괄이 새 채팅을 시작할 때 읽을 필수 자료. 현재 SDK 접근 차단·11/10 조건부 목표 및 KIC/PayPal 충돌 시간을 포함한다. [실측 작업 로그](docs/roles/lead/WORK_TIME_LOG.md)도 확인. 시간 초과 때에는 미완료를 그대로 기록하고 재예측한다.
+
 # UGREEN ProjectReady NAS — 새 채팅 자동 복원 진입점
 
 ## 사용자의 짧은 실행 명령

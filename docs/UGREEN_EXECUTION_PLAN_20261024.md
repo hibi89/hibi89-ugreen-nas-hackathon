@@ -1,3 +1,5 @@
+> **2026-10-24 KST 최신 시간 예산 공시:** 사용자의 요청으로 기존 작업 일정에 일별 보수적 예상시간을 추가했다. **[날짜별 작업시간·예비·완료 기준](UGREEN_DAILY_EFFORT_PLAN_20261024.md)**이 시간 산정에 우선하며, 아래 과거 worker 일정/고정 G0~G8 날짜는 *작업 범위 이력*이다. 현재 UGREEN은 SDK CLI 미검증 차단 상태다. 11/10 내부 조기 제출은 조건부이며 안전 달성으로 약속하지 않는다. 공식 11/16 16:45 KST는 변경 없다.
+
 # ProjectReady NAS — APPROVED UGREEN DELIVERY PLAN
 2026-10-24 KST | Status: user-approved PRODUCT/PLAN, not a tested implementation.
 Owner: UGREEN lead, lead/ugreen. Other hackathon schedules intentionally excluded.

@@ -21,3 +21,10 @@ A chosen: direct lead development/verification on one `lead/ugreen` workline. B 
 ## One-line new-chat restore and always-current handoff
 - `[해커톤총괄 깃헙 레포지토리 확인하고 작업하셈]` → `lead/ugreen/CHAT_BOOTSTRAP.md` → current remote HEAD + `LEAD_ACTIVE_WORK.md` → next authorized investigation/code/testing. Do not launch archived dispatcher/worker.
 - Major change/chat move requires STATUS/HANDOFF/TO_HACKATHON_LEAD and active-work synced with real evidence, commit/remote SHA checked; update stable bootstrap only if routes/roles change. No background sync or untested NAS completion claims.
+
+
+## Time estimate reliability (binding 2026-10-24)
+- First read `docs/UGREEN_DAILY_EFFORT_PLAN_20261024.md` (dated daily plan/base/reserve/cap) and `docs/roles/lead/WORK_TIME_LOG.md`. Before calling a task 'done', compare actual observed work time with estimate; unobserved means NOT_MEASURED.
+- The daily reserve is **not** already counted in planned work. When cap is reached, mark partial/BLOCKED, record evidence and reforecast before another commitment. A technical dependency without official access cannot be promised within a finite hour estimate.
+- If actual >1.5x planned, recalibrate next work day and tell the overall lead. If the same method is stuck 60-90 min / failed twice, record cause and switch approach. Do not move another hackathon's official-deadline blocks to UGREEN work.
+- Internal Nov 10 submission is a **conditional attempt** while SDK Gate1 is unresolved; maintain official Nov 16 16:45 and user approval on product scope/expense.
