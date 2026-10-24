@@ -97,9 +97,9 @@
     "corrective_commit_sha": "4b6904224df8ab9ede913ec6e79787b61d941baa",
     "passed_guard_run_id": 40067647144
   },
-  "last_ci_verified_code_sha": "bba61a7f5d22e3fb7743b7d778190b2d4aa1b3dc",
-  "repository_regression_tests_passed": 205,
-  "repository_regression_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40082466929",
+  "last_ci_verified_code_sha": "c02b8d24f57732b99af56280cc430374a8bc212c",
+  "repository_regression_tests_passed": 211,
+  "repository_regression_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40083630790",
   "closeout_sync_ci_status": "PASS",
   "closeout_sync_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40080489079",
   "early_skill_candidate": {
@@ -419,7 +419,7 @@
     "words": 351,
     "round1_submission_gate": "NOT_APPROVED_FOR_SUBMISSION"
   },
-  "next_action_priority": "G14_VERIFY_CI_AND_DOWNLOAD_SYNTHETIC_REPORT; G12_OFFICIAL_CREATOR_REQUIRES_OWNER_LOCAL_CODEX",
+  "next_action_priority": "G12_OWNER_LOCAL_CODEX_OFFICIAL_CREATOR_FIRST_REAL_GENERATION; ONLY_INTEGRATE_VERIFIED_ARTIFACT_WHEN_AVAILABLE",
   "g11_round1_disclosure_parity": {
     "date_kst": "2026-10-24",
     "status": "OFFLINE_VERIFIED_ONE_PAGE_VISUAL_PASS",
@@ -537,7 +537,7 @@
   "g14_executable_offline_demo": {
     "date_kst": "2026-10-24",
     "scope": "G4/G5 deterministic offline reports; five fully synthetic scenarios",
-    "status": "SOURCE_CI_PENDING",
+    "status": "OFFLINE_211_PASS_ARTIFACT_VERIFIED",
     "source": "tools/offline_demo_walkthrough.py",
     "test": "tests/test_offline_demo_walkthrough.py",
     "workflow": ".github/workflows/offline-demo.yml",
@@ -551,6 +551,20 @@
     "entrant_signoff": "PENDING",
     "devpost": "NOT_SUBMITTED",
     "actual_work_hours": null,
-    "incremental_spend_krw": 0
+    "incremental_spend_krw": 0,
+    "source_sha": "c02b8d24f57732b99af56280cc430374a8bc212c",
+    "offline_tests_pass": 211,
+    "offline_ci": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40083630790",
+    "demo_tests_pass": 6,
+    "demo_ci": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40083631042",
+    "demo_artifact_id": 12556421327,
+    "demo_artifact_url": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40083631042/artifacts/12556421327",
+    "demo_artifact_expiration_utc": "2026-10-31T09:51:49Z",
+    "demo_md_bytes": 2234,
+    "demo_json_bytes": 6835,
+    "manual_artifact_inspection": "PASS_5_CASES_AND_BOUNDARIES",
+    "master_ci": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40083630878",
+    "closeout_ci": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40083630804",
+    "real_nas": "NOT_RUN"
   }
 }
