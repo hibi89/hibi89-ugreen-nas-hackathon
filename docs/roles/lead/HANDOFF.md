@@ -70,3 +70,12 @@
 - 총괄 이전 기여: `docs/roles/lead/ROUND1_COMPLIANCE_AUDIT_20261024.md` 공식 공개 규정 점검. 새 `LEAD_ACTIVE_WORK.md`는 위 SDK 차단 해결·지원 CLI 증거 확보·G2 데이터 계약을 현재 1순위로 기록. 예선 기술 제약 검증 전 명령/버전/PII 기능 창작 금지.
 - 내부 조기 제출 2026-11-10 KST, 공식 Round1 2026-11-16 16:45 KST. 실 NAS/CLI/CI/Devpost 제출 미완료. 추가 신규 지출 0원, 개인정보 외부 전송 승인 없음.
 - 전환 전 기준 `lead/ugreen@b1a055911bf8a31d0643873507cdc52dccb67495`, `main@d8cd806cb2b3842a80a571fd09910ec370e2de17`. 새 커밋 SHA는 GitHub 원격 조회 결과를 최종 사용.
+
+
+## 2026-10-24 KST — 한 문장 새 채팅 복원 / 지속 최신화 공시
+- 사용자 고정 명령: **`[유그 해커톤 깃헙 레포지토리 확인하고 작업하셈]`**. 새로운 대화에서 [루트 START_HERE.md](../../../START_HERE.md)를 읽으면 `lead/ugreen` 최신 HEAD, 이 문서와 `LEAD_ACTIVE_WORK.md` 및 실제 코드/테스트 근거를 읽고 **사용자의 다음 업무 지시로 즉시 실행**한다. 별도 작업자 채팅·구형 디스패치/READY 큐를 호출하지 않는다.
+- 체계: 통합 상황실 1 + KIC·PayPal·UGREEN 각 총괄 겸 개발자 1 = 4개 채팅. 이 대화의 UGREEN 총괄만 `lead/ugreen` 신규 소스/문서 작업. 세 feature 브랜치 이력 보존, `main` 코드 안정화 기준 유지.
+- 확인한 feature HEAD: missing-files `4e74dc7b187e70ad72e906e042fdbf4c140940f8`, version-conflicts `f1aaf9f28800c9fb563d846622583314f6be6c85`, privacy `cbd7f2ac866ad338d2006dcc1337a5c44f029423`. 이전 UGR-001의 공개 기술 매트릭스는 존재하지만 SDK 내부 검증은 BLOCKED. 실제 CLI/NAS/CI 테스트 **0(실행 증거 없음)**, Devpost 최종 제출 미완료. 앱 서비스 Production 미적용.
+- G1 공식 개발 키트 기술 검증을 최신 활성 과제로 유지(기존 실패 방법 동일 재시도 금지). 비용 신규 0원, 공식 마감 2026-11-16 16:45 KST 및 내부 11/10 목표 유지. 이 문서 갱신 자체가 제품 기능 검증이나 제출 완료를 뜻하지 않는다.
+- 주요 작업마다 `LEAD_ACTIVE_WORK.md` + 본 `STATUS/HANDOFF/TO_HACKATHON_LEAD.md`를 가능한 한 한 커밋으로 최신화하고 **원격 SHA·테스트 PASS/FAIL/NOT_RUN·보류점**을 검증한다. 단순 질의/상태 불변이면 불필요한 커밋 금지. 채팅 없이 백그라운드 갱신은 하지 않는다.
+- 문서 변경 전 `lead/ugreen` 기준 HEAD: `ef8e2fcbdae01a871861e0fef67638fa9c72d527`; 새 커밋 SHA는 푸시 후 원격 조회로 확인한다.

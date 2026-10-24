@@ -1,3 +1,5 @@
+> **새 채팅 복원 명령:** `[유그 해커톤 깃헙 레포지토리 확인하고 작업하셈]`. 반드시 [루트 START_HERE](../../../START_HERE.md)와 최신 원격 HEAD/증거를 확인한 뒤 여기 적힌 다음 일을 총괄이 직접 수행한다. 이 파일은 작업 직후 실질 상태·검증·다음 단계를 갱신하는 **유일한 실행 포인터**다. 옛 UGR-001 READY는 재실행 권한이 아니다.
+
 # UGREEN — LEAD_ACTIVE_WORK (SOLE LIVE WORK POINTER)
 2026-10-24 KST. Owner UGREEN lead (same chat designs, codes, tests, reviews). Old UGR dispatcher no longer grants execution.
 

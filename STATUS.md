@@ -42,3 +42,9 @@
 - 작업자는 자기 feature 브랜치에 증거·TO_UGREEN_LEAD.md의 DONE_FOR_REVIEW 또는 BLOCKED 보고만 작성, 리드·다른 브랜치 수정 금지. **총괄이 원격 SHA와 증거를 검수/수락한 뒤 새 ID/REVISION을 READY로 게시**할 때만 다음 역할로 전환.
 - 시작 지침: [공통 작업자 입문](docs/WORKER_START_HERE.md) / [현재 작업](docs/dispatcher/CURRENT_TASK.md) / [예정 업무](docs/dispatcher/BACKLOG.md) / [검수 규약](docs/roles/lead/DISPATCH_PROTOCOL.md). 이 최신 운영 규칙이 이전 '3개 독립 채팅' 및 '세 명 동시 작업' 문구보다 우선한다.
 - 기술 개발/SDK 실검증·CI/NAS·Devpost 제출은 아직 완료되지 않았다. UGREEN 11/10 조기 제출, 11/16 16:45 KST 공식 마감, 신규 현금 비용 0원 목표 유지. GitHub 문서만으로 AI 채팅 자동 실행·통지/잠금 기능을 제공하지 않는다.
+
+
+## [현재 최우선 · 2026-10-24 KST] 단문 인수인계 및 상태 판단
+- 새 채팅에 `[유그 해커톤 깃헙 레포지토리 확인하고 작업하셈]` 입력 시 **[START_HERE.md](START_HERE.md)**부터 GitHub 최신 `lead/ugreen`을 확인하고 총괄이 개발/테스트/검수를 직접 이어간다. 과거 별도 작업자 지시서·브랜치는 보존된 이력이며 활성 실행 권한이 아니다.
+- 2026-10-24 확인: 단일 ProjectReady NAS Skill, G1 공식 SDK 패키지 내부 확인 미완료, 이전 UGR-001 공개 기능 매트릭스만 작성(BLOCKED). `lead/ugreen` 최신 활성 작업은 `docs/roles/lead/LEAD_ACTIVE_WORK.md`. 내부 11/10·공식 11/16 16:45 KST, 신규 지출 0원.
+- 이 문서의 이전 초기·잠정 기록은 이력. 중요 작업 뒤 상태·인수인계·상위 총괄 보고·활성 작업을 함께 최신화하고 원격 SHA 확인. 문서만 바꾼 것을 Skill 실행 성공으로 간주하지 않는다.
