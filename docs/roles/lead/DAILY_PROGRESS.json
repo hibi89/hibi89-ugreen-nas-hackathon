@@ -406,6 +406,23 @@
       "rights": "NOT_CLEARED",
       "real_nas": "NOT_RUN",
       "actual_hours": null
+    },
+    {
+      "scope_id": "G22_CREATOR_ONE_FILE_PREVIEW_REAL_CI_VERIFIED",
+      "status": "OFFLINE_CI_PASS_RELEASE_NOT_APPROVED",
+      "report": "docs/submission/G22_OFFICIAL_CREATOR_PREVIEW_VERIFIED_20261024.md",
+      "creator_zip_bytes": 4893,
+      "pdf_bytes": 5183,
+      "english_answers_words": 370,
+      "creator_only_one_skill_md": true,
+      "unit_tests_added_passed": 5,
+      "all_offline_tests_passed": 224,
+      "preview_ci": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40096040369",
+      "artifact_id": 12560941466,
+      "actual_official_checker_of_staged_skill": "NOT_RERUN",
+      "entrant_approval": "PENDING",
+      "devpost": "NOT_SUBMITTED",
+      "actual_work_hours": null
     }
   ],
   "overall_project_completion_percent": null,

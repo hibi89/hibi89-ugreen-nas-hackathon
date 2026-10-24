@@ -419,7 +419,7 @@
     "words": 351,
     "round1_submission_gate": "NOT_APPROVED_FOR_SUBMISSION"
   },
-  "next_action_priority": "G22_CHECK_NEW_GITHUB_CI_ACTUAL_PDF_AND_ZIP_MANIFEST; FIX_IF_FAILED; KEEP_STATIC_CHECK_UNRERUN_ON_ADDED_DISCLOSURE; THEN_REQUEST_USER_REVIEW_AND_EXACT_CHECKER_RE-RUN_IF_DESIRED; NO_DEVPOST_OR_SKILLHUB",
+  "next_action_priority": "G23_ENTRANT_RIGHTS_EDITORIAL_AND_OFFICIAL_CHECKER_OF_DISCLOSURE_AUGMENTED_ONE_FILE_SKILL; EXACT_FINAL_PDF_ZIP_APPROVAL_ONLY_AFTER; NO_AUTO_DEVPOST_SKILLHUB",
   "g11_round1_disclosure_parity": {
     "date_kst": "2026-10-24",
     "status": "OFFLINE_VERIFIED_ONE_PAGE_VISUAL_PASS",
@@ -675,7 +675,7 @@
   },
   "g22_creator_single_file_preview": {
     "date_kst": "2026-10-24",
-    "state": "SOURCE_BUILDER_COMMITTED_PENDING_ACTUAL_CI",
+    "state": "OFFLINE_CI_AND_PDF_ZIP_MANIFEST_VERIFIED_STAGED_OFFICIAL_CHECK_NOT_RERUN",
     "official_rules": "https://ugreenhackathon.devpost.com/rules",
     "source_branch": "review/ugreen-official-creator",
     "source_sha": "7af2cb750b37826fb02a00e2d45cb73f3a85c239",
@@ -687,13 +687,20 @@
     "original_canonical_skill": "UNCHANGED",
     "original_canonical_proposal": "UNCHANGED",
     "proposal_q8": "CORRECTED_IN_TEMPORARY_PREVIEW_ONLY",
-    "pdf_and_zip": "CI_PENDING",
+    "pdf_and_zip": "ONE_FILE_SKILL_ZIP_4893_BYTES_PDF_5183_BYTES_370_WORDS_CI_PASS",
     "license": "PENDING_ENTRANT_REVIEW",
     "approval": "NOT_GIVEN",
     "devpost": "NOT_SUBMITTED",
     "nas": "NOT_RUN",
     "source_code": "tools/round1_official_creator_preview.py",
     "workflow": ".github/workflows/round1-official-creator-preview.yml",
-    "report": "docs/submission/G22_OFFICIAL_CREATOR_ONE_FILE_PREVIEW_20261024.md"
+    "report": "docs/submission/G22_OFFICIAL_CREATOR_ONE_FILE_PREVIEW_20261024.md",
+    "reviewed_source_code_commit": "8b672d06ede9e931acb2b1f9bb21e77b61872d37",
+    "creator_preview_ci": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40096040369",
+    "creator_preview_artifact_id": 12560941466,
+    "artifact_expires_at_kst": "2026-10-31T21:57:04+09:00",
+    "offline_synthetic_tests_passed": 224,
+    "offline_ci": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40096040321",
+    "verification_report": "docs/submission/G22_OFFICIAL_CREATOR_PREVIEW_VERIFIED_20261024.md"
   }
 }
