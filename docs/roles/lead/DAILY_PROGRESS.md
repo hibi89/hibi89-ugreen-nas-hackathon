@@ -1,3 +1,5 @@
+> **2026-10-24 KST 추가 선행 G6 (이번 채팅):** `skill/projectready-nas/SKILL.md`와 직접 연결 `references/decision-policy.md` 작성; `tests/test_skill_candidate.py` 6개 합성 정적 검사 추가. [근거/2안 비교](../../architecture/G6_SKILL_DRAFT_OFFLINE_20261024.md). **공식 Uliya CLI/Expert Agent/SDK validator/NAS 실검증은 BLOCKED/NOT_RUN**, Devpost 미제출. 이번 코드 커밋의 원격 CI **검증 전(PENDING)**; 테스트 성공 미리 주장하지 않음. 10/24 기존 당일 분모 100%/남은 0시간 그대로이며 이 작업은 별도 선행 묶음. 실제 경과시간 미측정. 10/25 G1 1.5h+예비 1.5h, 실제 SDK 검증 완료 ETA 미정. 다음: 공식 키트 정확한 CLI·Agent·라이선스/체커 근거 확보 후 드래프트 적합성 검사.
+
 # UGREEN — 일일 완료율/남은 시간 (정정된 현재 보고판)
 **2026-10-24 KST · 정정 공시 · 10/24 달력일에 수행한 실제 산출물 기준**
 

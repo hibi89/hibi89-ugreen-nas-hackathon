@@ -28,7 +28,7 @@
     "id": "G1-SDK-DETAILS",
     "scheduled_kst": "2026-10-25",
     "status": "BLOCKED_EXTERNAL_EVIDENCE",
-    "scope": "Privately inspect exact public official kit CLI, agent registry, license, validator and permissions or seek official support; do not guess unsupported API",
+    "scope": "Privately verify the exact official kit CLI/registered Agent/validator/license, then check G6 Markdown draft against supported commands; no imagined API",
     "planned_hours": 1.5,
     "separate_reserve_hours": 1.5,
     "actual_completion_eta_hours": null
@@ -96,5 +96,15 @@
   "repository_regression_tests_passed": 110,
   "repository_regression_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40067647132",
   "closeout_sync_ci_status": "PASS",
-  "closeout_sync_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40067647144"
+  "closeout_sync_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40067647144",
+  "early_skill_candidate": {
+    "id": "G6_20261024",
+    "path": "skill/projectready-nas/SKILL.md",
+    "status": "OFFLINE_DRAFT_CI_PENDING",
+    "test_count_added": 6,
+    "official_uliya_validator": "NOT_RUN",
+    "actual_nas_test": "NOT_RUN",
+    "planned_real_integration_kst": "2026-11-03/04",
+    "actual_work_hours": null
+  }
 }

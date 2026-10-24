@@ -55,3 +55,10 @@
 - `[해커톤총괄 깃헙 레포지토리 확인하고 작업하셈]`로 UGREEN 총괄 새 채팅을 시작할 때 `lead/ugreen/CHAT_BOOTSTRAP.md` → 최신 HEAD/실제 `LEAD_ACTIVE_WORK.md`·소스·CLI 증거 → 총괄이 현재 승인된 다음 실작업 직접 수행.
 - 주요 조사·개발·테스트·검수·차단 해소·제출, 새 채팅 이관 직전에는 `LEAD_ACTIVE_WORK.md`·`STATUS/HANDOFF`·`TO_HACKATHON_LEAD.md`와 실제 증거를 최신화해 원격 커밋 SHA 확인. 이 진입문서는 경로/역할/규칙 변경시에만 수정.
 - 공식 Kit/CLI 다운로드 차단과 SDK/NAS 실검증 미해결. 본 변경은 채팅 인수인계 경로 공시일 뿐 공식 SDK/제품 실행/제출 완료가 아님. 자동 백그라운드 갱신은 없다.
+
+## 2026-10-24 KST — 새 채팅 G6 독립 선행 결과 (원격 CI 재검증 전)
+- `skill/projectready-nas/SKILL.md`와 `references/decision-policy.md`의 읽기 전용 Markdown 후보 작성. `tests/test_skill_candidate.py`로 정적 안전/구조 검사 6개 추가; [근거](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/blob/lead/ugreen/docs/architecture/G6_SKILL_DRAFT_OFFLINE_20261024.md).
+- 비교: A 공식 공개 Files/Documents 범위의 Markdown Skill 초안(채택, 신규 비용 0), B 미확인 Python/CLI 결합(공식 규격 미확인과 Round 1 ZIP 제한으로 보류).
+- 실제 공식 SDK CLI·Agent·권한·라이선스 본문/validator **BLOCKED/NOT_RUN**, NAS/PII/Devpost 제출 **NOT_RUN/NOT_SUBMITTED**. 코드 커밋 CI 검증 전 PENDING, 성공 확언 금지.
+- 10/24 기존 당일 작업 100%/잔여 0h 유지, 새 선행은 이중 집계하지 않음. 실제 작업 소요시간 미측정. 10/25 G1 명세 검증 계획 1.5h+별도 예비 1.5h=최대 3h, 외부 의존 실제 ETA 불명. 11/03~04의 공식 단일 Skill 통합/검사 작업은 여전히 미완료.
+- 후속: 개인 승인된 SDK 열람 또는 주최 지원으로 정확한 규격 확보, 공식 생성도구 검증 후 제한된 Markdown ZIP. 이번 변경 자체가 제품 완료·본선 진출 증거가 아님.

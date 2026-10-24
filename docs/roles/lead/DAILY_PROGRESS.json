@@ -93,6 +93,14 @@
       "official_sdk_compatible": "UNVERIFIED",
       "source": "tests/test_core_edge_scenarios.py",
       "report": "docs/architecture/G5_CORE_EDGE_SCENARIOS_20261024.md"
+    },
+    {
+      "scope_id": "G6_MARKDOWN_SKILL_CANDIDATE",
+      "status": "OFFLINE_CODE_PROPOSED_REMOTE_CI_PENDING",
+      "official_sdk_compatible": "UNVERIFIED",
+      "source": "skill/projectready-nas/SKILL.md",
+      "report": "docs/architecture/G6_SKILL_DRAFT_OFFLINE_20261024.md",
+      "actual_work_hours": null
     }
   ],
   "overall_project_completion_percent": null,
@@ -105,5 +113,6 @@
   "latest_repository_regression_tests_passed": 110,
   "latest_repository_regression_ci_url": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40067647132",
   "latest_closeout_guard_verified": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40067647144",
-  "notes_on_last_closeout": "One-line GitHub bootstrap and mandatory end-of-work handoff automated checks verified. No new SDK or NAS capability established."
+  "notes_on_last_closeout": "One-line GitHub bootstrap and mandatory end-of-work handoff automated checks verified. No new SDK or NAS capability established.",
+  "notes_on_new_chat_execution": "10/24 added early draft Skill+6 static checks, remote CI pending; original day 100% remains 100% without double-counting, G1 SDK still blocked"
 }

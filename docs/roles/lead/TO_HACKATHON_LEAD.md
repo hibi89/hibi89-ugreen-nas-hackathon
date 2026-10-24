@@ -173,3 +173,10 @@
 - G5 `tests/test_core_edge_scenarios.py`: CORE1 전체 항목 있음(전체 NEEDS_REVIEW), CORE2 필수 항목 누락(전체 BLOCKED), EDGE1 권한 거부(전체 NEEDS_REVIEW) 합성 회귀. [시나리오](../../architecture/G5_CORE_EDGE_SCENARIOS_20261024.md).
 - **검증:** [GitHub Actions 40066529848](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40066529848)에서 **91 tests / OK**, 실제 Uliya SDK CLI/등록 Agent/NAS 접속/공식 검사 **NOT_RUN**. 공개 SDK ZIP 원본이나 민감자료 게시 없음.
 - **10/24 당일 마감 100% / 미완료 0% / 잔여 0h** (새 선행 묶음도 오프라인 범위 DONE). 경과 작업시간 미측정. **G1 SDK 기술 게이트 계속 BLOCKED**이고 **10/25 별도 예정** 계획 1.5h+예비 1.5h, 외부 의존성 때문에 실제 완료 ETA 산정 불가. 11월 공식 연동·검증은 미완료 유지.
+
+## 2026-10-24 KST — 새 채팅 G6 독립 선행 결과 (원격 CI 재검증 전)
+- `skill/projectready-nas/SKILL.md`와 `references/decision-policy.md`의 읽기 전용 Markdown 후보 작성. `tests/test_skill_candidate.py`로 정적 안전/구조 검사 6개 추가; [근거](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/blob/lead/ugreen/docs/architecture/G6_SKILL_DRAFT_OFFLINE_20261024.md).
+- 비교: A 공식 공개 Files/Documents 범위의 Markdown Skill 초안(채택, 신규 비용 0), B 미확인 Python/CLI 결합(공식 규격 미확인과 Round 1 ZIP 제한으로 보류).
+- 실제 공식 SDK CLI·Agent·권한·라이선스 본문/validator **BLOCKED/NOT_RUN**, NAS/PII/Devpost 제출 **NOT_RUN/NOT_SUBMITTED**. 코드 커밋 CI 검증 전 PENDING, 성공 확언 금지.
+- 10/24 기존 당일 작업 100%/잔여 0h 유지, 새 선행은 이중 집계하지 않음. 실제 작업 소요시간 미측정. 10/25 G1 명세 검증 계획 1.5h+별도 예비 1.5h=최대 3h, 외부 의존 실제 ETA 불명. 11/03~04의 공식 단일 Skill 통합/검사 작업은 여전히 미완료.
+- 후속: 개인 승인된 SDK 열람 또는 주최 지원으로 정확한 규격 확보, 공식 생성도구 검증 후 제한된 Markdown ZIP. 이번 변경 자체가 제품 완료·본선 진출 증거가 아님.

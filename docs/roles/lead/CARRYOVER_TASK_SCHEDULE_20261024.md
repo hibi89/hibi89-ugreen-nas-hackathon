@@ -37,3 +37,10 @@
 - 11/03~04: [G4 통합 보고 엔진은 오프라인 합성 검증 완료](../../architecture/G4_COMBINED_REPORT_OFFLINE_20261024.md); **공식 `SKILL.md`/참조 Markdown, 등록 CLI/Agent 연결, 실제 검증된 데이터 흐름**이 남음.
 - 11/05: [G5 합성 3개 시나리오 선행 검증 완료](../../architecture/G5_CORE_EDGE_SCENARIOS_20261024.md); **공식 Skill 실행/검증 도구 지원되는 환경에서 재현·근거 확보** 남음.
 - 새 선행 작업 테스트 총 [91 PASS](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40066529848)이지 공식 NAS 테스트 91회가 아니다. 10/25 G1 공식 명세 게이트 및 모든 날짜별 시간 상한은 변경하지 않는다.
+
+## 2026-10-24 KST — 새 채팅 G6 독립 선행 결과 (원격 CI 재검증 전)
+- `skill/projectready-nas/SKILL.md`와 `references/decision-policy.md`의 읽기 전용 Markdown 후보 작성. `tests/test_skill_candidate.py`로 정적 안전/구조 검사 6개 추가; [근거](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/blob/lead/ugreen/docs/architecture/G6_SKILL_DRAFT_OFFLINE_20261024.md).
+- 비교: A 공식 공개 Files/Documents 범위의 Markdown Skill 초안(채택, 신규 비용 0), B 미확인 Python/CLI 결합(공식 규격 미확인과 Round 1 ZIP 제한으로 보류).
+- 실제 공식 SDK CLI·Agent·권한·라이선스 본문/validator **BLOCKED/NOT_RUN**, NAS/PII/Devpost 제출 **NOT_RUN/NOT_SUBMITTED**. 코드 커밋 CI 검증 전 PENDING, 성공 확언 금지.
+- 10/24 기존 당일 작업 100%/잔여 0h 유지, 새 선행은 이중 집계하지 않음. 실제 작업 소요시간 미측정. 10/25 G1 명세 검증 계획 1.5h+별도 예비 1.5h=최대 3h, 외부 의존 실제 ETA 불명. 11/03~04의 공식 단일 Skill 통합/검사 작업은 여전히 미완료.
+- 후속: 개인 승인된 SDK 열람 또는 주최 지원으로 정확한 규격 확보, 공식 생성도구 검증 후 제한된 Markdown ZIP. 이번 변경 자체가 제품 완료·본선 진출 증거가 아님.
