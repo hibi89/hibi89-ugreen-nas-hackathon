@@ -15,3 +15,10 @@
 - feature/version-conflicts HEAD f1aaf9f28800c9fb563d846622583314f6be6c85: 초기 안내, 새로운 개발·차단 보고 없음.
 - feature/privacy HEAD cbd7f2ac866ad338d2006dcc1337a5c44f029423: 초기 안내, 새로운 개발·차단 보고 없음.
 - 판정: SDK 실제 내부규격 확인 전 구현·지시 보류. 세 브랜치 수정하지 않음. 계획은 lead 브랜치에만 등록.
+
+
+## 2026-10-24 KST — before final scope approval
+- feature/missing-files HEAD 9b3052bf82ad1a8a4844b1aeee699c0b759251dc: initial message only; no reported implementation or new blocker.
+- feature/version-conflicts HEAD f1aaf9f28800c9fb563d846622583314f6be6c85: initial message only; no reported implementation or new blocker.
+- feature/privacy HEAD cbd7f2ac866ad338d2006dcc1337a5c44f029423: initial message only; no reported implementation or new blocker.
+- User approved the strengthened ProjectReady NAS and dates; worker brief is on lead/ugreen ONLY. Worker branches unchanged, delivery to worker chats unconfirmed. Recheck their messages before integration.

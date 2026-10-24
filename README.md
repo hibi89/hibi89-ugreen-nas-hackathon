@@ -28,3 +28,10 @@
 
 ## UGREEN 총괄의 독립 실행 계획 (2026-10-24)
 [ProjectReady NAS — 일정·역할·검수·0원 비용 계획](docs/UGREEN_EXECUTION_PLAN_20261024.md) (lead/ugreen 브랜치). 내부 조기 제출 11/10, 공식 예선 11/16 16:45 KST.
+
+
+## Final ProjectReady schedule (2026-10-24 KST)
+- [Approved UGREEN-only execution plan](docs/UGREEN_EXECUTION_PLAN_20261024.md)
+- [3 worker assignments and acceptance criteria](docs/roles/lead/WORKER_ASSIGNMENTS_20261024.md)
+- Early final submission target **2026-11-10 KST**; official **2026-11-16 16:45 KST**.
+- User-approved evidence-based client delivery Go/No-Go Skill, not three separate submissions. Product and NAS/CLI operation unverified; no new paid tools.

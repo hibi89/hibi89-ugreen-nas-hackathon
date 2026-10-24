@@ -22,3 +22,11 @@
 - 단일 Skill; 지원된 NAS 검색/문서 처리만 사용, 누락/충돌/정보노출은 지원 가능한 범위까지만 분석. 검사 불가 시 'Not checked', 원본/개인정보 보호 우선.
 - 세 feature는 역할 분리일 뿐 별도 제출 3개가 아님. 신규 유료 결제 0원. 조기 제출 11/10 KST.
 - 공식 Kit CLI 미검증: G1 기술 검증 전 세부 구현 확정 금지. [실행 계획](docs/UGREEN_EXECUTION_PLAN_20261024.md).
+
+
+## FINAL USER-APPROVED DECISION — 2026-10-24 KST
+- **ProjectReady NAS product fixed:** a requirement-to-NAS-file-evidence-to-delivery Go/No-Go AI Skill, rather than a generic file cleanup tool. ONE submission, three worker responsibilities.
+- **UGREEN-only schedule fixed:** official kit support study 10/25-26, data contract 10/27, workers 10/28-31, integrated Skill 11/03, technical checks 11/06, PDF/ZIP frozen 11/09, **internal final Devpost submission target 11/10 KST**. **Official Round 1 deadline 11/16 16:45 KST**.
+- **Zero incremental cash spending target**; new paid models/API/server/NAS not authorized. Existing subscriptions and work time excluded.
+- Source of truth: [approved execution plan](docs/UGREEN_EXECUTION_PLAN_20261024.md) and [worker instruction](docs/roles/lead/WORKER_ASSIGNMENTS_20261024.md). This approval supersedes old 'tentative product' and 11/14 target statements above.
+- **Actual execution:** Devpost registered, not created/submitted. No actual Uliya CLI archive internal study, SDK/NAS run, product tests or CI yet. Do not claim success until verified. Worker chats not automatically assigned.

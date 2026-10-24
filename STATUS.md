@@ -16,3 +16,11 @@
 - 상세: [UGREEN 독립 실행 계획](docs/UGREEN_EXECUTION_PLAN_20261024.md).
 - 상태: 참가 등록 확인; 작품 생성/최종 제출 미완료; 기능·API·CI·NAS 실검증/Production 0건·미검증. 공식 다운로드 키트 내부 문서 확보가 다음 P0.
 - 기존 스냅샷의 잠정 주제/11·14 목표와 다르면 **본 최신 운영 결정 우선**. 본 결정은 제품 개발 또는 제출 완료 증거가 아님.
+
+
+## FINAL USER-APPROVED DECISION — 2026-10-24 KST
+- **ProjectReady NAS product fixed:** a requirement-to-NAS-file-evidence-to-delivery Go/No-Go AI Skill, rather than a generic file cleanup tool. ONE submission, three worker responsibilities.
+- **UGREEN-only schedule fixed:** official kit support study 10/25-26, data contract 10/27, workers 10/28-31, integrated Skill 11/03, technical checks 11/06, PDF/ZIP frozen 11/09, **internal final Devpost submission target 11/10 KST**. **Official Round 1 deadline 11/16 16:45 KST**.
+- **Zero incremental cash spending target**; new paid models/API/server/NAS not authorized. Existing subscriptions and work time excluded.
+- Source of truth: [approved execution plan](docs/UGREEN_EXECUTION_PLAN_20261024.md) and [worker instruction](docs/roles/lead/WORKER_ASSIGNMENTS_20261024.md). This approval supersedes old 'tentative product' and 11/14 target statements above.
+- **Actual execution:** Devpost registered, not created/submitted. No actual Uliya CLI archive internal study, SDK/NAS run, product tests or CI yet. Do not claim success until verified. Worker chats not automatically assigned.
