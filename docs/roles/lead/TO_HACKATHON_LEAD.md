@@ -109,3 +109,9 @@
 - 11/17~12/01 기초 계획 **32h**, 별도 예비 **20.5h**, 원격 NAS 배정일 2일 작업을 교체하면 **총 최대 54.5~58.5h**. 24h 실제 NAS 접근은 그중 최대 12h 능동 작업(6h 계획 + 6h 예비)이고, 24h 연속 작업은 아님.
 - 11/21 초청 및 주최 배정일을 실제 확인 후에만 ACTIVE로 변경. 주최 Rules: 배정 **11/22~28 PT 중 하루**, 한국시간 기본 17:00~다음날 16:59. 영상은 실제 NAS 작동 화면, 영문 내레이션/전체 자막, 3분 미만 공개 YouTube. 자체 제출 11/30 20:00 KST, 공식 최종 **12/01 16:45 KST**.
 - 조건부 계획의 기록/링크만 추가. 본선 진출·SDK/G1 해제·실 NAS 테스트·유효 제출이 **완료되었다는 뜻이 아님**. 원격 SHA를 매번 다시 확인한다.
+
+
+## 2026-10-24 KST — G1 day 1 executed early: artifact link + offline verified contract
+- Evidence: [Day 1 source findings](G1_DAY1_EVIDENCE_20261024.md). Official Starter Kit download resolves to CDN artifact `uliya-skill-kit-0.7.3-en.zip?v=1790578898`; CDN bytes unavailable in tools due 2 independent egress failures, archive/license/CLI/Agent I/O still **UNVERIFIED**. Official Uliya user guide establishes File/Document assistants and local-vs-cloud/authorization UX, **NOT** actual Skill CLI schemas.
+- Substantive source added `src/projectready/readiness.py`, 16 synthetic boundary tests `tests/test_readiness.py`, GitHub Actions workflow. Local pure unit tests observed **16 PASS**; run same remote tests after commit to get GitHub Actions PASS (not assumed). These files are **OFFLINE PROTOTYPE ONLY**, never include Python/scripts/tests in official Skill ZIP. Real NAS/CLI/SDK verification **NOT RUN**, user permission/PII safety unchanged, new spend **0 KRW**.
+- G1 status **PARTIAL / BLOCKED_BY_PACKAGE_ACCESS**, G2 official adapter dependency NOT CLEARED. Next one task: authorize private participant-owned archive inspection (or official UGREEN support textual CLI references); original package stays private. No need to reimplement the same offline tests. Evidence commit SHA to be fetched from GitHub after push.

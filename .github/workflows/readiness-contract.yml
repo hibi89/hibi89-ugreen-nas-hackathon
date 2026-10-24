@@ -1,0 +1,21 @@
+name: Offline readiness contract
+on:
+  push:
+    branches: ["lead/ugreen"]
+    paths:
+      - "src/projectready/**"
+      - "tests/test_readiness.py"
+      - ".github/workflows/readiness-contract.yml"
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Execute synthetic offline tests only
+        run: python -m unittest discover -s tests -p 'test_readiness.py' -v
