@@ -25,7 +25,7 @@
 | UGR-D12 | 2026-11-04 | 오케스트레이션 연결 및 I/O 계약 재점검 | PARTIAL | 0% | 2h | 1h | 2026-10-24 | docs/architecture/G4_COMBINED_REPORT_OFFLINE_20261024.md | 5772a8a97364a26155c238ea7af576bdd400dc1a | — |
 | UGR-D13 | 2026-11-05 | CORE1·CORE2·EDGE1 합성 시나리오 실행 | PARTIAL | 0% | 2h | 1h | 2026-10-24 | docs/architecture/G5_CORE_EDGE_SCENARIOS_20261024.md | 5772a8a97364a26155c238ea7af576bdd400dc1a | — |
 | UGR-D14 | 2026-11-06 | 지원 도구 검증(가능한 경우)과 ZIP 사전 검사 | PARTIAL | 0% | 2h | 1h | 2026-10-24 | docs/architecture/G7_ROUND1_PACKAGE_PREFLIGHT_20261024.md | 5772a8a97364a26155c238ea7af576bdd400dc1a | — |
-| UGR-D15 | 2026-11-07 | 영문 제안서 10개 답변 초안 | DONE | 100% | 0h | 0h | 2026-10-24 | docs/submission/round1_proposal.json | — | — |
+| UGR-D15 | 2026-11-07 | 영문 제안서 10개 답변 초안 | DONE | 100% | 0h | 0h | 2026-10-24 | docs/submission/round1_proposal.json | 7432cc3701b92de9b9d187f4e00be5f3b0a79885 | — |
 | UGR-D16 | 2026-11-08 | PDF 편집·렌더 검수와 SKILL 패키징 | PARTIAL | 0% | 2h | 2h | 2026-10-24 | docs/architecture/G7_ROUND1_PACKAGE_PREFLIGHT_20261024.md | 5772a8a97364a26155c238ea7af576bdd400dc1a | — |
 | UGR-D17 | 2026-11-09 | 라이선스·PII·비밀·용량·링크·재현성 출시 검수 | PARTIAL | 0% | 1.5h | 1.5h | 2026-10-24 | docs/architecture/G7_ROUND1_PACKAGE_PREFLIGHT_20261024.md | 5772a8a97364a26155c238ea7af576bdd400dc1a | — |
 | UGR-D18 | 2026-11-10 | UGREEN 조기 제출 시도 조건부 / KIC 조기 제출 보호 | NOT_STARTED | 0% | 1h | 0.5h | — | — | — | — |
@@ -58,7 +58,7 @@
 - UGR-D12 (2026-11-04): combined_report.py 합성 통합 보고 선행; 실제 Agent I/O 연결 미실행. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음.
 - UGR-D13 (2026-11-05): CORE1/CORE2/EDGE1 합성 검증 완료; 실제 NAS 실행 미실행. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음.
 - UGR-D14 (2026-11-06): Skill 4개 Markdown 파일 사전검사 선행; 공식 validator 미실행. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음.
-- UGR-D15 (2026-11-07): 2026-10-24 10 official Devpost Round 1 questions answered in original English draft with 351/500 words and disclosable AI/platform sources. Local 1-page 4,484-byte PDF draft generated and visually checked; file regeneration tool committed, official form submission and final approval NOT_DONE.
+- UGR-D15 (2026-11-07): 2026-10-24 선행: 10개 공식 Round1 영문질문 351/500단어 초안 DONE. GitHub 소스 7432cc3701b92de9b9d187f4e00be5f3b0a79885에서 183/183 오프라인 CI PASS, MASTER/인수인계 CI PASS. 로컬 A4 PDF 1페이지 4,484 bytes 생성·렌더/텍스트 확인; 참가자 최종 승인·Devpost 제출은 NOT_SUBMITTED.
 - UGR-D16 (2026-11-08): ZIP 구조/재현성 도구 선행; 제출 영문 PDF 미생성. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음. 2026-10-24 provisional A4 PDF locally rendered (one page, 4,484 bytes) and readable; source renderer tools/render_round1_proposal_pdf.py; still PARTIAL because approved final PDF and packaged ZIP/receipt are absent.
 - UGR-D17 (2026-11-09): 출시 ZIP 구조·비밀 패턴 오프라인 사전검사; 공식 라이선스·PII·validator 최종 검수 미실행. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음.
 

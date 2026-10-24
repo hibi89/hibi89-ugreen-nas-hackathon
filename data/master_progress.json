@@ -343,13 +343,14 @@
       "actual_elapsed_hours": null,
       "evidence": [
         "docs/submission/round1_proposal.json",
-        "docs/submission/ROUND1_PROPOSAL_DRAFT.md"
+        "docs/submission/ROUND1_PROPOSAL_DRAFT.md",
+        "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40075411535"
       ],
-      "verified_sha": null,
+      "verified_sha": "7432cc3701b92de9b9d187f4e00be5f3b0a79885",
       "blocker": null,
       "recovery_date_kst": null,
       "recovery_condition": null,
-      "advance_note": "2026-10-24 10 official Devpost Round 1 questions answered in original English draft with 351/500 words and disclosable AI/platform sources. Local 1-page 4,484-byte PDF draft generated and visually checked; file regeneration tool committed, official form submission and final approval NOT_DONE."
+      "advance_note": "2026-10-24 선행: 10개 공식 Round1 영문질문 351/500단어 초안 DONE. GitHub 소스 7432cc3701b92de9b9d187f4e00be5f3b0a79885에서 183/183 오프라인 CI PASS, MASTER/인수인계 CI PASS. 로컬 A4 PDF 1페이지 4,484 bytes 생성·렌더/텍스트 확인; 참가자 최종 승인·Devpost 제출은 NOT_SUBMITTED."
     },
     {
       "day_id": "UGR-D16",
@@ -539,5 +540,5 @@
       "advance_note": null
     }
   ],
-  "source_reconciliation_note": "Round1 English draft pulled forward 2026-10-24. UGR-D15 draft itself DONE (10 official questions 351 words), while UGR-D16 final approved PDF/ZIP and Devpost remain PARTIAL/NOT_SUBMITTED. No official NAS run; D02/D03/D04 remain BLOCKED."
+  "source_reconciliation_note": "Latest verified proposal source 7432cc3701b92de9b9d187f4e00be5f3b0a79885; 183/183 offline tests PASS. Original-day D15 draft DONE, D16 final PDF+ZIP PARTIAL. G1 SDK/NAS/official validator still blocked or not run. No overall product completion percentage."
 }

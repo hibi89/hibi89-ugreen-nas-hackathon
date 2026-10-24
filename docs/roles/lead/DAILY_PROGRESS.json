@@ -56,8 +56,8 @@
   "sdk_archive_public_zip_downloaded_in_ephemeral_ci": true,
   "sdk_archive_sha256": "cf557e5a022e4297892f39768132855154232efdedeb726b2845450ccd70e1b3",
   "sdk_archive_metadata_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40064613266",
-  "offline_ci_latest_test_count": 165,
-  "offline_ci_latest_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40072583689",
+  "offline_ci_latest_test_count": 183,
+  "offline_ci_latest_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40075411535",
   "additional_approved_same_day_work": [
     {
       "scope_id": "G2_PROVISIONAL_EVIDENCE_CONTRACT",
@@ -232,11 +232,14 @@
     "executed_kst": "2026-10-24",
     "original_scheduled_kst": "2026-11-07",
     "day_id": "UGR-D15",
-    "status": "DRAFT_DONE_NOT_SUBMITTED",
+    "status": "D15_DRAFT_DONE_OFFLINE_CI_VERIFIED_NOT_SUBMITTED",
     "answer_words": 351,
     "pdf_local_verified": true,
     "pdf_size_bytes": 4484,
     "actual_hours": null,
-    "provisional_test_count_added": 9
+    "provisional_test_count_added": 9,
+    "verified_tests": 183,
+    "verified_source_commit": "7432cc3701b92de9b9d187f4e00be5f3b0a79885",
+    "verified_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40075411535"
   }
 }
