@@ -739,5 +739,20 @@
     "official_checker_for_staged_skill": "NOT_RUN",
     "devpost": "NOT_SUBMITTED",
     "master_status_changed": false
+  },
+  "g26_exact_checker_input_recovery": {
+    "date_kst": "2026-10-25",
+    "reported_local_download": "FAILED_DNS_AND_BROWSER_BLOCKED",
+    "artifact_id": 12560941466,
+    "artifact_wrapper_sha256": "a05f5d404572a221fe93cbb963702c5e8edd8b7a4919a4101d74b213ac869941",
+    "input_path": "docs/submission/checker_inputs/G22_20261024/projectready-nas/SKILL.md",
+    "input_sha256": "770e08c6eb5101785579eed7f2438547e0a0386d4c35aead860aab088e091169",
+    "input_recovery": "INDEPENDENTLY_VERIFIED",
+    "official_checker": "NOT_RUN",
+    "checker_json": "NOT_GENERATED",
+    "real_nas": "NOT_RUN",
+    "devpost": "NOT_SUBMITTED",
+    "master_progress": "UNCHANGED",
+    "report_path": "docs/submission/G26_CHECKER_INPUT_RECOVERY_20261025.md"
   }
 }
