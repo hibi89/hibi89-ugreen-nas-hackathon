@@ -56,8 +56,8 @@
   "sdk_archive_public_zip_downloaded_in_ephemeral_ci": true,
   "sdk_archive_sha256": "cf557e5a022e4297892f39768132855154232efdedeb726b2845450ccd70e1b3",
   "sdk_archive_metadata_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40064613266",
-  "offline_ci_latest_test_count": 200,
-  "offline_ci_latest_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40078079863",
+  "offline_ci_latest_test_count": 201,
+  "offline_ci_latest_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40079252331",
   "additional_approved_same_day_work": [
     {
       "scope_id": "G2_PROVISIONAL_EVIDENCE_CONTRACT",
@@ -190,7 +190,7 @@
     },
     {
       "scope_id": "G10_ROUND1_SKILLHUB_POLICY_GUARD",
-      "status": "SOURCE_PREPARED_CI_PENDING",
+      "status": "OFFLINE_CI_VERIFIED",
       "source": "skill/projectready-nas/SKILL.md",
       "test": "tests/test_skill_candidate.py",
       "tests_added": 1,
@@ -199,7 +199,10 @@
       "devpost": "NOT_SUBMITTED",
       "actual_work_hours": null,
       "master_day": "UGR-D17_PARTIAL",
-      "report": "docs/architecture/G10_ROUND1_POLICY_HARDENING_20261024.md"
+      "report": "docs/architecture/G10_ROUND1_POLICY_HARDENING_20261024.md",
+      "verified_code_sha": "256a766d63eac38a1c6b181d29e3d74e20f9709a",
+      "verified_ci_url": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40079252331",
+      "verified_offline_tests": 201
     }
   ],
   "overall_project_completion_percent": null,

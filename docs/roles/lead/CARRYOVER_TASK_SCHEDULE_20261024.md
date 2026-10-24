@@ -1,3 +1,9 @@
+## 2026-10-24 G10 CI VERIFIED — Round1 guard and command-center response
+- Code 256a766d63eac38a1c6b181d29e3d74e20f9709a verified GitHub CI: **201/201 OFFLINE tests** workflow 40079252331; Round1 strict draft build/release audit workflow 40079252294 SUCCESS; master check workflow 40079252273 SUCCESS; closeout path-sync workflow 40079252300 SUCCESS.
+- Fresh preview artifact 12554397827 (expires Oct31 08:45 UTC): exact draft PDF 4722 bytes/1 page, 351/500 answer words; four-Markdown Skill ZIP 6562 bytes; **NOT_APPROVED / NOT_SUBMITTED**. Runtime SDK, official validator, NAS, permission/privacy certification NOT_RUN, license NOT_CLEARED.
+- SUP-UGREEN-001: ACCEPTED, **technical draft evidence verified**; editorial/rights/AI disclosure and real submission still OPEN. SUP-UGREEN-002: ACCEPTED/implemented by prioritizing Round1 legal/artifact review and deferring repeated public SDK static probing; G1 tech gate still BLOCKED.
+- Master 2 DONE/12 PARTIAL/3 BLOCKED/7 NOT_STARTED; G10 mapped original D17 PARTIAL. Oct24 finite scheduled day 100% and 0h assigned remainder, actual time NOT_MEASURED; G1 Oct25 1.5h plus separate reserve 1.5h, real ETA UNKNOWN. Next unblocked action: participant editorial and legal review of generated artifacts.
+
 ## 2026-10-24 G10 lead closeout — NEW CODE CI PENDING
 - SUP-UGREEN-001: **ACCEPTED**, Round1 technical PDF/ZIP draft exists (200 prior offline PASS, run 40078079863; package run 40078079879). Entrant editorial acceptance, license/originality/AI disclosures and actual Devpost receipt are pending, so finding remains OPEN / not IMPLEMENTED_VERIFIED.
 - SUP-UGREEN-002: **ACCEPTED and source policy implemented (CI PENDING)**. No more repetitive SDK static catalogs without new official evidence; Round1 PDF/ZIP review need not await finalist-only real NAS execution. Runtime G1 still BLOCKED, not falsely resolved.

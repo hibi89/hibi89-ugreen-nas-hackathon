@@ -97,11 +97,11 @@
     "corrective_commit_sha": "4b6904224df8ab9ede913ec6e79787b61d941baa",
     "passed_guard_run_id": 40067647144
   },
-  "last_ci_verified_code_sha": "d666fc593a680ee357c0cc84aa20a5347924300b",
-  "repository_regression_tests_passed": 200,
-  "repository_regression_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40078079863",
+  "last_ci_verified_code_sha": "256a766d63eac38a1c6b181d29e3d74e20f9709a",
+  "repository_regression_tests_passed": 201,
+  "repository_regression_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40079252331",
   "closeout_sync_ci_status": "PASS",
-  "closeout_sync_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40078079857",
+  "closeout_sync_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40079252300",
   "early_skill_candidate": {
     "id": "G6_20261024",
     "path": "skill/projectready-nas/SKILL.md",
@@ -395,7 +395,7 @@
   },
   "g10_round1_policy_guard": {
     "date_kst": "2026-10-24",
-    "status": "SOURCE_PREPARED_CI_PENDING",
+    "status": "CI_VERIFIED_OFFLINE_ONLY",
     "next_action": "Review approved Round1 PDF/ZIP editorial, license, originality and AI/privacy disclosure before submitting; participant approval required",
     "original_day": "UGR-D17",
     "partial_only": true,
@@ -408,7 +408,16 @@
     "supervisor_findings": [
       "SUP-UGREEN-001",
       "SUP-UGREEN-002"
-    ]
+    ],
+    "source_sha": "256a766d63eac38a1c6b181d29e3d74e20f9709a",
+    "offline_tests_passed": 201,
+    "ci_offline": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40079252331",
+    "ci_candidate": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40079252294",
+    "candidate_artifact_id": 12554397827,
+    "pdf_bytes": 4722,
+    "zip_bytes": 6562,
+    "words": 351,
+    "round1_submission_gate": "NOT_APPROVED_FOR_SUBMISSION"
   },
   "next_action_priority": "ROUND1_EDITORIAL_RIGHTS_AND_DISCLOSURE_REVIEW_BEFORE_FURTHER_STATIC_G1_PROBING"
 }
