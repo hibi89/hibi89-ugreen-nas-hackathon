@@ -1,24 +1,19 @@
-> **최신 사용자 작업 방식 승인(2026-10-24):** [선행 개발·순서 유연화 규약](docs/WORK_ORDER_FLEX_POLICY_20261024.md) 필독. 오늘 완료 게이트 충족 뒤 다음 날짜/순번의 독립 READY 작업으로 선행 가능. 공식 SDK/Agent/NAS BLOCKED를 완료 취급하지 않고 달력일 100%·선행 완료율을 분리. 기존 '순차 실행만' 구형 문구보다 이 정책 우선.
+# UGREEN — 한 문장 복원 (2026-10-24 KST 최신 규칙)
 
-> **최우선 정정 (2026-10-24):** UGREEN 10/24 달력일 실제 수행 작업은 **100% 완료/잔여 0시간**이며 10/25로 넘어간 G1 SDK CLI/Agent 검증은 **아직 BLOCKED**. 예전 75% 보고는 25일 G1을 24일 달력일 분모와 혼동한 오류로 이력 보존. [현재 하루 보고](docs/roles/lead/DAILY_PROGRESS.md) 및 [보고 규칙](docs/roles/lead/DAILY_PROGRESS_REPORTING_PROTOCOL.md)을 읽고 작업한다. 전체 제품 완료율이나 실제 NAS/SDK 동작을 100%로 해석하지 않는다.
+**사용자 명령(그대로 입력):** `[유그린 해커톤 깃헙 레포지토리 확인하고 작업하셈]`
 
-# UGREEN ProjectReady NAS — 한 문장 새 채팅 복원
+이 문장을 받은 새 ChatGPT 대화는 **UGREEN NAS AI Hackathon의 단일 총괄 겸 직접 개발자**로 복원한다. 긴 인수인계 프롬프트·채팅 기록·사용자 재설명은 요구하지 않는다. GitHub의 **`hibi89/hibi89-ugreen-nas-hackathon` 저장소 `lead/ugreen` 최신 원격 HEAD**가 작업 상태의 정본이며, `main`·옛 feature 브랜치·오래된 문서의 과거 상태를 현재 지시로 사용하지 않는다.
 
-**사용자 고정 명령:** `[해커톤총괄 깃헙 레포지토리 확인하고 작업하셈]`
+## 새 채팅 실행 순서 (추가 확인 질문 없이)
+1. GitHub 연결 도구로 `lead/ugreen`의 **현재 원격 HEAD SHA**를 가져온다. 연결이 실패하면 접근 차단 사실만 설명하며 임의로 진행 상황을 만들지 않는다.
+2. **반드시 이 순서로 최신 버전 읽기**: [`docs/roles/lead/LIVE_HANDOFF.md`](docs/roles/lead/LIVE_HANDOFF.md) → [`docs/roles/lead/LIVE_STATE.json`](docs/roles/lead/LIVE_STATE.json) → [`docs/roles/lead/LEAD_ACTIVE_WORK.md`](docs/roles/lead/LEAD_ACTIVE_WORK.md) → [`docs/roles/lead/DAILY_PROGRESS.md`](docs/roles/lead/DAILY_PROGRESS.md) 및 `DAILY_PROGRESS.json` → [`docs/roles/lead/CARRYOVER_TASK_SCHEDULE_20261024.md`](docs/roles/lead/CARRYOVER_TASK_SCHEDULE_20261024.md) → [`docs/WORK_ORDER_FLEX_POLICY_20261024.md`](docs/WORK_ORDER_FLEX_POLICY_20261024.md) → 해당 소스·테스트·CI 증거.
+3. [`docs/roles/lead/SESSION_CLOSEOUT.md`](docs/roles/lead/SESSION_CLOSEOUT.md)의 **종료/인수인계 필수 절차**를 읽는다. 완료·미완료·차단·실측시간·예비시간 및 기존 선행 개발 중복 여부를 검증한다.
+4. 사용자의 '작업하셈'은 **실제로 조사/구현/테스트/검수/원격 커밋**하라는 뜻. 단순 복원 보고서만 작성하지 않는다. 현재 READY하고 독립 검증 가능한 최우선 업무를 바로 수행하며, G1 SDK 차단은 해결됐다는 증거가 있을 때만 해제한다. G2/G3b/G3c/G4/G5의 이미 합성 검증된 코드는 재구현하지 않는다.
+5. **작업이 끝날 때마다** LIVE_HANDOFF, LIVE_STATE, LEAD_ACTIVE_WORK, DAILY_PROGRESS(.md/.json), STATUS, HANDOFF, TO_HACKATHON_LEAD, WORK_TIME_LOG, 날짜별 이월표를 필요한 범위에서 모두 동기화하고 **같은 `lead/ugreen` 브랜치에 커밋/푸시**, 원격 SHA 및 CI 상태 재조회 후 종료 보고한다. 새 사용자 메시지 없이 백그라운드로 개발하는 기능은 아니다.
 
-**GitHub:** `hibi89/hibi89-ugreen-nas-hackathon` · **전담 브랜치:** `lead/ugreen`. 실제 4개 채팅 중 UGREEN 총괄 겸 직접 개발자 1개 채팅만 사용. [상위 통합 총괄 부트스트랩](https://github.com/hibi89/hackathon-command-center-2026/blob/main/CHAT_BOOTSTRAP.md).
+**2026-10-24 기준:** 해당 날짜에 수행한 실제 산출물 **100% 완료/남은 0h**(실제 경과시간 미측정), 오프라인 합성 CI [91/91 PASS](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40066651248). **G1 공식 SDK CLI/Expert Agent/권한/라이선스 내부 명세 및 NAS 실제 실행은 미검증·BLOCKED**. 다음 예정 G1 업무 **10/25 계획 1.5h+별도 예비 1.5h, 실제 완료 ETA 미정**. 전체 작품 제출/본선 진출로 혼동하지 않는다.
 
-## 새 채팅에서 반드시 바로 실행
-1. 원격 `lead/ugreen` 최신 HEAD 확인 → 이 `CHAT_BOOTSTRAP.md` → `HANDOFF.md` → `STATUS.md` → `docs/roles/lead/HANDOFF.md`·`STATUS.md` (존재 시) → **`docs/roles/lead/LEAD_ACTIVE_WORK.md`** → `docs/roles/lead/LEAD_FULLSTACK_PROTOCOL.md` → `TO_HACKATHON_LEAD.md` → 실제 소스/기능·테스트/CI·제출 증거를 읽는다.
-2. `LEAD_ACTIVE_WORK.md`에 표시된 **승인된 다음 업무**를 총괄이 직접 조사·개발/테스트/검수/커밋한다. `lead/ugreen`이 신규 작업 브랜치. 기존 `feature/missing-files`, `version-conflicts`, `privacy`는 원본 이력/증거로 보존하고 검증 후 필요한 부분만 이관. 구형 `CURRENT_TASK.md`의 READY는 실행 권한 없음.
-3. **이전 중단점(게시 당시)**: UGR-001이 공식 Kit/CLI 능력 매트릭스 공개 문서 정리를 보고했지만 SDK 압축파일 내부·지원 CLI/Expert Agent 등록·실 NAS 사용은 **BLOCKED/UNVERIFIED**. 동일 실패 방법 반복 금지. 공식 다운로드/지원·허가받은 자산으로 실지원 범위를 확인해야 하며 미지원 기능을 지어내지 않는다.
-4. **프로젝트 확정:** ProjectReady NAS 단일 납품 증거 기반 Go/No-Go Skill. 실 개인 파일이나 PII의 외부 전송, NAS 무단 변경, 새로운 유료 결제/범위 축소는 사전 승인 없이는 금지. 지원하지 않는 Skill/CLI 작동·개인정보 검사 성공 주장 금지.
-5. **매 중요 작업/새 채팅 이관 종료 시**: `LEAD_ACTIVE_WORK.md`, 기존 유효 `STATUS/HANDOFF.md`, `TO_HACKATHON_LEAD.md`와 실제 코드·테스트·차단/근거를 함께 최신화해 커밋하고 원격 SHA를 검증한다. 역할/경로 변경시에만 이 고정 진입 문서를 고친다.
+**대회 마감:** 예선 공식 2026-11-16 **16:45 KST**, 내부 조기 제출 11/10 조건부, 비용 신규 0원. 사용자 폴더의 외부 전송/삭제/유료 결제/공식 SDK에 없는 명령은 임의 수행하지 않는다.
 
-**내부 목표** 2026-11-10 KST / **공식 1라운드 마감** 2026-11-16 16:45 KST. 실 Devpost 제출 영수증은 별도.
-
-**한 줄의 역할 식별 한계:** 신규 대화에 UGREEN이라는 확정 역할이 없다면 문구만으로 3개 총괄을 구별할 수 없다. 대회명이 빠진 경우 통합 총괄이 기본 경로다.
-
-
-## 2026-10-24 KST 상시 지시: 하루 100% 기준 작업 완료 보고
-매 사용자 호출 종료 시 원격 [당일 완료율](docs/roles/lead/DAILY_PROGRESS.md)·[보고 규약](docs/roles/lead/DAILY_PROGRESS_REPORTING_PROTOCOL.md)을 읽고 **완료 XX%·미완료 YY%·남은 작업시간(기준 배당+별도 예비)·실제 완료 ETA 불확실성**을 GitHub/사용자 최종 보고에 동시 공시한다. 새 날은 100% 분모 작업 분해 후 시작, 미측정 실제 시간 조작 금지. 이전 G1 Day1은 75% DONE, 25% SDK 내부 검증 BLOCKED.
+## 정본/이력 우선순위
+사용자 최신 지시 → **`lead/ugreen` 현재 원격 소스·테스트/CI** → `LIVE_HANDOFF.md` + `LIVE_STATE.json` → `LEAD_ACTIVE_WORK.md` → 날짜별 공시 → 과거 회의록/옛 UGR dispatcher·worker 문서. 구형 `[유그 ...]`·`[해커톤총괄 ...]`는 **과거 별칭이고 사용자에게 권장하지 않는다**.

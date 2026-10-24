@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "canonical_user_prompt": "[유그린 해커톤 깃헙 레포지토리 확인하고 작업하셈]",
+  "repository": "hibi89/hibi89-ugreen-nas-hackathon",
+  "authoritative_branch": "lead/ugreen",
+  "role": "UGREEN lead and sole hands-on developer",
+  "last_session_closeout_date_kst": "2026-10-24",
+  "last_source_verified_head_at_handoff": "32d424397e3a6cc36ba1bba0703520059b2f4bff",
+  "source_verification_workflow": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40066651248",
+  "offline_synthetic_tests_passed": 91,
+  "official_sdk_cli_schema": "BLOCKED_UNVERIFIED",
+  "registered_expert_agents": "BLOCKED_UNVERIFIED",
+  "nas_runtime": "NOT_RUN",
+  "official_skill_validator": "NOT_RUN",
+  "pii_safety": "NOT_CHECKED",
+  "devpost_final_submission": "NOT_SUBMITTED",
+  "round2_finalist_status": "NOT_CONFIRMED",
+  "current_calendar_day": {
+    "date_kst": "2026-10-24",
+    "delivered_completion_percent": 100,
+    "remaining_percent": 0,
+    "remaining_planned_hours": 0,
+    "actual_hours": null,
+    "actual_hours_status": "NOT_MEASURED",
+    "sdk_gate_distinct": true
+  },
+  "next_work": {
+    "id": "G1-SDK-DETAILS",
+    "scheduled_kst": "2026-10-25",
+    "status": "BLOCKED_EXTERNAL_EVIDENCE",
+    "scope": "Privately inspect exact public official kit CLI, agent registry, license, validator and permissions or seek official support; do not guess unsupported API",
+    "planned_hours": 1.5,
+    "separate_reserve_hours": 1.5,
+    "actual_completion_eta_hours": null
+  },
+  "advance_done_offline": [
+    {
+      "id": "G2",
+      "source": "src/projectready/presence.py",
+      "status": "SYNTHETIC_ONLY"
+    },
+    {
+      "id": "G3B",
+      "source": "src/projectready/version_candidates.py",
+      "status": "SYNTHETIC_ONLY"
+    },
+    {
+      "id": "G3C",
+      "source": "src/projectready/policy_guard.py",
+      "status": "SYNTHETIC_ONLY"
+    },
+    {
+      "id": "G4",
+      "source": "src/projectready/combined_report.py",
+      "status": "SYNTHETIC_ONLY"
+    },
+    {
+      "id": "G5",
+      "source": "tests/test_core_edge_scenarios.py",
+      "status": "SYNTHETIC_ONLY"
+    }
+  ],
+  "current_priority_documents": [
+    "docs/roles/lead/LIVE_HANDOFF.md",
+    "docs/roles/lead/LEAD_ACTIVE_WORK.md",
+    "docs/roles/lead/DAILY_PROGRESS.json",
+    "docs/roles/lead/CARRYOVER_TASK_SCHEDULE_20261024.md"
+  ],
+  "closeout_must_update": [
+    "docs/roles/lead/LIVE_HANDOFF.md",
+    "docs/roles/lead/LIVE_STATE.json",
+    "docs/roles/lead/LEAD_ACTIVE_WORK.md",
+    "docs/roles/lead/DAILY_PROGRESS.md",
+    "docs/roles/lead/DAILY_PROGRESS.json",
+    "docs/roles/lead/STATUS.md",
+    "docs/roles/lead/HANDOFF.md",
+    "docs/roles/lead/TO_HACKATHON_LEAD.md",
+    "docs/roles/lead/WORK_TIME_LOG.md"
+  ],
+  "next_chat_must_refetch_live_head": true,
+  "new_commit_sha_must_be_verified_after_write": true,
+  "complete_until_official_sdk_confirmed": false
+}

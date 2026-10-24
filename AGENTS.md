@@ -1,3 +1,5 @@
+> **유그린 한 문장 자동 복원 — 최우선 규칙:** `[유그린 해커톤 깃헙 레포지토리 확인하고 작업하셈]` → `hibi89/hibi89-ugreen-nas-hackathon`의 **`lead/ugreen` 최신 원격 HEAD** 조회 → [`LIVE_HANDOFF.md`](docs/roles/lead/LIVE_HANDOFF.md)·[`LIVE_STATE.json`](docs/roles/lead/LIVE_STATE.json) 읽기 → [`LEAD_ACTIVE_WORK.md`](docs/roles/lead/LEAD_ACTIVE_WORK.md) 및 [종료 시마다 필수 동기화](docs/roles/lead/SESSION_CLOSEOUT.md)를 준수하며 **다음 실제 작업을 곧바로 실행**. 역할·진행·일정·차단을 사용자에게 다시 묻지 않는다. `main`·옛 worker/dispatcher 문서가 충돌하면 이 최신 규칙과 원격 확인이 우선.
+
 > **새 채팅 한 문장 진입:** `[해커톤총괄 깃헙 레포지토리 확인하고 작업하셈]` → [UGREEN CHAT_BOOTSTRAP.md](CHAT_BOOTSTRAP.md) (`lead/ugreen`). 원격 최신 HEAD 및 `LEAD_ACTIVE_WORK.md`로 실 작업 복원. 별도 작업자 채팅·구형 UGR 디스패치는 실행권 없음.
 
 > **2026-10-24 KST · 현재 최우선 공시 / 한 문장 복원:** 사용자 명령 **`[유그 해커톤 깃헙 레포지토리 확인하고 작업하셈]`** → [START_HERE.md](START_HERE.md) 읽기 → 최신 `lead/ugreen` HEAD 및 [LEAD_ACTIVE_WORK](docs/roles/lead/LEAD_ACTIVE_WORK.md) 확인 → **총괄이 직접 작업**. 별도 작업자/구형 디스패치는 폐기. 본 문서 하단의 구형 설명은 이력이다.

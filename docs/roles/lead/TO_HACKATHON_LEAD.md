@@ -1,3 +1,5 @@
+> **2026-10-24 최신 새 채팅 정본:** [LIVE_HANDOFF.md](LIVE_HANDOFF.md) · [LIVE_STATE.json](LIVE_STATE.json) · [SESSION_CLOSEOUT.md](SESSION_CLOSEOUT.md). 한 문장 `[유그린 해커톤 깃헙 레포지토리 확인하고 작업하셈]`을 새 채팅에 입력하면 `lead/ugreen` 최신 원격 SHA를 확인하고 지시·실제 개발을 이어간다. **작업 종료 때마다 이 세 파일과 LEAD_ACTIVE_WORK, DAILY_PROGRESS, STATUS/HANDOFF, TO_HACKATHON_LEAD, WORK_TIME_LOG를 최신화한 커밋이 필수**다. 기존 본문은 누적 이력일 수 있고 상단 정본이 우선. 현재 오프라인 91 PASS/10월24일 100% 종료, G1 공식 CLI·NAS 미검증·차단, 차기 10/25 1.5h+예비1.5h, 실제 완료 ETA 미정.
+
 # UGREEN NAS AI Hackathon → 3개 해커톤 전체 총괄 보고 (고정 창구)
 
 > 수신: **통합 해커톤 총괄** · 발신: **UGREEN NAS AI Hackathon 총괄(`lead/ugreen`)** · 2026-10-24 KST 최초 작성.
