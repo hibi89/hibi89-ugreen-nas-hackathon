@@ -16,3 +16,7 @@
 **2026-10-24 동일 날짜 G1 후속 작업:** 추가 공식 ZIP 메타데이터 조사 [#40064613266](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40064613266), 29/29 offline [CI #40064613228](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40064613228). 당일 75/25 **그대로**; 공시 중단점은 정확한 CLI/Agent 스키마. 실제 작업시간 미측정, 실제 완료 ETA 산정 불가. [G1_ZIP_METADATA_RECOVERY_20261024.md](G1_ZIP_METADATA_RECOVERY_20261024.md).
 
 **2026-10-24 승인된 선행 G2/G3b 오프라인 코드 실제 작업:** `presence.py`/22 tests + `version_candidates.py`/15 tests, [총 CI 66 PASS](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40065337137). **실제 수동 소요시간 미측정**, 원래 G1 75%+25% 차단 분모 유지. 신기능의 공식 SDK 호환성·검증 소요시간 별도 미확정.
+
+
+## [2026-10-24 KST] 75% 보고 정정 안내 (기존 기록은 이력)
+기존 75%/25%는 10/25 예정 SDK CLI 내부 명세 게이트를 10/24 '일일 산출물'과 혼동한 값이었다. 10/24 실제 수행한 **유한 산출물**(공식 ZIP 메타데이터, 오프라인 준비도 코드, G2 누락 검증, G3b 버전 후보)은 **전부 완료(당일 100%, 남은 0시간)**. *실제 수행 경과시간은 여전히 미측정*, 과거 계획 10/24는 0h였으며 선행 개발 작업에는 사전 추정 시간이 없었다. [현재 정정 진척](DAILY_PROGRESS.md), [기존 75% 이력](history/20261024_G1_EARLY_75_PERCENT_SNAPSHOT.json). 공식 SDK 내부 명령/등록 Agent 검증은 계속 BLOCKED로 **10/25 다음 날 과제(1.5h 계획+1.5h 별도 예비; 실제 완료 ETA 미정)**. 이 정정은 실 SDK 진전이 아니다.

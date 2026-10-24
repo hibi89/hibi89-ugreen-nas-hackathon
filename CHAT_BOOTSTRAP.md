@@ -1,3 +1,5 @@
+> **최우선 정정 (2026-10-24):** UGREEN 10/24 달력일 실제 수행 작업은 **100% 완료/잔여 0시간**이며 10/25로 넘어간 G1 SDK CLI/Agent 검증은 **아직 BLOCKED**. 예전 75% 보고는 25일 G1을 24일 달력일 분모와 혼동한 오류로 이력 보존. [현재 하루 보고](docs/roles/lead/DAILY_PROGRESS.md) 및 [보고 규칙](docs/roles/lead/DAILY_PROGRESS_REPORTING_PROTOCOL.md)을 읽고 작업한다. 전체 제품 완료율이나 실제 NAS/SDK 동작을 100%로 해석하지 않는다.
+
 # UGREEN ProjectReady NAS — 한 문장 새 채팅 복원
 
 **사용자 고정 명령:** `[해커톤총괄 깃헙 레포지토리 확인하고 작업하셈]`

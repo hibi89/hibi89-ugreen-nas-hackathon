@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "date_kst": "2026-10-24",
+  "day_id": "G1-DAY1-EARLY",
+  "report_type": "retrospective_snapshot",
+  "source_plan": "docs/UGREEN_DAILY_EFFORT_PLAN_20261024.md",
+  "planned_active_hours": 1.5,
+  "separate_reserve_hours": 1.5,
+  "actual_active_hours": null,
+  "actual_time_measurement": "NOT_MEASURED",
+  "daily_status": "PARTIAL_BLOCKED",
+  "completed_percent": 75,
+  "remaining_percent": 25,
+  "milestones": [
+    {
+      "id": "G1A",
+      "weight_percent": 25,
+      "status": "DONE",
+      "result": "기존 실패 및 공식 규정/지원 문서 확인",
+      "evidence": "docs/roles/lead/G1_DAY1_EVIDENCE_20261024.md"
+    },
+    {
+      "id": "G1B",
+      "weight_percent": 25,
+      "status": "DONE",
+      "result": "공식 CDN 키트 파일명 확인 + 이전과 다른 직접 다운로드 경로 실패/원인 증거",
+      "evidence": "docs/roles/lead/G1_DAY1_EVIDENCE_20261024.md"
+    },
+    {
+      "id": "G1C",
+      "weight_percent": 25,
+      "status": "DONE",
+      "result": "독립 오프라인 readiness 엔진과 원격 GitHub Actions 합성 테스트 16/16 PASS",
+      "evidence": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40063814809"
+    },
+    {
+      "id": "G1D",
+      "weight_percent": 25,
+      "status": "BLOCKED",
+      "result": "공식 SDK 압축파일 내부, 정확한 CLI/등록 Agent, 라이선스/검증기 실증",
+      "evidence": "docs/roles/lead/G1_DAY1_EVIDENCE_20261024.md"
+    }
+  ],
+  "remaining_plan_allocation_hours_approx": 0.4,
+  "remaining_reserve_allocation_hours": 1.5,
+  "remaining_total_completion_eta_hours": null,
+  "remaining_total_completion_eta_reason": "ZIP download solved, but exact official registered Agent/CLI/license permissions still not inspected. Requires private authorized SDK docs or official support",
+  "carryover_date_kst": "2026-10-25",
+  "carryover_plan_hours": 1.5,
+  "carryover_reserve_hours": 1.5,
+  "g1_technical_gate": "PARTIAL_BLOCKED_EXACT_CLI_SCHEMA",
+  "sdk_cli_runtime_tests": "NOT_RUN",
+  "production_and_submission": "NOT_DONE",
+  "last_verified_source_commit": "a7cde1bb7493d7177294f8058cd2b88547dc6400",
+  "updated_kst_note": "2026-10-24: original G1 daily scope still 75/25, despite explicitly approved early provisional G2 and G3b offline engineering. These do not clear blocked official adapter.",
+  "sdk_archive_public_zip_downloaded_in_ephemeral_ci": true,
+  "sdk_archive_sha256": "cf557e5a022e4297892f39768132855154232efdedeb726b2845450ccd70e1b3",
+  "sdk_archive_metadata_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40064613266",
+  "offline_ci_latest_test_count": 66,
+  "offline_ci_latest_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40065337137",
+  "additional_approved_same_day_work": [
+    {
+      "scope_id": "G2_PROVISIONAL_EVIDENCE_CONTRACT",
+      "status": "OFFLINE_CODE_AND_TESTS_DONE",
+      "official_sdk_compatible": "UNVERIFIED",
+      "source": "src/projectready/presence.py",
+      "report": "docs/architecture/G2_EVIDENCE_CONTRACT_20261024.md"
+    },
+    {
+      "scope_id": "G3B_PROVISIONAL_VERSION_SIGNALS",
+      "status": "OFFLINE_CODE_AND_TESTS_DONE",
+      "official_sdk_compatible": "UNVERIFIED",
+      "source": "src/projectready/version_candidates.py",
+      "report": "docs/architecture/G3B_VERSION_CANDIDATES_20261024.md"
+    }
+  ]
+}

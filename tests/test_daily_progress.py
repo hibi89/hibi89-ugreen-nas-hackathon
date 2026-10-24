@@ -14,7 +14,16 @@ class DailyProgressTests(unittest.TestCase):
         self.data = json.loads((ROOT / "docs/roles/lead/DAILY_PROGRESS.json").read_text(encoding="utf-8"))
 
     def test_snapshot_is_consistent(self):
-        self.assertEqual(75, validate_daily_progress(self.data)["completed_percent"])
+        self.assertEqual(100, validate_daily_progress(self.data)["completed_percent"])
+
+    def test_daily_full_does_not_claim_sdk_compatible(self):
+        self.assertNotEqual("PASS", self.data["g1_technical_gate"])
+        self.assertFalse(self.data["overall_official_skill_sdk_compatible"])
+
+    def test_historical_75_snapshot_preserved(self):
+        old = json.loads((ROOT / "docs/roles/lead/history/20261024_G1_EARLY_75_PERCENT_SNAPSHOT.json").read_text(encoding="utf-8"))
+        self.assertEqual(75, old["completed_percent"])
+        self.assertEqual(25, old["remaining_percent"])
 
     def test_sum_must_equal_100(self):
         d=deepcopy(self.data)
@@ -24,7 +33,8 @@ class DailyProgressTests(unittest.TestCase):
 
     def test_blocked_item_cannot_be_counted_done(self):
         d=deepcopy(self.data)
-        d["completed_percent"]=100
+        d["milestones"][0]["status"]="BLOCKED"
+        # Finished total must now be 75, but JSON still says 100.
         with self.assertRaises(ValueError):
             validate_daily_progress(d)
 
@@ -42,6 +52,9 @@ class DailyProgressTests(unittest.TestCase):
 
     def test_blocked_external_eta_is_unknown(self):
         d=deepcopy(self.data)
+        d["milestones"][0]["status"]="BLOCKED"
+        d["completed_percent"]=75
+        d["remaining_percent"]=25
         d["remaining_total_completion_eta_hours"]=1.0
         with self.assertRaises(ValueError):
             validate_daily_progress(d)
