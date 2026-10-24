@@ -353,6 +353,17 @@
       "human_approval": "PENDING",
       "devpost": "NOT_SUBMITTED",
       "actual_work_hours": null
+    },
+    {
+      "scope_id": "G19_CREATOR_SOURCE_INSPECTION",
+      "status": "READ_ONLY_TOOL_ADDED_CI_PENDING_LOCAL_BYTES_PENDING",
+      "source": "tools/review_creator_source.py",
+      "test_source": "tests/test_creator_source_review.py",
+      "synthetic_tests_added": 8,
+      "independently_checked_new_source": false,
+      "planned_master_state_change": false,
+      "actual_hours": null,
+      "incremental_spend_krw": 0
     }
   ],
   "overall_project_completion_percent": null,

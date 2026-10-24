@@ -615,5 +615,18 @@
     "devpost": "NOT_SUBMITTED",
     "skillhub": "NOT_PUBLISHED",
     "report": "docs/submission/G18_CODEX_CREATOR_RESULT_REPORTED_20261024.md"
+  },
+  "g19_creator_source_inspection": {
+    "date_kst": "2026-10-24",
+    "tool": "tools/review_creator_source.py",
+    "tests": "tests/test_creator_source_review.py",
+    "tests_added": 8,
+    "tests_execution": "CI_PENDING",
+    "status": "READ_ONLY_INSPECTION_TOOL_CREATED_GENERATED_FILE_NOT_RECEIVED",
+    "participant_reported_sha256": "e1b071666b836cc464147821d7823bc3061c757434697d9a64250d4a9abd5b4a",
+    "generated_file_independently_verified": false,
+    "existing_draft_modified": false,
+    "devpost": "NOT_SUBMITTED",
+    "next_step": "Receive newly created SKILL.md and direct Markdown references for SHA/content/rights audit; do not import automatically"
   }
 }
