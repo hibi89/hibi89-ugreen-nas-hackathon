@@ -13,6 +13,7 @@
 - Planned processing: only verified Uliya-supported read-only file/document capabilities with per-item evidence and conservative Go/No-Go reporting.
 - Outbound services: none intentionally configured. The Uliya model's local-versus-cloud processing remains UNVERIFIED; never represent it as proven private or read sensitive content without approval.
 - No real credentials, user files or API keys are bundled.
+- Prohibited sensitive targets (including `.env`, `.git`, `config.json`, private keys, credentials and browser sessions) are excluded even from an owner-supplied checklist. Do not probe or disclose their names; use NOT_CHECKED. This is an instruction-only preflight guard, not verified live NAS sandbox enforcement.
 
 ## Validation limitations
 - The offline Python unit tests and packaging preflight do not replace the official Uliya Skill Creation Tool validator, NAS runtime tests, or security certification. Neither production use nor Devpost submission is confirmed.

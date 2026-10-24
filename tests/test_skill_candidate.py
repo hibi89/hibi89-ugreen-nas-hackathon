@@ -43,6 +43,15 @@ class SkillDraftTests(unittest.TestCase):
         self.assertIn("Never invoke", official)
         self.assertIn("Do not upload, transmit, copy, modify, rename, move or delete files.", text)
 
+    def test_official_sensitive_materials_exclusion(self):
+        text = SKILL.read_text(encoding="utf-8")
+        policy = (DIR / "references/decision-policy.md").read_text(encoding="utf-8")
+        attribution = (DIR / "references/attribution.md").read_text(encoding="utf-8")
+        for marker in ("`.env`", "`.git`", "`config.json`", "browser sessions", "Do NOT probe", "redact", "NOT_CHECKED"):
+            self.assertIn(marker, text)
+        self.assertIn("NOT_CHECKED (restricted; do not probe or disclose the path)", policy)
+        self.assertIn("instruction-only preflight guard", attribution)
+
     def test_no_placeholders(self):
         for p in DIR.rglob("*.md"):
             self.assertIsNone(re.search(r"\b(?:TODO|TBD|FIXME|PLACEHOLDER)\b", p.read_text(), re.I))

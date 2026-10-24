@@ -1,3 +1,10 @@
+## 2026-10-24 G10 lead closeout — NEW CODE CI PENDING
+- SUP-UGREEN-001: **ACCEPTED**, Round1 technical PDF/ZIP draft exists (200 prior offline PASS, run 40078079863; package run 40078079879). Entrant editorial acceptance, license/originality/AI disclosures and actual Devpost receipt are pending, so finding remains OPEN / not IMPLEMENTED_VERIFIED.
+- SUP-UGREEN-002: **ACCEPTED and source policy implemented (CI PENDING)**. No more repetitive SDK static catalogs without new official evidence; Round1 PDF/ZIP review need not await finalist-only real NAS execution. Runtime G1 still BLOCKED, not falsely resolved.
+- Verified UGREEN SkillHub publication policy Art.7.1: added explicit prohibited .env/.git/config.json/key/session path rejection to Markdown Skill, decision matrix and attribution; one offline regression. This is instruction-level only, neither official SDK validator nor real NAS security attestation. G10 report docs/architecture/G10_ROUND1_POLICY_HARDENING_20261024.md.
+- G10 is Oct24 executed prework mapped to Nov9 UGR-D17 PARTIAL (no status inflation); schedule DONE 2/PARTIAL 12/BLOCKED 3/NOT_STARTED 7. Oct24 original finite day 100%/0h assigned remainder; actual developer hours NOT_MEASURED; next Oct25 G1 1.5h base and 1.5h separate reserve, actual ETA UNKNOWN; cash addition 0.
+- Next work: entrant review exact Round1 10-question PDF, four-Markdown ZIP, source/license/privacy/AI disclosures; no official upload before explicit approval and proof of validity. CI for THIS change is PENDING until verified.
+
 # UGREEN ProjectReady NAS — 작업시간 실측 기록
 2026-10-24 KST 생성. **단순 공시 문서 작업은 제품 개발 성과가 아니다.** 과거 작업의 실제 경과시간이 검증되지 않아 미측정으로 표기.
 

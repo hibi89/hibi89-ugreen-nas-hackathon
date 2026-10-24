@@ -392,5 +392,23 @@
     "artifact_id": 12553977616,
     "artifact_expires_utc": "2026-10-31T08:27:14Z",
     "all_pdf_answers_verified": true
-  }
+  },
+  "g10_round1_policy_guard": {
+    "date_kst": "2026-10-24",
+    "status": "SOURCE_PREPARED_CI_PENDING",
+    "next_action": "Review approved Round1 PDF/ZIP editorial, license, originality and AI/privacy disclosure before submitting; participant approval required",
+    "original_day": "UGR-D17",
+    "partial_only": true,
+    "offline_test_added": 1,
+    "report": "docs/architecture/G10_ROUND1_POLICY_HARDENING_20261024.md",
+    "real_nas": "NOT_RUN",
+    "official_validator": "NOT_RUN",
+    "devpost": "NOT_SUBMITTED",
+    "actual_hours": null,
+    "supervisor_findings": [
+      "SUP-UGREEN-001",
+      "SUP-UGREEN-002"
+    ]
+  },
+  "next_action_priority": "ROUND1_EDITORIAL_RIGHTS_AND_DISCLOSURE_REVIEW_BEFORE_FURTHER_STATIC_G1_PROBING"
 }

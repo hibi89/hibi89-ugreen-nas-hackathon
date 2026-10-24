@@ -1,3 +1,9 @@
+## 2026-10-24 KST G10 — Round1 policy preflight, new CI pending
+- Updated original four-file Markdown Skill candidate with official SkillHub Art.7.1 sensitive filename/path exclusions; regression +1, source-level prohibition only, NOT live enforcement. See docs/architecture/G10_ROUND1_POLICY_HARDENING_20261024.md.
+- Integrated lead SUP-UGREEN-001/002 recommendations ACCEPTED: prioritize Round1 entrant approval/licensing/AI disclosure/exact PDF and ZIP; no endless static SDK probes. Preliminary G1 real installed Agent/permissions/validator and NAS still BLOCKED/NOT_RUN; no Devpost submission.
+- Prior code SHA d666fc593a680ee357c0cc84aa20a5347924300b verified 200 offline CI PASS at 40078079863 and draft package at 40078079879. G10 new CI not yet verified.
+- Master 24 days: DONE2/PARTIAL12/BLOCKED3/NOT_STARTED7, D17 early PARTIAL. Oct24 finite scheduled work 100% / 0h remaining, actual elapsed hours NOT_MEASURED. Oct25 G1 allocation 1.5h base + 1.5h reserve, ETA unknown; no new expense or permission change.
+
 # UGREEN HANDOFF — 초기 인수인계 10항 (2026-10-24 KST)
 
 1. **목표·확정 요구·기술**: UGREEN 해커톤에 1인 참가. 공식 마감 **2026-11-16 16:45 KST**. 주제 **NAS 프로젝트 문서·파일 관리 AI Skill (잠정)**. 상세 기능은 검증·사용자 승인 전 잠정.
