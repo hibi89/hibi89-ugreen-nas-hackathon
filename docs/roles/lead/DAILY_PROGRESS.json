@@ -56,8 +56,8 @@
   "sdk_archive_public_zip_downloaded_in_ephemeral_ci": true,
   "sdk_archive_sha256": "cf557e5a022e4297892f39768132855154232efdedeb726b2845450ccd70e1b3",
   "sdk_archive_metadata_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40064613266",
-  "offline_ci_latest_test_count": 183,
-  "offline_ci_latest_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40075411535",
+  "offline_ci_latest_test_count": 190,
+  "offline_ci_latest_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40076525669",
   "additional_approved_same_day_work": [
     {
       "scope_id": "G2_PROVISIONAL_EVIDENCE_CONTRACT",
@@ -248,7 +248,7 @@
       "UGR-D16",
       "UGR-D17"
     ],
-    "status": "SOURCE_CORRECTION_CI_PENDING",
+    "status": "DRAFT_PREVIEW_CI_PASS_FINAL_RELEASE_PENDING",
     "source": "tools/round1_candidate_bundle.py",
     "workflow": ".github/workflows/round1-candidate.yml",
     "answer_words": 351,
@@ -257,6 +257,15 @@
     "official_validator": "NOT_RUN",
     "devpost_submission": "NOT_SUBMITTED",
     "initial_failure_cause": "one trailing newline mismatch between source JSON and proposal Markdown",
-    "downloadable_pdf_zip_available": false
+    "downloadable_pdf_zip_available": true,
+    "offline_tests_verified": 190,
+    "pdf_page_count": 1,
+    "pdf_bytes": 4722,
+    "zip_bytes": 6004,
+    "zip_file_count": 4,
+    "artifact_id": 12553276854,
+    "artifact_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40076525716",
+    "official_checker": "NOT_RUN",
+    "devpost": "NOT_SUBMITTED"
   }
 }

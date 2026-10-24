@@ -350,7 +350,7 @@
       "blocker": null,
       "recovery_date_kst": null,
       "recovery_condition": null,
-      "advance_note": "2026-10-24 선행: 10개 공식 Round1 영문질문 351/500단어 초안 DONE. GitHub 소스 7432cc3701b92de9b9d187f4e00be5f3b0a79885에서 183/183 오프라인 CI PASS, MASTER/인수인계 CI PASS. 로컬 A4 PDF 1페이지 4,484 bytes 생성·렌더/텍스트 확인; 참가자 최종 승인·Devpost 제출은 NOT_SUBMITTED. Official Round 1 question titles corrected to source Rule 4 verbatim in new draft code; prior PDF draft STALE. Corrected PDF creation and verification are pending GitHub Actions; D15 draft status stays DONE."
+      "advance_note": "2026-10-24 선행: 10개 공식 Round1 영문질문 351/500단어 초안 DONE. GitHub 소스 7432cc3701b92de9b9d187f4e00be5f3b0a79885에서 183/183 오프라인 CI PASS, MASTER/인수인계 CI PASS. 로컬 A4 PDF 1페이지 4,484 bytes 생성·렌더/텍스트 확인; 참가자 최종 승인·Devpost 제출은 NOT_SUBMITTED. Official Round 1 question titles corrected to source Rule 4 verbatim in new draft code; prior PDF draft STALE. Corrected PDF creation and verification are pending GitHub Actions; D15 draft status stays DONE. GitHub Actions 40076525716 exact official questions appeared correctly in newly regenerated 4722-byte one-page searchable PDF; still draft and not submitted."
     },
     {
       "day_id": "UGR-D16",
@@ -370,13 +370,14 @@
         "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/commit/5772a8a97364a26155c238ea7af576bdd400dc1a",
         "tools/render_round1_proposal_pdf.py",
         "tools/round1_candidate_bundle.py",
-        ".github/workflows/round1-candidate.yml"
+        ".github/workflows/round1-candidate.yml",
+        "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40076525716"
       ],
       "verified_sha": "5772a8a97364a26155c238ea7af576bdd400dc1a",
       "blocker": null,
       "recovery_date_kst": null,
       "recovery_condition": null,
-      "advance_note": "ZIP 구조/재현성 도구 선행; 제출 영문 PDF 미생성. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음. 2026-10-24 provisional A4 PDF locally rendered (one page, 4,484 bytes) and readable; source renderer tools/render_round1_proposal_pdf.py; still PARTIAL because approved final PDF and packaged ZIP/receipt are absent. G8 2026-10-24: automated Round1 PDF/ZIP/manifest DRAFT generation and artifact-upload workflow added; awaiting remote CI proof. Final participant-approved PDF/ZIP, official validation and Devpost submission still NOT_DONE."
+      "advance_note": "ZIP 구조/재현성 도구 선행; 제출 영문 PDF 미생성. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음. 2026-10-24 provisional A4 PDF locally rendered (one page, 4,484 bytes) and readable; source renderer tools/render_round1_proposal_pdf.py; still PARTIAL because approved final PDF and packaged ZIP/receipt are absent. G8 2026-10-24: automated Round1 PDF/ZIP/manifest DRAFT generation and artifact-upload workflow added; awaiting remote CI proof. Final participant-approved PDF/ZIP, official validation and Devpost submission still NOT_DONE. VERIFIED: GitHub Actions 40076525716 succeeded, created PDF 4722 bytes/1 page and ZIP 6004 bytes/4 directly-linked Markdown members. CI artifact ID 12553276854, PREVIEW_NOT_SUBMITTED. D16 remains PARTIAL pending participant approval/final package/real Devpost receipt."
     },
     {
       "day_id": "UGR-D17",
@@ -393,13 +394,14 @@
       "actual_elapsed_hours": null,
       "evidence": [
         "docs/architecture/G7_ROUND1_PACKAGE_PREFLIGHT_20261024.md",
-        "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/commit/5772a8a97364a26155c238ea7af576bdd400dc1a"
+        "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/commit/5772a8a97364a26155c238ea7af576bdd400dc1a",
+        "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40076525716"
       ],
       "verified_sha": "5772a8a97364a26155c238ea7af576bdd400dc1a",
       "blocker": null,
       "recovery_date_kst": null,
       "recovery_condition": null,
-      "advance_note": "출시 ZIP 구조·비밀 패턴 오프라인 사전검사; 공식 라이선스·PII·validator 최종 검수 미실행. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음. G8 ZIP SHA256 + per-member hashes, PDF searchable questions, size, 4-Markdown entries checked by candidate bundle script; automated result pending CI. License/privacy review remains unverified."
+      "advance_note": "출시 ZIP 구조·비밀 패턴 오프라인 사전검사; 공식 라이선스·PII·validator 최종 검수 미실행. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음. G8 ZIP SHA256 + per-member hashes, PDF searchable questions, size, 4-Markdown entries checked by candidate bundle script; automated result pending CI. License/privacy review remains unverified. Candidate ZIP manifest includes archive SHA256, file hashes, file/size and PDF searchable ten-heading checks; offline-only, no official validator or license/PII attestation."
     },
     {
       "day_id": "UGR-D18",
@@ -542,5 +544,5 @@
       "advance_note": null
     }
   ],
-  "source_reconciliation_note": "G8 correction: GitHub source 35141943 initial proposal exact prompts changed but Markdown generation left one trailing blank-line mismatch, offline CI failed 7 tests, candidate workflow did not build artifacts. Source regenerated and invalid-PDF exceptions hardened. New corrective CI pending. D15 draft DONE / D16-D17 PARTIAL, G1 blocked; no release or submission."
+  "source_reconciliation_note": "Latest G8 offline source 5ceb12c1e228f9ee8eba211dbd3f3d990cb1e1fb 190/190 tests PASS. PDF/ZIP candidate workflow #40076525716 SUCCESS; preview artifact ID 12553276854; initial closeout failed due master Markdown path not changed in previous corrective push, fixed by this regenerated D16 visible evidence update. G1 blocked, official Uliya/NAS/Devpost not done."
 }

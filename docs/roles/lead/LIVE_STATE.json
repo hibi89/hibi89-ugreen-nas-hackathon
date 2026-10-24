@@ -96,9 +96,9 @@
     "corrective_commit_sha": "4b6904224df8ab9ede913ec6e79787b61d941baa",
     "passed_guard_run_id": 40067647144
   },
-  "last_ci_verified_code_sha": "7432cc3701b92de9b9d187f4e00be5f3b0a79885",
-  "repository_regression_tests_passed": 183,
-  "repository_regression_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40075411535",
+  "last_ci_verified_code_sha": "5ceb12c1e228f9ee8eba211dbd3f3d990cb1e1fb",
+  "repository_regression_tests_passed": 190,
+  "repository_regression_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40076525669",
   "closeout_sync_ci_status": "PASS",
   "closeout_sync_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40075411508",
   "early_skill_candidate": {
@@ -318,7 +318,7 @@
   },
   "round1_draft_bundle": {
     "task_id": "G8-ROUND1-CANDIDATE-PREVIEW-20261024",
-    "status": "G8_CORRECTIVE_SOURCE_CI_PENDING",
+    "status": "DRAFT_PDF_ZIP_MANIFEST_CI_VERIFIED_NOT_SUBMITTED",
     "original_plan_ids": [
       "UGR-D16",
       "UGR-D17"
@@ -339,6 +339,20 @@
     "initial_workflow_status": "FAIL_MARKDOWN_RENDER_MISMATCH",
     "initial_offline_suite": "190_TESTS_2_FAIL_5_ERROR",
     "corrective_action": "JSON-generated draft MD corrected; invalid PDF parse failure normalized",
-    "validated_pdf_artifact": false
+    "validated_pdf_artifact": false,
+    "verified_source_sha": "5ceb12c1e228f9ee8eba211dbd3f3d990cb1e1fb",
+    "verified_offline_ci": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40076525669",
+    "verified_round1_ci": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40076525716",
+    "tests_passed": 190,
+    "pdf_bytes": 4722,
+    "pdf_pages": 1,
+    "zip_bytes": 6004,
+    "zip_markdown_files": 4,
+    "artifact_id": 12553276854,
+    "artifact_retention_days": 7,
+    "initial_closeout_failed": "MISSING_MASTER_MARKDOWN_PATH",
+    "closeout_fix_status": "NEW_CI_PENDING",
+    "real_nas": "NOT_RUN",
+    "license": "NOT_CLEARED"
   }
 }
