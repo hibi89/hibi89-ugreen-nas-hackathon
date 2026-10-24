@@ -46,3 +46,12 @@
 - Verified remote baseline at update: lead/ugreen 6c556db20f30acafe391f4db61e601e459fac1ea, main d8cd806cb2b3842a80a571fd09910ec370e2de17; three feature branches and initial messages unchanged. Fetch latest lead HEAD to see this report's actual final commit.
 - Confirmed: Devpost registration, GitHub branch/doc structure. NOT completed: Devpost submission, internal Kit CLI verification, Skill runtime, tests, CI, NAS, deployment. No changes made to worker or overall lead repo.
 - [Plan](../../UGREEN_EXECUTION_PLAN_20261024.md) and [worker briefs](WORKER_ASSIGNMENTS_20261024.md).
+
+
+## [최신 공시 2026-10-24 KST] 사용자 요청: 해커톤 3개 병렬 / 각 해커톤 기능 1명 순차
+- 이전 UGREEN 세 작업자 10/28~31 동시 병렬 일정 **폐기**. KIC·PayPal·UGREEN 세 대회는 각각 독립 1개 실행 레인으로 운영하며 UGREEN에서는 **한 시점에 오직 한 명의 기능 작업자만 활성**.
+- **UGREEN 순서/날짜**: 총괄 Kit·계약 10/25~27 → missing-files 10/28~29 → version-conflicts 10/30~31 → privacy 11/01~02 → 총괄 통합 11/03~05 → 기술검사 11/06 → PDF 11/07~08 → 제출후보 11/09 → 내부 Devpost 제출 11/10. 공식 11/16 16:45 KST.
+- 작업자 브랜치는 3개 모두 유지하고, **순차 활성화/인계 검수**만 변경. 3명의 AI 채팅방은 별도로 존재하더라도 동시에 개발하도록 지시하지 않음.
+- UGREEN 내 현재 ACTIVE_WORKER=none; 작업자에게 개별 전달·수신·개발 시작은 미확인. KIT/CLI·모델/기능 실검증 0건; Devpost 공식 작품 미생성·미제출.
+- 신규 유료 비용 0원 목표 유지. 일정/기능 충돌 시 사용자 승인 없이 범위를 줄이지 않는다. KIC/PayPal 저장소는 UGREEN 총괄이 수정하지 않음.
+- 상세 [UGREEN 일정](../../UGREEN_EXECUTION_PLAN_20261024.md) / [순차 작업 지시](WORKER_ASSIGNMENTS_20261024.md). 전체 총괄은 이 보고를 읽어 교차 진행 정책을 동기화할 수 있음.

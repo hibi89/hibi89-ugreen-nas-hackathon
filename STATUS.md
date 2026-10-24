@@ -24,3 +24,12 @@
 - **Zero incremental cash spending target**; new paid models/API/server/NAS not authorized. Existing subscriptions and work time excluded.
 - Source of truth: [approved execution plan](docs/UGREEN_EXECUTION_PLAN_20261024.md) and [worker instruction](docs/roles/lead/WORKER_ASSIGNMENTS_20261024.md). This approval supersedes old 'tentative product' and 11/14 target statements above.
 - **Actual execution:** Devpost registered, not created/submitted. No actual Uliya CLI archive internal study, SDK/NAS run, product tests or CI yet. Do not claim success until verified. Worker chats not automatically assigned.
+
+
+## [최신 운영 변경 · 2026-10-24 KST] 해커톤 간 병렬, 해커톤 내부 기능 담당 1명씩 순차
+- 사용자 확정: KIC·PayPal·UGREEN **세 대회는 동시에 진행**하되, **각 대회 내부에서는 기능 담당 AI를 한 번에 한 명만 활성화**한다. 3명 동시개발/병렬 설계 계획은 폐기한다.
+- UGREEN 작업 순서: 총괄 공식 Kit·데이터 계약 10/25~27 → 작업자1 missing-files **10/28~29** → 총괄 인계 검수 → 작업자2 version-conflicts **10/30~31** → 인계 검수 → 작업자3 privacy **11/01~02** → 인계 검수 → 총괄 통합 **11/03~05** → 검사 **11/06** → PDF **11/07~08** → 동결 **11/09** → Devpost 조기 제출 **11/10**.
+- **ACTIVE_WORKER=none** (아직 실 작업자 활성화/수신 확인 없음). 총괄이 1명 작업 완료 증거 SHA·테스트·보고서 및 차단을 검토하고 다음 담당자 활성화. 이전 작업자가 미완료면 다른 작업자 병렬 착수 금지.
+- 계획된 제품 ProjectReady NAS 단일 Skill, 기존 feature 브랜치 3개, 공식 마감 **11/16 16:45 KST**, 추가 현금 지출 **0원 목표**는 그대로 유지한다.
+- 공식 지원 CLI 미확인, 실제 실행·NAS·CI·작품 제출 미완료. 순차 작업으로 위험해지는 경우 **일정 또는 범위 변경 대안을 먼저 사용자에게 승인받는다**. 사용자 승인 없이 기능/품질 축소 금지.
+- 운영 기준: [최신 일정](docs/UGREEN_EXECUTION_PLAN_20261024.md), [순차 담당 지시](docs/roles/lead/WORKER_ASSIGNMENTS_20261024.md). 과거 병렬 표기보다 본 최신 지시가 우선이다.

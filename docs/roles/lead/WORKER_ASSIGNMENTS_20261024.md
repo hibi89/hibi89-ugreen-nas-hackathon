@@ -1,13 +1,34 @@
-# UGREEN worker assignment — approved ProjectReady NAS
-2026-10-24 KST. The three named AI roles are separate chat sessions. This document is the LEAD instruction source, not proof that they have received it or started work.
+# ProjectReady NAS — 순차 기능 담당자 운영 지시
 
-Read the latest lead plan: ../../UGREEN_EXECUTION_PLAN_20261024.md
-Each worker: read own branch HANDOFF -> STATUS -> AGENTS -> REQUIREMENTS -> role OPERATIONS. Do not edit other branches. Do not assume permitted NAS CLI names without official Kit. No real sensitive data, no uploads/rewrites, no new paid APIs.
+> 2026-10-24 KST, 사용자 확정. **KIC·PayPal·UGREEN은 대회별 병렬, UGREEN 기능 작업자는 한 명씩 순차.** 이 문서는 lead/ugreen 계획이며 자동 채팅 배포·작업 개시가 아니다.
 
-COMMON CONTRACT: deliverable requirement -> supported NAS observation/evidence -> verdict PASS/FAIL/REVIEW/NOT_CHECKED -> user action. Any required NOT_CHECKED prevents an unqualified READY.
+## 0. 활성 레인
+- **ACTIVE_WORKER=none (현재)**. 총괄이 공식 Skill Kit와 G2 데이터 계약을 확인하기 전 기능 작업자는 활성화하지 않는다.
+- 다른 담당자가 작업 중이면 새로운 담당자에게 개발을 시작시키지 않는다. 총괄이 원격 SHA, 테스트/검증 근거, TO_UGREEN_LEAD 메시지, STATUS/HANDOFF를 확인하고 명시적으로 다음 작업자를 지정한다.
+- G3 순서는 W1 → W2 → W3이며 같은 시각 활성 기능 담당은 최대 1명이다. 기능 3개는 하나의 Skill로 통합하고 개별 제출하지 않는다.
 
-- Worker 1: feature/missing-files. Check required deliverables against authorized folder. Cases: all present, two absent, search permission denied. Distinguish not searched from absent.
-- Worker 2: feature/version-conflicts. Explain conflicting candidate files without automatic deletion/selection. Cases: one clear file, two plausible versions, no available metadata/hash support.
-- Worker 3: feature/privacy. Define read-only privacy and external transmission guards, PII inspection only if supported. Cases: authorized local file, unauthorized external upload, inspection not supported.
-- All workers: milestone 10/31, evidence-based Markdown skill references and at least normal/error/edge test designs. Report actual progress in their own docs/roles/<role>/TO_UGREEN_LEAD.md with SHA, supported SDK evidence, tests, blockers, next action.
-- Lead integrates ONE SKILL by 11/03; validates 11/06; freezes PDF/ZIP 11/09; targets final Devpost submission 11/10. Official 11/16 16:45 KST.
+## 1. 실행 순서 및 핸드오프
+| 일자 KST | 활성 담당 | 산출물·검수 기준 |
+|---|---|---|
+| 10/25~27 | UGREEN 총괄만 | 공식 Uliya 지원 CLI·등록 Expert Agent·입출력 계약/권한/비용 확인; 미지원 기능은 미검증 |
+| **10/28~29** | **W1 feature/missing-files** | 필수 산출물과 파일 증거 매칭·Not searched vs missing·권한 거부. 자기 브랜치 참조 Markdown/테스트/TO_UGREEN_LEAD 갱신 |
+| **10/30~31** | **W2 feature/version-conflicts** | 상충 버전 후보·증거와 오탐 분석. 임의 최신 판정 및 미지원 해시 API 금지 |
+| **11/01~02** | **W3 feature/privacy** | 최소 권한·외부전송 제한·실제로 지원되는 위험 확인만. 검사 불가 = NOT_CHECKED |
+| **11/03~05** | UGREEN 총괄만 | 세 기능의 검증된 결과를 단일 SKILL.md + 직접 링크된 references Markdown으로 통합 |
+| 11/06 | 총괄 | 공식 Skill 생성 도구 및 모의 테스트 3개 유형. 미검증은 실제 작동으로 주장하지 않음 |
+| 11/07~08 | 총괄 | 영어 PDF 질문 10개, 500단어·1MB 이하, 출처/AI 도구/데이터 흐름 명시 |
+| 11/09 | 총괄 | 제출 ZIP/PDF 구조·크기·안전·해시/백업 동결 |
+| **11/10** | 총괄 지원 + 참가자 확인 | Devpost 조기 제출 영수증 확인 (공식 마감 **11/16 16:45 KST**) |
+
+## 2. 개별 브랜치 계약
+- 담당 W1: feature/missing-files, 공식 허용 폴더 조회와 필수 계약서 비교. 정상 7/7, 누락 2/7, 권한 부족/일부만 검색됨의 합성 사례.
+- 담당 W2: feature/version-conflicts, 실 증거로 충돌 후보 반환, 두 버전 모두 존재하는 경우 최신본 자동 선택 금지. 메타데이터 부족/미지원 API 예외.
+- 담당 W3: feature/privacy, 읽기 범위 제한·민감정보 의심 출력 최소화 및 외부 전송 차단. 지원되지 않는 개인정보 내용 분석은 검사 안 됐음을 명시.
+- 공통 출력 계약(가안): {scope, requirement_id, verdict: PASS|FAIL|REVIEW|NOT_CHECKED, evidence_refs, reason, limitations, next_action}. 실제 CLI 형식 아님.
+- 각 담당은 **자신의 브랜치** HANDOFF → STATUS → AGENTS → REQUIREMENTS → OPERATIONS를 먼저 읽고, 끝나면 자기 TO_UGREEN_LEAD.md에 원격 SHA·출처·테스트·실패·미검증·다음 작업을 남긴다.
+- 사용자 원본 수정·고객 실제 PII·.env/토큰·외부 전송·유료 API는 금지 또는 사전 승인. 신규 지출 0원 유지.
+
+## 3. 지연 시 판정
+- 개별 담당의 검수 실패·중단 시 다른 담당자를 병렬로 켜지 않는다. 원인/재시도 1회/대안 보고 후 사용자 승인으로 일정 조정.
+- 총괄은 세 담당자 메시지함을 읽을 수 있으나 **작업자 활성화는 항상 한 명씩**.
+- [최신 전용 일정](../../UGREEN_EXECUTION_PLAN_20261024.md) 및 [상위 보고](TO_HACKATHON_LEAD.md) 참조.

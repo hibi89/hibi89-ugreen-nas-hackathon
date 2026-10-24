@@ -14,14 +14,20 @@ Every required criterion has PASS, FAIL, REVIEW or NOT_CHECKED status and a file
 Data contract to refine at G2: input {authorized_folder, required_deliverables, scan_scope}; observation {requirement_id, supported_capability, evidence_refs, observed_value, confidence_or_uncertainty}; output {requirement_id, check_type, verdict, evidence_refs, limitation, next_action}. Not actual Uliya API syntax.
 Separate reads from writes: v1 stores no new customer data and has no permanent custom DB. Repeat reads should not mutate or widen privileges. Partial failures return NOT_CHECKED and explicit next actions.
 
+## [LATEST APPROVED EXECUTION POLICY — 2026-10-24 KST]
+
+**Parallel across competitions; sequential inside each competition.** UGREEN has exactly one active feature worker at a time. Current active worker: **NONE**. The older three-worker concurrent-development plan is superseded. W1 Oct 28-29 -> W2 Oct 30-31 -> W3 Nov 1-2, with lead verification before each handoff; lead integration Nov 3-5. No change to the Nov 10 early submission or the Nov 16 official deadline. See docs/roles/lead/WORKER_ASSIGNMENTS_20261024.md.
+
 ## Dated checkpoints — KST
 | Date | Gate / work | Measurable acceptance |
 |---|---|---|
 | 10/24 | G0: product and budget fixed | This user-approved GitHub document exists; technical implementation not yet claimed |
 | 10/25-26 | G1: official package capability study | Obtain and inspect actual UGREEN Skill Developer Package, supported commands, Expert Agent registration, allowed permissions, model/data-flow/price conditions; list confirmed vs unknown |
 | 10/27 | G2: architecture freeze | Contract checklist-to-file-evidence-to-verdict, permissions, recovery and unsupported-function behavior defined using real supported capabilities |
-| 10/28-31 | G3: three worker streams | Branch-specific flow references, normal/failure/edge examples, source evidence and report to lead; changes only on own branch |
-| 11/01-03 | G4: one integrated Skill | SKILL.md plus directly referenced Markdown; trace two synthetic client requirements through NAS observation, findings and decision |
+| 10/28-29 | G3a: W1 missing-files ONLY | Evidence-based missing deliverables check and tests, lead-reviewed handoff |
+| 10/30-31 | G3b: W2 version-conflicts ONLY | Candidate version conflict and uncertainty results; W1 inactive |
+| 11/01-02 | G3c: W3 privacy ONLY | Supported security/data handling checks; W1/W2 inactive |
+| 11/03-05 | G4: lead integrates one Skill | SKILL.md and directly referenced Markdown; trace synthetic contract -> evidence -> decision. No active feature worker |
 | 11/04-06 | G5: validation | Official creation-tool checks if accessible; synthetic completed/missing/version/permission-denied/empty-result tests; record PASS/FAIL and untested |
 | 11/07-08 | G6: English proposal | Ten required answers, <=500 English words (internal target 430-470), PDF <=1 MB; differentiate from existing file tools with clear real-world use |
 | 11/09 | G7: release candidate | PDF/ZIP size, structure, AI/third-party disclosure, no secrets/PII, file checksum/backup verified |
@@ -35,7 +41,7 @@ The dates are execution targets when each AI chat is called, not unattended auto
 - feature/version-conflicts: competing deliverable/version candidates; explain evidence and request user confirmation rather than assuming newest based on filename. Never invent hash or version-history APIs.
 - feature/privacy: read permissions and unauthorized transmission guardrails; PII scanning only if officially supported. If not checked, state that clearly; never claim that a file is safe.
 - lead/ugreen: official tool/capability evidence, input/output contract, integration, ZIP/PDF, 4 judging dimensions, Devpost receipt, reporting.
-Assignments: docs/roles/lead/WORKER_ASSIGNMENTS_20261024.md. Each worker reads its own branch HANDOFF / STATUS / AGENTS / REQUIREMENTS / OPERATIONS, and returns results via TO_UGREEN_LEAD.md. No AI chat starts automatically.
+Assignments: docs/roles/lead/WORKER_ASSIGNMENTS_20261024.md. **Workers operate strictly sequentially (one active at a time).** Each worker reads its own branch HANDOFF / STATUS / AGENTS / REQUIREMENTS / OPERATIONS, and returns results via TO_UGREEN_LEAD.md. No AI chat starts automatically.
 
 ## Tests and judging
 CORE1: 7 mandatory deliverables present with usable evidence -> READY only if all required checks were performed.
