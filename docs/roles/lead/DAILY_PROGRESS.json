@@ -56,8 +56,8 @@
   "sdk_archive_public_zip_downloaded_in_ephemeral_ci": true,
   "sdk_archive_sha256": "cf557e5a022e4297892f39768132855154232efdedeb726b2845450ccd70e1b3",
   "sdk_archive_metadata_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40064613266",
-  "offline_ci_latest_test_count": 151,
-  "offline_ci_latest_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40071426432",
+  "offline_ci_latest_test_count": 156,
+  "offline_ci_latest_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40071626325",
   "additional_approved_same_day_work": [
     {
       "scope_id": "G2_PROVISIONAL_EVIDENCE_CONTRACT",
@@ -154,11 +154,14 @@
     },
     {
       "scope_id": "G1_SELECTED_ACTION_CONTRACT",
-      "status": "SOURCE_COMMITTED_CI_PENDING",
+      "status": "OFFICIAL_CATALOG_ACTION_SHAPES_STATIC_CI_PASS",
       "source": "tools/sdk_action_contract_digest.py",
       "tests_added": 5,
       "actual_work_hours": null,
-      "official_validator": "NOT_RUN"
+      "official_validator": "NOT_RUN",
+      "verified_workflow": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40071626348",
+      "offline_suite_passed": 156,
+      "parameter_names_verified": false
     }
   ],
   "overall_project_completion_percent": null,
@@ -168,9 +171,9 @@
   "closeout_sync_enforcement_active": true,
   "closeout_sync_quality_issue": "2026-10-24 CI #40067541841 detected stale daily JSON in previous policy commit; correcting in next commit",
   "closeout_sync_guard_tested_status": "PENDING_RECHECK",
-  "latest_repository_regression_tests_passed": 151,
-  "latest_repository_regression_ci_url": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40071426432",
-  "latest_closeout_guard_verified": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40070572600",
+  "latest_repository_regression_tests_passed": 156,
+  "latest_repository_regression_ci_url": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40071626325",
+  "latest_closeout_guard_verified": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40071626303",
   "notes_on_last_closeout": "One-line GitHub bootstrap and mandatory end-of-work handoff automated checks verified. No new SDK or NAS capability established.",
-  "notes_on_new_chat_execution": "Official first-party pinned catalog identifiers now statically verified (9 CLI groups/7 domains), file-agent and document-agent names and 35 file+7 document actions documented. Selected read-only action parameter/approval schema drill CI pending; official validator and NAS still not run. Oct24 daily 100% unchanged; Oct25 G1 1.5+1.5h budget."
+  "notes_on_new_chat_execution": "Official pinned SDK static catalogue confirmed 9 selected action structures/param counts; 156/156 offline CI PASS at 17c386e78. Exact parameter names/permissions, script safety, official validator and live NAS still BLOCKED/NOT_RUN. Oct24 finite work 100% completed/0h remaining with extra advances outside denominator. Next G1 Oct25 1.5h plan+1.5h reserve, actual ETA unknown."
 }
