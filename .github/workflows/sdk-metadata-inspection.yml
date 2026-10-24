@@ -1,0 +1,26 @@
+name: Official SDK metadata inspection (ephemeral)
+on:
+  push:
+    branches: ["lead/ugreen"]
+    paths:
+      - ".github/workflows/sdk-metadata-inspection.yml"
+      - "tools/inspect_official_sdk.py"
+  workflow_dispatch:
+jobs:
+  inspect-official-public-kit:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 3
+    env:
+      # Exact PUBLIC download link obtained from UGREEN's official Starter Kit.
+      KIT_URL: https://cdn.shopify.com/s/files/1/0630/9416/1602/files/uliya-skill-kit-0.7.3-en.zip?v=1790578898
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Inspect public ZIP metadata without extracting, executing or saving archive
+        run: python tools/inspect_official_sdk.py --official-url "$KIT_URL"
+      # Do not upload artifacts or cache downloaded archives. Workflow logs print
+      # only schema-limited, metadata-level JSON; actual SDK docs remain private.
