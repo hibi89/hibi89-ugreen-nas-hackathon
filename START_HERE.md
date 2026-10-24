@@ -1,3 +1,5 @@
+> **[2026-10-24 공식 대회 규정/참가/도구/일정 신규 공시 — 통합 해커톤 총괄 필독](docs/contest/UGREEN_OFFICIAL_BRIEF_20261024.md)**: 공식 [Rules](https://ugreenhackathon.devpost.com/rules)·[Resources](https://ugreenhackathon.devpost.com/resources)·[Starter Kit](https://ai.ugreen.com/pages/hackathon-starter-kit) 직접 대조. 예선 마감 **11/16 16:45 KST**, PDF 10문항/500단어 + 초기 Skill ZIP ≤10MB, 공식 UGOS Creator 실생성 필요. 사용자 보고 기준 PC 설치/재시작 Codex Skill 인식은 확인됐으나 **실제 공식 생성/검사 완료 결과는 아직 미접수**. 전체 진도/CI 정본은 MASTER_PROGRESS와 실제 최신 HEAD를 읽을 것. 사용자 승인·Devpost 제출 전제 금지.
+
 > **2026-10-24 최신 우선 규칙:** [MASTER_PROGRESS.md](MASTER_PROGRESS.md) = 날짜별 24건의 DONE/PARTIAL/BLOCKED/NOT_STARTED·선행 작업·테스트 증거·기본/별도 예비시간에 관한 **최신 진행 정본**. `lead/ugreen` 원격 HEAD 확인 후 이 문서를 **가장 먼저 읽고**, 이후 LIVE_HANDOFF/LIVE_STATE와 증거를 대조한다. **작업을 끝낼 때마다 MASTER를 포함한 필수 인수인계 파일을 같은 push로 갱신**하고 GitHub Actions 진행표 무결성 검사를 통과해야 한다. 아래 구형 읽기 순서는 MASTER 우선 원칙에 따라 해석한다.
 
 # UGREEN — 한 문장 복원 (2026-10-24 KST 최신 규칙)
