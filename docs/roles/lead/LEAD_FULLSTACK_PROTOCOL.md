@@ -28,3 +28,7 @@ A chosen: direct lead development/verification on one `lead/ugreen` workline. B 
 - The daily reserve is **not** already counted in planned work. When cap is reached, mark partial/BLOCKED, record evidence and reforecast before another commitment. A technical dependency without official access cannot be promised within a finite hour estimate.
 - If actual >1.5x planned, recalibrate next work day and tell the overall lead. If the same method is stuck 60-90 min / failed twice, record cause and switch approach. Do not move another hackathon's official-deadline blocks to UGREEN work.
 - Internal Nov 10 submission is a **conditional attempt** while SDK Gate1 is unresolved; maintain official Nov 16 16:45 and user approval on product scope/expense.
+
+
+### Round 2 contingent plan
+If and only if a verifiable official finalist invitation arrives, read [conditional finalist schedule](../../UGREEN_FINALIST_DAILY_PLAN_20261024.md), confirm PT NAS assignment, convert to actual T/T+1 KST dates, rerun staffing/time risk. Without official invitation this file is **not active**; current Round1 G1 takes precedence.

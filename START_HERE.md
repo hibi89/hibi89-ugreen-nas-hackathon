@@ -1,3 +1,5 @@
+> **본선 진출 시 조건부 작업표 (2026-10-24 KST 공시)**: [11/17~12/01 일별 보수적 예상시간·별도 예비·T/T+1 단일 NAS 24시간 창](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/blob/lead/ugreen/docs/UGREEN_FINALIST_DAILY_PLAN_20261024.md). **진출·배정 미확인 / 현재 ACTIVE 아님**. 예선 시간표 [별도 유지](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/blob/lead/ugreen/docs/UGREEN_DAILY_EFFORT_PLAN_20261024.md). 기본 32h+예비 20.5h=최대 52.5h, NAS 배정일은 2일 일반 시간을 **교체**해 54.5~58.5h 상한. 원격 할당은 11/22~28 PT 중 1일, 한국시간 통상 배정일 17:00~다음 날 16:59, 실제 이메일이 우선. 실 NAS 촬영 필요, 최종 공식 12/01 16:45 KST, 자체 목표 11/30 20:00 KST. 시간표는 완료 가능성 보장이 아니며 SDK/NAS 런타임은 현재 미검증.
+
 > **일별 작업시간을 먼저 확인:** [보수적 일자별 일정표](docs/UGREEN_DAILY_EFFORT_PLAN_20261024.md)는 총괄이 새 채팅을 시작할 때 읽을 필수 자료. 현재 SDK 접근 차단·11/10 조건부 목표 및 KIC/PayPal 충돌 시간을 포함한다. [실측 작업 로그](docs/roles/lead/WORK_TIME_LOG.md)도 확인. 시간 초과 때에는 미완료를 그대로 기록하고 재예측한다.
 
 # UGREEN ProjectReady NAS — 새 채팅 자동 복원 진입점
