@@ -1,0 +1,41 @@
+name: UGREEN Round 1 PDF and Skill ZIP DRAFT bundle
+on:
+  push:
+    branches: ["lead/ugreen"]
+    paths:
+      - "tools/round1_candidate_bundle.py"
+      - "tools/render_round1_proposal_pdf.py"
+      - "tools/check_round1_proposal.py"
+      - "tools/round1_package_audit.py"
+      - "docs/submission/**"
+      - "skill/projectready-nas/**"
+      - ".github/workflows/round1-candidate.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  round1-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install build-time PDF tools only (not part of Skill ZIP)
+        run: python -m pip install "reportlab>=4,<5" "pypdf>=6,<7"
+      - name: Validate official 10 questions and English answer word cap
+        run: python tools/check_round1_proposal.py --check
+      - name: Build PDF draft and strict 4-Markdown ZIP in private CI folder
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/ugreen-round1"
+          python tools/render_round1_proposal_pdf.py --output "$RUNNER_TEMP/ugreen-round1/ProjectReady_Proposal_DRAFT.pdf"
+          python tools/round1_candidate_bundle.py --pdf "$RUNNER_TEMP/ugreen-round1/ProjectReady_Proposal_DRAFT.pdf" --output-dir "$RUNNER_TEMP/ugreen-round1"
+      - name: Upload only DRAFT PDF/ZIP/manifest as downloadable preview
+        uses: actions/upload-artifact@v4
+        with:
+          name: UGREEN-Round1-DRAFT-NOT-SUBMITTED
+          path: ${{ runner.temp }}/ugreen-round1/*
+          retention-days: 7
+          if-no-files-found: error

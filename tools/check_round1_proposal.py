@@ -12,16 +12,16 @@ ROOT=Path(__file__).resolve().parents[1]
 JSON_PATH=ROOT/"docs/submission/round1_proposal.json"
 MD_PATH=ROOT/"docs/submission/ROUND1_PROPOSAL_DRAFT.md"
 PROMPTS=[
-"What does the Skill do?",
-"Who is the target user and problem?",
-"What is your proposed solution?",
-"What is the core user flow?",
-"How is it different from existing tools or common AI?",
-"Which UGREEN AI NAS features are used, and when?",
-"What is the technical approach?",
-"What is implemented, and what remains?",
-"How will you test it as a Finalist?",
-"What limitations, risks, or dependencies remain?",
+    "One sentence: What does the Skill do?",
+    "Who is the target user and problem?",
+    "What is your proposed solution?",
+    "What is the Core User Flow?",
+    "What substantive difference does your idea offer compared with existing tools or conventional AI solutions?",
+    "Which UGREEN AI NAS capabilities will be used, and at which step in the workflow?",
+    "What was your technical approach? Describe the planned Skill workflow, supported NAS CLI capabilities, expert agent orchestration, required inputs, permissions, AI model choices, and data handling, as applicable;",
+    "What is the current development status? Identify what was implemented already, not yet implemented, or is pending NAS validation if selected to be a Finalist.",
+    "What is your final validation plan? Name two core test cases and one edge case to validate if selected as a Finalist.",
+    "Are there any known limitations of your Project? Describe current known limitations, technical risks, and any external dependencies."
 ]
 def word_count(text: str) -> int:
     return len(re.findall(r"\b[\w'-]+\b",text))

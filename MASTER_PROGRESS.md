@@ -58,9 +58,9 @@
 - UGR-D12 (2026-11-04): combined_report.py 합성 통합 보고 선행; 실제 Agent I/O 연결 미실행. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음.
 - UGR-D13 (2026-11-05): CORE1/CORE2/EDGE1 합성 검증 완료; 실제 NAS 실행 미실행. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음.
 - UGR-D14 (2026-11-06): Skill 4개 Markdown 파일 사전검사 선행; 공식 validator 미실행. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음.
-- UGR-D15 (2026-11-07): 2026-10-24 선행: 10개 공식 Round1 영문질문 351/500단어 초안 DONE. GitHub 소스 7432cc3701b92de9b9d187f4e00be5f3b0a79885에서 183/183 오프라인 CI PASS, MASTER/인수인계 CI PASS. 로컬 A4 PDF 1페이지 4,484 bytes 생성·렌더/텍스트 확인; 참가자 최종 승인·Devpost 제출은 NOT_SUBMITTED.
-- UGR-D16 (2026-11-08): ZIP 구조/재현성 도구 선행; 제출 영문 PDF 미생성. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음. 2026-10-24 provisional A4 PDF locally rendered (one page, 4,484 bytes) and readable; source renderer tools/render_round1_proposal_pdf.py; still PARTIAL because approved final PDF and packaged ZIP/receipt are absent.
-- UGR-D17 (2026-11-09): 출시 ZIP 구조·비밀 패턴 오프라인 사전검사; 공식 라이선스·PII·validator 최종 검수 미실행. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음.
+- UGR-D15 (2026-11-07): 2026-10-24 선행: 10개 공식 Round1 영문질문 351/500단어 초안 DONE. GitHub 소스 7432cc3701b92de9b9d187f4e00be5f3b0a79885에서 183/183 오프라인 CI PASS, MASTER/인수인계 CI PASS. 로컬 A4 PDF 1페이지 4,484 bytes 생성·렌더/텍스트 확인; 참가자 최종 승인·Devpost 제출은 NOT_SUBMITTED. Official Round 1 question titles corrected to source Rule 4 verbatim in new draft code; prior PDF draft STALE. Corrected PDF creation and verification are pending GitHub Actions; D15 draft status stays DONE.
+- UGR-D16 (2026-11-08): ZIP 구조/재현성 도구 선행; 제출 영문 PDF 미생성. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음. 2026-10-24 provisional A4 PDF locally rendered (one page, 4,484 bytes) and readable; source renderer tools/render_round1_proposal_pdf.py; still PARTIAL because approved final PDF and packaged ZIP/receipt are absent. G8 2026-10-24: automated Round1 PDF/ZIP/manifest DRAFT generation and artifact-upload workflow added; awaiting remote CI proof. Final participant-approved PDF/ZIP, official validation and Devpost submission still NOT_DONE.
+- UGR-D17 (2026-11-09): 출시 ZIP 구조·비밀 패턴 오프라인 사전검사; 공식 라이선스·PII·validator 최종 검수 미실행. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음. G8 ZIP SHA256 + per-member hashes, PDF searchable questions, size, 4-Markdown entries checked by candidate bundle script; automated result pending CI. License/privacy review remains unverified.
 
 ## 운영 의무
 

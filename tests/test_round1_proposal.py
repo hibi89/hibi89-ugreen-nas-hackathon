@@ -11,6 +11,10 @@ class Round1ProposalTests(unittest.TestCase):
         cls.markdown=MD_PATH.read_text(encoding="utf8")
     def test_exact_official_ten_questions(self):
         self.assertEqual([],errors(self.data,self.markdown))
+    def test_exact_official_rule_prompt_wording(self):
+        self.assertTrue(self.data["questions"][0]["prompt"].startswith("One sentence:"))
+        self.assertIn("expert agent orchestration",self.data["questions"][6]["prompt"])
+        self.assertIn("technical risks",self.data["questions"][9]["prompt"])
     def test_true_351_answer_words(self):
         self.assertEqual(351,sum(word_count(q["answer"]) for q in self.data["questions"]))
     def test_more_than_500_rejected(self):

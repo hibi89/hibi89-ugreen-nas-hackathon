@@ -62,6 +62,7 @@
   ],
   "current_priority_documents": [
     "MASTER_PROGRESS.md",
+    "docs/architecture/G8_ROUND1_DRAFT_BUNDLE_20261024.md",
     "docs/roles/lead/LIVE_HANDOFF.md",
     "docs/roles/lead/LEAD_ACTIVE_WORK.md",
     "docs/roles/lead/DAILY_PROGRESS.json",
@@ -314,5 +315,24 @@
     "verified_ci_url": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40075411535",
     "master_ci_url": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40075411543",
     "handoff_ci_url": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40075411508"
+  },
+  "round1_draft_bundle": {
+    "task_id": "G8-ROUND1-CANDIDATE-PREVIEW-20261024",
+    "status": "SOURCE_COMMITTED_CI_PENDING",
+    "original_plan_ids": [
+      "UGR-D16",
+      "UGR-D17"
+    ],
+    "evidence_doc": "docs/architecture/G8_ROUND1_DRAFT_BUNDLE_20261024.md",
+    "official_rule_exact_prompts": true,
+    "answer_words": 351,
+    "skill_markdown_count": 4,
+    "build_action": ".github/workflows/round1-candidate.yml",
+    "expected_artifact": "UGREEN-Round1-DRAFT-NOT-SUBMITTED",
+    "official_uliya_validator": "NOT_RUN",
+    "nas_runtime": "NOT_RUN",
+    "entrant_approval": "PENDING",
+    "devpost": "NOT_SUBMITTED",
+    "actual_hours": null
   }
 }
