@@ -1,3 +1,10 @@
+## 2026-10-24 G11 early D16/D17 — source disclosure parity and Round1 gate differentiation (new CI PENDING)
+- Verified downloaded PRIOR draft artifact 12554397827 (PDF one readable page/4722 bytes/351 answer words; ZIP 6562 bytes/4 Markdown files; manifest SHA checked). Visual inspection applies to prior artifact only.
+- Fixed hardcoded AI/source/dataflow PDF footer to derive all four disclosures from authoritative proposal JSON; new PDF is rejected when declared texts mismatch. New synthetic regression cases + release gate distinguishes mandatory official Skill Creation Tool usage proof (still NOT_EVIDENCED) from optional checker run/finalist NAS validation.
+- Devpost initial ZIP/PDF NOT APPROVED; entrant original-work/third-party-license, AI disclosure review, exact official creator execution, participant consent and receipt remain OPEN. G1 registered Agent/runtime BLOCKED, real NAS NOT_RUN.
+- 24-day plan totals unchanged 2 DONE/12 PARTIAL/3 BLOCKED/7 NOT_STARTED; G11 is Oct24 independent advance for Nov8-9 D16/D17 PARTIAL only. Oct24 scheduled finite 100%/0h remainder; developer time NOT_MEASURED. G1 Oct25 base 1.5h + reserve 1.5h, ETA unknown. No new spend. Source CI pending.
+- Read docs/architecture/G11_ROUND1_DISCLOSURE_PARITY_20261024.md. Next is G11 generated PDF visual QA and official tool provenance review; no submission without approval.
+
 ## 2026-10-24 G10 CI VERIFIED — Round1 guard and command-center response
 - Code 256a766d63eac38a1c6b181d29e3d74e20f9709a verified GitHub CI: **201/201 OFFLINE tests** workflow 40079252331; Round1 strict draft build/release audit workflow 40079252294 SUCCESS; master check workflow 40079252273 SUCCESS; closeout path-sync workflow 40079252300 SUCCESS.
 - Fresh preview artifact 12554397827 (expires Oct31 08:45 UTC): exact draft PDF 4722 bytes/1 page, 351/500 answer words; four-Markdown Skill ZIP 6562 bytes; **NOT_APPROVED / NOT_SUBMITTED**. Runtime SDK, official validator, NAS, permission/privacy certification NOT_RUN, license NOT_CLEARED.

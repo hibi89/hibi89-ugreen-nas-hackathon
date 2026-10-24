@@ -419,5 +419,28 @@
     "words": 351,
     "round1_submission_gate": "NOT_APPROVED_FOR_SUBMISSION"
   },
-  "next_action_priority": "ROUND1_EDITORIAL_RIGHTS_AND_DISCLOSURE_REVIEW_BEFORE_FURTHER_STATIC_G1_PROBING"
+  "next_action_priority": "G11_REGENERATED_PDF_VISUAL_AND_SOURCE_DISCLOSURE_PARITY; OFFICIAL_CREATOR_PROVENANCE_AND_ENTRANT_APPROVAL",
+  "g11_round1_disclosure_parity": {
+    "date_kst": "2026-10-24",
+    "status": "CODE_PUSH_PENDING_CI",
+    "source": [
+      "tools/render_round1_proposal_pdf.py",
+      "tools/round1_candidate_bundle.py",
+      "tools/round1_release_gate.py"
+    ],
+    "new_tests": 3,
+    "report": "docs/architecture/G11_ROUND1_DISCLOSURE_PARITY_20261024.md",
+    "reviewed_artifact_id": 12554397827,
+    "reviewed_pdf_bytes": 4722,
+    "reviewed_zip_bytes": 6562,
+    "artifact_manual_visual_review": "PASS_EXISTING_DRAFT_BEFORE_G11",
+    "official_creator_usage": "NOT_EVIDENCED",
+    "round1_license_and_rights": "NOT_CLEARED",
+    "new_pdf_visual_review": "PENDING",
+    "official_checker": "NOT_RUN",
+    "real_nas": "NOT_RUN",
+    "devpost": "NOT_SUBMITTED",
+    "participant_approval": "PENDING",
+    "actual_hours": null
+  }
 }

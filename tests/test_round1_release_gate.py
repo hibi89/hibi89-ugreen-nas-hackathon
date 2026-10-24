@@ -27,6 +27,18 @@ class ReleaseAuditTests(unittest.TestCase):
     self.assertEqual(r["assessment"],"OFFLINE_TECHNICAL_PREVIEW_PASS")
     self.assertEqual(r["release_decision"],"NOT_APPROVED_FOR_SUBMISSION")
     self.assertIn("NOT SUBMITTED",markdown(r))
+ def test_round1_required_vs_finalist_only_gates(self):
+    report=audit(self.data,self.zip,self.pdf)
+    round1={item["gate"] for item in report["required_reviews"]}
+    deferred={item["gate"] for item in report["other_incomplete"]}
+    self.assertIn("official_creation_tool_use",round1)
+    self.assertIn("sdk_license_and_attribution",round1)
+    self.assertIn("round1_dataflow_disclosure",round1)
+    self.assertNotIn("real_nas_runtime",round1)
+    self.assertNotIn("official_checker_execution",round1)
+    self.assertIn("real_nas_runtime",deferred)
+    self.assertIn("official_checker_execution",deferred)
+    self.assertIn("Finalist-only",markdown(report))
  def test_zip_tamper_fails(self):
     with self.assertRaises(ReleaseAuditError):audit(self.data,self.zip+b"x",self.pdf)
  def test_pdf_tamper_fails(self):

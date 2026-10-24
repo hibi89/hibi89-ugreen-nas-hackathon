@@ -7,6 +7,7 @@ Not part of the runtime Skill, and not the official Uliya validator.
 from __future__ import annotations
 import argparse,json
 from pathlib import Path
+from xml.sax.saxutils import escape
 from check_round1_proposal import JSON_PATH,MD_PATH,errors
 
 def render(out:Path)->None:
@@ -31,9 +32,18 @@ def render(out:Path)->None:
     for item in d["questions"]:
         story.append(KeepTogether([Paragraph(f"{item['number']:02d}  {item['prompt']}",styles["question"]),
                                    Paragraph(item["answer"],styles["answer"])]))
-    story+=[Spacer(1,8),Paragraph("Disclosures (separate from ten substantive answers)",styles["question"]),
-      Paragraph("AI assistance: OpenAI ChatGPT for skill design, source drafting, synthetic tests, and review. UGREEN Uliya/UGOS public Starter Kit and catalog referenced, not bundled. Official license and runtime permissions remain unverified. No third-party executables, private files or credentials are included.",styles["footer"]),
-      Paragraph("Source: ugreenhackathon.devpost.com/rules | Participant approval and submission still pending.",styles["footer"])]
+    story += [Spacer(1,8), Paragraph("Disclosures (separate from ten substantive answers)",styles["question"])]
+    disclosure_labels = (
+        ("ai_assistance", "AI assistance"),
+        ("platform", "Platform and third-party source"),
+        ("other_libraries", "Other libraries"),
+        ("data_flow", "Data flow and permissions"),
+    )
+    # PDF declarations must be rendered from the same checked proposal JSON,
+    # never a manually maintained shorter footer that can become stale.
+    for key, label in disclosure_labels:
+        story.append(Paragraph(f"<b>{escape(label)}:</b> {escape(d['disclosures'][key])}",styles["footer"]))
+    story.append(Paragraph("Official rules: ugreenhackathon.devpost.com/rules | Participant approval and submission pending.",styles["footer"]))
     def foot(canvas,doc):
         canvas.setStrokeColor(colors.HexColor("#CCD7E0"));canvas.line(47,32,A4[0]-47,32)
         canvas.setFont("Helvetica",7);canvas.drawRightString(A4[0]-47,21,f"{doc.page} | DRAFT")

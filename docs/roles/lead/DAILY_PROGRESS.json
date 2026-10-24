@@ -203,6 +203,22 @@
       "verified_code_sha": "256a766d63eac38a1c6b181d29e3d74e20f9709a",
       "verified_ci_url": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40079252331",
       "verified_offline_tests": 201
+    },
+    {
+      "scope_id": "G11_ROUND1_DISCLOSURE_PARITY_AND_RELEASE_GATES",
+      "status": "CODE_PUSH_PENDING_CI",
+      "master_days": [
+        "UGR-D16_PARTIAL",
+        "UGR-D17_PARTIAL"
+      ],
+      "report": "docs/architecture/G11_ROUND1_DISCLOSURE_PARITY_20261024.md",
+      "synthetic_tests_added": 3,
+      "previous_verified_offline_tests": 201,
+      "official_creator_usage": "NOT_EVIDENCED",
+      "official_validator": "NOT_RUN",
+      "real_nas": "NOT_RUN",
+      "devpost": "NOT_SUBMITTED",
+      "actual_work_hours": null
     }
   ],
   "overall_project_completion_percent": null,

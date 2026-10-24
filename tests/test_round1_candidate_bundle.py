@@ -8,7 +8,7 @@ from pathlib import Path
 from unittest.mock import patch
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"tools"))
-from round1_candidate_bundle import draft_bundle,sha256,validate_candidate_zip,validate_pdf,missing_pdf_sections
+from round1_candidate_bundle import draft_bundle,sha256,validate_candidate_zip,validate_pdf,missing_pdf_sections,missing_pdf_disclosures
 from round1_package_audit import PackageError
 
 
@@ -34,6 +34,26 @@ class CandidateBundleTests(unittest.TestCase):
     def test_missing_question_heading_detected(self):
         q=[{"number":1,"prompt":"Official first prompt?","answer":"Answer intact."}]
         self.assertIn("1:prompt",missing_pdf_sections("Answer intact.",q))
+
+    def test_pdf_disclosures_match_canonical_source(self):
+        declarations = {
+            "ai_assistance": "GPT assistance, human entrant review.",
+            "platform": "UGREEN public guide, original workflow.",
+            "other_libraries": "No third-party runtime is bundled.",
+            "data_flow": "Owner approval required; cloud handling unknown.",
+        }
+        extracted = " ".join(declarations.values())
+        self.assertEqual([], missing_pdf_disclosures(extracted, declarations))
+        altered = extracted.replace("cloud handling unknown", "local-only proven")
+        self.assertEqual(["disclosure:data_flow"], missing_pdf_disclosures(altered, declarations))
+
+    def test_pdf_rejects_missing_ai_disclosure(self):
+        declarations = {"ai_assistance": "External AI support was disclosed.",
+                        "platform": "Public UGREEN catalog only.",
+                        "other_libraries": "No library bundled.",
+                        "data_flow": "Cloud handling not verified."}
+        self.assertIn("disclosure:ai_assistance",
+                      missing_pdf_disclosures("Public UGREEN catalog only. No library bundled. Cloud handling not verified.", declarations))
 
     def test_reproducible_binary(self):
         a,_=draft_bundle(self.skill)

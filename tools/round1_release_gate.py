@@ -10,14 +10,16 @@ from pathlib import Path
 MAX_PDF=1_000_000
 MAX_ZIP=10*1024*1024
 GATES=(
- ("entrant_editorial_approval","PENDING","Participant reviews English answers, PDF layout and declarations"),
- ("sdk_license_and_attribution","NOT_CLEARED","Verify first-party tool usage rights and attribution"),
- ("privacy_dataflow_and_permissions","NOT_CLEARED","Verify actual NAS data processing, authorization and cloud flow"),
- ("official_skill_creation_tool","NOT_RUN","Check with official creation tool when approved and safe"),
+ ("entrant_editorial_approval","PENDING","Entrant must review the exact ten-answer PDF, Markdown ZIP, and factual declarations"),
+ ("official_creation_tool_use","NOT_VERIFIED","Round 1 rules require using the official UGOS Skill Creation Tool; installed use/creation provenance is not evidenced by the public capability catalog"),
+ ("sdk_license_and_attribution","NOT_CLEARED","Confirm official-kit usage terms, all third-party sources/licenses and ownership before submission"),
+ ("round1_dataflow_disclosure","REVIEW_PENDING","Entrant confirms the planned owner permission, external services and local/cloud unknowns are stated truthfully; live NAS access is not required in Round 1"),
 )
 OTHER=(
- ("real_nas_runtime","NOT_RUN","Finalist-only device validation, not Round 1 proof"),
- ("devpost_submission","NOT_SUBMITTED","Real Devpost receipt must be verified after actual submission"),
+ ("official_checker_execution","NOT_RUN","Starter Kit recommends running its checker; no equivalent official-validation success claimed"),
+ ("real_nas_runtime","NOT_RUN","Finalist-only device validation; NOT a Round 1 eligibility prerequisite"),
+ ("real_privacy_permission_audit","NOT_CHECKED","Full installed runtime/privacy verification is finalist-dependent and not a Round 1 prerequisite"),
+ ("devpost_submission","NOT_SUBMITTED","Real Devpost receipt must be verified after approved submission"),
 )
 class ReleaseAuditError(ValueError):pass
 def sha256(raw:bytes)->str:return hashlib.sha256(raw).hexdigest()

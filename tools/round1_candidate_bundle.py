@@ -1,7 +1,7 @@
 """Build an inspectable DRAFT Round 1 ZIP + PDF manifest. Never submit.
 
 Actual input PDF gets parsed with pypdf: validates size, extractability,
-ten official question texts, and the authored first/last answer.
+all ten complete official question/answer pairs and all JSON disclosures.
 Only direct-linked Markdown references enter the ZIP; no SDK/runtime code.
 """
 from __future__ import annotations
@@ -65,7 +65,18 @@ def missing_pdf_sections(extracted: str, questions: list[dict]) -> list[str]:
     return missing
 
 
-def validate_pdf(pdf: Path, questions: list[dict]) -> dict:
+def missing_pdf_disclosures(extracted: str, disclosures: dict[str, str]) -> list[str]:
+    """Check all source declarations, not only the ten substantive answers."""
+    cleaned = re.sub(r"\s+", " ", extracted.replace("\u00ad", "")).strip()
+    missing = []
+    for field in ("ai_assistance", "platform", "other_libraries", "data_flow"):
+        expected = re.sub(r"\s+", " ", disclosures.get(field, "").replace("\u00ad", "")).strip()
+        if not expected or expected not in cleaned:
+            missing.append("disclosure:" + field)
+    return missing
+
+
+def validate_pdf(pdf: Path, questions: list[dict], disclosures: dict[str, str] | None = None) -> dict:
     content = pdf.read_bytes()
     if len(content) > PDF_LIMIT or not content.startswith(b"%PDF-") or b"%%EOF" not in content[-1024:]:
         raise ValueError("Invalid or >1 MB PDF")
@@ -82,8 +93,10 @@ def validate_pdf(pdf: Path, questions: list[dict]) -> dict:
     except Exception as exc:
         raise ValueError("PDF cannot be parsed and searched") from exc
     missing = missing_pdf_sections(text, questions)
+    if disclosures is not None:
+        missing.extend(missing_pdf_disclosures(text, disclosures))
     if missing:
-        raise ValueError("Proposal PDF missing exact current question/answer sections: "
+        raise ValueError("Proposal PDF missing current question/answer/disclosure sections: "
                          + ", ".join(missing))
     if "DRAFT" not in text or "NOT SUBMITTED" not in text:
         raise ValueError("Draft PDF missing non-submission disclosure")
@@ -111,7 +124,7 @@ def draft_bundle(skill_dir: Path, pdf: Path | None = None) -> tuple[bytes, dict]
         "proposal_question_count": 10,
         "proposal_answer_words": proposal["substantive_words"],
         "proposal_word_limit": 500,
-        "pdf": validate_pdf(pdf, proposal["questions"]) if pdf else None,
+        "pdf": validate_pdf(pdf, proposal["questions"], proposal["disclosures"]) if pdf else None,
         "official_uliya_checker": "NOT_RUN",
         "live_nas_validation": "NOT_RUN",
         "license_and_dataflow_review": "NOT_CLEARED",
