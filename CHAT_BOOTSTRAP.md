@@ -1,3 +1,5 @@
+> **통합 수뇌부 전달 — 필독 (2026-10-24):** 사용자 요청으로 [상위 총괄 감독 의견](docs/FROM_HACKATHON_COMMAND.md)을 직접 수신했다. **새 채팅 복원·주요 작업 착수 전에 반드시 읽고**, 해당 지적을 `TO_HACKATHON_LEAD.md`에 수용/차단/근거 있는 반론/검증완료로 답신한다. 우선순위 지침은 정본 진척 JSON·최신 원격 소스·실 CI 결과의 수치를 덮어쓰지 않는다. 무단 제출/계정/비용 변경 없이 현행 총괄 직접 개발 체제 유지.
+
 > **2026-10-24 최신 우선 규칙:** [MASTER_PROGRESS.md](MASTER_PROGRESS.md) = 날짜별 24건의 DONE/PARTIAL/BLOCKED/NOT_STARTED·선행 작업·테스트 증거·기본/별도 예비시간에 관한 **최신 진행 정본**. `lead/ugreen` 원격 HEAD 확인 후 이 문서를 **가장 먼저 읽고**, 이후 LIVE_HANDOFF/LIVE_STATE와 증거를 대조한다. **작업을 끝낼 때마다 MASTER를 포함한 필수 인수인계 파일을 같은 push로 갱신**하고 GitHub Actions 진행표 무결성 검사를 통과해야 한다. 아래 구형 읽기 순서는 MASTER 우선 원칙에 따라 해석한다.
 
 # UGREEN — 한 문장 복원 (2026-10-24 KST 최신 규칙)
