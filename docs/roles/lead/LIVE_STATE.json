@@ -92,19 +92,23 @@
     "corrective_commit_sha": "4b6904224df8ab9ede913ec6e79787b61d941baa",
     "passed_guard_run_id": 40067647144
   },
-  "last_ci_verified_code_sha": "4b6904224df8ab9ede913ec6e79787b61d941baa",
-  "repository_regression_tests_passed": 110,
-  "repository_regression_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40067647132",
+  "last_ci_verified_code_sha": "22c75f3abd5a56a9585a0de257ccff16710d457a",
+  "repository_regression_tests_passed": 116,
+  "repository_regression_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40069126450",
   "closeout_sync_ci_status": "PASS",
-  "closeout_sync_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40067647144",
+  "closeout_sync_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40069126414",
   "early_skill_candidate": {
     "id": "G6_20261024",
     "path": "skill/projectready-nas/SKILL.md",
-    "status": "OFFLINE_DRAFT_CI_PENDING",
+    "status": "OFFLINE_STATIC_CI_PASS",
     "test_count_added": 6,
+    "verified_repository_test_count": 116,
+    "verified_test_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40069126450",
+    "verified_closeout_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40069126414",
+    "code_commit": "22c75f3abd5a56a9585a0de257ccff16710d457a",
     "official_uliya_validator": "NOT_RUN",
     "actual_nas_test": "NOT_RUN",
-    "planned_real_integration_kst": "2026-11-03/04",
-    "actual_work_hours": null
+    "actual_work_hours": null,
+    "planned_real_integration_kst": "2026-11-03/04"
   }
 }
