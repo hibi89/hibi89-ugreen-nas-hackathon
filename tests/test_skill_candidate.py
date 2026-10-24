@@ -52,6 +52,18 @@ class SkillDraftTests(unittest.TestCase):
         self.assertIn("NOT_CHECKED (restricted; do not probe or disclose the path)", policy)
         self.assertIn("instruction-only preflight guard", attribution)
 
+    def test_report_redacts_sensitive_paths_and_example_never_claims_nas_evidence(self):
+        text = SKILL.read_text(encoding="utf-8")
+        response = text.split("## Response", 1)[1].split("## Safety", 1)[0]
+        self.assertIn("display only `[restricted item]`", response)
+        self.assertIn("never echo its original name", response)
+        example = response.split("## Illustrative result", 1)[1]
+        for phrase in ("synthetic scenario, NOT an actual NAS scan", "NOT_CHECKED, not MISSING",
+                       "truncated", "VERSION_REVIEW", "NEEDS_REVIEW", "not READY",
+                       "not a real file-agent reference"):
+            self.assertIn(phrase, example)
+        self.assertNotIn("secret", example.lower())
+
     def test_no_placeholders(self):
         for p in DIR.rglob("*.md"):
             self.assertIsNone(re.search(r"\b(?:TODO|TBD|FIXME|PLACEHOLDER)\b", p.read_text(), re.I))

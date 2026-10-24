@@ -251,6 +251,24 @@
       "no_new_external_sdk_execution": true,
       "incremental_spend_krw": 0,
       "actual_work_hours": null
+    },
+    {
+      "scope_id": "G13_JUDGING_VALUE_AND_RESTRICTED_PATH_REPORT",
+      "status": "SOURCE_CI_PENDING",
+      "master_days": [
+        "UGR-D11_PARTIAL",
+        "UGR-D16_PARTIAL",
+        "UGR-D17_PARTIAL"
+      ],
+      "report": "docs/architecture/G13_ROUND1_JUDGE_REPORT_SAMPLE_20261024.md",
+      "source": "skill/projectready-nas/SKILL.md",
+      "test": "tests/test_skill_candidate.py",
+      "new_regressions": 1,
+      "official_creator_usage": "NOT_EVIDENCED",
+      "official_validator": "NOT_RUN",
+      "nas": "NOT_RUN",
+      "devpost": "NOT_SUBMITTED",
+      "actual_work_hours": null
     }
   ],
   "overall_project_completion_percent": null,

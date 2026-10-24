@@ -419,7 +419,7 @@
     "words": 351,
     "round1_submission_gate": "NOT_APPROVED_FOR_SUBMISSION"
   },
-  "next_action_priority": "G12_OWNER_LOCAL_CODEX_OFFICIAL_CREATOR_GENERATION_PLUS_REVIEW; NO_RELEASE_BEFORE_IP_APPROVAL",
+  "next_action_priority": "G13_CI_ARTIFACT_AND_HANDOFF_CLOSURE_THEN_G12_ACTUAL_OFFICIAL_CREATOR_CODEX_GENERATION",
   "g11_round1_disclosure_parity": {
     "date_kst": "2026-10-24",
     "status": "OFFLINE_VERIFIED_ONE_PAGE_VISUAL_PASS",
@@ -488,5 +488,24 @@
     "actual_hours": null,
     "sdk_archive_sha256_prior_public": "cf557e5a022e4297892f39768132855154232efdedeb726b2845450ccd70e1b3",
     "new_code_or_offline_tests": 0
+  },
+  "g13_judge_sample_redaction": {
+    "date_kst": "2026-10-24",
+    "status": "SOURCE_PUSH_PENDING_CI",
+    "rubric_primary_url": "https://ugreenhackathon.devpost.com/rules",
+    "official_rubric_equal_weights": 4,
+    "report": "docs/architecture/G13_ROUND1_JUDGE_REPORT_SAMPLE_20261024.md",
+    "skill": "skill/projectready-nas/SKILL.md",
+    "test": "tests/test_skill_candidate.py",
+    "new_tests": 1,
+    "changes": "SYNTHETIC example evidence+no false MISSING+version review+human next action, fail-closed restricted item path redaction in Response",
+    "pdf_source_changed": false,
+    "official_creator_usage": "NOT_EVIDENCED",
+    "official_checker": "NOT_RUN",
+    "nas": "NOT_RUN",
+    "devpost": "NOT_SUBMITTED",
+    "participant_approval": "PENDING",
+    "actual_hours": null,
+    "incremental_spend_krw": 0
   }
 }

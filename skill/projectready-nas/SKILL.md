@@ -23,7 +23,16 @@ Use when the owner asks whether a specific project-delivery folder contains an e
 7. Read [disclosures and data-flow boundaries](references/attribution.md), including AI tools, external components, unresolved Uliya model processing and missing official SDK license/validator evidence. Do not describe this provisional skill as NAS-certified.
 
 ## Response
-Report the authorized folder, each mandatory path, PRESENT/MISSING/NOT_CHECKED status and observed source reference, version concerns, listing completeness, permission and privacy gaps, final READY/BLOCKED/NEEDS_REVIEW status, and the precise human review needed. If no result appears, state the searched scope and whether the scan was complete, then stop.
+Report the authorized nonsensitive folder, each **permitted** required path, PRESENT/MISSING/NOT_CHECKED status and its actual observed source reference, version concerns, listing completeness, permission and privacy gaps, final READY/BLOCKED/NEEDS_REVIEW status, and the precise human review needed. For a restricted checklist item or incidentally listed sensitive path, display only `[restricted item]` plus NOT_CHECKED; never echo its original name in the report, logs, citations or human follow-up prompt. If no result appears, state the authorized nonsensitive scope and whether the scan was complete, then stop.
+
+## Illustrative result (synthetic scenario, NOT an actual NAS scan)
+- Authorized sample folder: `/demo-handoff`; required: `brief.pdf`, `handoff.pdf`, one owner-confirmed final artwork.
+- `brief.pdf`: **PRESENT** — only because the *hypothetical* Files Agent returned `synthetic:item-1` inside the authorized folder.
+- `handoff.pdf`: **NOT_CHECKED**, not MISSING — the *hypothetical* folder listing was truncated, so absence cannot be proved.
+- Artwork: **VERSION_REVIEW** — two *hypothetical* candidates `art-v2.png` and `art-final.png`; no trustworthy final-version approval exists.
+- Completeness: **NOT_VERIFIED**; file permissions/content privacy: **NOT_CHECKED**.
+- **Overall: NEEDS_REVIEW** (not READY). Next owner steps: approve the authoritative artwork version, grant an authorized complete rescan for `handoff.pdf`, and separately review any required privacy/permissions evidence. Never infer confirmation from names.
+- This sample is invented for explanation; `synthetic:*` is **not a real file-agent reference or command syntax**. On a real run, only actually observed and authorized references may appear in output.
 
 ## Safety
 No mutation or external sharing is authorized by this Skill. Ask the user for explicit consent before any high-risk action, even if a tool offers it. Do not declare READY with unresolved mandatory checks, guessed versions, unverifiable tool output, or privacy marked NOT_CHECKED.
