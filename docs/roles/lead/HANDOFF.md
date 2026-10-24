@@ -54,3 +54,10 @@
 - 작업자는 자기 feature 브랜치에 증거·TO_UGREEN_LEAD.md의 DONE_FOR_REVIEW 또는 BLOCKED 보고만 작성, 리드·다른 브랜치 수정 금지. **총괄이 원격 SHA와 증거를 검수/수락한 뒤 새 ID/REVISION을 READY로 게시**할 때만 다음 역할로 전환.
 - 시작 지침: [공통 작업자 입문](../../WORKER_START_HERE.md) / [현재 작업](../../dispatcher/CURRENT_TASK.md) / [예정 업무](../../dispatcher/BACKLOG.md) / [검수 규약](DISPATCH_PROTOCOL.md). 이 최신 운영 규칙이 이전 '3개 독립 채팅' 및 '세 명 동시 작업' 문구보다 우선한다.
 - 기술 개발/SDK 실검증·CI/NAS·Devpost 제출은 아직 완료되지 않았다. UGREEN 11/10 조기 제출, 11/16 16:45 KST 공식 마감, 신규 현금 비용 0원 목표 유지. GitHub 문서만으로 AI 채팅 자동 실행·통지/잠금 기능을 제공하지 않는다.
+
+
+## 2026-10-24 KST — Live lead turn: official Round 1 acceptance gate audited
+- Read official Rules and Starter Kit public guidance, plus central command-center `AGENTS.md` and `START_HERE.md`. Created `docs/roles/lead/ROUND1_COMPLIANCE_AUDIT_20261024.md` to fix submission acceptance criteria and identify uncertain numerical packaging caps. This is planning/compliance evidence **only**, not product validation.
+- Official public references: https://ugreenhackathon.devpost.com/rules ; https://ai.ugreen.com/pages/hackathon-starter-kit . ZIP must be limited to `SKILL.md` and directly linked Markdown references; avoid illustrative README in submitted package; confirm exact UGOS CLI from downloaded official archive under UGR-001.
+- UGR-001 still READY/REV1/feature/missing-files; neither DONE_FOR_REVIEW/BLOCKED report nor SDK_CAPABILITY_MATRIX exists on worker branch. Do not advance UGR-002 before worker result, lead review and G2 gate. No new branch, no changed work dispatch.
+- Tests: remote GitHub/document existence/source cross-check only; app/CLI/NAS/CI tests **0 and unverified**. No Production service (N/A). Expenses KRW 0 incremental. Commit created by GitHub connector must be validated against lead branch remote SHA in same turn.

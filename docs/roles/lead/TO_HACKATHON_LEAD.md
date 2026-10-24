@@ -65,3 +65,10 @@
 - 작업자 결과는 자기 브랜치 TO_UGREEN_LEAD에 TASK_ID·SHA·테스트/미검증 기재, 총괄이 직접 검수한 뒤에만 차기 Task를 게시. 자동 실행/실시간 동기화/자동 잠금 없음.
 - GitHub의 3 feature 및 main 브랜치, 통합 총괄 저장소는 수정하지 않음. 이번 변경은 lead/ugreen의 문서·작업 할당 체계만. Skill 구현/CLI 확인·CI/실 NAS·Devpost 제출은 미검증.
 - 11/10 내부 제출 목표, 11/16 16:45 KST 공식 마감, 추가 현금 지출 0원 목표 유지.
+
+
+## 2026-10-24 KST — New lead compliance review (no worker completion)
+- UGREEN lead independently checked public official contest Rules and Starter Kit guide. Evidence file: `docs/roles/lead/ROUND1_COMPLIANCE_AUDIT_20261024.md` on lead/ugreen. Main findings: R1 PDF ten answers <=500 substantive English words; submit ZIP SKILL.md + direct-linked references Markdown only, <=10 MB; first round does not require NAS runtime/demo/video. Read-only delivery readiness and supported official expert-agent/CLI limits preserved.
+- Starter Kit sample generator folder recommends README, but avoid packing it in stricter Round 1 ZIP. Previous PDF 1MB, uncompressed ZIP 10MB, per-file 1MB and <=100 files remain conservative project checks, not independently verified in public Rules here.
+- Active dispatcher unchanged UGR-001 REV1 READY; feature/missing-files report initial, capability matrix absent. Other two feature reports initial. No implementation/CI/NAS/Devpost final submission. Official deadline Nov 16 16:45 KST, internal Nov 10; new paid spending 0.
+- Lead next: inspect UGR-001 official archive/CLI evidence, then G2 contract. This review must not be represented as completed SDK investigation.

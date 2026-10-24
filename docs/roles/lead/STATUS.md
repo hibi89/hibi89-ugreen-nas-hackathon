@@ -54,3 +54,10 @@
 - 작업자는 자기 feature 브랜치에 증거·TO_UGREEN_LEAD.md의 DONE_FOR_REVIEW 또는 BLOCKED 보고만 작성, 리드·다른 브랜치 수정 금지. **총괄이 원격 SHA와 증거를 검수/수락한 뒤 새 ID/REVISION을 READY로 게시**할 때만 다음 역할로 전환.
 - 시작 지침: [공통 작업자 입문](../../WORKER_START_HERE.md) / [현재 작업](../../dispatcher/CURRENT_TASK.md) / [예정 업무](../../dispatcher/BACKLOG.md) / [검수 규약](DISPATCH_PROTOCOL.md). 이 최신 운영 규칙이 이전 '3개 독립 채팅' 및 '세 명 동시 작업' 문구보다 우선한다.
 - 기술 개발/SDK 실검증·CI/NAS·Devpost 제출은 아직 완료되지 않았다. UGREEN 11/10 조기 제출, 11/16 16:45 KST 공식 마감, 신규 현금 비용 0원 목표 유지. GitHub 문서만으로 AI 채팅 자동 실행·통지/잠금 기능을 제공하지 않는다.
+
+
+## 2026-10-24 KST — New lead public-rule submission audit
+- Independently reviewed Devpost official Rules and official UGREEN Starter Kit *web pages*, and wrote `docs/roles/lead/ROUND1_COMPLIANCE_AUDIT_20261024.md`. This is **official public-source compliance review only**, NOT downloaded SDK internals or CLI/NAS tests.
+- Important precedence: Starter Kit section 5 example suggests README in generation folder; Round 1 ZIP package should be constrained to `SKILL.md` plus directly linked `references/*.md` per Rules. PDF ten answers <=500 substantive English words; ZIP <=10 MB. Prior PDF 1MB and unpacked/file count caps retained as conservative local checks but were **not independently established from public Rules** in this review.
+- Fresh remote refs before writing: lead `3f193407b03691e371da3914f7e6710286c22961`; missing-files `9b3052bf82ad1a8a4844b1aeee699c0b759251dc`; version-conflicts `f1aaf9f28800c9fb563d846622583314f6be6c85`; privacy `cbd7f2ac866ad338d2006dcc1337a5c44f029423`; main `d8cd806cb2b3842a80a571fd09910ec370e2de17`.
+- UGR-001 REV1 **READY, worker unstarted**; capability matrix file absent. No dispatch change, no product implementation/tests/CI, no Devpost submission. Next: worker publishes official archive/CLI matrix on feature/missing-files; lead reviews before G2.
