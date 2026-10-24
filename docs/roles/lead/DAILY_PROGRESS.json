@@ -366,6 +366,19 @@
       "incremental_spend_krw": 0,
       "test_claim": "219/219 synthetic and offline PASS on commit 1ce2f9a, 8 new tests; official Creator output not used",
       "ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40091570530"
+    },
+    {
+      "scope_id": "G20_REAL_UPLOADED_REVIEW_ZIP_INDEPENDENT_AUDIT",
+      "status": "SOURCE_HASH_AND_ZIP_INTEGRITY_VERIFIED_OFFICIAL_CHECKER_NOT_INDEPENDENTLY_RERUN",
+      "evidence": "docs/submission/G20_UPLOADED_REVIEW_ZIP_INDEPENDENT_AUDIT_20261024.md",
+      "generated_skill_sha256_verified": "e1b071666b836cc464147821d7823bc3061c757434697d9a64250d4a9abd5b4a",
+      "official_checker_attached_json": "static-pass_errors_0_warnings_0",
+      "design_gate": "BLOCKED_P1_DELEGATE_INSTRUCTION_MUST_BE_SELF_CONTAINED_WITH_USER_AUTHORIZED_INPUTS",
+      "source_original_unchanged": true,
+      "human_approval": "PENDING",
+      "live_nas": "NOT_RUN",
+      "devpost": "NOT_SUBMITTED",
+      "actual_work_hours": null
     }
   ],
   "overall_project_completion_percent": null,

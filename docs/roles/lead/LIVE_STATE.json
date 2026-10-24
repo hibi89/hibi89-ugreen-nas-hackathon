@@ -419,7 +419,7 @@
     "words": 351,
     "round1_submission_gate": "NOT_APPROVED_FOR_SUBMISSION"
   },
-  "next_action_priority": "G18_GET_LOCAL_GENERATED_SKILL_MD_BYTES_OR_OWNER_APPROVED_SANITIZED_FEATURE_BRANCH; HASH_AND_SECURITY_AUDIT; REBUILD_APPROVED_PDF_ZIP; NO_DEVPOST_OR_SKILLHUB_AUTOPUBLISH",
+  "next_action_priority": "G20_FIX_DYNAMIC_SELF_CONTAINED_FILE_AGENT_AND_DOCUMENT_AGENT_DELEGATION_WITH_SCOPE_CHECKLIST_CANDIDATE_PATTERNS_EXACT_REFERENCES_AND_QUERY; RERUN_OFFICIAL_CODEX_CHECKER; RE-UPLOAD_NEW_SKILL_SHA; UPDATE_PDF_Q8_AFTER_APPROVAL; NO_AUTO_PUBLISH_OR_SUBMIT",
   "g11_round1_disclosure_parity": {
     "date_kst": "2026-10-24",
     "status": "OFFLINE_VERIFIED_ONE_PAGE_VISUAL_PASS",
@@ -601,8 +601,8 @@
     "checker_warnings": 0,
     "generated_rel_path": "projectready-nas-official/projectready-nas/SKILL.md",
     "reported_sha256": "e1b071666b836cc464147821d7823bc3061c757434697d9a64250d4a9abd5b4a",
-    "actual_generated_bytes_reviewed": false,
-    "hash_independently_verified": false,
+    "actual_generated_bytes_reviewed": true,
+    "hash_independently_verified": true,
     "existing_original_modified": false,
     "official_archive_sha256": "cf557e5a022e4297892f39768132855154232efdedeb726b2845450ccd70e1b3",
     "vendor_skill_sha256": "7a69238f3737e5686b4f6da74c9214e4655627821d13ce7d574787656713bd17",
@@ -633,5 +633,25 @@
     "master_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40091570583",
     "handoff_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40091570555",
     "draft_bundle_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40091570581"
+  },
+  "g20_uploaded_zip_independent_audit": {
+    "received_at_kst": "2026-10-24T20:51:00+09:00",
+    "real_uploaded_review_zip_sha256": "f85a07b3dfb73602abe1f6897aa6cbce9ed5c2eb8047c5f27fe465ceeaac0e86",
+    "generated_skill_sha256_verified": "e1b071666b836cc464147821d7823bc3061c757434697d9a64250d4a9abd5b4a",
+    "source_bytes_received_and_independently_reviewed": true,
+    "zip_entry_count": 3,
+    "zip_safety_pass": true,
+    "report_sha256_verified": "2e5e22f327e78738c095d4cce4c9c7385fdbc15e4a5304e5b12f0a651ad9ee4a",
+    "checker_json_sha256_verified": "de19ea9c7518ea0ef8f46d391ccc19cf616e31d9fa340630ea4d300466af9431",
+    "checker_json_claim": "static-pass (0 errors,0 warnings)",
+    "checker_actual_execution": "CODEX_REPORTED_NOT_INDEPENDENTLY_RERUN",
+    "independent_design_review": "P1_MISSING_SELF_CONTAINED_DELEGATION_SCOPE_AND_PARAMETERS",
+    "preexisting_submission_pdf": "Q8_STALE_AFTER_LOCAL_OFFICIAL_CREATOR_CHECK",
+    "original_skill_modified": false,
+    "devpost": "NOT_SUBMITTED",
+    "skillhub": "NOT_PUBLISHED",
+    "nas": "NOT_RUN",
+    "human_release_approval": "PENDING",
+    "report": "docs/submission/G20_UPLOADED_REVIEW_ZIP_INDEPENDENT_AUDIT_20261024.md"
   }
 }

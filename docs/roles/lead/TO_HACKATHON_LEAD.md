@@ -1,3 +1,5 @@
+> **[G20 2026-10-24 20:51 KST 검수 ZIP 실물 독립검증](docs/submission/G20_UPLOADED_REVIEW_ZIP_INDEPENDENT_AUDIT_20261024.md)**: 참가자가 직접 업로드한 실제 `ProjectReady_OFFICIAL_REVIEW.zip`과 3개 포함 파일의 SHA256/ZIP 안전성 모두 일치. 신규 `projectready-nas/SKILL.md` 7,345B SHA256 `e1b071666b836cc464147821d7823bc3061c757434697d9a64250d4a9abd5b4a` **독립 확인**. 첨부 공식 checker JSON은 `static-pass` 오류0/경고0이며 대상 파일 SHA 일치(실제 checker 실행 자체는 Codex 보고). **보완 P1:** 하위 expert delegate 명령에 실제 승인 폴더/필수 체크리스트/후보 패턴·승인된 파일 참조/질문 값을 삽입해 **자기완결형 위임 지시**가 되도록 명확히 구현한 뒤 공식 검사 재실행. 예선 PDF Q8의 '공식 validator 미실행' 표현도 새 후보 적용 시 정정. 검수용 ZIP ≠ Devpost 제출 ZIP. 실 NAS·Agent·권리 승인·최종 제출은 아직 미완료, 기존 GitHub Skill 불변.
+
 ## G19 CI 검증 답신 — IMPLEMENTED_VERIFIED (2026-10-24 KST)
 - 실제 GitHub source 1ce2f9a의 오프라인 **219/219 PASS** (run 40091570530), MASTER/인수인계/기존 PDF-ZIP 초안 workflow 3건도 SUCCESS. 총괄 지시 P0 수용.
 - 참가자 Codex 공식 Creator 사용/정적 checker 0/0 성공은 참가자 보고만; 신규 SKILL.md 실물 미접수라 실제 해시·문서·상대 참조·권리·데이터 흐름 독립 미검증. 기술 테스트의 PASS를 제출 적격성 승인으로 간주하지 않음.
