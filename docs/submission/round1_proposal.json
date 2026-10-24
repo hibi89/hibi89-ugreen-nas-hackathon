@@ -65,14 +65,28 @@
     "data_flow": "No customer NAS data has been accessed. Future owner-scoped NAS reading requires installed Agent, permission, and local/cloud processing verification."
   },
   "proof_status": {
-    "offline_source_sha": "d3a2e870b8438576041c1ed7595d03eb3e2733d2",
-    "offline_ci_url": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40074746061",
-    "offline_test_count": 174,
+    "offline_source_sha": "a4a1dcd6945907c74e7edfb9ca0ecc0d2bab2388",
+    "offline_ci_url": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40085820724",
+    "offline_test_count": 211,
+    "proposal_skill_preview": {
+      "status": "DRAFT_TECHNICAL_PREVIEW_ONLY",
+      "built_workflow_url": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40082152962",
+      "artifact_id": 12555447981,
+      "pdf_pages": 1,
+      "pdf_bytes": 5038,
+      "pdf_sha256": "1a2f4614d1c8eecf319db15bf31a9cca80d70764c8b4ed4a9faa55b582218006",
+      "skill_zip_markdown_members": 4,
+      "skill_zip_bytes": 7097,
+      "skill_zip_sha256": "a7646dfa127491e79c86b48c78d24092c242cfc15ffe394bbf136853a16fbaae"
+    },
+    "official_creation_tool": "NOT_EVIDENCED",
     "official_validator": "NOT_RUN",
     "nas": "NOT_RUN",
+    "participant_approval": "PENDING",
+    "rights_and_license": "NOT_CLEARED",
     "devpost": "NOT_SUBMITTED"
   },
-  "notes": "The ten question texts now match official Devpost Rule 4 / Round 1 (2026-10-24 review). Existing draft PDF from prior commit is STALE; regenerate before any upload. Not submitted. License, participant review, NAS and official checker remain outstanding.",
+  "notes": "Technical draft PDF/Skill ZIP from GitHub Actions run 40082152962 was inspected against byte-level SHA manifests: one-page 5,038-byte PDF and 4-Markdown 7,097-byte ZIP. This preview is current for the checked-in proposal answers and Skill source as of 2026-10-24, before any official-creator-generated output is merged; rebuild after substantive changes. Official UGOS creator actual Skill generation NOT_EVIDENCED. License/IP, participant editorial review, approval and Devpost submission remain outstanding. Official checker and NAS runtime NOT_RUN.",
   "official_question_text_verified": true,
   "official_question_source": "https://ugreenhackathon.devpost.com/rules"
 }
