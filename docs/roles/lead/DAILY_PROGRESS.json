@@ -537,5 +537,15 @@
     "devpost": "NOT_SUBMITTED",
     "changes_to_daily_completion": false,
     "actual_hours": null
+  },
+  "g25_pdf_export_correction": {
+    "date_kst": "2026-10-24",
+    "type": "ARTIFACT_DELIVERY_SHA_CORRECTION_NO_FEATURE_PROGRESS",
+    "source_pdf_sha256": "df071504716c6121e7606cc1178ba7a3fdaa38856c3482b1b0864fc554088f80",
+    "pdf_export_fix": "ZIP_CONTAINING_ORIGINAL_BYTES_VERIFIED",
+    "official_checker": "NOT_RUN",
+    "license": "NOT_CLEARED",
+    "devpost": "NOT_SUBMITTED",
+    "actual_hours": null
   }
 }
