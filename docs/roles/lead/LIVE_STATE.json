@@ -97,9 +97,9 @@
     "corrective_commit_sha": "4b6904224df8ab9ede913ec6e79787b61d941baa",
     "passed_guard_run_id": 40067647144
   },
-  "last_ci_verified_code_sha": "c02b8d24f57732b99af56280cc430374a8bc212c",
+  "last_ci_verified_code_sha": "d82541c38dfda2f966049bf2872755f976de63d3",
   "repository_regression_tests_passed": 211,
-  "repository_regression_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40083630790",
+  "repository_regression_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40085452321",
   "closeout_sync_ci_status": "PASS",
   "closeout_sync_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40080489079",
   "early_skill_candidate": {
@@ -419,7 +419,7 @@
     "words": 351,
     "round1_submission_gate": "NOT_APPROVED_FOR_SUBMISSION"
   },
-  "next_action_priority": "G15_OFFICIAL_ARCHIVE_EPHEMERAL_COPY_SMOKE_VERIFICATION; THEN_OWNER_RUN_REAL_SUPPORTED_CODEX_CREATOR",
+  "next_action_priority": "BLOCKED_EXTERNAL_USER_WIN_POWERSHELL_TO_INSTALL_OFFICIAL_CREATOR_THEN_CODEX_ACTUAL_GENERATION; NO_MORE_SYNTHETIC_WORK",
   "g11_round1_disclosure_parity": {
     "date_kst": "2026-10-24",
     "status": "OFFLINE_VERIFIED_ONE_PAGE_VISUAL_PASS",
@@ -569,7 +569,7 @@
   },
   "g15_official_codex_preparation": {
     "date_kst": "2026-10-24",
-    "status": "SOURCE_AND_CI_PENDING",
+    "status": "EPHEMERAL_FIRST_PARTY_ZIP_COPY_CI_VERIFIED_OWNER_ACTION_REQUIRED",
     "source": "tools/prepare_ugos_codex_kit.ps1",
     "workflow": ".github/workflows/ugos-kit-codex-prep.yml",
     "report": "docs/architecture/G15_OWNER_CODEX_OFFICIAL_TOOL_PREP_20261024.md",
@@ -583,6 +583,13 @@
     "devpost": "NOT_SUBMITTED",
     "new_offline_python_tests": 0,
     "incremental_spend_krw": 0,
-    "actual_hours": null
+    "actual_hours": null,
+    "source_sha": "d82541c38dfda2f966049bf2872755f976de63d3",
+    "workflow_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40085452383",
+    "workflow_result": "PASS_SHA256_AND_COPIED_OFFICIAL_SKILL_FOLDER_AND_OVERWRITE_BLOCKED_AND_EPHEMERAL_CLEANUP",
+    "offline_ci": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40085452321",
+    "offline_tests_passed": 211,
+    "master_ci": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40085452312",
+    "handoff_ci": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40085452304"
   }
 }

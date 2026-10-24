@@ -1,3 +1,6 @@
+## G15 verified 2026-10-24 — owner action remains
+- Source d82541c38dfda2f966049bf2872755f976de63d3: official kit copy CI 40085452383 PASS, offline suite 211/211 CI 40085452321 PASS, master CI 40085452312 PASS and handoff CI 40085452304 PASS. Vendor archive hash matched; ephemeral Codex copy and overwrite refusal verified; no vendor code run. Official tool-guided entrant Skill creation has NOT happened; rights review and entrant approval pending, no Devpost submission. Supervisor P0 accepted, exact local Codex procedure in G12/G15. Other 24-day states unchanged.
+
 ## G15 2026-10-24 — first-party UGREEN kit safe local Codex setup (CI PENDING)
 - New tools/prepare_ugos_codex_kit.ps1 verifies previously proven official ZIP SHA before extracting, protects unsafe ZIP paths/symlinks, requires opt-in Codex install and refuses overwrite. New .github/workflows/ugos-kit-codex-prep.yml tests only copying in ephemeral runner, no vendor scripts or owner data. Evidence: docs/architecture/G15_OWNER_CODEX_OFFICIAL_TOOL_PREP_20261024.md.
 - Official Creator Skill generation NOT_EVIDENCED; actual checker/NAS NOT_RUN, rights/signoff PENDING, Devpost NOT_SUBMITTED. No package/PDF change. 24-day 2 DONE/12 PARTIAL/3 BLOCKED/7 NOT_STARTED. Original Oct24 100%/0h scheduled remaining, actual hours NOT_MEASURED; next G1 Oct25 1.5h base+1.5h reserve, ETA unknown; 0 KRW cost.

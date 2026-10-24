@@ -314,7 +314,7 @@
     },
     {
       "scope_id": "G15_OFFICIAL_CODEX_SKILL_TOOL_PREPARATION",
-      "status": "SOURCE_CI_PENDING",
+      "status": "FIRST_PARTY_ARCHIVE_SETUP_CI_VERIFIED_OWNER_CREATION_PENDING",
       "master_days": [
         "UGR-D02_BLOCKED",
         "UGR-D03_BLOCKED",
@@ -328,7 +328,12 @@
       "official_checker": "NOT_RUN",
       "real_nas": "NOT_RUN",
       "devpost": "NOT_SUBMITTED",
-      "actual_work_hours": null
+      "actual_work_hours": null,
+      "verified_source_sha": "d82541c38dfda2f966049bf2872755f976de63d3",
+      "kit_smoke_ci": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40085452383",
+      "offline_ci": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40085452321",
+      "offline_tests_passed": 211,
+      "owner_creator_status": "NOT_EVIDENCED"
     }
   ],
   "overall_project_completion_percent": null,
