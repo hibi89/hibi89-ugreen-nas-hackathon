@@ -1,0 +1,74 @@
+name: G37 G36-matched owner-review Round1 PDF ZIP (NOT SUBMITTED)
+on:
+  push:
+    branches: ["lead/ugreen"]
+    paths:
+      - "tools/round1_g37_release_parity.py"
+      - "tests/test_round1_g37_release_parity.py"
+      - ".github/workflows/g37-round1-owner-review.yml"
+      - "docs/submission/checker_inputs/G36_20261026/projectready-nas/SKILL.md"
+      - "docs/submission/evidence/G36_FIRST_PARTY_STATIC_PASS_20261026.json"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  g37-parity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install PDF-only independent test and renderer dependencies
+        run: python -m pip install "reportlab>=4,<5" "pypdf>=6,<7" "PyMuPDF>=1.25,<2"
+      - name: G37 exact-source and fail-closed regressions
+        run: python -m unittest discover -s tests -p test_round1_g37_release_parity.py -v
+      - name: Generate separate owner-review PDF ZIP and manifest
+        run: python tools/round1_g37_release_parity.py --output-dir "$RUNNER_TEMP/g37-preview"
+      - name: Independently audit PDF and exact single-entry ZIP bytes and manifest
+        run: |
+          python - "$RUNNER_TEMP/g37-preview" <<'PY'
+          import hashlib, json, pathlib, sys, zipfile
+          d=pathlib.Path(sys.argv[1])
+          m=json.loads((d/"ProjectReady_G37_Manifest.json").read_text())
+          zp=d/"ProjectReady_G37_G36_Skill_OWNER_REVIEW_NOT_SUBMITTED.zip"
+          pp=d/"ProjectReady_G37_Round1_OWNER_REVIEW_NOT_SUBMITTED.pdf"
+          assert m["devpost"]=="NOT_SUBMITTED" and m["human_entrant_approval"]=="PENDING"
+          assert m["official_checker"]=="G36_FIRST_PARTY_STATIC_PASS_EXACT_SHA_ONLY"
+          assert m["proposal_answer_words"]<=500
+          assert m["pdf"]["pages"]==1
+          assert m["pdf"]["sha256"]==hashlib.sha256(pp.read_bytes()).hexdigest()
+          assert m["skill_zip_sha256"]==hashlib.sha256(zp.read_bytes()).hexdigest()
+          assert pp.stat().st_size<=1000000 and zp.stat().st_size<=10000000
+          with zipfile.ZipFile(zp) as z:
+              assert z.namelist()==["projectready-nas/SKILL.md"]
+              skill=z.read("projectready-nas/SKILL.md")
+          assert hashlib.sha256(skill).hexdigest()==m["candidate_skill_sha256"]
+          assert skill==pathlib.Path(
+              "docs/submission/checker_inputs/G36_20261026/projectready-nas/SKILL.md"
+          ).read_bytes()
+          assert m["candidate_skill_sha256"]=="e4e45dea7f2ca22a37c2c3803ed12d6b9914c7ca4686d9b891976ba1481610a4"
+          import fitz
+          doc=fitz.open(pp)
+          assert len(doc)==1
+          page=doc[0]
+          blocks=[b for b in page.get_text("blocks") if len(b)>=5 and str(b[4]).strip()]
+          assert len(blocks)>=12
+          assert all(b[0]>=0 and b[1]>=0 and b[2]<=page.rect.width and b[3]<=page.rect.height for b in blocks)
+          pix=page.get_pixmap(matrix=fitz.Matrix(2,2), alpha=False)
+          assert pix.width>1100 and pix.height>1600
+          (d/"ProjectReady_G37_Round1_PREVIEW.png").write_bytes(pix.tobytes("png"))
+          print("G37 PDF PAGE BOUNDARY + PNG RENDER PASS",len(blocks),pix.width,pix.height)
+          print(json.dumps(m,ensure_ascii=False))
+          print("G37 INDEPENDENT PDF AND ZIP BYTE PARITY PASS; NOT SUBMITTED")
+          PY
+      - name: Upload owner-review artifacts without submission
+        uses: actions/upload-artifact@v4
+        with:
+          name: G37-G36-EXACT-OWNER-REVIEW-NOT-SUBMITTED
+          path: ${{ runner.temp }}/g37-preview/*
+          retention-days: 7
+          if-no-files-found: error
