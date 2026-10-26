@@ -132,7 +132,8 @@ jobs:
           r=json.load(open("g36-evidence/G36_SANITIZED_CHECKER_RESULT.json",encoding="utf-8"))
           assert r["checker_exit_code"]==0, "Official checker non-zero exit"
           assert r["checker_result_status"]=="static-pass", "Official checker did not report static-pass"
-          assert r["checker_summary"]=={"errors":0,"warnings":0,"info":0}, "Diagnostics not clean"\n          assert not r["diagnostics_codes"] and not r["stderr_present"], "Unverified checker diagnostics"
+          assert r["checker_summary"]=={"errors":0,"warnings":0,"info":0}, "Diagnostics not clean"
+          assert not r["diagnostics_codes"] and not r["stderr_present"], "Unverified checker diagnostics"
           print("EXACT_G36_FIRST_PARTY_STATIC_PASS; REAL_NAS_NOT_RUN")
           PY
       - name: Remove downloaded vendor kit; never upload or commit vendor scripts
