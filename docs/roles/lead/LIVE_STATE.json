@@ -25,10 +25,10 @@
     "sdk_gate_distinct": true
   },
   "next_work": {
-    "id": "G40-OWNER_LICENSE_AND_CREATOR-EVIDENCE_RESOLUTION",
+    "id": "G40-VERIFY-CHAIN-CI-AND-PREPARE-OWNER-ONLY-EVIDENCE",
     "scheduled_kst": "2026-10-26",
-    "status": "BLOCKED_EXTERNAL_LICENSE_AND_ENTRANT_CONFIRMATION",
-    "scope": "Use G39 dossier to seek owner-selected official kit license/terms clarification and confirm private original Codex Creator generation evidence and entrant personal ownership/AI disclosure. Preserve G36 and G37 SHA; rebuild if owner edits. No outbound contact or Devpost/SkillHub submission without explicit instructions.",
+    "status": "CI_PENDING_PLUS_EXTERNAL_HOLD",
+    "scope": "Read G40 exact Git G20/G36/G37/G39 lineage checker run; if passes, persist verified status. Do not equate source hash check with participant Codex Creator invocation, license grant, legal rights or entrant approval. Preserve artifact hashes; do not submit or contact UGREEN.",
     "planned_hours": 0,
     "separate_reserve_hours": 0,
     "actual_completion_eta_hours": null
@@ -1049,5 +1049,19 @@
     "rights_clearance": "PENDING",
     "entrant_consent": "NOT_GIVEN",
     "devpost": "NOT_SUBMITTED"
+  },
+  "g40_creator_license_chain": {
+    "report": "docs/submission/G40_VERIFIED_GITHUB_CREATOR_CHAIN_20261026.md",
+    "evidence": "docs/submission/evidence/G40_CREATOR_CHAIN_STATUS_20261026.json",
+    "creator_review_commit": "7af2cb750b37826fb02a00e2d45cb73f3a85c239",
+    "review_sha256": "164e84fe2fd8bc14e421b5469cc862aa4971f71c9b46aea08cc2f281c7229ead",
+    "g36_sha256": "e4e45dea7f2ca22a37c2c3803ed12d6b9914c7ca4686d9b891976ba1481610a4",
+    "current_g37_artifacts_unchanged": true,
+    "workflow": ".github/workflows/g40-creator-provenance-gate.yml",
+    "ci_status": "PENDING",
+    "license_rights": "NOT_CLEARED",
+    "creator_local_invocation": "PARTICIPANT_REPORTED_NOT_REPLAYED",
+    "release": "HOLD_EXTERNAL_OWNER_LICENSE_REVIEW",
+    "submission": "NOT_SUBMITTED"
   }
 }

@@ -808,5 +808,20 @@
     "g1_base_hours": 1.5,
     "g1_reserve_hours": 1.5,
     "actual_elapsed_hours": null
+  },
+  "g40_2026_10_26": {
+    "technical_scope": "GIT_CREATOR_SOURCE_G20_G36_G37_G39_EVIDENCE_CHAIN",
+    "source_review_commit": "7af2cb750b37826fb02a00e2d45cb73f3a85c239",
+    "source_review_sha256": "164e84fe2fd8bc14e421b5469cc862aa4971f71c9b46aea08cc2f281c7229ead",
+    "workflow": "G40_STAGED_CI_PENDING",
+    "license": "NOT_CLEARED",
+    "creator_replay": false,
+    "owner_approval": "NOT_GIVEN",
+    "nas": "NOT_RUN",
+    "devpost": "NOT_SUBMITTED",
+    "g1_pct": 0,
+    "base_remaining_h": 1.5,
+    "reserve_remaining_h": 1.5,
+    "actual_h": null
   }
 }

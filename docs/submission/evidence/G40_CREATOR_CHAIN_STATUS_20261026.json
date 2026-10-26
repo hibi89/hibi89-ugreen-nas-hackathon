@@ -1,0 +1,11 @@
+{
+  "date_kst": "2026-10-26",
+  "status": "G40_STAGE_PENDING_CI",
+  "pinned_review_commit": "7af2cb750b37826fb02a00e2d45cb73f3a85c239",
+  "pinned_review_skill_sha256": "164e84fe2fd8bc14e421b5469cc862aa4971f71c9b46aea08cc2f281c7229ead",
+  "g36_skill_sha256": "e4e45dea7f2ca22a37c2c3803ed12d6b9914c7ca4686d9b891976ba1481610a4",
+  "official_kit_license": "NOT_IDENTIFIED",
+  "creator_local_execution": "PARTICIPANT_REPORTED",
+  "owner_approval": "NOT_GIVEN",
+  "devpost": "NOT_SUBMITTED"
+}

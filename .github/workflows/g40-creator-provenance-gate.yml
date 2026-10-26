@@ -1,0 +1,37 @@
+name: G40 verify historical creator-source and checker lineage, no release
+on:
+  push:
+    branches: ["lead/ugreen"]
+    paths:
+      - "tools/g40_provenance_evidence.py"
+      - "tests/test_g40_provenance_evidence.py"
+      - ".github/workflows/g40-creator-provenance-gate.yml"
+      - "docs/submission/evidence/G39_OFFICIAL_LICENSE_AND_CREATOR_PROVENANCE_20261026.json"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  artifact-lineage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Review five fail-closed provenance regressions
+        run: python -m unittest discover -s tests -p test_g40_provenance_evidence.py -v
+      - name: Verify actual pinned GitHub source and G20/G36/G37/G39 chain
+        run: |
+          set -euo pipefail
+          git cat-file -e "7af2cb750b37826fb02a00e2d45cb73f3a85c239^{commit}"
+          python tools/g40_provenance_evidence.py --output "$RUNNER_TEMP/G40_SOURCE_LINEAGE_HOLD.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G40-GITHUB-SOURCE-CHECKER-CHAIN-HOLD-NOT-SUBMITTED
+          path: ${{ runner.temp }}/G40_SOURCE_LINEAGE_HOLD.json
+          if-no-files-found: error
+          retention-days: 7
