@@ -1,0 +1,75 @@
+{
+  "evidence_type": "G39_OFFICIAL_KIT_LICENSE_CREATOR_AI_PROVENANCE_TRIAGE_20261026",
+  "audit_date_kst": "2026-10-26",
+  "branch": "lead/ugreen",
+  "official_sources": {
+    "starter_kit": "https://ai.ugreen.com/pages/hackathon-starter-kit",
+    "devpost_rules": "https://ugreenhackathon.devpost.com/rules",
+    "devpost_resources_ai_faq": "https://ugreenhackathon.devpost.com/resources",
+    "skillhub_user_agreement": "https://api.ugnas.com/api/system/v1/ua/agreement/page?acceptLanguage=en-US&agreementCode=skillhub-user-agreement",
+    "skillhub_publication_standards": "https://api.ugnas.com/api/system/v1/ua/agreement/page?acceptLanguage=en-US&agreementCode=skillhub-publish-audit-spec"
+  },
+  "official_pinned_archive": {
+    "file": "uliya-skill-kit-0.7.3-en.zip",
+    "sha256": "cf557e5a022e4297892f39768132855154232efdedeb726b2845450ccd70e1b3",
+    "github_actions_run_id": 40316770329,
+    "github_actions_result": "success",
+    "github_artifact_id": 12647441110,
+    "checked_file_count": 26,
+    "license_candidate_filenames": [],
+    "license_candidate_file_count": 0,
+    "limitation": "Filename-based inspection did not find a distinct LICENSE/LICENCE/COPYING/NOTICE/TERMS file. This cannot exclude terms embedded elsewhere or linked from website; no license grant or right to redistribute inferred."
+  },
+  "observed_vendor_terms": "Official Starter Kit demands agreement to User Agreement/Privacy Policy/Publishing Standards; Devpost Section 4 states package and NAS use subject to related license agreement. SkillHub User Agreement governs marketplace publishing, not equivalent to identifying the separate kit's copyright/license grant.",
+  "actual_vendor_kit_license": "NOT_IDENTIFIED_FROM_PINNED_ARCHIVE_OR_LINKED_PUBLIC_TERMS",
+  "toolkit_right_to_use_in_hackathon": "OFFICIAL_SITE_INVITES_USE_SUBJECT_TO_TERMS; NOT_A_SEPARATELY_PROVEN_COPYRIGHT_LICENSE",
+  "rights_clearance": "PENDING_ENTRANT_AND_ORGANIZER_REVIEW",
+  "creator_provenance": {
+    "originally_generated": "PARTICIPANT_REPORTED_CODEX_OFFICIAL_TOOL_ON_2026_10_24",
+    "report": "docs/submission/G18_CODEX_CREATOR_RESULT_REPORTED_20261024.md",
+    "original_reported_generated_sha256": "e1b071666b836cc464147821d7823bc3061c757434697d9a64250d4a9abd5b4a",
+    "source_review_report": "docs/submission/G22_OFFICIAL_CREATOR_ONE_FILE_PREVIEW_20261024.md",
+    "source_review_pinned_commit": "7af2cb750b37826fb02a00e2d45cb73f3a85c239",
+    "current_candidate_sha256": "e4e45dea7f2ca22a37c2c3803ed12d6b9914c7ca4686d9b891976ba1481610a4",
+    "current_candidate_first_party_checker": {
+      "run_id": 40311253113,
+      "status": "static-pass",
+      "findings": [
+        0,
+        0,
+        0
+      ]
+    },
+    "actual_creator_tool_execution_provenance_independently_replayed": false,
+    "entrant_final_authorship_approval": "PENDING"
+  },
+  "official_ai_policy": {
+    "coding_assistants": "PERMITTED_WITH_DISCLOSURE",
+    "listing_all_ai_tools_and_uses": "REQUIRED",
+    "human_core_idea_and_pdf_answers": "OFFICIAL_NONBINDING_RECOMMENDATION",
+    "pdf_answers_currently_authored_using_ai": "AI_ASSISTED_AND_DISCLOSED_ENTRANT_EDITORIAL_ACCEPTANCE_PENDING",
+    "entrant_language_and_eligibility": "PENDING",
+    "author_eligibility_automatically_verified": false
+  },
+  "exact_current_artifacts": {
+    "g37_pdf_sha256": "d5d1bf9383d9f7d811f2e8f30b649a41e2b2b382ce3d8ae4f60c75e917874936",
+    "g37_zip_sha256": "b3efbe261dc0ea35e90c290e362fc0efad70e59315d8cc5f0a009d445ece66d7",
+    "g36_skill_sha256": "e4e45dea7f2ca22a37c2c3803ed12d6b9914c7ca4686d9b891976ba1481610a4",
+    "source_g37_artifact_id": 12644844524,
+    "not_resubmitted": true
+  },
+  "unanswered_items": [
+    "UGREEN kit specific applicable license terms",
+    "Whether official kit is an event-only licensed development tool or redistributable SDK",
+    "Required third-party license disclosure formulation when tool itself is not bundled",
+    "Entrant's own Creator execution chain/source author approval",
+    "Entrant review of AI-assisted text in own words",
+    "Exact-file entrant submission consent"
+  ],
+  "release_decision": "HOLD_EXTERNAL_LICENSE_ORIGINALITY_AND_OWNER_SIGNOFF",
+  "sent_to_organizer": false,
+  "submitted_to_devpost": false,
+  "skillhub_published": false,
+  "live_nas_tested": false,
+  "source_storage_policy": "No vendor ZIP, vendor code, private Codex transcript, credentials or NAS data redistributed."
+}

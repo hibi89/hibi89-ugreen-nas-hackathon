@@ -791,5 +791,22 @@
     "remaining_base": 1.5,
     "remaining_reserve": 1.5,
     "actual_hours": null
+  },
+  "g39_2026_10_26": {
+    "stage": "KIT_LICENSE_METADATA_AUDITED_CREATOR_EVIDENCE_TRIAGED",
+    "kit_sha256": "cf557e5a022e4297892f39768132855154232efdedeb726b2845450ccd70e1b3",
+    "archive_members": 26,
+    "distinct_license_named_documents": 0,
+    "github_action": 40316770329,
+    "report": "docs/submission/G39_OFFICIAL_LICENSE_AND_CREATOR_PROVENANCE_DOSSIER_20261026.md",
+    "evidence": "docs/submission/evidence/G39_OFFICIAL_LICENSE_AND_CREATOR_PROVENANCE_20261026.json",
+    "source_rights": "NOT_CLEARED",
+    "creator_origin": "PARTICIPANT_REPORTED",
+    "ai_policy": "PERMITTED_DISCLOSURE_AND_HUMAN_PDF_VOICE_ADVICE",
+    "devpost": "NOT_SUBMITTED",
+    "g1_pct": 0,
+    "g1_base_hours": 1.5,
+    "g1_reserve_hours": 1.5,
+    "actual_elapsed_hours": null
   }
 }

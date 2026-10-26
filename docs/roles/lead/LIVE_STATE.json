@@ -25,10 +25,10 @@
     "sdk_gate_distinct": true
   },
   "next_work": {
-    "id": "G39-CREATOR-LICENSE-PROVENANCE-OWNER-DECISION",
+    "id": "G40-OWNER_LICENSE_AND_CREATOR-EVIDENCE_RESOLUTION",
     "scheduled_kst": "2026-10-26",
-    "status": "BLOCKED_ON_ENTRANT_RIGHTS_AND_LICENSE",
-    "scope": "Prepare factual evidence dossier and owner-only review of official Creation Tool provenance, applicable UGREEN/third-party terms and originality. Do not infer approval or attempt Devpost submission; G37 original PDF still lacks resolved vendor license identification.",
+    "status": "BLOCKED_EXTERNAL_LICENSE_AND_ENTRANT_CONFIRMATION",
+    "scope": "Use G39 dossier to seek owner-selected official kit license/terms clarification and confirm private original Codex Creator generation evidence and entrant personal ownership/AI disclosure. Preserve G36 and G37 SHA; rebuild if owner edits. No outbound contact or Devpost/SkillHub submission without explicit instructions.",
     "planned_hours": 0,
     "separate_reserve_hours": 0,
     "actual_completion_eta_hours": null
@@ -1030,6 +1030,24 @@
     "applicable_UGREEN_license": "NOT_IDENTIFIED",
     "entrant_approval": "NOT_GIVEN",
     "decision": "HOLD_EXTERNAL_REVIEW_REQUIRED_NOT_SUBMITTED",
+    "devpost": "NOT_SUBMITTED"
+  },
+  "g39_license_creator_provenance": {
+    "report": "docs/submission/G39_OFFICIAL_LICENSE_AND_CREATOR_PROVENANCE_DOSSIER_20261026.md",
+    "evidence": "docs/submission/evidence/G39_OFFICIAL_LICENSE_AND_CREATOR_PROVENANCE_20261026.json",
+    "owner_questions": "docs/submission/G39_OWNER_ORGANIZER_LICENSE_QUESTIONS_20261026.md",
+    "official_kit_archive_sha256": "cf557e5a022e4297892f39768132855154232efdedeb726b2845450ccd70e1b3",
+    "kit_files_inspected": 26,
+    "kit_named_license_documents": 0,
+    "github_actions_run_id": 40316770329,
+    "artifact_id": 12647441110,
+    "applicable_vendor_kit_license": "NOT_IDENTIFIED",
+    "official_creator_origin": "PARTICIPANT_REPORTED_NOT_REPLAYED",
+    "first_party_g36_static_checker": "VERIFIED_RUN_40311253113",
+    "ai_tools": "PERMITTED_DISCLOSURE_REQUIRED_HUMAN_VOICE_RECOMMENDED",
+    "g37_artifacts_changed": false,
+    "rights_clearance": "PENDING",
+    "entrant_consent": "NOT_GIVEN",
     "devpost": "NOT_SUBMITTED"
   }
 }
