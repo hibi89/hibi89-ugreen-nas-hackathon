@@ -98,8 +98,8 @@
     "passed_guard_run_id": 40067647144
   },
   "last_ci_verified_code_sha": "1ce2f9a605e9f09465e896098de31ccac4c0ae35",
-  "repository_regression_tests_passed": 219,
-  "repository_regression_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40091570530",
+  "repository_regression_tests_passed": 235,
+  "repository_regression_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40304214495",
   "closeout_sync_ci_status": "PASS",
   "closeout_sync_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40080489079",
   "early_skill_candidate": {
@@ -895,9 +895,18 @@
     "g31_sha256": "cb69afb6525d1ca530f72b83ad26965c411ca02dfdbab97aa762d612d34d25a2",
     "g31_verdict": "PARTICIPANT_REPORTED_NOT_UPLOADABLE_2_ERRORS",
     "official_checker": "NOT_RUN",
-    "offline_bundle": "CI_PENDING",
+    "offline_bundle": "SUCCESS_RUN_40304214712",
     "nas_runtime": "NOT_RUN",
     "submission": "NOT_SUBMITTED",
-    "report": "docs/submission/G32_SINGLE_QUOTE_CHECKER_RECOVERY_20261026.md"
+    "report": "docs/submission/G32_SINGLE_QUOTE_CHECKER_RECOVERY_20261026.md",
+    "skill_sha256": "2baf409f990e8b5ba78bdb378b86dbf81ca83eec2dfa4cc605e1642ffd38feaa",
+    "skill_bytes": 14389,
+    "zip_sha256": "1843eef0a40e85bdf14ccc1922f0bf989d25f5a1029c8fe1400aaf1d40ed6ec7",
+    "offline_regression_tests": "3/3_PASS",
+    "repository_offline_tests": "235/235_PASS",
+    "artifact_id": 12640709232,
+    "ci_head": "d8f2222d409bba9131cad52235c49f7b714a2fb7",
+    "closeout_ci": "SUCCESS_RUN_40304214571",
+    "master_ci": "SUCCESS_RUN_40304214796"
   }
 }

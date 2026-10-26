@@ -1,5 +1,11 @@
 # G32 — G31 official checker rejection and isolated repair (2026-10-26 KST)
 
+## Independent GitHub CI verification — 2026-10-26 KST
+- Exact source: **14,389 bytes**, SHA256 **`2baf409f990e8b5ba78bdb378b86dbf81ca83eec2dfa4cc605e1642ffd38feaa`** (GitHub Actions runner computed on the actual committed `SKILL.md`).
+- Deterministic single-Markdown ZIP: SHA256 **`1843eef0a40e85bdf14ccc1922f0bf989d25f5a1029c8fe1400aaf1d40ed6ec7`**; artifact ID **12640709232**, [source workflow SUCCESS](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40304214712). Artifact is an offline preview, not an approved Devpost upload.
+- G32-focused regression **3/3 PASS**; complete offline repository suite **235/235 PASS** [run](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40304214495); handoff guard [SUCCESS](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40304214571); canonical 24-day master [SUCCESS](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40304214796).
+- **Official G32 first-party checker remains NOT_RUN.** None of these workflows invokes the official Uliya checker or tests actual NAS and Expert Agents. The next external gate requires exact-SHA official result and full diagnostics.
+
 ## Evidence and exact status
 Participant-reported, installed first-party `uliya-skill-kit/scripts/check-skill.mjs` result for the **G31** SHA256 `cb69afb6525d1ca530f72b83ad26965c411ca02dfdbab97aa762d612d34d25a2`: `not-uploadable`, exit code **1**, errors **2**, warnings **0**, info **0**, diagnostics `DELEGATE_FORMAT_INVALID` at source lines **73** and **87**. The vendor asks for `--instruction '<task>'` with correct shell single quotes and escaped inner apostrophes. This is participant evidence, not a first-party checker invocation by the lead; no invented full checker JSON is committed. The old G31 documentation marked the checker NOT_RUN and is retained as dated history.
 
@@ -11,7 +17,7 @@ The new candidate is [G32 exact Skill](checker_inputs/G32_20261026/projectready-
 
 ## Verification and release gate
 - Local-code-level review: two double-quoted instruction templates replaced by vendor-format single-quoted **inert** tasks. Existing required-scope, permissions, privacy, no-writes and evidence-fail-closed conditions preserved.
-- [Focused regression](../../tests/test_g32_delegate_quote.py) and [offline ZIP workflow](../../.github/workflows/g32-offline-candidate.yml) added. Their result is **PENDING** until remote GitHub CI confirms. Workflow builds only a single-entry `projectready-nas/SKILL.md` ZIP, outputs member/ZIP hashes; it does **not** execute vendor code or contact NAS.
+- [Focused regression](../../tests/test_g32_delegate_quote.py) and [offline ZIP workflow](../../.github/workflows/g32-offline-candidate.yml) added. Remote workflow and tests have now **PASSED** as documented above. Workflow builds only a single-entry `projectready-nas/SKILL.md` ZIP, outputs member/ZIP hashes; it does **not** execute vendor code or contact NAS.
 - **G32 official checker = NOT_RUN**. Next: verify CI artifact exact SHA, then participant runs installed vendor checker against same SHA and reports full diagnostics, exit and before/after SHA. Do not infer `static-pass` from the G22 result. If vendor still rejects, do not submit.
 - **Blocked/uncleared:** live expert dispatch, registered agent/effective permissions, NAS access, data-processing location, IP/third-party license, owner editorial/release approval, SkillHub publication and Devpost receipt. No user data accessed, no deployment.
 - Original 24-day master 2 DONE / 12 PARTIAL / 3 BLOCKED / 7 NOT_STARTED; UGR-D16/D17 remain PARTIAL; G1 runtime BLOCKED. Oct24 fixed work 100% and actual labor hours unknown; not an overall completion percentage.

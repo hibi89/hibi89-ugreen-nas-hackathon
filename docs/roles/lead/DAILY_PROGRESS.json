@@ -681,10 +681,14 @@
     "official_checker": "NOT_RUN",
     "g31_participant_checker": "NOT_UPLOADABLE_ERRORS_2_EXIT_1",
     "source": "docs/submission/checker_inputs/G32_20261026/projectready-nas/SKILL.md",
-    "offline_ci": "PENDING",
+    "offline_ci": "PASS_G32_3_OF_3_FULL_235_OF_235",
     "previous_oct24_day_complete_pct": 100,
     "overall_24_day_status_unchanged": true,
     "actual_active_hours": null,
-    "owner_local_first_party_check_required": true
+    "owner_local_first_party_check_required": true,
+    "skill_sha256": "2baf409f990e8b5ba78bdb378b86dbf81ca83eec2dfa4cc605e1642ffd38feaa",
+    "skill_bytes": 14389,
+    "zip_sha256": "1843eef0a40e85bdf14ccc1922f0bf989d25f5a1029c8fe1400aaf1d40ed6ec7",
+    "offline_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40304214712"
   }
 }
