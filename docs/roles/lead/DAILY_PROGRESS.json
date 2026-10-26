@@ -845,5 +845,13 @@
     "g1_base_hours_remaining": 1.5,
     "g1_separate_reserve_hours_remaining": 1.5,
     "actual_hours": null
+  },
+  "g42_2026_10_26": {
+    "status": "TEST_STAGED_CI_PENDING",
+    "percent_complete": null,
+    "actual_hours": null,
+    "real_nas": "NOT_RUN",
+    "license": "REPLY_PENDING",
+    "devpost": "NOT_SUBMITTED"
   }
 }

@@ -1,0 +1,7 @@
+# G42 — adversarial read-only synthetic test matrix (2026-10-26 KST)
+
+**Test code staged; new remote CI result PENDING.** New tests/test_g42_adversarial_boundaries.py exercises actual Python modules in synthetic conditions only. Covers incomplete/denied/paginated scans, prefix/path escape, duplicate/missing evidence, read-only consent, version ambiguity, static G36 SHA and previous G37 PDF/ZIP evidence SHA. Synthetic ZIP tamper/slip/link probes test attack indicators, not actual original artifact bytes. Existing G41 Actions run 40321597804 separately verified actual G37 original bytes.
+
+**Security limitations OPEN:** Standalone Python metadata engine can classify a synthetic sensitive .env path as present, even though the G36 Skill instructions forbid such targets. FileEvidence carries no verified symlink resolution target. Adapter trust/consent are caller assertions, not official NAS runtime attestation. Tests must not be represented as production security certification. No owner data accessed, no NAS, no Devpost. G36 Skill and G37 PDF/ZIP untouched. UGREEN licensing inquiry sent and reply unverified; rights/owner approval HOLD. Original 24-day 2 DONE/12 PARTIAL/3 BLOCKED/7 NOT_STARTED; actual work hours unmeasured.
+
+**Next:** Check GitHub Actions test results before marking G42 verified. Scope a separate boundary implementation if approved; official license response remains pending.

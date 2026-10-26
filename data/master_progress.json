@@ -245,7 +245,7 @@
       "blocker": null,
       "recovery_date_kst": null,
       "recovery_condition": null,
-      "advance_note": "권한 거부·불완전 조회 합성 테스트 선행; 실제 사용자/PII 검증 미실행. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음."
+      "advance_note": "권한 거부·불완전 조회 합성 테스트 선행; 실제 사용자/PII 검증 미실행. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음. G42 2026-10-26: adversarial tests staged, CI PENDING, original hashes pinned; read-only synthetic only, security gaps OPEN."
     },
     {
       "day_id": "UGR-D11",
