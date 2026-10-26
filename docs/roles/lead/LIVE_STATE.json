@@ -4,14 +4,14 @@
   "repository": "hibi89/hibi89-ugreen-nas-hackathon",
   "authoritative_branch": "lead/ugreen",
   "role": "UGREEN lead and sole hands-on developer",
-  "last_session_closeout_date_kst": "2026-10-24",
+  "last_session_closeout_date_kst": "2026-10-26",
   "last_source_verified_head_at_handoff": "af8e14ab4efa148b903403231d3d20a77e88a7ac",
   "source_verification_workflow": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40072722105",
   "offline_synthetic_tests_passed": 91,
   "official_sdk_cli_schema": "BLOCKED_UNVERIFIED",
   "registered_expert_agents": "BLOCKED_UNVERIFIED",
   "nas_runtime": "NOT_RUN",
-  "official_skill_validator": "G22_PARTICIPANT_STATIC_PASS_EXACT_SHA;G29_PARTICIPANT_WARNING_1_NEEDS_TARGET_VALIDATION;G31_NOT_RUN",
+  "official_skill_validator": "G22_PARTICIPANT_STATIC_PASS;G29_PARTICIPANT_WARNING_1;G31_PARTICIPANT_NOT_UPLOADABLE_ERRORS_2;G32_NOT_RUN",
   "pii_safety": "NOT_CHECKED",
   "devpost_final_submission": "NOT_SUBMITTED",
   "round2_finalist_status": "NOT_CONFIRMED",
@@ -25,12 +25,12 @@
     "sdk_gate_distinct": true
   },
   "next_work": {
-    "id": "G1-RUNTIME-INVOCATION",
-    "scheduled_kst": "2026-10-25",
-    "status": "BLOCKED_OFFICIAL_CLI_EXPERT_AGENT_RUNTIME_AND_EFFECTIVE_PERMISSIONS",
-    "scope": "Obtain first-party CLI invocation and registered expert-agent effective-permission evidence; separate G22 SKILL.md official static checker reported PASS exact SHA, without real NAS execution or license/owner consent yet",
-    "planned_hours": 1.5,
-    "separate_reserve_hours": 1.5,
+    "id": "G32-EXACT-SHA-OFFICIAL-CHECKER",
+    "scheduled_kst": "2026-10-26",
+    "status": "BLOCKED_OWNER_LOCAL_FIRST_PARTY_CHECK",
+    "scope": "After G32 ZIP/checksum CI succeeds, run installed official Uliya checker on exact G32 SKILL.md and supply JSON, exit code, and unchanged before/after SHA. No NAS access or submission.",
+    "planned_hours": 0,
+    "separate_reserve_hours": 0,
     "actual_completion_eta_hours": null
   },
   "advance_done_offline": [
@@ -879,5 +879,25 @@
     "change_to_original_daily_completion": false,
     "actual_hours": null,
     "report": "docs/submission/G31_DELEGATE_WARNING_RECOVERY_20261025.md"
+  },
+  "previous_g1_blocked_work": {
+    "id": "G1-RUNTIME-INVOCATION",
+    "scheduled_kst": "2026-10-25",
+    "status": "BLOCKED_OFFICIAL_CLI_EXPERT_AGENT_RUNTIME_AND_EFFECTIVE_PERMISSIONS",
+    "scope": "Obtain first-party CLI invocation and registered expert-agent effective-permission evidence; separate G22 SKILL.md official static checker reported PASS exact SHA, without real NAS execution or license/owner consent yet",
+    "planned_hours": 1.5,
+    "separate_reserve_hours": 1.5,
+    "actual_completion_eta_hours": null
+  },
+  "g32_candidate": {
+    "source_path": "docs/submission/checker_inputs/G32_20261026/projectready-nas/SKILL.md",
+    "source_base_head": "991d0f8bd49192b9e6b8948ae0f5e1dfb26800de",
+    "g31_sha256": "cb69afb6525d1ca530f72b83ad26965c411ca02dfdbab97aa762d612d34d25a2",
+    "g31_verdict": "PARTICIPANT_REPORTED_NOT_UPLOADABLE_2_ERRORS",
+    "official_checker": "NOT_RUN",
+    "offline_bundle": "CI_PENDING",
+    "nas_runtime": "NOT_RUN",
+    "submission": "NOT_SUBMITTED",
+    "report": "docs/submission/G32_SINGLE_QUOTE_CHECKER_RECOVERY_20261026.md"
   }
 }

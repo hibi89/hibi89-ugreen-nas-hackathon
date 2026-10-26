@@ -1,0 +1,17 @@
+# G32 — G31 official checker rejection and isolated repair (2026-10-26 KST)
+
+## Evidence and exact status
+Participant-reported, installed first-party `uliya-skill-kit/scripts/check-skill.mjs` result for the **G31** SHA256 `cb69afb6525d1ca530f72b83ad26965c411ca02dfdbab97aa762d612d34d25a2`: `not-uploadable`, exit code **1**, errors **2**, warnings **0**, info **0**, diagnostics `DELEGATE_FORMAT_INVALID` at source lines **73** and **87**. The vendor asks for `--instruction '<task>'` with correct shell single quotes and escaped inner apostrophes. This is participant evidence, not a first-party checker invocation by the lead; no invented full checker JSON is committed. The old G31 documentation marked the checker NOT_RUN and is retained as dated history.
+
+## Two options compared and decision
+1. **Selected — G32 staged syntax repair**: preserve G31 original; stage a separate Skill using standard single-quoted `--instruction` on both expert targets and make the shown commands *inert refusal tasks*, because no actual owner-authorized NAS values exist at authoring time. Before any live run, the parent must render the full self-contained approved instruction, substitute the entire single-quoted task text, escape apostrophes correctly and verify runtime support. No use of `eval` or unapproved NAS calls. Zero paid cost; smallest defensible scope.
+2. **Rejected — single-quote the G31 shell variable**: `--instruction '$FILE_AGENT_INSTRUCTION'` would pass literal variable name to the expert (POSIX shell) rather than an approved path/checklist. It damages correctness and could conceal a missing scope contract.
+
+The new candidate is [G32 exact Skill](checker_inputs/G32_20261026/projectready-nas/SKILL.md). Prior [G31 exact Skill](checker_inputs/G31_20261025/projectready-nas/SKILL.md) and earlier G22/G29 artifacts are unchanged. The latest G29 PDF (independent G30 audit) remains one page, 362 answer words, 5136B, SHA256 `418a81aa56b47d8fe33a442414e2e76d711dc1bfd1cdb2a0df313073a8a5da77`. G32 PDF parity has not been newly confirmed.
+
+## Verification and release gate
+- Local-code-level review: two double-quoted instruction templates replaced by vendor-format single-quoted **inert** tasks. Existing required-scope, permissions, privacy, no-writes and evidence-fail-closed conditions preserved.
+- [Focused regression](../../tests/test_g32_delegate_quote.py) and [offline ZIP workflow](../../.github/workflows/g32-offline-candidate.yml) added. Their result is **PENDING** until remote GitHub CI confirms. Workflow builds only a single-entry `projectready-nas/SKILL.md` ZIP, outputs member/ZIP hashes; it does **not** execute vendor code or contact NAS.
+- **G32 official checker = NOT_RUN**. Next: verify CI artifact exact SHA, then participant runs installed vendor checker against same SHA and reports full diagnostics, exit and before/after SHA. Do not infer `static-pass` from the G22 result. If vendor still rejects, do not submit.
+- **Blocked/uncleared:** live expert dispatch, registered agent/effective permissions, NAS access, data-processing location, IP/third-party license, owner editorial/release approval, SkillHub publication and Devpost receipt. No user data accessed, no deployment.
+- Original 24-day master 2 DONE / 12 PARTIAL / 3 BLOCKED / 7 NOT_STARTED; UGR-D16/D17 remain PARTIAL; G1 runtime BLOCKED. Oct24 fixed work 100% and actual labor hours unknown; not an overall completion percentage.

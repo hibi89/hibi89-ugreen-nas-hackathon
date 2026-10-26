@@ -676,5 +676,15 @@
     "change_to_original_daily_completion": false,
     "actual_hours": null,
     "report": "docs/submission/G31_DELEGATE_WARNING_RECOVERY_20261025.md"
+  },
+  "g32_2026_10_26": {
+    "official_checker": "NOT_RUN",
+    "g31_participant_checker": "NOT_UPLOADABLE_ERRORS_2_EXIT_1",
+    "source": "docs/submission/checker_inputs/G32_20261026/projectready-nas/SKILL.md",
+    "offline_ci": "PENDING",
+    "previous_oct24_day_complete_pct": 100,
+    "overall_24_day_status_unchanged": true,
+    "actual_active_hours": null,
+    "owner_local_first_party_check_required": true
   }
 }

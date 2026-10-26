@@ -1,0 +1,45 @@
+name: G32 isolated Markdown ZIP preview (NOT official validation)
+on:
+  push:
+    branches: ["lead/ugreen"]
+    paths:
+      - "docs/submission/checker_inputs/G32_20261026/projectready-nas/SKILL.md"
+      - ".github/workflows/g32-offline-candidate.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  offline-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Focused offline regression
+        run: python -m unittest discover -s tests -p 'test_g32_delegate_quote.py' -v
+      - name: Reproducible single-entry source ZIP and independent hashes
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          from zipfile import ZipFile, ZipInfo, ZIP_DEFLATED
+          source=Path('docs/submission/checker_inputs/G32_20261026/projectready-nas/SKILL.md')
+          b=source.read_bytes()
+          assert b.startswith(b'---\nname: projectready-nas\n') and len(b)<1000000
+          out=Path('g32-offline-artifacts');out.mkdir(exist_ok=True)
+          zpath=out/'ProjectReady_G32_OFFLINE_NOT_APPROVED.zip'
+          info=ZipInfo('projectready-nas/SKILL.md',(2026,10,26,0,0,0));info.compress_type=ZIP_DEFLATED
+          with ZipFile(zpath,'w') as z:z.writestr(info,b)
+          with ZipFile(zpath) as z:
+              assert z.namelist()==['projectready-nas/SKILL.md']
+              assert z.read('projectready-nas/SKILL.md')==b
+          result={'status':'OFFLINE_ONLY_OFFICIAL_CHECKER_NOT_RUN_NOT_SUBMITTED','skill_bytes':len(b),
+                  'skill_sha256':hashlib.sha256(b).hexdigest(),'zip_sha256':hashlib.sha256(zpath.read_bytes()).hexdigest()}
+          (out/'G32_CHECKSUMS.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8')
+          print(json.dumps(result))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G32-OFFLINE-NOT-SUBMITTED
+          path: g32-offline-artifacts/
+          retention-days: 7
