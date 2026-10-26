@@ -1,0 +1,41 @@
+{
+  "evidence_type": "G36_INDEPENDENTLY_EXECUTED_FIRST_PARTY_ULIYA_STATIC_CHECK",
+  "date_kst": "2026-10-26",
+  "branch": "lead/ugreen",
+  "source_path": "docs/submission/checker_inputs/G36_20261026/projectready-nas/SKILL.md",
+  "source_sha256": "e4e45dea7f2ca22a37c2c3803ed12d6b9914c7ca4686d9b891976ba1481610a4",
+  "source_bytes": 14522,
+  "source_commit": "07d5127160331c6aa06a5f0ac9e91bd1205b9cde",
+  "checker_workflow_commit": "d69c365adbe2cd4ab2f2a801c9d6d00fb3ac1b2f",
+  "official_vendor_kit": "uliya-skill-kit-0.7.3-en",
+  "official_vendor_zip_sha256": "cf557e5a022e4297892f39768132855154232efdedeb726b2845450ccd70e1b3",
+  "first_party_checker": "scripts/check-skill.mjs",
+  "checker_run_id": 40311253113,
+  "checker_url": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40311253113",
+  "checker_artifact_id": 12644268439,
+  "checker_exit": 0,
+  "checker_status": "static-pass",
+  "checker_json_sha256": "26d29672dd763d3303aa3ff862615dc0dda0f02e44c1d0b9d525fb6890eb6586",
+  "summary": {
+    "errors": 0,
+    "warnings": 0,
+    "info": 0
+  },
+  "diagnostics": [],
+  "stderr_present": false,
+  "source_sha_before_after_equal": true,
+  "network_blocked_during_checker": true,
+  "candidate_mounted_read_only": true,
+  "regression": {
+    "focused_tests_passed": 3,
+    "focused_tests_failed": 0
+  },
+  "original_candidates_changed": false,
+  "semantic_audit": "G32 inert syntax-only examples removed; replaced with operational guarded read-only tasks requiring separately bound exact owner values. Article 2.5 semantic/sponsor clearance not independently granted.",
+  "new_round1_zip_pdf": "NOT_YET_REBUILT_FOR_G36",
+  "nas_runtime": "NOT_RUN",
+  "registered_expert_permissions": "NOT_VERIFIED",
+  "rights_license": "PENDING_ENTRANT_REVIEW",
+  "entrant_signoff": "PENDING",
+  "devpost": "NOT_SUBMITTED"
+}

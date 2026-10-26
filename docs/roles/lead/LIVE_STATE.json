@@ -25,10 +25,10 @@
     "sdk_gate_distinct": true
   },
   "next_work": {
-    "id": "G36-SEMANTIC-DELEGATE-PUBLISH-CANDIDATE",
+    "id": "G37-EXACT-G36-ROUND1-PDF-ZIP-PARITY",
     "scheduled_kst": "2026-10-26",
-    "status": "READY_ISOLATED_CODE_OLD_G32_PRESERVED",
-    "scope": "Prepare separate G36 Skill without inert/template command examples, preserving owner consent and fail-closed semantics; test exact new SHA with first-party isolated checker. Rebuild matched PDF/ZIP only after static pass; no real NAS or submission. Entrant legal/rights approval separate.",
+    "status": "READY_INTERNAL_ONLY",
+    "scope": "Build a new G36-exact owner-review PDF and single-Markdown ZIP using the same safely pinned G36 first-party checked SHA and machine-readable G36 evidence; independently verify all 10 answers, word cap, PDF readability and byte hashes. Do not submit, run NAS or falsely clear rights. Visual PDF review and human final signoff remain separate.",
     "planned_hours": 0,
     "separate_reserve_hours": 0,
     "actual_completion_eta_hours": null
@@ -973,5 +973,21 @@
     "rights": "PENDING",
     "entrant_approval": "PENDING",
     "devpost": "NOT_SUBMITTED"
+  },
+  "g36_candidate": {
+    "source_path": "docs/submission/checker_inputs/G36_20261026/projectready-nas/SKILL.md",
+    "skill_sha256": "e4e45dea7f2ca22a37c2c3803ed12d6b9914c7ca4686d9b891976ba1481610a4",
+    "skill_bytes": 14522,
+    "official_checker": "FIRST_PARTY_STATIC_PASS_0_0_0_EXACT_SHA",
+    "official_run_id": 40311253113,
+    "artifact_id": 12644268439,
+    "regressions": "3_OF_3_PASS",
+    "report": "docs/submission/G36_GUARDED_DELEGATION_OFFICIAL_CHECKER_20261026.md",
+    "evidence": "docs/submission/evidence/G36_FIRST_PARTY_STATIC_PASS_20261026.json",
+    "rights": "PENDING",
+    "runtime": "NOT_RUN",
+    "pdf_zip": "NOT_BUILT_FOR_G36",
+    "devpost": "NOT_SUBMITTED",
+    "old_g32_unchanged": true
   }
 }

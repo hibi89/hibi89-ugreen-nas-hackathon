@@ -736,5 +736,22 @@
     "g1_base_remaining_hours": 1.5,
     "g1_separate_reserve_hours": 1.5,
     "actual_hours": null
+  },
+  "g36_2026_10_26": {
+    "skill_sha256": "e4e45dea7f2ca22a37c2c3803ed12d6b9914c7ca4686d9b891976ba1481610a4",
+    "skill_bytes": 14522,
+    "first_party_checker": "PASS_G36_EXACT_0_0_0_EXIT0_RUN_40311253113",
+    "focused_tests": "3_OF_3_PASS",
+    "ci_false_start": "40311120673_FAILED_FINAL_ASSERTION_ESCAPED_NEWLINE_FIXED",
+    "pdf_zip": "NEEDS_G37",
+    "report": "docs/submission/G36_GUARDED_DELEGATION_OFFICIAL_CHECKER_20261026.md",
+    "evidence": "docs/submission/evidence/G36_FIRST_PARTY_STATIC_PASS_20261026.json",
+    "nas": "NOT_RUN",
+    "rights": "PENDING",
+    "devpost": "NOT_SUBMITTED",
+    "g1_runtime_percent": 0,
+    "g1_base_hours_remaining": 1.5,
+    "g1_separate_reserve_hours_remaining": 1.5,
+    "actual_hours": null
   }
 }
