@@ -1,0 +1,101 @@
+name: G39 audit official pinned kit license metadata (NO vendor code redistributed)
+on:
+  workflow_dispatch:
+  push:
+    branches: ["lead/ugreen"]
+    paths:
+      - ".github/workflows/g39-kit-license-metadata-audit.yml"
+permissions:
+  contents: read
+jobs:
+  pinned-license-inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Download pinned first-party public kit to ephemeral temp storage
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/g39-vendor"
+          curl --fail --silent --show-error --location --max-time 90 --retry 1 \
+            'https://cdn.shopify.com/s/files/1/0630/9416/1602/files/uliya-skill-kit-0.7.3-en.zip?v=1790578898' \
+            -o "$RUNNER_TEMP/g39-vendor/official-kit.zip"
+          echo "cf557e5a022e4297892f39768132855154232efdedeb726b2845450ccd70e1b3  $RUNNER_TEMP/g39-vendor/official-kit.zip" | sha256sum --check
+      - name: Inspect archive ONLY for license metadata, not redistribution or authorization
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/g39-evidence"
+          python - <<'PY'
+          import hashlib, json, os, pathlib, re, stat, zipfile
+          kit=pathlib.Path(os.environ["RUNNER_TEMP"])/"g39-vendor"/"official-kit.zip"
+          assert kit.exists()
+          assert hashlib.sha256(kit.read_bytes()).hexdigest()=="cf557e5a022e4297892f39768132855154232efdedeb726b2845450ccd70e1b3"
+          with zipfile.ZipFile(kit) as z:
+              infos=z.infolist()
+              assert 1<len(infos)<=1000
+              assert sum(i.file_size for i in infos)<64*1024*1024
+              seen=set()
+              records=[]
+              filenames=[]
+              for i in infos:
+                  name=i.filename
+                  assert name and not name.startswith("/") and "\\" not in name and ":" not in name
+                  parts=name.rstrip("/").split("/")
+                  assert all(x not in ("",".","..") for x in parts)
+                  key=name.rstrip("/").lower()
+                  assert key not in seen and i.file_size<=8*1024*1024
+                  seen.add(key)
+                  assert not stat.S_ISLNK((i.external_attr>>16)&0xffff)
+                  if i.is_dir():continue
+                  filenames.append(name)
+                  basename=parts[-1].lower()
+                  # Source and third-party dependency names are not a copyright grant.
+                  likely=bool(re.fullmatch(r"(license|licence|copying|notice|authors|copyright|terms)(\.[a-z0-9_-]+)?",basename))
+                  possible=bool(re.search(r"(license|licence|copying|notice|third.party|copyright)",basename))
+                  if likely or possible:
+                      sample=z.read(i)
+                      txt=sample.decode("utf-8","replace")[:60000]
+                      markers=[]
+                      for label,pat in [
+                          ("SPDX_LICENSE_IDENTIFIER",r"SPDX-License-Identifier\s*:\s*([A-Za-z0-9.()+_ -]{2,120})"),
+                          ("MIT_LICENSE_TEXT",r"Permission is hereby granted, free of charge, to any person"),
+                          ("APACHE_2_LICENSE_TEXT",r"Apache License\s+Version 2\.0"),
+                          ("GPL_LICENSE_TEXT",r"GNU GENERAL PUBLIC LICENSE"),
+                          ("RIGHTS_RESERVED",r"All rights reserved"),
+                          ("LICENSE_GRANT_WORD",r"\b(license|licence|permission|authorization)\b")
+                      ]:
+                          if re.search(pat,txt,re.I):markers.append(label)
+                      records.append({"path":name,"sha256":hashlib.sha256(sample).hexdigest(),"bytes":len(sample),"license_metadata_markers":markers,"is_top_level_kit_file":len(parts)<=2})
+              # Only report root-level license markers, no vendor source/text.
+              root_candidates=[x for x in records if x["is_top_level_kit_file"]]
+              output={
+                "evidence_type":"G39_VENDOR_OFFICIAL_KIT_PINNED_ARCHIVE_LICENSE_METADATA_INVENTORY",
+                "source_url":"https://ai.ugreen.com/pages/hackathon-starter-kit",
+                "official_archive_filename":"uliya-skill-kit-0.7.3-en.zip",
+                "archive_sha256":"cf557e5a022e4297892f39768132855154232efdedeb726b2845450ccd70e1b3",
+                "archive_member_count":len(filenames),
+                "license_candidate_paths":records,
+                "top_level_license_candidate_count":len(root_candidates),
+                "interpretation":"ARCHIVE_METADATA_ONLY_NOT_LEGAL_GRANT_NOT_VENDOR_APPROVAL",
+                "unverified_applicable_license":"PENDING_OWNER_AND_VENDOR_TERMS_REVIEW",
+                "vendor_code_published":False,"real_NAS_access":False,
+                "Devpost_submission":False
+              }
+          out=pathlib.Path(os.environ["RUNNER_TEMP"])/"g39-evidence"/"G39_PINNED_KIT_LICENSE_METADATA.json"
+          out.write_text(json.dumps(output,indent=2,ensure_ascii=False)+"\n",encoding="utf-8")
+          print(json.dumps(output,ensure_ascii=False))
+          print("G39 PINNED ARCHIVE METADATA INSPECTED; NO LEGAL LICENSE ASSUMED")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G39-UGREEN-KIT-LICENSE-METADATA-ONLY-NOT-CLEARED
+          path: ${{ runner.temp }}/g39-evidence/G39_PINNED_KIT_LICENSE_METADATA.json
+          if-no-files-found: error
+          retention-days: 7
+      - name: Remove ephemeral UGREEN vendor ZIP; never package or publish vendor code
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/g39-vendor"
