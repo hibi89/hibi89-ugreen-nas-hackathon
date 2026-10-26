@@ -1,0 +1,50 @@
+{
+  "evidence_type": "G41_EXACT_G37_PDF_SKILL_DISCLOSURE_AND_RIGHTS_HOLD_20261026",
+  "date_kst": "2026-10-26",
+  "source_head_sha": "7eedef326c71529fbb1a98697ad2c2439e5140d4",
+  "original_artifact_id": 12644844524,
+  "original_run_id": 40312824725,
+  "g41_ci_run_id": 40321597804,
+  "ci_url": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40321597804",
+  "ci_outcome": "SUCCESS",
+  "focused_regression_tests": 8,
+  "full_offline_suite_tests": 269,
+  "g41_result_artifact_id": 12649037946,
+  "original_pdf": {
+    "bytes": 5227,
+    "sha256": "d5d1bf9383d9f7d811f2e8f30b649a41e2b2b382ce3d8ae4f60c75e917874936",
+    "pages": 1,
+    "questions": 10,
+    "answer_words": 378,
+    "disclosures": 4
+  },
+  "original_zip": {
+    "bytes": 5685,
+    "sha256": "b3efbe261dc0ea35e90c290e362fc0efad70e59315d8cc5f0a009d445ece66d7",
+    "members": [
+      "projectready-nas/SKILL.md"
+    ]
+  },
+  "source_skill_sha256": "e4e45dea7f2ca22a37c2c3803ed12d6b9914c7ca4686d9b891976ba1481610a4",
+  "machine_findings": {
+    "official_tool_url_present": true,
+    "ai_tools": [
+      "ChatGPT",
+      "Codex"
+    ],
+    "license_identifier": "NOT_IDENTIFIED_OR_CLEARED",
+    "all_four_disclosures_present": true,
+    "unknown_model_local_cloud_disclosed": true,
+    "offline_qa_pymupdf_used": true,
+    "pymupdf_mentioned_in_pdf": false,
+    "pymupdf_risk_severity": "INVENTORY_REVIEW_WARNING",
+    "original_creator_execution": "PARTICIPANT_REPORTED_NOT_REPLAYED",
+    "official_checker": "G36_FIRST_PARTY_STATIC_PASS_EXACT_SOURCE"
+  },
+  "owner_approval": "NOT_GIVEN",
+  "rights": "NOT_CLEARED",
+  "real_nas": "NOT_RUN",
+  "devpost": "NOT_SUBMITTED",
+  "result": "ORIGINAL_ARTIFACT_POLICY_INTEGRITY_PASS_EXTERNAL_RIGHTS_AND_OWNER_HOLD",
+  "report_path": "docs/submission/G41_PDF_SKILL_AI_THIRDPARTY_DISCLOSURE_REVIEW_20261026.md"
+}

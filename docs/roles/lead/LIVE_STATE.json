@@ -25,10 +25,10 @@
     "sdk_gate_distinct": true
   },
   "next_work": {
-    "id": "G41-OWNER-CREATOR-PROVENANCE-AND-DISCLOSURE_REVIEW",
+    "id": "G42-READ_ONLY_SOURCE_AND_SECURITY_FAIL_CLOSED_TESTS",
     "scheduled_kst": "2026-10-26",
-    "status": "READY_NONPUBLISHING_INTERNAL_WITH_EXTERNAL_LICENSE_HOLD",
-    "scope": "Review exact G37 Skill/PDF source/license/AI/Creator declarations against official rules. Prepare owner-only evidence review with no automatic attestation, outbound organizer message, or Devpost/SkillHub publish. Only first-party source chain verified; standalone official-kit license not identified, local Creator execution not independently reproduced.",
+    "status": "READY_INTERNAL_NO_OWNER_PC_NEEDED",
+    "scope": "Run independent synthetic adversarial test/matrix on source/G36 intended read-only privacy scope, ZIP/PDF tamper validation, path/symlink/permission truncation handling. Do not change actual first-party checked G36 bytes or exact G37 original output; any new version requires own SHA check. Rights and participant release remain separate.",
     "planned_hours": 0,
     "separate_reserve_hours": 0,
     "actual_completion_eta_hours": null
@@ -1066,5 +1066,23 @@
     "ci_focused_tests_passed": 5,
     "original_review_source_actual_bytes": 10481,
     "result_artifact_id": 12648750561
+  },
+  "g41_disclosure_review": {
+    "report": "docs/submission/G41_PDF_SKILL_AI_THIRDPARTY_DISCLOSURE_REVIEW_20261026.md",
+    "evidence": "docs/submission/evidence/G41_IMMUTABLE_DISCLOSURE_CI_20261026.json",
+    "original_artifact_id": 12644844524,
+    "run_id": 40321597804,
+    "ci_status": "SUCCESS_8_OF_8_FOCUSED_269_OF_269_OFFLINE",
+    "current_g37_original_pdf_sha256": "d5d1bf9383d9f7d811f2e8f30b649a41e2b2b382ce3d8ae4f60c75e917874936",
+    "current_g37_original_zip_sha256": "b3efbe261dc0ea35e90c290e362fc0efad70e59315d8cc5f0a009d445ece66d7",
+    "g36_checked_skill_sha256": "e4e45dea7f2ca22a37c2c3803ed12d6b9914c7ca4686d9b891976ba1481610a4",
+    "applicable_license": "NOT_IDENTIFIED",
+    "offline_qa_tool_inventory": "PYMUPDF_NOT_LISTED_IN_PDF",
+    "risk_severity": "INVENTORY_REVIEW_WARNING_NOT_INHERENT_DISQUALIFICATION",
+    "creator_local_invocation": "PARTICIPANT_REPORTED_NOT_INDEPENDENTLY_REPLAYED",
+    "owner_approval": "NOT_GIVEN",
+    "devpost": "NOT_SUBMITTED",
+    "nas": "NOT_RUN",
+    "artifact_sources_changed": false
   }
 }

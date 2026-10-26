@@ -827,5 +827,23 @@
     "historical_source_actual_bytes": 10481,
     "artifact_id": 12648750561,
     "source_g20_g36_g37_g39_integrity": "PASS_HOLD"
+  },
+  "g41_2026_10_26": {
+    "stage": "ACTUAL_G37_DISCLOSURES_TECH_PASS_EXTERNAL_HOLD",
+    "run_id": 40321597804,
+    "focused_tests": "8_OF_8_PASS",
+    "offline_suite": "269_OF_269_PASS",
+    "report": "docs/submission/G41_PDF_SKILL_AI_THIRDPARTY_DISCLOSURE_REVIEW_20261026.md",
+    "evidence": "docs/submission/evidence/G41_IMMUTABLE_DISCLOSURE_CI_20261026.json",
+    "vendor_license": "NOT_IDENTIFIED",
+    "pymupdf_developer_QA": "MISSING_FROM_PDF_INVENTORY",
+    "creatortool": "PARTICIPANT_REPORTED",
+    "human_approval": "PENDING",
+    "nas": "NOT_RUN",
+    "devpost": "NOT_SUBMITTED",
+    "g1_percent": 0,
+    "g1_base_hours_remaining": 1.5,
+    "g1_separate_reserve_hours_remaining": 1.5,
+    "actual_hours": null
   }
 }
