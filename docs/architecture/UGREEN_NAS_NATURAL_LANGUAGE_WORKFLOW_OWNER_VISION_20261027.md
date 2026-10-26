@@ -1,3 +1,5 @@
+> **2026-10-27 VERIFIED PRIZE DISTINCTION:** Official UGREEN Rules section 8 awards **two Most Creative Skills Awards of USD 5,000 each**, restricted to **eligible Round 2 submissions** and based on Innovation & Differentiation; there is **NO confirmed Round-1-only idea prize**. Even a creativity-focused finalist must demonstrate a functioning same-project Skill on the assigned NAS to be an eligible Round 2 submission. Source: https://ugreenhackathon.devpost.com/rules . Winning/top-3 claims remain speculative.
+
 # UGREEN NAS FlowPilot — Owner Natural-Language Automation Vision and Official Contest Boundary
 Decision documented 2026-10-27 KST. **VISION / IMPLEMENTATION PROPOSAL ONLY, NOT REAL NAS WORKING SYSTEM OR OFFICIAL SUBMISSION.** Existing G36/G37 ProjectReady originals remain immutable. Competition Skill must be original and newly authored.
 
