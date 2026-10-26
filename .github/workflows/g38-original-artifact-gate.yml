@@ -1,0 +1,49 @@
+name: G38 immutable G37 original-artifact rights gate (never submits)
+on:
+  push:
+    branches: ["lead/ugreen"]
+    paths:
+      - "tools/g38_release_gate.py"
+      - "tests/test_g38_release_gate.py"
+      - ".github/workflows/g38-original-artifact-gate.yml"
+      - "docs/submission/evidence/G37_G36_EXACT_ARTIFACT_AUDIT_20261026.json"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  assess-hold:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install independent PDF parser only
+        run: python -m pip install "pypdf>=6,<7"
+      - name: Verify non-submission gate regressions
+        run: python -m unittest discover -s tests -p test_g38_release_gate.py -v
+      - name: Fetch the ACTUAL G37 artifact from completed immutable run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/g38-original"
+          gh run download 40312824725 -R ${{ github.repository }} --name G37-G36-EXACT-OWNER-REVIEW-NOT-SUBMITTED --dir "$RUNNER_TEMP/g38-original"
+          echo 'Downloaded original Actions artifact, NOT a freshly generated or rewritten PDF'
+      - name: Fail closed on any original PDF ZIP SHA or metadata drift
+        run: |
+          set -euo pipefail
+          python tools/g38_release_gate.py \
+            --artifact-dir "$RUNNER_TEMP/g38-original" \
+            --output "$RUNNER_TEMP/G38_OWNER_GATE_HOLD.json"
+      - name: Upload ONLY sanitized hold ledger, never release
+        uses: actions/upload-artifact@v4
+        with:
+          name: G38-TECH-PASS-EXTERNAL-APPROVAL-HOLD-NOT-SUBMITTED
+          path: ${{ runner.temp }}/G38_OWNER_GATE_HOLD.json
+          retention-days: 7
+          if-no-files-found: error
