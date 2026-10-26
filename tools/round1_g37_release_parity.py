@@ -1,4 +1,4 @@
-"""G37: build exact G36 / G36-proven Round 1 owner REVIEW package, never submit.
+"""G37: build exact G36 / G36-checker-proven Round 1 owner REVIEW package, never submit.
 
 The original Round 1 proposal, G29 PDF/ZIP and all prior Skill candidates
 remain immutable. The official Uliya checker static-pass applies ONLY to
@@ -38,8 +38,6 @@ def pinned_source() -> bytes:
         raise ValueError("Expected original G36 regular file missing or symlinked")
     if G36_SHA != digest(G36.read_bytes()) or G36.stat().st_size != 14522:
         raise ValueError("G36 exact checked SHA/size changed; cannot inherit static pass")
-    if G36.is_symlink() or G36.parent.is_symlink() or not G36.is_file():
-        raise ValueError("G36 Skill is missing or symlink")
     if G36_EVIDENCE.is_symlink() or not G36_EVIDENCE.is_file():
         raise ValueError("Official G36 checker evidence missing or symlink")
     source = G36.read_bytes()
@@ -57,7 +55,7 @@ def pinned_source() -> bytes:
         or j.get("source_sha_before_after_equal") is not True
         or j.get("network_blocked_during_checker") is not True
         or j.get("candidate_mounted_read_only") is not True
-        or j.get("real_nas") != "NOT_RUN"
+        or j.get("nas_runtime") != "NOT_RUN"
         or j.get("devpost") != "NOT_SUBMITTED"
         or not isinstance(j.get("checker_json_sha256"), str)
         or len(j["checker_json_sha256"]) != 64):

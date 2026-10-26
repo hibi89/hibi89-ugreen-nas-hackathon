@@ -19,7 +19,7 @@ class G37Tests(unittest.TestCase):
         self.assertLessEqual(p["substantive_words"],500)
         self.assertIn("revised G36 Skill passed",p["questions"][7]["answer"])
         self.assertNotIn("No official Uliya validator",p["questions"][7]["answer"])
-        self.assertIn("first-party static checker",p["proof_status"]["official_validator"].lower().replace("_"," "))
+        self.assertEqual(p["proof_status"]["official_validator"],"G36_EXACT_SHA_FIRST_PARTY_STATIC_PASS")
         self.assertEqual(p["proof_status"]["devpost"],"NOT_SUBMITTED")
         self.assertEqual(p["proof_status"]["nas"],"NOT_RUN")
     def test_one_markdown_zip_and_deterministic_bytes(self):
