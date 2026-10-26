@@ -447,7 +447,14 @@
     "original_baseline_hours": 34.25,
     "separate_reserve_hours": 26.75,
     "estimated_remaining_hours": null,
-    "actual_development_time": null
+    "actual_development_time": null,
+    "counts": {
+      "DONE": 14,
+      "BLOCKED": 3,
+      "NOT_STARTED": 7
+    },
+    "as_of_kst": "2026-10-26",
+    "status": "14 DONE/0 PARTIAL/3 BLOCKED/7 NOT_STARTED"
   },
   "last_verified_ci_before_master": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40072583689",
   "master_progress_ref": "data/master_progress.json",
@@ -852,6 +859,21 @@
     "actual_hours": null,
     "real_nas": "NOT_RUN",
     "license": "REPLY_PENDING",
+    "devpost": "NOT_SUBMITTED"
+  },
+  "scoped_day_acceptance_reconciliation_2026_10_26": {
+    "status": "12_OF_12_PRIOR_PARTIAL_DAY_DELIVERABLES_RECONCILED_FROM_HISTORICAL_CI",
+    "date_kst": "2026-10-26",
+    "scope": "Historical fixed-day acceptance only, not release",
+    "prior_partial": 12,
+    "current_partial": 0,
+    "current_done": 14,
+    "current_blocked": 3,
+    "current_not_started": 7,
+    "actual_active_hours": null,
+    "real_nas": "NOT_RUN",
+    "new_g42_tests": "CI_PENDING",
+    "release": "HOLD",
     "devpost": "NOT_SUBMITTED"
   }
 }

@@ -25,10 +25,10 @@
     "sdk_gate_distinct": true
   },
   "next_work": {
-    "id": "G42-READ_ONLY_SOURCE_AND_SECURITY_FAIL_CLOSED_TESTS",
+    "id": "G42-CI-AND-RUNTIME_BOUNDARY_FOLLOWUP",
     "scheduled_kst": "2026-10-26",
-    "status": "G42_TEST_CI_PENDING",
-    "scope": "Check new G42 adversarial test CI; preserve checked G36 and actual G37. Follow-up scoped runtime adapter safety design if warranted.",
+    "status": "NEXT_INTERNAL",
+    "scope": "Verify new G42 tests by CI; inspect and document restricted target/symlink/permission adapter boundaries, do not alter exact G36/G37 and do not claim runtime NAS proof.",
     "planned_hours": 0,
     "separate_reserve_hours": 0,
     "actual_completion_eta_hours": null
@@ -251,23 +251,23 @@
   "master_progress": {
     "path": "MASTER_PROGRESS.md",
     "priority": "AUTHORITATIVE_24_DAY_STATUS",
-    "as_of_kst": "2026-10-24",
+    "as_of_kst": "2026-10-26",
     "original_source": "docs/UGREEN_DAILY_EFFORT_PLAN_20261024.md",
     "planned_days": 24,
     "counts": {
-      "DONE": 1,
-      "PARTIAL": 13,
-      "BLOCKED": 2,
-      "NOT_STARTED": 8
+      "DONE": 14,
+      "BLOCKED": 3,
+      "NOT_STARTED": 7
     },
     "original_planned_base_hours": 34.25,
     "original_separate_reserve_hours": 26.75,
     "actual_remaining_hours": null,
     "global_completion_percent": null,
     "real_nas_run": false,
-    "official_checker_run": false,
+    "official_checker_run": true,
     "devpost_submitted": false,
-    "actual_work_hours": null
+    "actual_work_hours": null,
+    "official_checker_scope": "G36_EXACT_SHA_STATIC_ONLY"
   },
   "closeout_enforces_master_on_every_push": true,
   "master_progress_ref": "data/master_progress.json",
@@ -1109,5 +1109,27 @@
     "symlink_resolution": "UNVERIFIED",
     "original_submission_artifact_modified": false,
     "release": "HOLD"
+  },
+  "scoped_day_acceptance_reconciliation": {
+    "date_kst": "2026-10-26",
+    "original_partial": 12,
+    "partial_reconciled_done": 12,
+    "remaining_partial": 0,
+    "completed_days": 14,
+    "blocked_days": 3,
+    "not_started_days": 7,
+    "classification": "FIXED_DAY_ACCEPTANCE_ONLY_NOT_PRODUCT_LAUNCH",
+    "historical_ci_basis": [
+      "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40321597804",
+      "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40311253113",
+      "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40312824725",
+      "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40083631042"
+    ],
+    "g42_new_tests": "CI_PENDING",
+    "release": "HOLD",
+    "official_nas": "NOT_RUN",
+    "owner_originality_release_review": "PENDING",
+    "license_vendor_reply": "NOT_VERIFIED",
+    "devpost": "NOT_SUBMITTED"
   }
 }
