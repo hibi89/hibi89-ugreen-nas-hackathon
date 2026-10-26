@@ -1,0 +1,63 @@
+name: G34 G32-matched owner-review Round1 PDF ZIP (NOT SUBMITTED)
+on:
+  push:
+    branches: ["lead/ugreen"]
+    paths:
+      - "tools/round1_g34_release_parity.py"
+      - "tests/test_round1_g34_release_parity.py"
+      - ".github/workflows/g34-round1-owner-review.yml"
+      - "docs/submission/checker_inputs/G32_20261026/projectready-nas/SKILL.md"
+      - "docs/submission/evidence/G33_FIRST_PARTY_G32_OFFICIAL_CHECKER_20261026.json"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  g34-parity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install PDF-only independent test and renderer dependencies
+        run: python -m pip install "reportlab>=4,<5" "pypdf>=6,<7"
+      - name: G34 exact-source and fail-closed regressions
+        run: python -m unittest discover -s tests -p test_round1_g34_release_parity.py -v
+      - name: Generate separate owner-review PDF ZIP and manifest
+        run: python tools/round1_g34_release_parity.py --output-dir "$RUNNER_TEMP/g34-preview"
+      - name: Independently audit PDF and exact single-entry ZIP bytes and manifest
+        run: |
+          python - "$RUNNER_TEMP/g34-preview" <<'PY'
+          import hashlib, json, pathlib, sys, zipfile
+          d=pathlib.Path(sys.argv[1])
+          m=json.loads((d/"ProjectReady_G34_Manifest.json").read_text())
+          zp=d/"ProjectReady_G34_G32_Skill_OWNER_REVIEW_NOT_SUBMITTED.zip"
+          pp=d/"ProjectReady_G34_Round1_OWNER_REVIEW_NOT_SUBMITTED.pdf"
+          assert m["devpost"]=="NOT_SUBMITTED" and m["human_entrant_approval"]=="PENDING"
+          assert m["official_checker"]=="G32_FIRST_PARTY_STATIC_PASS_EXACT_SHA_ONLY"
+          assert m["proposal_answer_words"]<=500
+          assert m["pdf"]["pages"]==1
+          assert m["pdf"]["sha256"]==hashlib.sha256(pp.read_bytes()).hexdigest()
+          assert m["skill_zip_sha256"]==hashlib.sha256(zp.read_bytes()).hexdigest()
+          assert pp.stat().st_size<=1000000 and zp.stat().st_size<=10000000
+          with zipfile.ZipFile(zp) as z:
+              assert z.namelist()==["projectready-nas/SKILL.md"]
+              skill=z.read("projectready-nas/SKILL.md")
+          assert hashlib.sha256(skill).hexdigest()==m["candidate_skill_sha256"]
+          assert skill==pathlib.Path(
+              "docs/submission/checker_inputs/G32_20261026/projectready-nas/SKILL.md"
+          ).read_bytes()
+          assert m["candidate_skill_sha256"]=="2baf409f990e8b5ba78bdb378b86dbf81ca83eec2dfa4cc605e1642ffd38feaa"
+          print(json.dumps(m,ensure_ascii=False))
+          print("G34 INDEPENDENT PDF AND ZIP BYTE PARITY PASS; NOT SUBMITTED")
+          PY
+      - name: Upload owner-review artifacts without submission
+        uses: actions/upload-artifact@v4
+        with:
+          name: G34-G32-EXACT-OWNER-REVIEW-NOT-SUBMITTED
+          path: ${{ runner.temp }}/g34-preview/*
+          retention-days: 7
+          if-no-files-found: error
