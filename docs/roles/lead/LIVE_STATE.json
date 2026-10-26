@@ -11,7 +11,7 @@
   "official_sdk_cli_schema": "BLOCKED_UNVERIFIED",
   "registered_expert_agents": "BLOCKED_UNVERIFIED",
   "nas_runtime": "NOT_RUN",
-  "official_skill_validator": "G22_PARTICIPANT_STATIC_PASS;G29_PARTICIPANT_WARNING_1;G31_PARTICIPANT_NOT_UPLOADABLE_ERRORS_2;G32_NOT_RUN",
+  "official_skill_validator": "G22_PARTICIPANT_STATIC_PASS_EXACT_SHA;G29_PARTICIPANT_WARNING_1;G31_PARTICIPANT_NOT_UPLOADABLE_2_ERRORS;G32_FIRST_PARTY_STATIC_PASS_0_0_0_EXACT_SHA",
   "pii_safety": "NOT_CHECKED",
   "devpost_final_submission": "NOT_SUBMITTED",
   "round2_finalist_status": "NOT_CONFIRMED",
@@ -25,10 +25,10 @@
     "sdk_gate_distinct": true
   },
   "next_work": {
-    "id": "G32-EXACT-SHA-OFFICIAL-CHECKER",
+    "id": "G34-G32-PDF-ZIP-RELEASE-PARITY",
     "scheduled_kst": "2026-10-26",
-    "status": "BLOCKED_OWNER_LOCAL_FIRST_PARTY_CHECK",
-    "scope": "After G32 ZIP/checksum CI succeeds, run installed official Uliya checker on exact G32 SKILL.md and supply JSON, exit code, and unchanged before/after SHA. No NAS access or submission.",
+    "status": "READY_INTERNAL_REVIEW_OWNER_APPROVAL_REQUIRED_FOR_RELEASE",
+    "scope": "Build distinct G32-matched one-Markdown ZIP and compare 10-question PDF declarations against latest G33 checker facts; preserve older G29 source; inspect IP/license/AI/data-flow declarations. Do not publish/submit, contact NAS or change original approved content. Separate final approval gate.",
     "planned_hours": 0,
     "separate_reserve_hours": 0,
     "actual_completion_eta_hours": null
@@ -894,7 +894,7 @@
     "source_base_head": "991d0f8bd49192b9e6b8948ae0f5e1dfb26800de",
     "g31_sha256": "cb69afb6525d1ca530f72b83ad26965c411ca02dfdbab97aa762d612d34d25a2",
     "g31_verdict": "PARTICIPANT_REPORTED_NOT_UPLOADABLE_2_ERRORS",
-    "official_checker": "NOT_RUN",
+    "official_checker": "FIRST_PARTY_VERIFIED_STATIC_PASS_0_0_0",
     "offline_bundle": "SUCCESS_RUN_40304214712",
     "nas_runtime": "NOT_RUN",
     "submission": "NOT_SUBMITTED",
@@ -907,6 +907,40 @@
     "artifact_id": 12640709232,
     "ci_head": "d8f2222d409bba9131cad52235c49f7b714a2fb7",
     "closeout_ci": "SUCCESS_RUN_40304214571",
-    "master_ci": "SUCCESS_RUN_40304214796"
+    "master_ci": "SUCCESS_RUN_40304214796",
+    "g33_official_run_id": 40306076413,
+    "g33_official_evidence": "docs/submission/evidence/G33_FIRST_PARTY_G32_OFFICIAL_CHECKER_20261026.json",
+    "g33_source_sha": "fb71c8fa73519663f57fbf584577bccea11ce765",
+    "checker_exit_code": 0,
+    "official_checker_sha256": "2baf409f990e8b5ba78bdb378b86dbf81ca83eec2dfa4cc605e1642ffd38feaa",
+    "checked_in_network_isolated_container": true
+  },
+  "g1_runtime_gate_unresolved": true,
+  "g33_first_party_checker_verified": {
+    "evidence_type": "FIRST_PARTY_CHECKER_RUN_ISOLATED_NO_NETWORK",
+    "candidate": "G32_20261026/projectready-nas/SKILL.md",
+    "skill_sha256_before_after": "2baf409f990e8b5ba78bdb378b86dbf81ca83eec2dfa4cc605e1642ffd38feaa",
+    "bytes": 14389,
+    "vendor_archive_sha256": "cf557e5a022e4297892f39768132855154232efdedeb726b2845450ccd70e1b3",
+    "checker_exit_code": 0,
+    "checker_result_status": "static-pass",
+    "checker_json_sha256": "76817dc8dd55078373df182b2bf3b0d5c069a1edf7954d78b2815c60df1d7671",
+    "checker_summary": {
+      "errors": 0,
+      "warnings": 0,
+      "info": 0
+    },
+    "diagnostics_codes": [],
+    "stderr_present": false,
+    "stderr_sha256": null,
+    "first_party_checker_executed": true,
+    "real_nas_or_expert_agent_executed": false,
+    "unapproved_external_network_access": false,
+    "devpost_submitted": false,
+    "workflow_run_id": 40306076413,
+    "workflow_url": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40306076413",
+    "artifact_id": 12642750797,
+    "source_head": "fb71c8fa73519663f57fbf584577bccea11ce765",
+    "verification_scope": "Official vendor checker executed in offline Docker on pinned public kit and exact public G32; owner-local Codex/NAS runtime not tested."
   }
 }

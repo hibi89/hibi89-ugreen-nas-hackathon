@@ -678,7 +678,7 @@
     "report": "docs/submission/G31_DELEGATE_WARNING_RECOVERY_20261025.md"
   },
   "g32_2026_10_26": {
-    "official_checker": "NOT_RUN",
+    "official_checker": "FIRST_PARTY_G33_STATIC_PASS_EXACT_SHA",
     "g31_participant_checker": "NOT_UPLOADABLE_ERRORS_2_EXIT_1",
     "source": "docs/submission/checker_inputs/G32_20261026/projectready-nas/SKILL.md",
     "offline_ci": "PASS_G32_3_OF_3_FULL_235_OF_235",
@@ -690,5 +690,20 @@
     "skill_bytes": 14389,
     "zip_sha256": "1843eef0a40e85bdf14ccc1922f0bf989d25f5a1029c8fe1400aaf1d40ed6ec7",
     "offline_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40304214712"
+  },
+  "g33_2026_10_26": {
+    "source_sha": "fb71c8fa73519663f57fbf584577bccea11ce765",
+    "first_party_checker": "STATIC_PASS_ERRORS_0_WARNINGS_0_INFO_0_EXIT_0",
+    "exact_skill_sha256": "2baf409f990e8b5ba78bdb378b86dbf81ca83eec2dfa4cc605e1642ffd38feaa",
+    "kit_sha256": "cf557e5a022e4297892f39768132855154232efdedeb726b2845450ccd70e1b3",
+    "run_id": 40306076413,
+    "artifact_id": 12642750797,
+    "staging_pdf_zip_parity": "PENDING_G34",
+    "g1_runtime_day_completion_percent": 0,
+    "g1_runtime_base_hours": 1.5,
+    "g1_runtime_reserve_hours": 1.5,
+    "actual_labor_hours": null,
+    "devpost": "NOT_SUBMITTED",
+    "no_real_nas_or_agent": true
   }
 }

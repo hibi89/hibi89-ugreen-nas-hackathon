@@ -1,0 +1,27 @@
+{
+  "evidence_type": "FIRST_PARTY_CHECKER_RUN_ISOLATED_NO_NETWORK",
+  "candidate": "G32_20261026/projectready-nas/SKILL.md",
+  "skill_sha256_before_after": "2baf409f990e8b5ba78bdb378b86dbf81ca83eec2dfa4cc605e1642ffd38feaa",
+  "bytes": 14389,
+  "vendor_archive_sha256": "cf557e5a022e4297892f39768132855154232efdedeb726b2845450ccd70e1b3",
+  "checker_exit_code": 0,
+  "checker_result_status": "static-pass",
+  "checker_json_sha256": "76817dc8dd55078373df182b2bf3b0d5c069a1edf7954d78b2815c60df1d7671",
+  "checker_summary": {
+    "errors": 0,
+    "warnings": 0,
+    "info": 0
+  },
+  "diagnostics_codes": [],
+  "stderr_present": false,
+  "stderr_sha256": null,
+  "first_party_checker_executed": true,
+  "real_nas_or_expert_agent_executed": false,
+  "unapproved_external_network_access": false,
+  "devpost_submitted": false,
+  "workflow_run_id": 40306076413,
+  "workflow_url": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40306076413",
+  "artifact_id": 12642750797,
+  "source_head": "fb71c8fa73519663f57fbf584577bccea11ce765",
+  "verification_scope": "Official vendor checker executed in offline Docker on pinned public kit and exact public G32; owner-local Codex/NAS runtime not tested."
+}
