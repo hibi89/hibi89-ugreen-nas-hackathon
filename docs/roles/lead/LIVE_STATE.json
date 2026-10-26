@@ -25,10 +25,10 @@
     "sdk_gate_distinct": true
   },
   "next_work": {
-    "id": "G40-VERIFY-CHAIN-CI-AND-PREPARE-OWNER-ONLY-EVIDENCE",
+    "id": "G41-OWNER-CREATOR-PROVENANCE-AND-DISCLOSURE_REVIEW",
     "scheduled_kst": "2026-10-26",
-    "status": "CI_PENDING_PLUS_EXTERNAL_HOLD",
-    "scope": "Read G40 exact Git G20/G36/G37/G39 lineage checker run; if passes, persist verified status. Do not equate source hash check with participant Codex Creator invocation, license grant, legal rights or entrant approval. Preserve artifact hashes; do not submit or contact UGREEN.",
+    "status": "READY_NONPUBLISHING_INTERNAL_WITH_EXTERNAL_LICENSE_HOLD",
+    "scope": "Review exact G37 Skill/PDF source/license/AI/Creator declarations against official rules. Prepare owner-only evidence review with no automatic attestation, outbound organizer message, or Devpost/SkillHub publish. Only first-party source chain verified; standalone official-kit license not identified, local Creator execution not independently reproduced.",
     "planned_hours": 0,
     "separate_reserve_hours": 0,
     "actual_completion_eta_hours": null
@@ -1058,10 +1058,13 @@
     "g36_sha256": "e4e45dea7f2ca22a37c2c3803ed12d6b9914c7ca4686d9b891976ba1481610a4",
     "current_g37_artifacts_unchanged": true,
     "workflow": ".github/workflows/g40-creator-provenance-gate.yml",
-    "ci_status": "PENDING",
+    "ci_status": "SUCCESS_VERIFIED_RUN_40319136757",
     "license_rights": "NOT_CLEARED",
     "creator_local_invocation": "PARTICIPANT_REPORTED_NOT_REPLAYED",
     "release": "HOLD_EXTERNAL_OWNER_LICENSE_REVIEW",
-    "submission": "NOT_SUBMITTED"
+    "submission": "NOT_SUBMITTED",
+    "ci_focused_tests_passed": 5,
+    "original_review_source_actual_bytes": 10481,
+    "result_artifact_id": 12648750561
   }
 }
