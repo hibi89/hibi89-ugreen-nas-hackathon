@@ -25,10 +25,10 @@
     "sdk_gate_distinct": true
   },
   "next_work": {
-    "id": "G38-ENTRANT-RELEASE-AND-RIGHTS-REVIEW",
+    "id": "G39-CREATOR-LICENSE-PROVENANCE-OWNER-DECISION",
     "scheduled_kst": "2026-10-26",
-    "status": "BLOCKED_ON_ENTRANT_IP_LICENSE_EDITORIAL_APPROVAL",
-    "scope": "Complete exact G37 PDF/ZIP owner review; confirm original creator attribution/eligibility, applicable UGREEN platform/license and data-flow disclosures. Explicit participant approval required before any Devpost/SkillHub submission. Do not submit on G38 unless separately directly instructed and rights gate cleared; NAS and permissions remain untested.",
+    "status": "BLOCKED_ON_ENTRANT_RIGHTS_AND_LICENSE",
+    "scope": "Prepare factual evidence dossier and owner-only review of official Creation Tool provenance, applicable UGREEN/third-party terms and originality. Do not infer approval or attempt Devpost submission; G37 original PDF still lacks resolved vendor license identification.",
     "planned_hours": 0,
     "separate_reserve_hours": 0,
     "actual_completion_eta_hours": null
@@ -1017,5 +1017,19 @@
     "github_artifact_id": 12644844524,
     "actual_ci_run_id": 40312824725,
     "independent_evidence": "docs/submission/evidence/G37_G36_EXACT_ARTIFACT_AUDIT_20261026.json"
+  },
+  "g38_release_hold": {
+    "report": "docs/submission/G38_OWNER_RIGHTS_SUBMISSION_GATE_20261026.md",
+    "checklist": "docs/submission/G38_OWNER_REVIEW_CHECKLIST_20261026.md",
+    "evidence": "docs/submission/evidence/G38_FINAL_RELEASE_HOLD_20261026.json",
+    "g38_ci_run_id": 40314967409,
+    "g38_regressions": "6_OF_6_PASS",
+    "correct_pdf_sha256": "d5d1bf9383d9f7d811f2e8f30b649a41e2b2b382ce3d8ae4f60c75e917874936",
+    "correct_zip_sha256": "b3efbe261dc0ea35e90c290e362fc0efad70e59315d8cc5f0a009d445ece66d7",
+    "rewritten_sandbox_pdf_detected": true,
+    "applicable_UGREEN_license": "NOT_IDENTIFIED",
+    "entrant_approval": "NOT_GIVEN",
+    "decision": "HOLD_EXTERNAL_REVIEW_REQUIRED_NOT_SUBMITTED",
+    "devpost": "NOT_SUBMITTED"
   }
 }

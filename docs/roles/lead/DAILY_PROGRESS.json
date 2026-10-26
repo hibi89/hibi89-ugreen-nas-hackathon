@@ -776,5 +776,20 @@
     "pdf_sha256": "d5d1bf9383d9f7d811f2e8f30b649a41e2b2b382ce3d8ae4f60c75e917874936",
     "zip_sha256": "b3efbe261dc0ea35e90c290e362fc0efad70e59315d8cc5f0a009d445ece66d7",
     "answer_words": 378
+  },
+  "g38_2026_10_26": {
+    "status": "ORIGINAL_ARTIFACT_PARITY_PASS_RELEASE_HOLD",
+    "ci_run": 40314967409,
+    "tests": "6_OF_6_PASS",
+    "pdf_sha256": "d5d1bf9383d9f7d811f2e8f30b649a41e2b2b382ce3d8ae4f60c75e917874936",
+    "zip_sha256": "b3efbe261dc0ea35e90c290e362fc0efad70e59315d8cc5f0a009d445ece66d7",
+    "old_sandbox_pdf_rewritten": true,
+    "owner_release": "NOT_GIVEN",
+    "license": "NOT_CLEARED",
+    "devpost": "NOT_SUBMITTED",
+    "g1_pct": 0,
+    "remaining_base": 1.5,
+    "remaining_reserve": 1.5,
+    "actual_hours": null
   }
 }

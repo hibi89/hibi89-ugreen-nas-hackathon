@@ -1,0 +1,39 @@
+{
+  "status": "G38_EXACT_ORIGINAL_TECHNICAL_PASS_RELEASE_HOLD",
+  "date_kst": "2026-10-26",
+  "original_g37_artifact_id": 12644844524,
+  "original_run_id": 40312824725,
+  "g38_ci_run_id": 40314967409,
+  "g38_ci_url": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40314967409",
+  "g38_ci_conclusion": "success",
+  "g38_focused_tests": 6,
+  "g38_hold_artifact_id": 12646696150,
+  "exact_pdf": {
+    "bytes": 5227,
+    "sha256": "d5d1bf9383d9f7d811f2e8f30b649a41e2b2b382ce3d8ae4f60c75e917874936",
+    "pages": 1,
+    "substantive_words": 378,
+    "questions": 10,
+    "disclosures": 4
+  },
+  "exact_zip": {
+    "bytes": 5685,
+    "sha256": "b3efbe261dc0ea35e90c290e362fc0efad70e59315d8cc5f0a009d445ece66d7",
+    "members": [
+      "projectready-nas/SKILL.md"
+    ]
+  },
+  "source_sha256": "e4e45dea7f2ca22a37c2c3803ed12d6b9914c7ca4686d9b891976ba1481610a4",
+  "old_sandbox_pdf": {
+    "bytes": 30188,
+    "sha256": "5ea8a4ee289c3fa7b7456aca7bada3367380540f105e422c996e6ba0f92f07e1",
+    "status": "WRONG_BYTES_DO_NOT_SUBMIT"
+  },
+  "third_party_license": "NOT_CLEARED",
+  "originality": "PENDING_ENTRANT",
+  "official_creator": "PARTICIPANT_REPORTED",
+  "owner_release": "NOT_GIVEN",
+  "actual_nas": "NOT_RUN",
+  "devpost": "NOT_SUBMITTED",
+  "deadline_kst": "2026-11-16T16:45:00+09:00"
+}

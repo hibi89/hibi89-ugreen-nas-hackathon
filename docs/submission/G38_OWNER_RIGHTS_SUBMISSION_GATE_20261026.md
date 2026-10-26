@@ -1,0 +1,27 @@
+# G38 — UGREEN Round 1 exact-original release gate (2026-10-26 KST)
+
+**TECHNICAL PASS / RELEASE HOLD.** No Devpost submission or SkillHub publication.
+
+## Verified original assets
+G37 first-party-checker-matched source is G36 `SKILL.md` **14,522 bytes**, SHA256 `e4e45dea7f2ca22a37c2c3803ed12d6b9914c7ca4686d9b891976ba1481610a4`, static-pass 0/0/0 in vendor checker run 40311253113. G37 official review PDF is **5,227 bytes**, SHA256 `d5d1bf9383d9f7d811f2e8f30b649a41e2b2b382ce3d8ae4f60c75e917874936`, one page, 378/500 English answer words, 10 entire official questions/answers and four disclosures. G37 single-Markdown Skill ZIP is **5,685 bytes**, SHA256 `b3efbe261dc0ea35e90c290e362fc0efad70e59315d8cc5f0a009d445ece66d7` and contains byte-identical G36 source.
+
+G38 actual [GitHub Actions run 40314967409](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40314967409) **SUCCESS**: used `gh run download` to retrieve the actual G37 artifact **12644844524** (run 40312824725), not a fresh reportlab rendering; verified original PDF/ZIP/proposal JSON/Markdown SHA, full PDF Q/A and disclosure text, manifest status, and G36 Skill byte parity. Six isolated release-gate tests PASS. The output `HOLD_EXTERNAL_REVIEW_REQUIRED_NOT_SUBMITTED` is **intentional** because legal/entrant approvals cannot be generated.
+
+**Important discrepancy:** Previously offered `G37_UGREEN_Round1_verified.pdf` in the sandbox was **30,188 bytes**, SHA `5ea8a4ee289c3fa7b7456aca7bada3367380540f105e422c996e6ba0f92f07e1`, NOT the actual G37 official 5,227-byte PDF. Other sandbox-named PDFs may also be rewritten. Use only the original PDF bytes extracted from unmodified GitHub artifact 12644844524; independently verify SHA `d5d1bf9383d9f7d811f2e8f30b649a41e2b2b382ce3d8ae4f60c75e917874936` immediately before upload. No old sandbox PDF link constitutes release verification.
+
+## Official rules checked 2026-10-26
+- [Official Devpost rules](https://ugreenhackathon.devpost.com/rules): Round 1 deadline **2026-11-15 11:45 p.m. PST = 2026-11-16 16:45 KST**. PDF ten English answers <=500 substantive words, one Markdown-only ZIP <=10MB; Round1 real NAS/demo not required.
+- Mandatory official UGOS Skill Creation Tool use; the entrant's original/new core and sole ownership, individual eligibility and one-project status require entrant attestation. G36 static checker PASS does not by itself establish official Creator *generation* or contest eligibility.
+- Third Party Integrations clause says the proposal **must identify third-party components, sources and applicable licenses**, plus services and data flows. G37 PDF says UGREEN platform license 'not cleared or verified' rather than supplying an established applicable license; this is a truthful **OPEN MATERIAL ISSUE**, not a passing license disclosure. Do not invent an MIT/Apache license; review vendor terms and/or seek organizer clarification.
+- OpenAI ChatGPT and Codex assistance disclosed. Rules prohibit a person outside the entrant's team developing a submission; permitted development tools do not prove AI assistance eligibility. Entrant reviews originality and if needed seeks organizer clarification.
+- [UGREEN SkillHub User Agreement](https://api.ugnas.com/api/system/v1/ua/agreement/page?acceptLanguage=en-US&agreementCode=skillhub-user-agreement) Article 7 and [Publishing Standards](https://api.ugnas.com/api/system/v1/ua/agreement/page?acceptLanguage=en-US&agreementCode=skillhub-publish-audit-spec) require compliant third-party rights and no leftover nonfunctional samples; marketplace publishing is distinct from Devpost Round1.
+
+## Outstanding gates
+1. Entrant eligibility/ownership and new core declaration; actual Creator provenance and approved outside contributions.
+2. Determine actual vendor/platform/third-party source/license rights and improve PDF if necessary, rebuilding PDF hash; no unverified license claim.
+3. Entrant review of exact SHA-matched PDF/ZIP and AI/dataflow accuracy, explicit final consent to submit a specific SHA pair.
+4. Entrant's personal Devpost registration/upload and verifiable submission receipt. Not attempted.
+
+A `ㄱ` to continue internal development **is not** approval to submit.
+
+**Technical gate source:** `tools/g38_release_gate.py`, isolated CI `.github/workflows/g38-original-artifact-gate.yml`; [machine ledger](evidence/G38_FINAL_RELEASE_HOLD_20261026.json). All historic 24-day counts 2 DONE /12 PARTIAL /3 BLOCKED /7 NOT_STARTED, Oct26 G1 original runtime 0% BLOCKED (1.5h base + 1.5h separate reserve; actual labor unmeasured).
