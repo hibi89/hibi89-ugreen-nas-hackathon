@@ -1,0 +1,47 @@
+name: G41 exact G37 proposal and Skill disclosure integrity (no submit)
+on:
+  push:
+    branches: ["lead/ugreen"]
+    paths:
+      - "tools/g41_submission_disclosure_audit.py"
+      - "tests/test_g41_submission_disclosure_audit.py"
+      - ".github/workflows/g41-submission-disclosure-review.yml"
+      - "docs/submission/evidence/G37_G36_EXACT_ARTIFACT_AUDIT_20261026.json"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  review-not-release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Offline PDF parser only
+        run: python -m pip install "pypdf>=6,<7"
+      - name: Disclosures, third-party tool inventory and fail-closed tests
+        run: python -m unittest discover -s tests -p test_g41_submission_disclosure_audit.py -v
+      - name: Download actual G37 Actions PDF ZIP JSON MD without changing content
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/g41-g37"
+          gh run download 40312824725 -R ${{ github.repository }} --name G37-G36-EXACT-OWNER-REVIEW-NOT-SUBMITTED --dir "$RUNNER_TEMP/g41-g37"
+      - name: Audit original immutable G37 bytes, content and explicit rights holds
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/g41_submission_disclosure_audit.py \
+            --artifact-dir "$RUNNER_TEMP/g41-g37" \
+            --output "$RUNNER_TEMP/G41_DISCLOSURE_REVIEW_HOLD.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G41-ORIGINAL-PROPOSAL-DISCLOSURE-AUDIT-HOLD-NOT-SUBMITTED
+          path: ${{ runner.temp }}/G41_DISCLOSURE_REVIEW_HOLD.json
+          if-no-files-found: error
+          retention-days: 7
