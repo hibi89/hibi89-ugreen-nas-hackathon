@@ -1,0 +1,45 @@
+{
+  "evidence_type": "G34_INDEPENDENT_G32_ROUND1_PDF_ZIP_PARITY_PASS_NOT_SUBMITTED",
+  "date_kst": "2026-10-26",
+  "workflow_run_id": 40308015514,
+  "workflow_url": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40308015514",
+  "workflow_head": "03a9d55b080091d9df9c8899a0ae08daa12e4bba",
+  "workflow_result": "success",
+  "focused_tests": {
+    "pass": 6,
+    "fail": 0
+  },
+  "g32_official_static_checker_run_id": 40306076413,
+  "g32_exact_skill_sha256": "2baf409f990e8b5ba78bdb378b86dbf81ca83eec2dfa4cc605e1642ffd38feaa",
+  "skill_bytes": 14389,
+  "zip": {
+    "sha256": "2b4260e3e27c6efde1d7857e9b80ab4441177b84a3cdf80544dcdb107933c077",
+    "bytes": 5722,
+    "members": [
+      "projectready-nas/SKILL.md"
+    ],
+    "member_byte_equal_verified": true
+  },
+  "pdf": {
+    "sha256": "ba0fdf853386073df9cecd9bc88152d3188eaa3bbaf8886ac92ad1dace638991",
+    "bytes": 5158,
+    "pages": 1,
+    "questions_and_answers_verified": 10,
+    "disclosures_verified": 4,
+    "extractable_text": true,
+    "visual_human_review": "PENDING"
+  },
+  "english_answer_words": 365,
+  "word_cap": 500,
+  "proposal_json_sha256": "dd6307f62faa9247f25da4a050c317e221583e684fb1f98f0cee3cc6ca4d18c3",
+  "proposal_markdown_sha256": "1e2439d2ef861ef4d166daa63ceaff5ba7df884470b012f7dbdf9f6f7beba093",
+  "github_actions_artifact_id": 12642484476,
+  "artifact_name": "G34-G32-EXACT-OWNER-REVIEW-NOT-SUBMITTED",
+  "zip_of_artifacts_sha256": "a3e114edd4ea0d989b330ab2037f661a6a6befe3104c350d33722e3aab6b7b34",
+  "artifact_retention_days": 7,
+  "creator_local_execution": "PARTICIPANT_REPORTED_NOT_INDEPENDENTLY_REPLAYED",
+  "rights_licensing": "PENDING_ENTRANT_REVIEW",
+  "human_final_approval": "PENDING",
+  "real_nas": "NOT_RUN",
+  "devpost": "NOT_SUBMITTED"
+}

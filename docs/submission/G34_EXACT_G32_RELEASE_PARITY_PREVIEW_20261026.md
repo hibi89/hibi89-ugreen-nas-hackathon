@@ -1,5 +1,14 @@
 # G34 — G32/G33 exact-source submission PDF + ZIP parity PREVIEW (2026-10-26 KST)
 
+## Verified CI result — 2026-10-26 KST
+- Actual [G34 owner-review workflow run 40308015514](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40308015514) completed **SUCCESS**; focused regressions **6/6 PASS**; full offline readiness, closeout synchronization, canonical 24-day progress and older draft workflow on matching commit also **SUCCESS**.
+- **365/500** substantive English answer words; generated PDF **exactly 1 searchable page, 5,158 bytes**, SHA256 `ba0fdf853386073df9cecd9bc88152d3188eaa3bbaf8886ac92ad1dace638991`; all ten whole official Q/A bodies and four disclosures found by strict PDF parsing.
+- G34 owner-review ZIP **5,722 bytes**, SHA256 `2b4260e3e27c6efde1d7857e9b80ab4441177b84a3cdf80544dcdb107933c077`; exactly one member `projectready-nas/SKILL.md`, **14,389 bytes**, SHA256 `2baf409f990e8b5ba78bdb378b86dbf81ca83eec2dfa4cc605e1642ffd38feaa` byte-matched the *actual G32 first-party checker validated file*. Different ZIP compression than earlier G32 preview is allowed because checked Skill member bytes remain identical.
+- G34 Actions artifact ID **12642484476**, uploaded 16,918 bytes, wrapper SHA `a3e114edd4ea0d989b330ab2037f661a6a6befe3104c350d33722e3aab6b7b34`, expires after 7 days. Retain the exact manifests and replayable source in GitHub; do not imply forever-available ZIP/PDF download.
+- [Permanent sanitized CI manifest](docs/submission/evidence/G34_EXACT_G32_PACKAGE_CI_20261026.json). **PDF manual visual appearance NOT_YET_REVIEWED**, entrant rights/license/AI disclosure approval PENDING, eligible official Creator origin PARTICIPANT_REPORTED not independently replayed, NAS/Agent NOT_RUN, Devpost NOT_SUBMITTED. This is an owner-review staging package only.
+
+
+
 **Scope:** staged human owner review, not Devpost submission, SkillHub publication, NAS access or license approval.
 
 ## Immutable pinned inputs

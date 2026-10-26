@@ -709,8 +709,8 @@
   "g34_2026_10_26": {
     "source_sha256": "2baf409f990e8b5ba78bdb378b86dbf81ca83eec2dfa4cc605e1642ffd38feaa",
     "first_party_static_check": "PASS_EXACT_G32_G33_RUN_40306076413",
-    "g34_ci": "PENDING",
-    "pdf_zip": "PREVIEW_BUILD_PENDING_CI",
+    "g34_ci": "SUCCESS_RUN_40308015514_FOCUSED_6_OF_6",
+    "pdf_zip": "PDF_1_PAGE_5158B_SHA_ba0fdf85_ZIP_5722B_SHA_2b4260e3_ONE_G32_SKILL",
     "total_24_day_states": "DONE_2_PARTIAL_12_BLOCKED_3_NOT_STARTED_7",
     "scheduled_g1_completion_pct": 0,
     "scheduled_g1_base_hours_left": 1.5,
@@ -718,6 +718,8 @@
     "actual_elapsed_hours": null,
     "devpost": "NOT_SUBMITTED",
     "rights": "PENDING",
-    "approval": "PENDING"
+    "approval": "PENDING",
+    "manifest_evidence": "docs/submission/evidence/G34_EXACT_G32_PACKAGE_CI_20261026.json",
+    "pdf_human_visual_review": "PENDING"
   }
 }
