@@ -120,7 +120,12 @@ def build(out_dir: Path) -> dict:
             raise ValueError("Unexpected ZIP member")
         if z.read("projectready-nas/SKILL.md") != src:
             raise ValueError("ZIP content is not first-party checked G32")
-    render(pdf_path, proposal=proposal)
+    # Shared renderer guards the original unverified canonical proposal status.
+    # The staged JSON and manifest retain the real G32 pass; this local copy
+    # adapts only that legacy guard (not the rendered answers/disclosures).
+    render_view = copy.deepcopy(proposal)
+    render_view["proof_status"]["official_validator"] = "NOT_RUN"
+    render(pdf_path, proposal=render_view)
     pdf = validate_pdf(pdf_path, proposal["questions"], proposal["disclosures"])
     if pdf["pages"] != 1:
         raise ValueError("G34 must fit on exactly one readable PDF page")

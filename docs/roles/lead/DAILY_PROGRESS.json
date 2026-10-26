@@ -705,5 +705,19 @@
     "actual_labor_hours": null,
     "devpost": "NOT_SUBMITTED",
     "no_real_nas_or_agent": true
+  },
+  "g34_2026_10_26": {
+    "source_sha256": "2baf409f990e8b5ba78bdb378b86dbf81ca83eec2dfa4cc605e1642ffd38feaa",
+    "first_party_static_check": "PASS_EXACT_G32_G33_RUN_40306076413",
+    "g34_ci": "PENDING",
+    "pdf_zip": "PREVIEW_BUILD_PENDING_CI",
+    "total_24_day_states": "DONE_2_PARTIAL_12_BLOCKED_3_NOT_STARTED_7",
+    "scheduled_g1_completion_pct": 0,
+    "scheduled_g1_base_hours_left": 1.5,
+    "scheduled_g1_separate_reserve_hours_left": 1.5,
+    "actual_elapsed_hours": null,
+    "devpost": "NOT_SUBMITTED",
+    "rights": "PENDING",
+    "approval": "PENDING"
   }
 }

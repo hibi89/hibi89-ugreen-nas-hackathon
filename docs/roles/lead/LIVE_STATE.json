@@ -25,10 +25,10 @@
     "sdk_gate_distinct": true
   },
   "next_work": {
-    "id": "G34-G32-PDF-ZIP-RELEASE-PARITY",
+    "id": "G34-PDF-ZIP-EXACT-PARITY-CI",
     "scheduled_kst": "2026-10-26",
-    "status": "READY_INTERNAL_REVIEW_OWNER_APPROVAL_REQUIRED_FOR_RELEASE",
-    "scope": "Build distinct G32-matched one-Markdown ZIP and compare 10-question PDF declarations against latest G33 checker facts; preserve older G29 source; inspect IP/license/AI/data-flow declarations. Do not publish/submit, contact NAS or change original approved content. Separate final approval gate.",
+    "status": "READY_AWAIT_ACTUAL_G34_CI_RESULT",
+    "scope": "Validate G34 generated G32-byte-identical ZIP, 10-answer PDF exact body, constraints and hashes; inspect CI artifact. Do not submit, touch NAS, merge into main, change old proposal. After pass, advance owner editorial, IP/rights and legal release review.",
     "planned_hours": 0,
     "separate_reserve_hours": 0,
     "actual_completion_eta_hours": null
@@ -942,5 +942,19 @@
     "artifact_id": 12642750797,
     "source_head": "fb71c8fa73519663f57fbf584577bccea11ce765",
     "verification_scope": "Official vendor checker executed in offline Docker on pinned public kit and exact public G32; owner-local Codex/NAS runtime not tested."
+  },
+  "g34_release_preview": {
+    "code_commit": "85570c14094762df8844532ffd3528fbf7eaef9d",
+    "source_sha256": "2baf409f990e8b5ba78bdb378b86dbf81ca83eec2dfa4cc605e1642ffd38feaa",
+    "source_checker_run_id": 40306076413,
+    "build_script": "tools/round1_g34_release_parity.py",
+    "workflow": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/workflows/g34-round1-owner-review.yml",
+    "report": "docs/submission/G34_EXACT_G32_RELEASE_PARITY_PREVIEW_20261026.md",
+    "artifact_status": "PENDING_GITHUB_ACTIONS",
+    "pdf_validated": "PENDING",
+    "source_changed": false,
+    "devpost": "NOT_SUBMITTED",
+    "rights_and_license": "NOT_CLEARED",
+    "entrant_approval": "PENDING"
   }
 }
