@@ -753,5 +753,22 @@
     "g1_base_hours_remaining": 1.5,
     "g1_separate_reserve_hours_remaining": 1.5,
     "actual_hours": null
+  },
+  "g37_2026_10_26": {
+    "stage": "BUILDER_AND_WORKFLOW_STAGED_CI_PENDING",
+    "source_sha256": "e4e45dea7f2ca22a37c2c3803ed12d6b9914c7ca4686d9b891976ba1481610a4",
+    "official_checker": "G36_FIRST_PARTY_STATIC_PASS_RUN_40311253113",
+    "preview_pdf_zip": "NOT_YET_CI_VERIFIED",
+    "focused_tests": "PENDING_RECHECK",
+    "prior_failure": "INITIAL_RECEIPT_JSON_NAS_FIELD_AND_TEST_ASSERTION_CORRECTED",
+    "visual": "NOT_YET_INSPECTED",
+    "human_approval": "PENDING",
+    "rights_license": "NOT_CLEARED",
+    "devpost": "NOT_SUBMITTED",
+    "nas": "NOT_RUN",
+    "g1_runtime_pct": 0,
+    "g1_base_hours": 1.5,
+    "g1_separate_reserve": 1.5,
+    "actual_work_hours": null
   }
 }

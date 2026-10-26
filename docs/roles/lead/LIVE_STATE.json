@@ -25,10 +25,10 @@
     "sdk_gate_distinct": true
   },
   "next_work": {
-    "id": "G37-EXACT-G36-ROUND1-PDF-ZIP-PARITY",
+    "id": "G37-VERIFY-EXACT-PDF-ZIP-CI-AND-VISUAL",
     "scheduled_kst": "2026-10-26",
-    "status": "READY_INTERNAL_ONLY",
-    "scope": "Build a new G36-exact owner-review PDF and single-Markdown ZIP using the same safely pinned G36 first-party checked SHA and machine-readable G36 evidence; independently verify all 10 answers, word cap, PDF readability and byte hashes. Do not submit, run NAS or falsely clear rights. Visual PDF review and human final signoff remain separate.",
+    "status": "READY_AWAIT_GITHUB_CI",
+    "scope": "Check new G37 workflow success, full regression, compare original G36 member byte hash, PDF 10 answers/disclosures and 500 words, download PNG and PDF to inspect actual clipping. Record manifest hashes and artifact only after proof. Never submit or infer licensing.",
     "planned_hours": 0,
     "separate_reserve_hours": 0,
     "actual_completion_eta_hours": null
@@ -989,5 +989,24 @@
     "pdf_zip": "NOT_BUILT_FOR_G36",
     "devpost": "NOT_SUBMITTED",
     "old_g32_unchanged": true
+  },
+  "g37_release_preview": {
+    "source": "docs/submission/checker_inputs/G36_20261026/projectready-nas/SKILL.md",
+    "source_sha256": "e4e45dea7f2ca22a37c2c3803ed12d6b9914c7ca4686d9b891976ba1481610a4",
+    "first_party_run": 40311253113,
+    "first_party_status": "EXACT_G36_STATIC_PASS",
+    "builder": "tools/round1_g37_release_parity.py",
+    "tests": "tests/test_round1_g37_release_parity.py",
+    "workflow": ".github/workflows/g37-round1-owner-review.yml",
+    "report": "docs/submission/G37_G36_MATCHED_PDF_ZIP_RELEASE_PREVIEW_20261026.md",
+    "pdf_zip_status": "PENDING_VERIFIED_CI",
+    "human_visual_pdf": "PENDING",
+    "rights_license": "NOT_CLEARED",
+    "human_approval": "PENDING",
+    "devpost": "NOT_SUBMITTED",
+    "nas": "NOT_RUN",
+    "original_sources_modified": false,
+    "initial_ci_issue": "Original checker receipt JSON uses nas_runtime, not real_nas; corrected, followed by rerun",
+    "g37_source_commit": "2cfe80046f0e7a2efd9f1a9626907620b1ff303d"
   }
 }
