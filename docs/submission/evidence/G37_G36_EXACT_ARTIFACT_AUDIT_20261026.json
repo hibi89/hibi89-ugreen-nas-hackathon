@@ -1,0 +1,73 @@
+{
+  "evidence_type": "G37_EXACT_G36_FIRST_PARTY_CHECKER_MATCHED_ROUND1_ARTIFACT_INDEPENDENT_AUDIT",
+  "date_kst": "2026-10-26",
+  "branch": "lead/ugreen",
+  "source_sha256": "e4e45dea7f2ca22a37c2c3803ed12d6b9914c7ca4686d9b891976ba1481610a4",
+  "first_party_checker": {
+    "run_id": 40311253113,
+    "verdict": "static-pass",
+    "exit": 0,
+    "diagnostics": {
+      "errors": 0,
+      "warnings": 0,
+      "info": 0
+    },
+    "exact_sha_only": true
+  },
+  "workflow": {
+    "run_id": 40312824725,
+    "url": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40312824725",
+    "head_sha": "67ba07b8516dbde336abbf118f4753964e0bbe79",
+    "conclusion": "success",
+    "artifact_id": 12644844524,
+    "artifact_wrapper_sha256": "0efa423bc2d5246bd5026f90cadbad2794dd9bffa0f29c73dae4a94089009cac",
+    "focused_tests_passed": 6,
+    "full_repo_tests_passed": 250,
+    "full_repo_test_run_id": 40312824912,
+    "initial_ci_failure": "Receipt key and test assertion corrected; initial run 40312622487 failed; final run success"
+  },
+  "pdf": {
+    "filename": "ProjectReady_G37_Round1_OWNER_REVIEW_NOT_SUBMITTED.pdf",
+    "sha256": "d5d1bf9383d9f7d811f2e8f30b649a41e2b2b382ce3d8ae4f60c75e917874936",
+    "bytes": 5227,
+    "pages": 1,
+    "answer_words": 378,
+    "answer_word_limit": 500,
+    "exact_official_questions": 10,
+    "disclosures": 4,
+    "content_extractable": true,
+    "actual_visual_review": "PASS_ONE_PAGE_NO_OVERFLOW_OR_CLIPPING",
+    "render_dpi": 200,
+    "render_pixels": [
+      1654,
+      2339
+    ],
+    "render_sha256": "4c772a26cd0f8931321c6f4a549511ec225ad2f890ad5cc4c43eb5f580d3ec5d",
+    "text_blocks": 19,
+    "text_blocks_outside_page": 0
+  },
+  "zip": {
+    "filename": "ProjectReady_G37_G36_Skill_OWNER_REVIEW_NOT_SUBMITTED.zip",
+    "sha256": "b3efbe261dc0ea35e90c290e362fc0efad70e59315d8cc5f0a009d445ece66d7",
+    "bytes": 5685,
+    "members": [
+      "projectready-nas/SKILL.md"
+    ],
+    "contained_skill_sha256": "e4e45dea7f2ca22a37c2c3803ed12d6b9914c7ca4686d9b891976ba1481610a4",
+    "contained_skill_bytes": 14522,
+    "byte_equal_to_verified_g36": true
+  },
+  "proposal": {
+    "json_sha256": "6d2fee9cca12bb874e9687e7fb0ad8d96ce211bec730b0ec450fe7cc0199cb69",
+    "markdown_sha256": "3ef647c1f23292516b4191faa7c4bee7e73069d21cc821018df462f7b7aae752"
+  },
+  "limitations": {
+    "human_review": "PENDING",
+    "rights_license": "NOT_CLEARED",
+    "creator_origin": "PARTICIPANT_REPORTED_NOT_INDEPENDENTLY_REPLAYED",
+    "actual_nas_or_expert_agent": "NOT_RUN",
+    "real_privacy_dataflow": "UNVERIFIED",
+    "devpost": "NOT_SUBMITTED",
+    "official_skillhub_semantic_compliance": "NOT_SPONSOR_CERTIFIED"
+  }
+}

@@ -25,10 +25,10 @@
     "sdk_gate_distinct": true
   },
   "next_work": {
-    "id": "G37-VERIFY-EXACT-PDF-ZIP-CI-AND-VISUAL",
+    "id": "G38-ENTRANT-RELEASE-AND-RIGHTS-REVIEW",
     "scheduled_kst": "2026-10-26",
-    "status": "READY_AWAIT_GITHUB_CI",
-    "scope": "Check new G37 workflow success, full regression, compare original G36 member byte hash, PDF 10 answers/disclosures and 500 words, download PNG and PDF to inspect actual clipping. Record manifest hashes and artifact only after proof. Never submit or infer licensing.",
+    "status": "BLOCKED_ON_ENTRANT_IP_LICENSE_EDITORIAL_APPROVAL",
+    "scope": "Complete exact G37 PDF/ZIP owner review; confirm original creator attribution/eligibility, applicable UGREEN platform/license and data-flow disclosures. Explicit participant approval required before any Devpost/SkillHub submission. Do not submit on G38 unless separately directly instructed and rights gate cleared; NAS and permissions remain untested.",
     "planned_hours": 0,
     "separate_reserve_hours": 0,
     "actual_completion_eta_hours": null
@@ -999,14 +999,23 @@
     "tests": "tests/test_round1_g37_release_parity.py",
     "workflow": ".github/workflows/g37-round1-owner-review.yml",
     "report": "docs/submission/G37_G36_MATCHED_PDF_ZIP_RELEASE_PREVIEW_20261026.md",
-    "pdf_zip_status": "PENDING_VERIFIED_CI",
-    "human_visual_pdf": "PENDING",
+    "pdf_zip_status": "ACTUAL_CI_AND_INDEPENDENT_BYTE_PARITY_PASS_RUN_40312824725",
+    "human_visual_pdf": "ACTUAL_200DPI_VISUAL_PASS_19_BLOCKS_NO_CLIPPING",
     "rights_license": "NOT_CLEARED",
     "human_approval": "PENDING",
     "devpost": "NOT_SUBMITTED",
     "nas": "NOT_RUN",
     "original_sources_modified": false,
     "initial_ci_issue": "Original checker receipt JSON uses nas_runtime, not real_nas; corrected, followed by rerun",
-    "g37_source_commit": "2cfe80046f0e7a2efd9f1a9626907620b1ff303d"
+    "g37_source_commit": "2cfe80046f0e7a2efd9f1a9626907620b1ff303d",
+    "test_counts": "G37_FOCUSED_6_OF_6_FULL_REPO_250_OF_250",
+    "pdf_sha256": "d5d1bf9383d9f7d811f2e8f30b649a41e2b2b382ce3d8ae4f60c75e917874936",
+    "zip_sha256": "b3efbe261dc0ea35e90c290e362fc0efad70e59315d8cc5f0a009d445ece66d7",
+    "pdf_bytes": 5227,
+    "zip_bytes": 5685,
+    "proposal_answer_words": 378,
+    "github_artifact_id": 12644844524,
+    "actual_ci_run_id": 40312824725,
+    "independent_evidence": "docs/submission/evidence/G37_G36_EXACT_ARTIFACT_AUDIT_20261026.json"
   }
 }

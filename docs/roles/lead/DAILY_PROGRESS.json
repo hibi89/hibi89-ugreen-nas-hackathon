@@ -755,13 +755,13 @@
     "actual_hours": null
   },
   "g37_2026_10_26": {
-    "stage": "BUILDER_AND_WORKFLOW_STAGED_CI_PENDING",
+    "stage": "COMPLETE_WITHIN_OWNER_REVIEW_PREVIEW_ONLY",
     "source_sha256": "e4e45dea7f2ca22a37c2c3803ed12d6b9914c7ca4686d9b891976ba1481610a4",
     "official_checker": "G36_FIRST_PARTY_STATIC_PASS_RUN_40311253113",
-    "preview_pdf_zip": "NOT_YET_CI_VERIFIED",
-    "focused_tests": "PENDING_RECHECK",
+    "preview_pdf_zip": "SUCCESS_CI_AND_INDEPENDENT_BYTE_VISUAL_AUDIT",
+    "focused_tests": "6_OF_6_PASS_FULL_250_OF_250_PASS",
     "prior_failure": "INITIAL_RECEIPT_JSON_NAS_FIELD_AND_TEST_ASSERTION_CORRECTED",
-    "visual": "NOT_YET_INSPECTED",
+    "visual": "PASS_200DPI_ONE_PAGE_19_BLOCKS_NO_CLIP",
     "human_approval": "PENDING",
     "rights_license": "NOT_CLEARED",
     "devpost": "NOT_SUBMITTED",
@@ -769,6 +769,12 @@
     "g1_runtime_pct": 0,
     "g1_base_hours": 1.5,
     "g1_separate_reserve": 1.5,
-    "actual_work_hours": null
+    "actual_work_hours": null,
+    "artifact_id": 12644844524,
+    "actual_ci_run_id": 40312824725,
+    "independent_evidence": "docs/submission/evidence/G37_G36_EXACT_ARTIFACT_AUDIT_20261026.json",
+    "pdf_sha256": "d5d1bf9383d9f7d811f2e8f30b649a41e2b2b382ce3d8ae4f60c75e917874936",
+    "zip_sha256": "b3efbe261dc0ea35e90c290e362fc0efad70e59315d8cc5f0a009d445ece66d7",
+    "answer_words": 378
   }
 }
