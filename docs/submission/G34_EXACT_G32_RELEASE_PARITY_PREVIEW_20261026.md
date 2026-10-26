@@ -1,3 +1,5 @@
+> **G35 2026-10-26 — G34 actual PDF visual PASS; RELEASE HOLD:** downloaded artifact 12642484476, outer SHA verified; PDF SHA `ba0fdf853386073df9cecd9bc88152d3188eaa3bbaf8886ac92ad1dace638991`, 200dpi A4 visual PASS (10 QAs/4 disclosures/19 in-bounds text blocks/no clipping), ZIP G32 exact member SHA retained. **New potential UGREEN Standards Article 2.5 issue:** G32 includes two inert syntax-only delegate examples. Static G33 `static-pass` does not establish semantic publication eligibility. Hold G34 release pending separate G36 revised Skill + new-SHA checker and rebuilt PDF/ZIP; entrant ownership/license/AI disclosure final approval still pending, no NAS or submission. [G35 evidence](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/blob/lead%2Fugreen/docs/submission/G35_G34_VISUAL_AND_RIGHTS_REVIEW_20261026.md). 24-day status 2 DONE/12 PARTIAL/3 BLOCKED/7 NOT_STARTED; Oct26 G1 0% blocked, base1.5h+reserve1.5h, labor unmeasured.
+
 # G34 — G32/G33 exact-source submission PDF + ZIP parity PREVIEW (2026-10-26 KST)
 
 ## Verified CI result — 2026-10-26 KST

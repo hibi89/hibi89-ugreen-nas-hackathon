@@ -25,10 +25,10 @@
     "sdk_gate_distinct": true
   },
   "next_work": {
-    "id": "G35-INDEPENDENT-PDF-VISUAL-RIGHTS-RELEASE-REVIEW",
+    "id": "G36-SEMANTIC-DELEGATE-PUBLISH-CANDIDATE",
     "scheduled_kst": "2026-10-26",
-    "status": "READY_INTERNAL_VISUAL_CHECK_OWNER_REVIEW_EXTERNAL_GATE",
-    "scope": "Inspect exact G34 PDF visible rendering for overflow/cutoff and independently review current entrant license/originality, AI-assisted Creator provenance, and privacy/dataflow disclosures. No submission, no owner approval inference, no real NAS calls. Exact file SHA if changed must be rechecked.",
+    "status": "READY_ISOLATED_CODE_OLD_G32_PRESERVED",
+    "scope": "Prepare separate G36 Skill without inert/template command examples, preserving owner consent and fail-closed semantics; test exact new SHA with first-party isolated checker. Rebuild matched PDF/ZIP only after static pass; no real NAS or submission. Entrant legal/rights approval separate.",
     "planned_hours": 0,
     "separate_reserve_hours": 0,
     "actual_completion_eta_hours": null
@@ -951,7 +951,7 @@
     "workflow": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/workflows/g34-round1-owner-review.yml",
     "report": "docs/submission/G34_EXACT_G32_RELEASE_PARITY_PREVIEW_20261026.md",
     "artifact_status": "SUCCESS_G34_ACTIONS_RUN_40308015514_ARTIFACT_12642484476",
-    "pdf_validated": "SEARCHABLE_EXACT_10_QA_4_DISCLOSURES_1_PAGE_VISUAL_REVIEW_PENDING",
+    "pdf_validated": "ACTUAL_VISUAL_PDF_PASS_200DPI_1PAGE_NO_CLIP",
     "source_changed": false,
     "devpost": "NOT_SUBMITTED",
     "rights_and_license": "NOT_CLEARED",
@@ -962,5 +962,16 @@
     "answer_words": 365,
     "evidence": "docs/submission/evidence/G34_EXACT_G32_PACKAGE_CI_20261026.json",
     "ci_head": "03a9d55b080091d9df9c8899a0ae08daa12e4bba"
+  },
+  "g35_review": {
+    "report": "docs/submission/G35_G34_VISUAL_AND_RIGHTS_REVIEW_20261026.md",
+    "evidence": "docs/submission/evidence/G35_G34_PDF_VISUAL_AUDIT_20261026.json",
+    "pdf_visual": "PASS_ACTUAL_200DPI_NO_OVERFLOW",
+    "pdf_sha256": "ba0fdf853386073df9cecd9bc88152d3188eaa3bbaf8886ac92ad1dace638991",
+    "zip_sha256": "2b4260e3e27c6efde1d7857e9b80ab4441177b84a3cdf80544dcdb107933c077",
+    "release": "HOLD_G32_INERT_DELEGATE_ARTICLE_2_5_RISK",
+    "rights": "PENDING",
+    "entrant_approval": "PENDING",
+    "devpost": "NOT_SUBMITTED"
   }
 }

@@ -1,0 +1,53 @@
+{
+  "id": "G35_20261026",
+  "date_kst": "2026-10-26",
+  "artifact_id": 12642484476,
+  "artifact_run_id": 40308015514,
+  "artifact_wrapper_sha256": "a3e114edd4ea0d989b330ab2037f661a6a6befe3104c350d33722e3aab6b7b34",
+  "pdf": {
+    "bytes": 5158,
+    "sha256": "ba0fdf853386073df9cecd9bc88152d3188eaa3bbaf8886ac92ad1dace638991",
+    "pages": 1,
+    "page_size_pt": [
+      595.28,
+      841.89
+    ],
+    "render_dpi": 200,
+    "raster_pixels": [
+      1654,
+      2339
+    ],
+    "raster_sha256": "9eef63b30ffcea34504aad419ff38e50db255635ce862bb878cb384e00de564b",
+    "visible_text_blocks": 19,
+    "text_blocks_outside_page": 0,
+    "all_ten_questions_present": true,
+    "all_four_disclosures_present": true,
+    "answer_words": 365,
+    "visual_result": "PASS_NO_CLIPPING_OVERLAP_OVERFLOW",
+    "human_entrant_review": "PENDING"
+  },
+  "zip": {
+    "bytes": 5722,
+    "sha256": "2b4260e3e27c6efde1d7857e9b80ab4441177b84a3cdf80544dcdb107933c077",
+    "entries": [
+      "projectready-nas/SKILL.md"
+    ],
+    "g32_member_sha256": "2baf409f990e8b5ba78bdb378b86dbf81ca83eec2dfa4cc605e1642ffd38feaa",
+    "g33_exact_static_checker": "STATIC_PASS_0_0_0"
+  },
+  "rights_review": {
+    "devpost_rules": "https://ugreenhackathon.devpost.com/rules",
+    "user_agreement": "https://api.ugnas.com/api/system/v1/ua/agreement/page?acceptLanguage=en-US&agreementCode=skillhub-user-agreement",
+    "publishing_standards": "https://api.ugnas.com/api/system/v1/ua/agreement/page?acceptLanguage=en-US&agreementCode=skillhub-publish-audit-spec",
+    "structure_and_pdf_limits": "PASS",
+    "license_and_source_rights": "PENDING",
+    "entrant_originality_and_sole_ownership": "PENDING",
+    "creator_used": "PARTICIPANT_REPORTED_NOT_INDEPENDENTLY_REPLAYED",
+    "ai_attribution": "DISCLOSED_HUMAN_REVIEW_PENDING",
+    "dataflow_location": "UNKNOWN_DISCLOSED",
+    "semantic_publication_issue": "G32 contains two inert syntax-only delegate command examples, possible Article2.5 nonfunctional/template samples, requires separate revision or organizer clarification",
+    "real_nas": "NOT_RUN",
+    "devpost": "NOT_SUBMITTED"
+  },
+  "verdict": "PDF_VISUAL_PASS_RELEASE_HOLD"
+}

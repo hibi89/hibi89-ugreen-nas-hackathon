@@ -721,5 +721,20 @@
     "approval": "PENDING",
     "manifest_evidence": "docs/submission/evidence/G34_EXACT_G32_PACKAGE_CI_20261026.json",
     "pdf_human_visual_review": "PENDING"
+  },
+  "g35_2026_10_26": {
+    "actual_pdf_visual": "PASS_200DPI_19_BLOCKS_NO_OVERFLOW",
+    "actual_pdf_sha256": "ba0fdf853386073df9cecd9bc88152d3188eaa3bbaf8886ac92ad1dace638991",
+    "actual_zip_sha256": "2b4260e3e27c6efde1d7857e9b80ab4441177b84a3cdf80544dcdb107933c077",
+    "evidence": "docs/submission/evidence/G35_G34_PDF_VISUAL_AUDIT_20261026.json",
+    "release": "HOLD_POTENTIAL_SKILLHUB_ARTICLE_2_5_ISSUE",
+    "rights": "NOT_CLEARED",
+    "approval": "PENDING",
+    "nas": "NOT_RUN",
+    "devpost": "NOT_SUBMITTED",
+    "g1_completion_percent": 0,
+    "g1_base_remaining_hours": 1.5,
+    "g1_separate_reserve_hours": 1.5,
+    "actual_hours": null
   }
 }
