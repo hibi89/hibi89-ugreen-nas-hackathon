@@ -168,6 +168,8 @@ def process_goal(goal: str, *, root: Path | None = None,
                 public["review_queue"].append({"step": step_index,
                                                "item_index": item["index"],
                                                "state": state})
+    public["review_required"] = bool(public["review_queue"])
+    public["review_item_count"] = len(public["review_queue"])
     return public
 
 
