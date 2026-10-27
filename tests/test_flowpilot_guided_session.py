@@ -24,6 +24,7 @@ class GuidedSessionTests(unittest.TestCase):
             ask=lambda prompt: next(answers), emit=output.append)
         self.assertEqual(result["executed_steps"], 1)
         self.assertTrue(result["owner_folder_metadata_accessed"])
+        self.assertEqual(result["next_action"], "REVIEW_LOCAL_FINDINGS")
         self.assertNotIn(str(self.root), "\n".join(output))
 
     def test_declined_without_root_access(self):
@@ -33,6 +34,16 @@ class GuidedSessionTests(unittest.TestCase):
             result = run_guided_session("파일 확인",
                 ask=lambda prompt: next(answers), emit=lambda message: None)
         self.assertEqual(result["status"], "DECLINED")
+        self.assertEqual(result["next_action"], "NO_ACTION")
+        self.assertEqual(result["executed_steps"], 0)
+
+    def test_missing_inputs_provide_next_action_without_access(self):
+        from flowpilot_goal_preview import process_goal
+        with patch("flowpilot_owner_local_audit._valid_root",
+                   side_effect=AssertionError("unexpected access")):
+            result = process_goal("파일 확인")
+        self.assertEqual(result["status"], "WAITING_USER")
+        self.assertEqual(result["next_action"], "PROVIDE_MISSING_INPUTS")
         self.assertEqual(result["executed_steps"], 0)
 
     def test_unsafe_goal_refused_before_prompt(self):
