@@ -1251,5 +1251,21 @@
     "round1_requires_nas": false,
     "finalist_nas_access": "SEPARATE",
     "devpost": "NOT_SUBMITTED"
+  },
+  "g60_followup": {
+    "date_kst": "2026-10-28",
+    "target_trial_window_kst": "2026-11-03_TO_2026-11-05_CONDITIONAL",
+    "preflight_window_kst": "2026-10-31_TO_2026-11-02",
+    "owner_approved_shift": true,
+    "account_issued": "UNVERIFIED",
+    "uliya_expert_rights": "UNVERIFIED",
+    "trial_started": false,
+    "test_mode": "LOCAL_EPHEMERAL_FILESYSTEM_SYNTHETIC_ONLY",
+    "new_tests": 13,
+    "ci": "PENDING",
+    "official_creator": "NOT_EVIDENCED",
+    "nas": "NOT_RUN",
+    "devpost": "NOT_SUBMITTED",
+    "actual_hours": null
   }
 }

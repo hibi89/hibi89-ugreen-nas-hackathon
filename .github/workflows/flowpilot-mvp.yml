@@ -10,6 +10,8 @@ on:
       - "tests/test_flowpilot_demo.py"
       - "tools/flowpilot_offline_demo.py"
       - "tools/flowpilot_mvp_cli.py"
+      - "tools/flowpilot_local_file_mvp.py"
+      - "tests/test_flowpilot_local_file_mvp.py"
       - "tests/test_flowpilot_mvp_cli.py"
       - "src/flowpilot/pipeline.py"
       - "tests/test_flowpilot_pipeline.py"
@@ -89,6 +91,29 @@ jobs:
               assert record["registered_agent_invoked"] is False
               assert record["devpost_submitted"] is False
           print("G58 runnable synthetic MVP 5/5 scenarios PASS; NO NAS / CREATOR")
+          PY
+      - name: G60 real temp-file metadata MVP five-scenario smoke (NOT NAS)
+        run: |
+          python -m unittest discover -s tests -p test_flowpilot_local_file_mvp.py -v
+          python tools/flowpilot_local_file_mvp.py --scenario complete_synthetic_handoff > "$RUNNER_TEMP/g60_local_complete.json"
+          python tools/flowpilot_local_file_mvp.py --scenario missing_required_synthetic > "$RUNNER_TEMP/g60_local_missing.json"
+          python tools/flowpilot_local_file_mvp.py --scenario conflicting_versions_synthetic > "$RUNNER_TEMP/g60_local_conflict.json"
+          python tools/flowpilot_local_file_mvp.py --scenario truncated_or_denied_synthetic > "$RUNNER_TEMP/g60_local_denied.json"
+          python tools/flowpilot_local_file_mvp.py --scenario symlink_unknown_synthetic > "$RUNNER_TEMP/g60_local_symlink.json"
+          python - <<'PY'
+          import json,os,pathlib
+          p=pathlib.Path(os.environ["RUNNER_TEMP"])
+          expected={"complete":"PRESENT","missing":"MISSING","conflict":"VERSION_REVIEW",
+                    "denied":"NOT_CHECKED","symlink":"NOT_CHECKED"}
+          for name,state in expected.items():
+              row=json.loads((p/f"g60_local_{name}.json").read_text(encoding="utf-8"))
+              assert state in (item["state"] for item in row["items"]), name
+              assert row["mode"]=="EPHEMERAL_LOCAL_FILESYSTEM_SYNTHETIC_MVP"
+              assert row["filesystem_probe"]=="OS_LSTAT_ONLY_ON_GENERATED_TEST_FILES"
+              assert row["real_nas_verified"] is False
+              assert row["registered_uliya_expert_invoked"] is False
+              assert row["release_gate"]=="HOLD"
+          print("G60 local actual-file metadata 5/5 PASS, real NAS NOT RUN")
           PY
       - name: Recheck all existing offline contracts
         run: python -m unittest discover -s tests -p 'test_*.py' -v
