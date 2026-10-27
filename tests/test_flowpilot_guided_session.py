@@ -1,5 +1,6 @@
 """G69 guided CLI regression: consent, refusal and local metadata."""
 import sys
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
@@ -67,6 +68,38 @@ class GuidedSessionTests(unittest.TestCase):
             result = run_guided_session("파일 확인",
                 ask=lambda prompt: next(answers), emit=lambda message: None)
         self.assertEqual(result["status"], "DECLINED")
+
+
+    def test_cli_subprocess_approved(self):
+        script = str(ROOT / "tools" / "flowpilot_goal_preview.py")
+        cmd = [sys.executable, script, "--goal", "파일 확인", "--interactive"]
+        completed = subprocess.run(cmd,
+            input=str(self.root) + "\nREADME.md\\nAPPROVE\\n",
+            capture_output=True, text=True, timeout=15)
+        self.assertEqual(completed.returncode, 0, completed.stderr)
+        self.assertIn("FLOWPILOT_PREVIEW=", completed.stdout)
+        self.assertIn("FLOWPILOT_RESULT=", completed.stdout)
+        self.assertIn("NEEDS_REVIEW", completed.stdout)
+        self.assertNotIn(str(self.root), completed.stdout)
+
+    def test_cli_subprocess_declined(self):
+        script = str(ROOT / "tools" / "flowpilot_goal_preview.py")
+        completed = subprocess.run(
+            [sys.executable, script, "--goal", "파일 확인", "--interactive"],
+            input=str(self.root) + "\nREADME.md\\nNO\\n",
+            capture_output=True, text=True, timeout=15)
+        self.assertEqual(completed.returncode, 0, completed.stderr)
+        self.assertIn('"status": "DECLINED"', completed.stdout)
+        self.assertNotIn(str(self.root), completed.stdout)
+
+    def test_cli_subprocess_no_flag_bypass(self):
+        script = str(ROOT / "tools" / "flowpilot_goal_preview.py")
+        completed = subprocess.run(
+            [sys.executable, script, "--goal", "파일 확인", "--interactive",
+             "--approve-local-metadata"],
+            capture_output=True, text=True, timeout=15)
+        self.assertEqual(completed.returncode, 2)
+        self.assertIn("GOAL_REFUSED", completed.stdout)
 
 if __name__ == "__main__":
     unittest.main()
