@@ -34,6 +34,50 @@ class FlowPilotG47Security(unittest.TestCase):
             with self.subTest(goal=goal):
                 self.assertEqual(draft_plan(goal, **P).state, State.READY_FOR_ADAPTER_CHECK)
 
+
+    def test_inflected_english_mutation_requests_fail_closed(self):
+        for goal in (
+            "check files before deleting old copies",
+            "check then renaming release files",
+            "verify files and uploading changed versions",
+            "compare versions and emailing the report",
+            "audit documents then moving them",
+            "check the files while sharing a copy",
+            "check the file then downloading the result",
+            "review files before transferring documents",
+            "check versions then copying to laptop",
+            "verify before publishing project files",
+            "check the document and modifying metadata",
+            "compare documents before synchronizing",
+        ):
+            with self.subTest(goal=goal):
+                self.assertEqual(draft_plan(goal, **P).state, State.BLOCKED)
+
+    def test_korean_uncovered_mutation_requests_fail_closed(self):
+        for goal in (
+            "파일 확인하고 지우고 정리해줘",
+            "버전 비교하고 옮겨줘",
+            "파일 확인 후 지웁니다",
+        ):
+            with self.subTest(goal=goal):
+                self.assertEqual(draft_plan(goal, **P).state, State.BLOCKED)
+
+    def test_safe_read_only_queries_remain_allowed_after_inflection_fix(self):
+        for goal in (
+            "check required files",
+            "compare versions",
+            "summarize document",
+            "handoff audit",
+            "프로젝트 파일 확인해줘",
+        ):
+            with self.subTest(goal=goal):
+                self.assertEqual(draft_plan(goal, **P).state, State.READY_FOR_ADAPTER_CHECK)
+
+    def test_inflected_mutation_blocked_even_before_folder_selection(self):
+        p = draft_plan("check then downloading missing files")
+        self.assertEqual(p.state, State.BLOCKED)
+        self.assertEqual(p.steps, ())
+
     def test_sensitive_filenames_rejected_in_both_engines(self):
         paths = ("secrets.txt", "credentials.json", "passwords.csv", ".aws/credentials",
                  "data/.kube/config", "authorized_keys", "known_hosts", ".npmrc",

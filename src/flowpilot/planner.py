@@ -52,9 +52,20 @@ _RESTRICTED = re.compile(
     r"|^(config[.]json|id_rsa|id_ed25519|authorized_keys|known_hosts|[.]npmrc|[.]netrc|[.]aws|[.]kube|[.]gnupg|[.]docker)$", re.IGNORECASE
 )
 _WRITES = re.compile(
-    r"\b(?:delete|remove|rename|move|upload|transfer|send|overwrite|wipe|modify|copy|share|publish|export|edit|erase)\b"
-    r"|\b(?:download|synchronize|synchronise|sync|email|forward|attach)\b"
-    r"|(?:삭제|이동|업로드|전송|수정|덮어쓰기|복사|공유|지워|지우기|보내|내보내기|게시|발행|다운로드|내려받|동기화|첨부해|저장해|이름\s*바꿔)", re.IGNORECASE
+    # Inflected mutating/transfer verbs must fail closed, not just bare
+    # imperatives. The word boundaries avoid matching unrelated substrings.
+    r"\b(?:delet(?:e|es|ed|ing)|remov(?:e|es|ed|ing|al)|renam(?:e|es|ed|ing)|"
+    r"mov(?:e|es|ed|ing)|upload(?:s|ed|ing)?|transfer(?:s|red|ring)?|"
+    r"send(?:s|ing)?|sent|overwrit(?:e|es|ing|ten)|wip(?:e|es|ed|ing)|"
+    r"modif(?:y|ies|ied|ying)|cop(?:y|ies|ied|ying)|shar(?:e|es|ed|ing)|"
+    r"publish(?:es|ed|ing)?|export(?:s|ed|ing)?|edit(?:s|ed|ing)?|"
+    r"eras(?:e|es|ed|ing)|download(?:s|ed|ing)?|"
+    r"synchroniz(?:e|es|ed|ing)|synchronis(?:e|es|ed|ing)|"
+    r"sync(?:s|ed|ing)?|email(?:s|ed|ing)?|forward(?:s|ed|ing)?|"
+    r"attach(?:es|ed|ing)?)\b"
+    r"|(?:삭제|이동|업로드|전송|수정|덮어쓰기|복사|공유|지워|지우|지웠|지웁|"
+    r"옮기|지우기|보내|내보내기|게시|발행|다운로드|내려받|동기화|첨부해|"
+    r"저장해|이름\s*바꿔)", re.IGNORECASE
 )
 
 
