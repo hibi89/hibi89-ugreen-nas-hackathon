@@ -46,6 +46,16 @@ class GuidedSessionTests(unittest.TestCase):
         self.assertEqual(result["next_action"], "PROVIDE_MISSING_INPUTS")
         self.assertEqual(result["executed_steps"], 0)
 
+    def test_complete_unapproved_plan_requests_approval(self):
+        from flowpilot_goal_preview import process_goal
+        with patch("flowpilot_owner_local_audit._valid_root",
+                   side_effect=AssertionError("unexpected access")):
+            result = process_goal("파일 확인", root=self.root,
+                required=["README.md"], metadata_consent=False)
+        self.assertEqual(result["status"], "WAITING_APPROVAL")
+        self.assertEqual(result["next_action"], "APPROVE_LOCAL_METADATA_OR_DECLINE")
+        self.assertFalse(result["owner_folder_metadata_accessed"])
+
     def test_unsafe_goal_refused_before_prompt(self):
         with self.assertRaises(WorkflowRefused):
             run_guided_session("파일 삭제해줘",
