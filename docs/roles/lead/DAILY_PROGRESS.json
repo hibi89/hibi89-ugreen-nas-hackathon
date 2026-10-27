@@ -1111,6 +1111,23 @@
     "closeout": "PASS",
     "offline_readiness": "PASS",
     "draft_bundle": "IN_PROGRESS",
-    "owner_preview": "QUEUED"
+    "owner_preview": "PASS_DRAFT_ONLY",
+    "verification": "G55_7_OF_7_GITHUB_JOBS_SUCCESS_OFFLINE_ONLY",
+    "verified_code_sha": "9f1ca7bbb0d6e67867bf5bc2a5c3774c9fbf4bfb",
+    "full_tests": "388/388_PASS",
+    "source_checker": "PASS_STATIC_ONLY",
+    "round1_draft_bundle": "PASS_DRAFT_ONLY",
+    "official_flowpilot_creator": "NOT_EVIDENCED",
+    "real_nas": "NOT_RUN",
+    "owner_release": "HOLD",
+    "run_ids": [
+      40517777771,
+      40517777852,
+      40517777853,
+      40517777800,
+      40517777695,
+      40517777826,
+      40517777886
+    ]
   }
 }
