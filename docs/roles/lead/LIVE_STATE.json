@@ -1439,5 +1439,23 @@
     "first_party_checker": "PREVIOUS_EXACT_SOURCE_STATIC_PASS_UNCHANGED",
     "real_nas": "NOT_RUN",
     "release": "HOLD"
+  },
+  "g58": {
+    "date_kst": "2026-10-27",
+    "target_mvp_kst": "2026-10-28",
+    "scope": "G58_SYNTHETIC_CLI_MVP_ONLY",
+    "owner_parallel_exclusions": [
+      "HAE",
+      "Lightning Azent (LA)",
+      "REA_APP"
+    ],
+    "new_tests": 12,
+    "ci": "PENDING",
+    "real_nas": "NOT_RUN",
+    "creator": "NOT_EVIDENCED",
+    "devpost": "NOT_SUBMITTED",
+    "frontend": "DEFERRED_TO_POST_MVP",
+    "source_bundle": "UNCHANGED",
+    "actual_elapsed_hours": null
   }
 }

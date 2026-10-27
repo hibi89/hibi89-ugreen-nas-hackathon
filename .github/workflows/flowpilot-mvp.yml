@@ -9,6 +9,8 @@ on:
       - "tests/test_flowpilot_g47_security.py"
       - "tests/test_flowpilot_demo.py"
       - "tools/flowpilot_offline_demo.py"
+      - "tools/flowpilot_mvp_cli.py"
+      - "tests/test_flowpilot_mvp_cli.py"
       - "src/flowpilot/pipeline.py"
       - "tests/test_flowpilot_pipeline.py"
       - "tools/flowpilot_package_audit.py"
@@ -64,6 +66,29 @@ jobs:
           assert r["creator_execution_independently_verified"] is False
           assert r["devpost_submitted"] is False
           print("G57 candidate structure only; official Creator NOT_RUN, release HOLD")
+          PY
+      - name: G58 one-command synthetic MVP smoke (CLI, NOT NAS)
+        run: |
+          python -m unittest discover -s tests -p test_flowpilot_mvp_cli.py -v
+          python tools/flowpilot_mvp_cli.py --scenario complete_synthetic_handoff > "$RUNNER_TEMP/g58_complete.json"
+          python tools/flowpilot_mvp_cli.py --scenario missing_required_synthetic > "$RUNNER_TEMP/g58_missing.json"
+          python tools/flowpilot_mvp_cli.py --scenario conflicting_versions_synthetic > "$RUNNER_TEMP/g58_versions.json"
+          python tools/flowpilot_mvp_cli.py --scenario truncated_or_denied_synthetic > "$RUNNER_TEMP/g58_denied.json"
+          python tools/flowpilot_mvp_cli.py --scenario symlink_unknown_synthetic > "$RUNNER_TEMP/g58_link.json"
+          python - <<'PY'
+          import json,os,pathlib
+          root=pathlib.Path(os.environ["RUNNER_TEMP"])
+          names=("complete","missing","versions","denied","link")
+          expected=("PRESENT","MISSING","VERSION_REVIEW","NOT_CHECKED","NOT_CHECKED")
+          for name,want in zip(names,expected):
+              record=json.loads((root/f"g58_{name}.json").read_text(encoding="utf-8"))
+              assert want in [x["state"] for x in record["required_items"]]
+              assert record["mode"]=="SYNTHETIC_OFFLINE_MVP_ONLY"
+              assert record["release_gate"]=="HOLD"
+              assert record["actual_nas_verified"] is False
+              assert record["registered_agent_invoked"] is False
+              assert record["devpost_submitted"] is False
+          print("G58 runnable synthetic MVP 5/5 scenarios PASS; NO NAS / CREATOR")
           PY
       - name: Recheck all existing offline contracts
         run: python -m unittest discover -s tests -p 'test_*.py' -v
