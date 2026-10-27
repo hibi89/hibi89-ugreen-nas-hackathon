@@ -74,7 +74,7 @@ class GuidedSessionTests(unittest.TestCase):
         script = str(ROOT / "tools" / "flowpilot_goal_preview.py")
         cmd = [sys.executable, script, "--goal", "파일 확인", "--interactive"]
         completed = subprocess.run(cmd,
-            input=str(self.root) + "\nREADME.md\\nAPPROVE\\n",
+            input=str(self.root) + "\nREADME.md\nAPPROVE\n",
             capture_output=True, text=True, timeout=15)
         self.assertEqual(completed.returncode, 0, completed.stderr)
         self.assertIn("FLOWPILOT_PREVIEW=", completed.stdout)
@@ -86,7 +86,7 @@ class GuidedSessionTests(unittest.TestCase):
         script = str(ROOT / "tools" / "flowpilot_goal_preview.py")
         completed = subprocess.run(
             [sys.executable, script, "--goal", "파일 확인", "--interactive"],
-            input=str(self.root) + "\nREADME.md\\nNO\\n",
+            input=str(self.root) + "\nREADME.md\nNO\n",
             capture_output=True, text=True, timeout=15)
         self.assertEqual(completed.returncode, 0, completed.stderr)
         self.assertIn('"status": "DECLINED"', completed.stdout)
