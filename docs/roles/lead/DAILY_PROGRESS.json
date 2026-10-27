@@ -1410,6 +1410,10 @@
     "registered_expert": "NOT_CALLED",
     "rights_release": "HOLD",
     "devpost": "NOT_SUBMITTED",
-    "actual_hours": "NOT_MEASURED"
+    "actual_hours": "NOT_MEASURED",
+    "branch_actions": "NOT_RUN",
+    "remote_candidate_checker_recheck": "STATIC_PASS_EXACT_BRANCH_BYTES",
+    "local_master_integrity": "PASS_24_ENTRIES",
+    "local_closeout_path_sync": "PASS_13_PATHS"
   }
 }

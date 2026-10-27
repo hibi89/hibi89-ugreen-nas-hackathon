@@ -28,4 +28,10 @@ Date: 2026-10-28 KST. Candidate branch: `codex/ugreen-flowpilot-creator`, based 
 - Next action: human review of G65 source differences and rights/disclosure statements; then decide whether to adopt and package this candidate. The 24-day schedule statuses were not promoted.
 - Actual work hours: **NOT_MEASURED**. No paid API or external/private-data upload was used.
 
-Branch-specific GitHub Actions for this documentation/candidate commit are pending at the time of this report; the cited 486-test result is the verified exact-code G64 run above.
+## Post-commit verification
+
+- Fetched the committed Skill from `codex/ugreen-flowpilot-creator`; its text matched the local checked bytes. Re-ran the official Checker on those exact branch bytes: `static-pass`, SHA256 `d04ee09ebe9877cc114eb684ed00a87880bb2767f7ae2289bf27640957dab71e`, 0 errors/warnings/info.
+- Regenerated the 24-day dashboard from `data/master_progress.json`; `render_master_progress.py --check` and `tools/check_master_progress.py` passed (24 entries and source-plan reconciliation). The Windows-generated path separator was normalized to the repository's forward-slash form.
+- The local `check_handoff_sync.py` required-path function accepted all 13 paths in the G65 commit. This is a local path-set validation, not a GitHub Actions result.
+- G65 branch Actions status: **NOT_RUN**. GitHub reports zero runs for commit `8847e1892eb689bb23652f07bccbba5be2b225a2`; repository push workflows are restricted to `lead/ugreen`. The connected GitHub tools are read-only for dispatch, `gh` is not installed, and the desktop browser automation stopped on its URL-safety check before taking action. No browser action or CI pass is claimed.
+- The Python code and tests are unchanged from exact G64 source commit `ef4f45bcabea198e97c41bbfb6983f16bf4eda77`, whose Actions run above passed 486/486; G65 branch-specific Python CI was not run.

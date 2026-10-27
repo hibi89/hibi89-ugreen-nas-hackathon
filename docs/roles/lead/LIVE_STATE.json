@@ -100,7 +100,7 @@
   "last_ci_verified_code_sha": "ef4f45bcabea198e97c41bbfb6983f16bf4eda77",
   "repository_regression_tests_passed": 486,
   "repository_regression_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40539218786",
-  "closeout_sync_ci_status": "PASS",
+  "closeout_sync_ci_status": "BASE_G64_PASS_G65_BRANCH_NOT_RUN_LOCAL_PATH_SYNC_PASS",
   "closeout_sync_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40539218725",
   "early_skill_candidate": {
     "id": "G6_20261024",
@@ -1650,6 +1650,11 @@
     "registered_expert": "NOT_CALLED",
     "rights_release": "HOLD",
     "devpost": "NOT_SUBMITTED",
-    "actual_hours": "NOT_MEASURED"
+    "actual_hours": "NOT_MEASURED",
+    "branch_actions": "NOT_RUN",
+    "branch_actions_reason": "Push workflows target lead/ugreen; connected GitHub tools are read-only for dispatch; gh CLI unavailable; browser automation stopped on URL-safety check.",
+    "remote_candidate_checker_recheck": "STATIC_PASS_EXACT_BRANCH_BYTES",
+    "local_master_integrity": "PASS_24_ENTRIES",
+    "local_closeout_path_sync": "PASS_13_PATHS"
   }
 }
