@@ -153,6 +153,7 @@ def process_goal(goal: str, *, root: Path | None = None,
                              else "RESOLVE_BLOCKED_CHECKS" if result["status"] == "BLOCKED"
                              else "REVIEW_LOCAL_RESULT")
     public["executed_steps"] = result["executed_steps"]
+    public["review_queue"] = []
     public["owner_folder_metadata_accessed"] = any(
         s["inspected_local_metadata"] for s in result["steps"])
     public["observed"] = result["steps"]
