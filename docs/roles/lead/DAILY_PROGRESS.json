@@ -432,8 +432,8 @@
   "closeout_sync_enforcement_active": true,
   "closeout_sync_quality_issue": "2026-10-24 CI #40067541841 detected stale daily JSON in previous policy commit; correcting in next commit",
   "closeout_sync_guard_tested_status": "PENDING_RECHECK",
-  "latest_repository_regression_tests_passed": 404,
-  "latest_repository_regression_ci_url": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40524752615",
+  "latest_repository_regression_tests_passed": 416,
+  "latest_repository_regression_ci_url": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40526183128",
   "latest_closeout_guard_verified": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40072583787",
   "notes_on_last_closeout": "One-line GitHub bootstrap and mandatory end-of-work handoff automated checks verified. No new SDK or NAS capability established.",
   "notes_on_new_chat_execution": "G1 official pinned catalog read-only reference bound into Skill; 4 Markdown files, 165/165 offline tests + actual skill preflight PASS at source 5772a8a9, closeout sync PASS. No official Uliya checker/NAS/PII permission tested; next G1 Oct25 1.5h base+1.5h reserve, ETA unknown. Oct24 finite-day scope remains 100%, 0h, not overall project completion.",
@@ -1210,8 +1210,30 @@
     "real_nas": "NOT_RUN",
     "creator": "NOT_EVIDENCED",
     "devpost": "NOT_SUBMITTED",
-    "frontend": "DEFERRED_TO_POST_MVP",
+    "frontend": "POST_MVP",
     "source_bundle": "UNCHANGED",
-    "actual_elapsed_hours": null
+    "actual_elapsed_hours": null,
+    "source_sha_verified": "574b314ea34559bb5e9dd50e270a134f9451be4d",
+    "full_suite": "416/416_PASSED",
+    "cli_scenarios": "5/5_PASS",
+    "cli_new_tests": "12/12_PASS",
+    "ci_full": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40526183128",
+    "ci_status": "5_OF_5_SUCCESS",
+    "other_ci_runs": [
+      40526183224,
+      40526183144,
+      40526183385,
+      40526183665
+    ],
+    "run_command": "python tools/flowpilot_mvp_cli.py",
+    "synthetic_scope_only": true,
+    "target_date_kst": "2026-10-28",
+    "owner_excluded_workstreams": [
+      "HAE",
+      "LA",
+      "REA_APP"
+    ],
+    "nas": "NOT_RUN",
+    "release": "HOLD"
   }
 }

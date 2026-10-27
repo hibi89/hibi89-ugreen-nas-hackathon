@@ -97,9 +97,9 @@
     "corrective_commit_sha": "4b6904224df8ab9ede913ec6e79787b61d941baa",
     "passed_guard_run_id": 40067647144
   },
-  "last_ci_verified_code_sha": "4bd755d23721414d070948dfac1b7b6281d6378b",
-  "repository_regression_tests_passed": 404,
-  "repository_regression_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40524752615",
+  "last_ci_verified_code_sha": "574b314ea34559bb5e9dd50e270a134f9451be4d",
+  "repository_regression_tests_passed": 416,
+  "repository_regression_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40526183128",
   "closeout_sync_ci_status": "PASS",
   "closeout_sync_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40517777771",
   "early_skill_candidate": {
@@ -1454,8 +1454,30 @@
     "real_nas": "NOT_RUN",
     "creator": "NOT_EVIDENCED",
     "devpost": "NOT_SUBMITTED",
-    "frontend": "DEFERRED_TO_POST_MVP",
+    "frontend": "POST_MVP",
     "source_bundle": "UNCHANGED",
-    "actual_elapsed_hours": null
+    "actual_elapsed_hours": null,
+    "source_sha_verified": "574b314ea34559bb5e9dd50e270a134f9451be4d",
+    "full_suite": "416/416_PASSED",
+    "cli_scenarios": "5/5_PASS",
+    "cli_new_tests": "12/12_PASS",
+    "ci_full": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40526183128",
+    "ci_status": "5_OF_5_SUCCESS",
+    "other_ci_runs": [
+      40526183224,
+      40526183144,
+      40526183385,
+      40526183665
+    ],
+    "run_command": "python tools/flowpilot_mvp_cli.py",
+    "synthetic_scope_only": true,
+    "target_date_kst": "2026-10-28",
+    "owner_excluded_workstreams": [
+      "HAE",
+      "LA",
+      "REA_APP"
+    ],
+    "nas": "NOT_RUN",
+    "release": "HOLD"
   }
 }
