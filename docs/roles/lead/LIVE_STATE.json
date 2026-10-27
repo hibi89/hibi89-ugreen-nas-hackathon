@@ -1659,7 +1659,7 @@
   },
   "g67_owner_preview": {
     "date_kst": "2026-10-28",
-    "status": "SOURCE_PREPARED_CI_PENDING",
+    "status": "VERIFIED_ACTIONS_30DAY_ARTIFACT",
     "scope": "G66_CORRECTED_CREATOR_CANDIDATE_NEW_ROUND1_OWNER_REVIEW_PDF_ZIP",
     "candidate_sha256": "f7982feae70e773440486fd8b0bee408fbadc69ced82d96d6e761c686f6131a5",
     "prior_g66_checker": "STATIC_PASS_0_0_0",
@@ -1676,6 +1676,18 @@
     "canon_skill": "UNCHANGED",
     "prior_g52_preview": "UNCHANGED",
     "trial": "CONDITIONAL_2026_11_03_TO_05",
-    "work_hours": "NOT_MEASURED"
+    "work_hours": "NOT_MEASURED",
+    "source_sha": "c774605c9e068ab4dd7aed9f19d99b22051f3733",
+    "ci_url": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40551283845",
+    "full_suite": "493_493_PASS",
+    "new_tests": "7_7_PASS",
+    "actual_pdf_pages": 1,
+    "pdf_sha256": "448efd6f78c533b1bda61972486eeff1f6bc97bb24c621536c2a0b4ac59c7f1a",
+    "zip_sha256": "ca537f7912aeaab2a319ae164b3e35f42e617460884c11cfdfc9a4e46a340382",
+    "archive_id": "12754414136",
+    "archive_expires_at": "2026-11-26T17:30:56Z",
+    "download_rehash": "PASS",
+    "zip_single_markdown_byte_parity": "PASS",
+    "visual_page_review": "PASS_NO_CLIPPING"
   }
 }
