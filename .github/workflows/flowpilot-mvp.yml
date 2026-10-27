@@ -16,6 +16,8 @@ on:
       - "tests/test_flowpilot_round1_status.py"
       - "tools/g53_flowpilot_creator_gate.py"
       - "tests/test_g53_flowpilot_creator_gate.py"
+      - "tools/g57_flowpilot_creator_candidate_intake.py"
+      - "tests/test_g57_flowpilot_creator_candidate_intake.py"
       - "tools/flowpilot_round1_preview.py"
       - "docs/submission/flowpilot_round1_qas_20261027.json"
       - ".github/workflows/flowpilot-mvp.yml"
@@ -48,6 +50,21 @@ jobs:
           python -m unittest discover -s tests -p test_g53_flowpilot_creator_gate.py -v
           python tools/g53_flowpilot_creator_gate.py > "$RUNNER_TEMP/g53_creator_hold.json"
           python -c 'import json,os,pathlib; p=pathlib.Path(os.environ["RUNNER_TEMP"])/"g53_creator_hold.json"; r=json.loads(p.read_text()); assert r["status"]=="CREATOR_NOT_EVIDENCED" and r["release_gate"]=="HOLD" and not r["official_creator_execution_independently_verified"]'
+      - name: G57 newly generated FlowPilot structural source intake (NOT Creator execution)
+        run: |
+          python -m unittest discover -s tests -p test_g57_flowpilot_creator_candidate_intake.py -v
+          python tools/g57_flowpilot_creator_candidate_intake.py --candidate-dir skill/flowpilot-nas > "$RUNNER_TEMP/g57_human_review_only.json"
+          python - <<'PY'
+          import json,os,pathlib
+          p=pathlib.Path(os.environ["RUNNER_TEMP"])/"g57_human_review_only.json"
+          r=json.loads(p.read_text(encoding="utf-8"))
+          assert r["release_gate"]=="HOLD"
+          assert r["status"]=="SOURCE_MATCHED_HUMAN_PROVENANCE_REVIEW"
+          assert r["operator_receipt_status"]=="CREATOR_NOT_EVIDENCED"
+          assert r["creator_execution_independently_verified"] is False
+          assert r["devpost_submitted"] is False
+          print("G57 candidate structure only; official Creator NOT_RUN, release HOLD")
+          PY
       - name: Recheck all existing offline contracts
         run: python -m unittest discover -s tests -p 'test_*.py' -v
       - name: Clearly distinguish draft from submitted or real NAS

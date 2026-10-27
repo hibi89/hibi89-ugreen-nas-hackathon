@@ -1413,5 +1413,18 @@
     "offline_readiness": "JOB_SUCCESS_40522638425",
     "creator": "NOT_EVIDENCED",
     "owner_release": "HOLD"
+  },
+  "g57": {
+    "date_kst": "2026-10-27",
+    "source_base_sha": "61500c88e209f77c0db7f291ee29aedcc8fb2008",
+    "tool": "tools/g57_flowpilot_creator_candidate_intake.py",
+    "tests": "tests/test_g57_flowpilot_creator_candidate_intake.py",
+    "new_tests": 12,
+    "ci": "PENDING",
+    "purpose": "OFFLINE_NEW_CREATOR_CANDIDATE_SOURCE_ACCEPTANCE_HUMAN_REVIEW_ONLY",
+    "source_and_submission_artifacts": "UNCHANGED",
+    "official_creator": "NOT_EVIDENCED",
+    "nas": "NOT_RUN",
+    "devpost": "NOT_SUBMITTED"
   }
 }
