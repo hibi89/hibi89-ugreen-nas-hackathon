@@ -130,8 +130,15 @@ def build(output: Path) -> dict:
     text = "\n".join(page.extract_text() or "" for page in reader.pages)
     if any(f"Q{i}." not in text for i in range(1, 11)):
         raise ValueError("Missing visible official question in rendered PDF")
-    if PIN not in text or "NOT SUBMITTED" not in text or "Owner release: HOLD" not in text:
-        raise ValueError("Missing reviewer status/byte identity on PDF")
+    # Extractors may insert newlines inside the 64-character digest or footer.
+    # Preserve an exact-byte SHA comparison, but normalize extraction whitespace.
+    normalized = " ".join(text.split())
+    compact = "".join(text.split())
+    has_sha = PIN in compact
+    has_status = "NOT SUBMITTED" in normalized
+    has_release = "Owner release: HOLD" in normalized
+    if not (has_sha and has_status and has_release):
+        raise ValueError(f"PDF extracted proof incomplete: sha={has_sha}, status={has_status}, release={has_release}")
     if len(skill) > 1_000_000 or pdf.stat().st_size > 1_000_000 or bundle.stat().st_size > 10_000_000:
         raise ValueError("Artifact exceeds size policy")
     result = {

@@ -47,8 +47,8 @@ class G67CreatorPreview(unittest.TestCase):
         text = pdf.pages[0].extract_text()
         for i in range(1, 11):
             self.assertIn(f"Q{i}.", text)
-        self.assertIn(preview.PIN, text)
-        self.assertIn("Owner release: HOLD", text)
+        self.assertIn(preview.PIN, "".join(text.split()))
+        self.assertIn("Owner release: HOLD", " ".join(text.split()))
 
     def test_qas_current_creator_and_no_false_nas_claim(self):
         skill, qs, disclosure, count = preview.validate_inputs()
