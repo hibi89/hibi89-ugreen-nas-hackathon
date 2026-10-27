@@ -109,7 +109,7 @@ def process_goal(goal: str, *, root: Path | None = None,
             raise WorkflowRefused("Duplicate, empty or excessive version candidates")
         if len(set(items).union(*(set(values) for values in mapping.values()))) > 100:
             raise WorkflowRefused("Excessive combined file scope")
-    if need_versions and set(mapping) != set(items):
+    if need_versions and not mapping:
         missing.append("version_candidate_mapping")
 
     public = {
