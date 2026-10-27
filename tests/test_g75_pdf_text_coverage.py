@@ -18,6 +18,11 @@ class G75PDFTextTests(unittest.TestCase):
         self.assertIn("qa_source_sha256",source)
         self.assertIn("hashlib.sha256(qa_bytes).hexdigest()",source)
 
+    def test_workflow_verifies_exact_answer_source(self):
+        workflow=(ROOT/".github/workflows/g45-flowpilot-round1-preview.yml").read_text(encoding="utf-8")
+        self.assertIn('e["qa_source_sha256"]==hashlib.sha256(qa_source).hexdigest()',workflow)
+        self.assertIn('tests/test_g75_pdf_text_coverage.py',workflow)
+
     def test_source_answers_and_disclosure_nonempty(self):
         import json
         data=json.loads(QA.read_text(encoding="utf-8"))
