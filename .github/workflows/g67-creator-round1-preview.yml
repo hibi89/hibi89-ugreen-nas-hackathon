@@ -24,7 +24,7 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install existing PDF builder dependencies
-        run: python -m pip install "reportlab>=4,<5" "pypdf>=6,<7"
+        run: python -m pip install "reportlab>=4,<5" "pypdf>=6,<7" "pypdfium2>=4,<5"
       - name: Full offline Python regression suite including G67 (NOT NAS)
         run: |
           python - <<'PY'
@@ -68,16 +68,30 @@ jobs:
           assert manifest["zip_composition"]["third_party_binary_members"]==0
           print("G67 exact-byte owner preview: 1-page official QAs and 1 Markdown file; NOT SUBMITTED")
           PY
-      - name: Render actual PDF to inspection PNG (without converting source)
+      - name: Render actual PDF to PNG and verify unclipped page margins
         shell: bash
         run: |
           set -euo pipefail
-          command -v pdftoppm
-          pdftoppm -f 1 -l 1 -r 160 -png -singlefile \
-            "$RUNNER_TEMP/g67-preview/FlowPilot_G67_CREATOR_OWNER_REVIEW.pdf" \
-            "$RUNNER_TEMP/g67-preview/FlowPilot_G67_PAGE_1_RENDER"
-          test -s "$RUNNER_TEMP/g67-preview/FlowPilot_G67_PAGE_1_RENDER.png"
-          echo "G67 actual one-page preview rendered (image in private Actions artifact)"
+          python - <<'PY'
+          import os,pathlib
+          import pypdfium2 as pdfium
+          from PIL import Image, ImageChops
+          p=pathlib.Path(os.environ["RUNNER_TEMP"])/"g67-preview"
+          doc=pdfium.PdfDocument(str(p/"FlowPilot_G67_CREATOR_OWNER_REVIEW.pdf"))
+          assert len(doc)==1
+          page=doc[0]
+          bitmap=page.render(scale=160/72)
+          image=bitmap.to_pil().convert("RGB")
+          target=p/"FlowPilot_G67_PAGE_1_RENDER.png"
+          image.save(target)
+          background=Image.new("RGB", image.size, (255,255,255))
+          bbox=ImageChops.difference(image,background).getbbox()
+          assert bbox is not None, "Blank preview page"
+          w,h=image.size
+          assert bbox[0]>=16 and bbox[1]>=16, "Text clipped top/left"
+          assert bbox[2]<w-16 and bbox[3]<h-16, "Text clipped bottom/right"
+          print("G67 PDF visually rendered; page",image.size,"ink bounds",bbox,"no border clipping")
+          PY
       - uses: actions/upload-artifact@v4
         with:
           name: G67-UGREEN-CREATOR-ROUND1-OWNER-REVIEW-NOT-SUBMITTED
