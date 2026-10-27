@@ -118,6 +118,7 @@ def process_goal(goal: str, *, root: Path | None = None,
 
     public = {
         "mode": "BOUNDED_GOAL_TO_LOCAL_PLAN_NOT_NAS",
+        "result_schema": "flowpilot-review-result-v1",
         "status": "WAITING_USER" if missing else "WAITING_APPROVAL",
         "plan": [{"index": i+1, "read_only_action": name}
                  for i,name in enumerate(goals)],
