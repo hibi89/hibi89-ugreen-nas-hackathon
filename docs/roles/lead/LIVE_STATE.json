@@ -1387,5 +1387,18 @@
     "devpost": "NOT_SUBMITTED",
     "owner_release": "HOLD",
     "actual_work_hours": null
+  },
+  "g56b": {
+    "date_kst": "2026-10-27",
+    "source_failed_sha": "11fc00f19e75bb468f37a6e0d0cc29fbc14bf3b1",
+    "failed_offline_ci": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40522317143",
+    "failure": "KOREAN_OLMGYEO_INFLECTION_NOT_MATCHED",
+    "test_change": "Add 옮겼어 under existing test subcases",
+    "fix": "Add 옮겨 and 옮겼 to denial matcher",
+    "new_ci": "PENDING",
+    "official_creator": "NOT_EVIDENCED",
+    "nas": "NOT_RUN",
+    "devpost": "NOT_SUBMITTED",
+    "elapsed_hours": null
   }
 }

@@ -57,6 +57,7 @@ class FlowPilotG47Security(unittest.TestCase):
         for goal in (
             "파일 확인하고 지우고 정리해줘",
             "버전 비교하고 옮겨줘",
+            "버전 비교하고 옮겼어",
             "파일 확인 후 지웁니다",
         ):
             with self.subTest(goal=goal):
