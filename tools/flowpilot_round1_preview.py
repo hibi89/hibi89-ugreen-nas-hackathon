@@ -24,7 +24,8 @@ def build(output:Path):
     skill=SKILL.read_bytes()
     if hashlib.sha256(skill).hexdigest()!=PIN:raise ValueError("Changed source SHA needs review")
     if not skill.startswith(b"---\nname: flowpilot-nas\ndescription:"):raise ValueError("Invalid Skill YAML")
-    data=json.loads(QA.read_text(encoding="utf-8"))
+    qa_bytes=QA.read_bytes()
+    data=json.loads(qa_bytes.decode("utf-8"))
     questions=data["questions"]
     if data.get("status")!="OWNER_REVIEW_NOT_SUBMITTED" or len(questions)!=10:raise ValueError("Need ten owner-review QAs")
     if any(not q.get("question") or not q.get("answer") for q in questions):raise ValueError("Empty answer")
@@ -69,7 +70,7 @@ def build(output:Path):
     if not covered(disclosure):
         raise ValueError("Rendered PDF lost AI/third-party disclosure")
     if pdf.stat().st_size>1000000 or bundle.stat().st_size>10000000 or len(skill)>1000000:raise ValueError("Package exceeds limit")
-    evidence={"state":"OWNER_REVIEW_NOT_SUBMITTED","source_sha256":PIN,"zip_sha256":hashlib.sha256(bundle.read_bytes()).hexdigest(),"pdf_sha256":hashlib.sha256(pdf.read_bytes()).hexdigest(),"zip_bytes":bundle.stat().st_size,"pdf_bytes":pdf.stat().st_size,"answers":10,"substantive_words":words,"zip_composition_audit":zip_audit,"official_creator":"NOT_RUN","official_checker":CHECKER_STATUS,"official_checker_run":CHECKER_RUN,"nas_runtime":"NOT_RUN","devpost":"NOT_SUBMITTED"}
+    evidence={"state":"OWNER_REVIEW_NOT_SUBMITTED","source_sha256":PIN,"qa_source_sha256":hashlib.sha256(qa_bytes).hexdigest(),"zip_sha256":hashlib.sha256(bundle.read_bytes()).hexdigest(),"pdf_sha256":hashlib.sha256(pdf.read_bytes()).hexdigest(),"zip_bytes":bundle.stat().st_size,"pdf_bytes":pdf.stat().st_size,"answers":10,"substantive_words":words,"zip_composition_audit":zip_audit,"official_creator":"NOT_RUN","official_checker":CHECKER_STATUS,"official_checker_run":CHECKER_RUN,"nas_runtime":"NOT_RUN","devpost":"NOT_SUBMITTED"}
     (output/"FlowPilot_Round1_OWNER_REVIEW_manifest.json").write_text(json.dumps(evidence,indent=2)+"\n",encoding="utf-8")
     return evidence
 
