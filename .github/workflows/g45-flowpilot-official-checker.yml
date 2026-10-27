@@ -25,7 +25,21 @@ jobs:
           HASH=$(sha256sum "$SOURCE" | cut -d' ' -f1)
           echo "G45_SKILL_SHA256=$HASH" >> "$GITHUB_ENV"
           echo "G45 CHECKOUT exact candidate SHA256=$HASH"
-          python3 -m unittest discover -s tests -p test_g45_delegate_semantics.py -v
+          python3 - <<'PY'
+          import unittest
+          loader=unittest.TestLoader()
+          suite=unittest.TestSuite((
+              loader.discover("tests", pattern="test_flowpilot_mvp.py"),
+              loader.discover("tests", pattern="test_flowpilot_evidence.py"),
+          ))
+          count=suite.countTestCases()
+          if count < 34:
+              raise SystemExit("G46: expected at least 34 discovered tests; got "+str(count))
+          result=unittest.TextTestRunner(verbosity=2).run(suite)
+          if not result.wasSuccessful():
+              raise SystemExit("FlowPilot unit test gate failed")
+          print("G46 OFFLINE FLOWPILOT",count,"/ ",count,"PASS; NOT NAS")
+          PY
       - name: Download authenticated-public vendor URL, verify pinned vendor archive, safely extract in ephemeral runner
         shell: bash
         run: |

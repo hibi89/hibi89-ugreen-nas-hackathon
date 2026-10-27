@@ -911,7 +911,7 @@
     "pdf_pages": 1,
     "official_pdf_qas": 10,
     "substantive_words": 359,
-    "local_pdf_sha256": "9832ae8d291b365afb2c026448aca4b7a83edd01fc5ce83eb348e8c5eae2f122",
+    "local_pdf_sha256": "0eb7c28aeea1d9b6c4a13a92b0c0c6086a32a9e9a89bcdb5b9936ad95c4049a6",
     "local_zip_sha256": "973ec305f479ba88963e8541ebd9e34de1394ca4e5cf76f2ee102ad46c823919",
     "official_creator": "NOT_RUN_FOR_FLOWPILOT",
     "new_g45_official_checker_ci": "PENDING_NOT_VERIFIED",
@@ -920,5 +920,21 @@
     "owner_final_approval": "NOT_GIVEN",
     "devpost": "NOT_SUBMITTED",
     "historical_g36_g37": "PRESERVED"
+  },
+  "flowpilot_g46": {
+    "status": "G46_LOCAL_ARTIFACT_VERIFIED_REMOTE_CI_PENDING",
+    "pdf_pages": 1,
+    "official_prompts_exact": 10,
+    "substantive_words": 359,
+    "old_g45_pdf_sha256_verified": "0eb7c28aeea1d9b6c4a13a92b0c0c6086a32a9e9a89bcdb5b9936ad95c4049a6",
+    "g46_pdf_sha256": "f7225b229b3ce35999eb384f5c3857eaa22e8c49851bda51047330d1de7c8b1b",
+    "skill_sha256": "985713d709aa36ad3e590557aac242be860716834f31eb27ff460bee960184b0",
+    "zip_sha256": "973ec305f479ba88963e8541ebd9e34de1394ca4e5cf76f2ee102ad46c823919",
+    "official_static_checker_ci": "NOT_VERIFIED",
+    "official_creator": "NOT_RUN",
+    "nas_runtime": "NOT_RUN",
+    "owner_approval": "HOLD",
+    "devpost": "NOT_SUBMITTED",
+    "ci_test_gate": "AT_LEAST_34_MUST_RUN"
   }
 }

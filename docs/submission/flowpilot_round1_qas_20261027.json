@@ -2,7 +2,7 @@
   "status": "OWNER_REVIEW_NOT_SUBMITTED",
   "questions": [
     {
-      "question": "What does the Skill do?",
+      "question": "One sentence: What does the Skill do?",
       "answer": "NAS FlowPilot converts a project handoff request into a scoped, read-only NAS evidence review with a previewed plan and uncertainty-aware report."
     },
     {
@@ -18,27 +18,27 @@
       "answer": "Owner requests a handoff check; the Skill clarifies folder and checklist, explains processing uncertainty, previews steps and seeks approval. The file expert lists authorized metadata; optional document review needs separate consent. The Skill returns PRESENT, MISSING, VERSION_REVIEW or NOT_CHECKED with next actions."
     },
     {
-      "question": "What is substantively different?",
+      "question": "What substantive difference does your idea offer compared with existing tools or conventional AI solutions?",
       "answer": "Unlike a static checklist or generic chatbot, the plan adapts among handoff, missing-file, version-review and selected-document tasks, while disallowing scope expansion and fabricated complete scans. Owner-controlled NAS data remains the workflow's starting point."
     },
     {
-      "question": "Which NAS capabilities are used and when?",
+      "question": "Which UGREEN AI NAS capabilities will be used, and at which step in the workflow?",
       "answer": "The proposed registered file-agent uses catalog-listed ug-filesystem ls/find/stat for scoped discovery. An optional registered document-agent uses ug-document metadata/qa/extract/reconcile on consented exact references. Installed support and permissions require runtime verification."
     },
     {
-      "question": "What technical approach is proposed?",
+      "question": "What was your technical approach? Describe the planned Skill workflow, supported NAS CLI capabilities, expert agent orchestration, required inputs, permissions, AI model choices, and data handling, as applicable;",
       "answer": "A Markdown SKILL.md implements conversational input slots, plan preview, read-only expert delegation and evidence-based failure handling. Offline Python tests exercise parsing, permissions, version ambiguity and restricted paths but are not included in the ZIP. Data location is not assumed to be local; no arbitrary REST or external integrations are used."
     },
     {
-      "question": "What is implemented and what is pending?",
+      "question": "What is the current development status? Identify what was implemented already, not yet implemented, or is pending NAS validation if selected to be a Finalist.",
       "answer": "A new FlowPilot Markdown candidate and separate offline planning/evidence modules exist. The candidate has not yet been generated or validated by the official Creator/checker. Actual registered-agent calls, real NAS operation, final permissions and publication approval are pending."
     },
     {
-      "question": "What will be tested as a finalist?",
+      "question": "What is your final validation plan? Name two core test cases and one edge case to validate if selected as a Finalist.",
       "answer": "Core case one: a complete authorized delivery folder produces referenced file findings. Core case two: two plausible final versions cause VERSION_REVIEW, never automatic selection. Edge case: denied or truncated listing, restricted target or unverified symlink must produce NOT_CHECKED without data leakage."
     },
     {
-      "question": "What are the limitations and dependencies?",
+      "question": "Are there any known limitations of your Project? Describe current known limitations, technical risks, and any external dependencies.",
       "answer": "Official Creator compatibility, exact live dispatcher syntax, user permissions, data-processing location and real NAS completeness remain unverified. No scheduler, file mutation, generic n8n runtime or third-party SaaS connector is claimed. Final review requires explicit entrant approval."
     }
   ],
