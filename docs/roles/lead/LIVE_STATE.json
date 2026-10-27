@@ -25,10 +25,10 @@
     "sdk_gate_distinct": true
   },
   "next_work": {
-    "id": "G43-CI-AND-VISION-GAP",
+    "id": "G44-CI-VERIFY-THEN-CREATOR",
     "scheduled_kst": "2026-10-27",
-    "status": "PENDING_OFFLINE_CI",
-    "scope": "Verify FlowPilot offline source tests and contrast scoped Skill to owner natural-language vision; no unverified official runtime or NAS claims.",
+    "status": "WAITING_CI_VERIFICATION",
+    "scope": "Verify latest new FlowPilot Python regression and handoff CI; use official Creator/checker on newly authored candidate when available; then PDF/ZIP and rights approval.",
     "planned_hours": 0,
     "separate_reserve_hours": 0,
     "actual_completion_eta_hours": null
@@ -1147,5 +1147,16 @@
     "devpost": "NOT_SUBMITTED",
     "historic_g36_g37": "UNCHANGED",
     "next": "Confirm CI; then design/feature gap audit and official Creator gate."
+  },
+  "flowpilot_evidence_20261027": {
+    "phase": "G44_CODE_COMMITTED_LOCAL_TEST_16_PASS_REMOTE_CI_PENDING",
+    "module": "src/flowpilot/evidence.py",
+    "tests": "tests/test_flowpilot_evidence.py",
+    "official_creator": "NOT_RUN_FOR_FLOWPILOT",
+    "real_nas": "NOT_RUN",
+    "devpost": "NOT_SUBMITTED",
+    "owner_signoff": "NOT_GIVEN",
+    "old_g36_g37": "UNCHANGED",
+    "vendor_email": "PRIVATE_REPLY_RECEIVED_LICENSE_CHOICES_NOT_BLANKET_RELEASE"
   }
 }

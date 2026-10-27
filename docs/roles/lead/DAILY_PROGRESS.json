@@ -891,5 +891,16 @@
     "devpost": "NOT_SUBMITTED",
     "historic_g36_g37": "UNCHANGED",
     "next": "Confirm CI; then design/feature gap audit and official Creator gate."
+  },
+  "flowpilot_evidence_20261027": {
+    "phase": "G44_CODE_COMMITTED_LOCAL_TEST_16_PASS_REMOTE_CI_PENDING",
+    "module": "src/flowpilot/evidence.py",
+    "tests": "tests/test_flowpilot_evidence.py",
+    "official_creator": "NOT_RUN_FOR_FLOWPILOT",
+    "real_nas": "NOT_RUN",
+    "devpost": "NOT_SUBMITTED",
+    "owner_signoff": "NOT_GIVEN",
+    "old_g36_g37": "UNCHANGED",
+    "vendor_email": "PRIVATE_REPLY_RECEIVED_LICENSE_CHOICES_NOT_BLANKET_RELEASE"
   }
 }

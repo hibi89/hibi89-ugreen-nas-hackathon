@@ -107,7 +107,7 @@
       "blocker": "실지원 SDK 계약 미확정으로 G2 승인 게이트 차단",
       "recovery_date_kst": "2026-10-27",
       "recovery_condition": "공식 설치 환경에서 실제 명령·권한/응답 검증 또는 주최 측 지원 근거, 없으면 BLOCKED 유지",
-      "advance_note": "G2 임시 증거/미검증 계약 선행 완료. 실제 공식 Agent I/O 근거 없어 계약 동결 불가. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음. 2026-10-27 G43 FlowPilot new independent offline NL-to-bounded-plan MVP candidate staged; official Creator/runtime and release still NOT_VERIFIED; original G36/G37 unchanged."
+      "advance_note": "G2 임시 증거/미검증 계약 선행 완료. 실제 공식 Agent I/O 근거 없어 계약 동결 불가. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음. 2026-10-27 G43 FlowPilot new independent offline NL-to-bounded-plan MVP candidate staged; official Creator/runtime and release still NOT_VERIFIED; original G36/G37 unchanged. 2026-10-27 G44 offline FlowPilot evidence/report tests independently 16/16 PASS on Python 3.13; new GitHub CI PENDING; NAS and registered Agents NOT_RUN. Private vendor reply clarified entrant-license/disclosure but not automatic rights release."
     },
     {
       "day_id": "UGR-D05",
