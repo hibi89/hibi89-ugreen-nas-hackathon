@@ -1235,5 +1235,21 @@
     ],
     "nas": "NOT_RUN",
     "release": "HOLD"
+  },
+  "g59_trial_window": {
+    "date_kst": "2026-10-28",
+    "public_general_ugos_demo": "3_HOUR_OFFER_CONFIRMED_ON_OFFICIAL_UGREEN_WEBSITE",
+    "actual_account_issued": "UNVERIFIED",
+    "creator_and_expert_rights": "UNVERIFIED",
+    "preflight_target_kst": "2026-10-29",
+    "trial_execution_target_kst": "2026-10-30_EVENING_CONDITIONAL_OWNER_APPROVAL",
+    "planned_active_minutes": 120,
+    "emergency_reserve_minutes": 60,
+    "activate_only_after_approval": true,
+    "actual_trial_started": false,
+    "actual_nas": "NOT_RUN",
+    "round1_requires_nas": false,
+    "finalist_nas_access": "SEPARATE",
+    "devpost": "NOT_SUBMITTED"
   }
 }
