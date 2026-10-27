@@ -1,3 +1,5 @@
+> **G66 post-Creator editorial correction (2026-10-28 KST):** After the official Codex Creator and original `d04ee09e...` exact-file checker run, UGREEN lead independently found a broken `G58` documentation pointer within the generated Skill. Only that pointer was corrected to this existing G65 evidence document, in the separate review branch. This changes the Skill SHA256, so the earlier 0/0/0 `static-pass` does NOT validate the corrected bytes. A new exact-byte, pinned-vendor, isolated checker run and 486 existing Python regression tests are required before accepting the corrected candidate. Creator provenance still refers to the original assisted creation; editorial correction is distinct. Official NAS/Expert NOT_RUN; owner adoption/release HOLD, Devpost NOT_SUBMITTED, canonical Skill and G52 originals unchanged.
+
 # G65 — Official FlowPilot Creator execution and validation
 
 Date: 2026-10-28 KST. Candidate branch: `codex/ugreen-flowpilot-creator`, based on `lead/ugreen` HEAD `b3e3147805cbbcd241bf262d57838b60d113d1b1`.
