@@ -1415,5 +1415,26 @@
     "remote_candidate_checker_recheck": "STATIC_PASS_EXACT_BRANCH_BYTES",
     "local_master_integrity": "PASS_24_ENTRIES",
     "local_closeout_path_sync": "PASS_13_PATHS"
+  },
+  "g67_owner_preview": {
+    "date_kst": "2026-10-28",
+    "status": "SOURCE_PREPARED_CI_PENDING",
+    "scope": "G66_CORRECTED_CREATOR_CANDIDATE_NEW_ROUND1_OWNER_REVIEW_PDF_ZIP",
+    "candidate_sha256": "f7982feae70e773440486fd8b0bee408fbadc69ced82d96d6e761c686f6131a5",
+    "prior_g66_checker": "STATIC_PASS_0_0_0",
+    "prior_checker_run": "40547404706",
+    "creator": "OPERATOR_REPORTED_CODEX_OFFICIAL_ULIYA_0.7.3_EN",
+    "new_tests_expected": 7,
+    "full_tests_expected": 493,
+    "answer_words": 392,
+    "pdf_pages_expected": 1,
+    "owner_release": "HOLD",
+    "nas": "NOT_RUN",
+    "expert": "NOT_RUN",
+    "devpost": "NOT_SUBMITTED",
+    "canon_skill": "UNCHANGED",
+    "prior_g52_preview": "UNCHANGED",
+    "trial": "CONDITIONAL_2026_11_03_TO_05",
+    "work_hours": "NOT_MEASURED"
   }
 }
