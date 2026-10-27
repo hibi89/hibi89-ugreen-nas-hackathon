@@ -1582,5 +1582,22 @@
     "nas": "NOT_RUN",
     "uliya": "NOT_CONNECTED",
     "rights": "HOLD"
+  },
+  "g63_followup": {
+    "date_kst": "2026-10-28",
+    "task": "G63_SEQUENTIAL_CONSENTED_LOCAL_METADATA_WORKFLOW",
+    "code": "tools/flowpilot_local_workflow.py",
+    "tests": "tests/test_flowpilot_local_workflow.py",
+    "focused_tests_expected": 9,
+    "full_tests_expected": 472,
+    "exact_source_ci": "PENDING",
+    "owner_local_metadata": "OPT_IN",
+    "real_ugos_nas": "NOT_RUN",
+    "registered_uliya_agent": "NOT_RUN",
+    "official_flowpilot_creator": "NOT_EVIDENCED",
+    "entrant_release": "HOLD",
+    "devpost": "NOT_SUBMITTED",
+    "planned_three_hour_trial": "2026-11-03_TO_05_CONDITIONAL",
+    "actual_hours": null
   }
 }

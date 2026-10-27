@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project_name": "UGREEN NAS AI Hackathon",
   "expected_days": 24,
-  "updated_kst": "2026-10-27",
+  "updated_kst": "2026-10-28",
   "original_plan": "docs/UGREEN_DAILY_EFFORT_PLAN_20261024.md",
   "active_day_id": "UGR-D02",
   "days": [
@@ -132,7 +132,7 @@
       "blocker": null,
       "recovery_date_kst": null,
       "recovery_condition": null,
-      "advance_note": "presence.py 합성 구현·테스트 완료; 공식 NAS read adapter와 권한/완전성 미검증. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음. 2026-10-26: Original fixed-day acceptance independently reconciled from committed source and earlier verified CI. src/projectready/presence.py, tests/test_presence.py; authorized path contract and FAIL vs NOT_CHECKED cases in G41 offline suite. Real adapter scope and effective permissions remain G1 BLOCKED. DONE only means scheduled deliverable complete; NOT real NAS/permission/PII clearance or Devpost submission. Real labor unmeasured. G42 newest test remains CI PENDING.",
+      "advance_note": "presence.py 합성 구현·테스트 완료; 공식 NAS read adapter와 권한/완전성 미검증. 정식 일일 범위의 완료 가중치가 없으므로 0%를 임의 상승시키지 않음. 2026-10-26: Original fixed-day acceptance independently reconciled from committed source and earlier verified CI. src/projectready/presence.py, tests/test_presence.py; authorized path contract and FAIL vs NOT_CHECKED cases in G41 offline suite. Real adapter scope and effective permissions remain G1 BLOCKED. DONE only means scheduled deliverable complete; NOT real NAS/permission/PII clearance or Devpost submission. Real labor unmeasured. G42 newest test remains CI PENDING. G63 sequential actual local metadata checks newly staged, nine tests CI PENDING. Official NAS/Creator NOT_RUN; release HOLD; this does not change the 24-day schedule completion states.",
       "acceptance_reconciled_kst": "2026-10-26",
       "acceptance_outcome": "SCOPED_DELIVERABLE_VERIFIED_OFFLINE"
     },
