@@ -22,6 +22,18 @@ class FlowPilotG47Security(unittest.TestCase):
             with self.subTest(goal=goal):
                 self.assertEqual(draft_plan(goal, **P).state, State.BLOCKED)
 
+    def test_download_and_sync_requests_are_not_read_only(self):
+        for goal in ("download project files", "sync project file to laptop",
+                     "email the checked file", "파일 다운로드해줘",
+                     "NAS 파일 내려받아줘", "프로젝트 파일 동기화해줘"):
+            with self.subTest(goal=goal):
+                self.assertEqual(draft_plan(goal, **P).state, State.BLOCKED)
+
+    def test_existing_read_only_goals_remain_supported(self):
+        for goal in ("check required files", "summarize document", "프로젝트 파일 확인해줘"):
+            with self.subTest(goal=goal):
+                self.assertEqual(draft_plan(goal, **P).state, State.READY_FOR_ADAPTER_CHECK)
+
     def test_sensitive_filenames_rejected_in_both_engines(self):
         paths = ("secrets.txt", "credentials.json", "passwords.csv", ".aws/credentials",
                  "data/.kube/config", "authorized_keys", "known_hosts", ".npmrc",

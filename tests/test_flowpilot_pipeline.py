@@ -29,6 +29,15 @@ class FlowPilotPipeline(unittest.TestCase):
         x=evaluate_offline(**BASE)
         self.assertEqual(x.status,'NEEDS_REVIEW');self.assertIn('NO_OBSERVED_METADATA',x.limitations)
 
+    def test_string_document_approval_never_unlocks_pipeline_stage(self):
+        batch = fixture(seen('README.md', 'synthetic://a'),
+                        seen('release/output.pdf', 'synthetic://b'))
+        x = evaluate_offline(**{**BASE, 'request': 'summarize document'},
+                             batch=batch, document_approved='true',
+                             returned_document_refs=('synthetic://a',))
+        self.assertEqual(x.status, 'NEEDS_REVIEW')
+        self.assertNotIn('document', [s.id for s in x.plan.steps])
+
     def test_root_mismatch_blocks(self):
         x=evaluate_offline(**BASE,batch=fixture(root='/volume1/projects/other'))
         self.assertEqual(x.status,'BLOCKED');self.assertIsNone(x.report)

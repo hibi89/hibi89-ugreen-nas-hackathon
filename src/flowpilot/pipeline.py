@@ -59,7 +59,7 @@ def evaluate_offline(
     if batch.authorized_root != plan.authorized_root:
         no_document = replace(plan, steps=tuple(step for step in plan.steps if step.id != "document"))
         return FlowResult("BLOCKED", no_document, None, base + ("ROOT_MISMATCH",))
-    if plan.intent is Intent.SUMMARIZE_SELECTED and document_approved and returned_document_refs:
+    if plan.intent is Intent.SUMMARIZE_SELECTED and document_approved is True and returned_document_refs:
         if not inventory_claimed_complete:
             return FlowResult("NEEDS_REVIEW", plan, None,
                               base + ("DOCUMENT_STAGE_BLOCKED_UNVERIFIED_INVENTORY",))
@@ -75,7 +75,7 @@ def evaluate_offline(
             return FlowResult("BLOCKED", no_document, None,
                               base + ("UNATTRIBUTABLE_DOCUMENT_REFERENCE",))
     findings = report(plan.required_paths, batch, version_candidates=version_candidates)
-    if plan.intent is Intent.SUMMARIZE_SELECTED and document_approved and returned_document_refs:
+    if plan.intent is Intent.SUMMARIZE_SELECTED and document_approved is True and returned_document_refs:
         # Only unambiguous PRESENT evidence uniquely attributable to a
         # checklist item may appear in a selected-document plan. A claimed
         # complete listing alone cannot override symlink/version uncertainty.

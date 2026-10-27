@@ -53,7 +53,8 @@ _RESTRICTED = re.compile(
 )
 _WRITES = re.compile(
     r"\b(?:delete|remove|rename|move|upload|transfer|send|overwrite|wipe|modify|copy|share|publish|export|edit|erase)\b"
-    r"|(?:삭제|이동|업로드|전송|수정|덮어쓰기|복사|공유|지워|지우기|보내|내보내기|게시|발행)", re.IGNORECASE
+    r"|\b(?:download|synchronize|synchronise|sync|email|forward|attach)\b"
+    r"|(?:삭제|이동|업로드|전송|수정|덮어쓰기|복사|공유|지워|지우기|보내|내보내기|게시|발행|다운로드|내려받|동기화|첨부해|저장해|이름\s*바꿔)", re.IGNORECASE
 )
 
 
@@ -126,9 +127,11 @@ def draft_plan(
     paths = tuple(_safe(path, root=False) for path in required_paths)
     if len(set(paths)) != len(paths) or len(paths) > 100:
         raise ValueError("Duplicate or excessive required paths")
-    if not metadata_approved:
+    # Dataclass/type annotations do not enforce input booleans. A nonempty
+    # string or integer is not owner approval.
+    if metadata_approved is not True:
         questions.append("Approve read-only metadata access to this exact folder?")
-    if not unknown_processing_accepted:
+    if unknown_processing_accepted is not True:
         questions.append("Processing location is unverified; continue with scoped metadata only?")
     if questions:
         return Plan(State.WAITING_APPROVAL, intent, root, paths, (), tuple(questions), tuple(limitations))
@@ -136,7 +139,7 @@ def draft_plan(
     if intent in (Intent.HANDOFF_AUDIT, Intent.REVIEW_VERSIONS):
         steps.append(Step("versions", "file-agent", "Compare only scoped candidate names; do not automatically choose latest"))
     if intent == Intent.SUMMARIZE_SELECTED:
-        if document_approved and returned_document_refs:
+        if document_approved is True and returned_document_refs:
             if any(not isinstance(ref, str) or not ref.strip() for ref in returned_document_refs):
                 raise ValueError("Invalid returned document reference")
             steps.append(Step("document", "document-agent", "Only exact verified returned references, separately approved; never widen scope"))

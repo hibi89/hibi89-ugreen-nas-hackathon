@@ -95,6 +95,23 @@ class FlowPilotMVP(unittest.TestCase):
             draft_plan(**{**P, "request": "summarize document"},
                        document_approved=True, returned_document_refs=("",))
 
+    def test_untrusted_string_metadata_approval_does_not_unlock_plan(self):
+        x = draft_plan(**{**P, "metadata_approved": "true"})
+        self.assertEqual(x.state, State.WAITING_APPROVAL)
+        self.assertEqual(x.steps, ())
+
+    def test_untrusted_integer_processing_approval_does_not_unlock_plan(self):
+        x = draft_plan(**{**P, "unknown_processing_accepted": 1})
+        self.assertEqual(x.state, State.WAITING_APPROVAL)
+        self.assertEqual(x.steps, ())
+
+    def test_untrusted_string_content_consent_does_not_plan_document(self):
+        x = draft_plan(**{**P, "request": "summarize document"},
+                       document_approved="yes",
+                       returned_document_refs=("synthetic://a",))
+        self.assertEqual(x.state, State.READY_FOR_ADAPTER_CHECK)
+        self.assertNotIn("document", [s.id for s in x.steps])
+
     def test_markdown_source_no_scripts_or_real_nas_claim(self):
         skill = (ROOT / "skill" / "flowpilot-nas" / "SKILL.md").read_text(encoding="utf-8")
         self.assertTrue(skill.startswith("---\nname: flowpilot-nas\n"))
