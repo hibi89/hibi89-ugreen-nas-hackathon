@@ -4,7 +4,7 @@
   "repository": "hibi89/hibi89-ugreen-nas-hackathon",
   "authoritative_branch": "lead/ugreen",
   "role": "UGREEN lead and sole hands-on developer",
-  "last_session_closeout_date_kst": "2026-10-26",
+  "last_session_closeout_date_kst": "2026-10-27",
   "last_source_verified_head_at_handoff": "af8e14ab4efa148b903403231d3d20a77e88a7ac",
   "source_verification_workflow": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40072722105",
   "offline_synthetic_tests_passed": 91,
@@ -25,10 +25,10 @@
     "sdk_gate_distinct": true
   },
   "next_work": {
-    "id": "G42-CI-AND-RUNTIME_BOUNDARY_FOLLOWUP",
-    "scheduled_kst": "2026-10-26",
-    "status": "NEXT_INTERNAL",
-    "scope": "Verify new G42 tests by CI; inspect and document restricted target/symlink/permission adapter boundaries, do not alter exact G36/G37 and do not claim runtime NAS proof.",
+    "id": "G43-CI-AND-VISION-GAP",
+    "scheduled_kst": "2026-10-27",
+    "status": "PENDING_OFFLINE_CI",
+    "scope": "Verify FlowPilot offline source tests and contrast scoped Skill to owner natural-language vision; no unverified official runtime or NAS claims.",
     "planned_hours": 0,
     "separate_reserve_hours": 0,
     "actual_completion_eta_hours": null
@@ -1131,5 +1131,21 @@
     "owner_originality_release_review": "PENDING",
     "license_vendor_reply": "NOT_VERIFIED",
     "devpost": "NOT_SUBMITTED"
+  },
+  "flowpilot_mvp_20261027": {
+    "phase": "MVP_OFFLINE_IMPLEMENTED_CI_PENDING",
+    "skill_candidate": "skill/flowpilot-nas/SKILL.md",
+    "offline_planner": "src/flowpilot/planner.py",
+    "offline_tests": "tests/test_flowpilot_mvp.py",
+    "official_creator": "NOT_RUN_FOR_FLOWPILOT",
+    "official_checker": "NOT_RUN_FOR_FLOWPILOT",
+    "registered_agent": "NOT_VERIFIED",
+    "actual_nas": "NOT_RUN",
+    "round1_pdf_zip": "NOT_CREATED_FOR_FLOWPILOT",
+    "owner_approval": "NOT_GIVEN",
+    "license": "HOLD",
+    "devpost": "NOT_SUBMITTED",
+    "historic_g36_g37": "UNCHANGED",
+    "next": "Confirm CI; then design/feature gap audit and official Creator gate."
   }
 }

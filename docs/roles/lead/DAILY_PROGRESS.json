@@ -875,5 +875,21 @@
     "new_g42_tests": "CI_PENDING",
     "release": "HOLD",
     "devpost": "NOT_SUBMITTED"
+  },
+  "flowpilot_mvp_20261027": {
+    "phase": "MVP_OFFLINE_IMPLEMENTED_CI_PENDING",
+    "skill_candidate": "skill/flowpilot-nas/SKILL.md",
+    "offline_planner": "src/flowpilot/planner.py",
+    "offline_tests": "tests/test_flowpilot_mvp.py",
+    "official_creator": "NOT_RUN_FOR_FLOWPILOT",
+    "official_checker": "NOT_RUN_FOR_FLOWPILOT",
+    "registered_agent": "NOT_VERIFIED",
+    "actual_nas": "NOT_RUN",
+    "round1_pdf_zip": "NOT_CREATED_FOR_FLOWPILOT",
+    "owner_approval": "NOT_GIVEN",
+    "license": "HOLD",
+    "devpost": "NOT_SUBMITTED",
+    "historic_g36_g37": "UNCHANGED",
+    "next": "Confirm CI; then design/feature gap audit and official Creator gate."
   }
 }

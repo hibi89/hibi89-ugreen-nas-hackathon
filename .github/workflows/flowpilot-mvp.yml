@@ -1,0 +1,29 @@
+name: UGREEN FlowPilot offline MVP (NOT NAS runtime)
+on:
+  push:
+    branches: ["lead/ugreen"]
+    paths:
+      - "src/flowpilot/**"
+      - "skill/flowpilot-nas/**"
+      - "tests/test_flowpilot_mvp.py"
+      - ".github/workflows/flowpilot-mvp.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  offline-mvp:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Verify FlowPilot offline planner and candidate Skill source
+        run: python -m unittest discover -s tests -p 'test_flowpilot_mvp.py' -v
+      - name: Recheck all existing offline contracts
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Clearly distinguish draft from submitted or real NAS
+        run: |
+          test -f skill/flowpilot-nas/SKILL.md
+          echo "OFFLINE FLOWPILOT ONLY; OFFICIAL CREATOR, NAS AND DEVPOST NOT RUN"
