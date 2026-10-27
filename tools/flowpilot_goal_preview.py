@@ -146,7 +146,8 @@ def process_goal(goal: str, *, root: Path | None = None,
     # Existing G63 engine preflights all stages *before* metadata access.
     result = run_workflow(Path(root), recipe, metadata_consent=metadata_consent)
     public["status"] = result["status"]
-    public["next_action"] = ("REVIEW_LOCAL_FINDINGS" if result["status"] == "NEEDS_REVIEW"
+    public["next_action"] = ("APPROVE_LOCAL_METADATA_OR_DECLINE" if result["status"] == "WAITING_APPROVAL"
+                             else "REVIEW_LOCAL_FINDINGS" if result["status"] == "NEEDS_REVIEW"
                              else "RESOLVE_BLOCKED_CHECKS" if result["status"] == "BLOCKED"
                              else "REVIEW_LOCAL_RESULT")
     public["executed_steps"] = result["executed_steps"]
