@@ -101,5 +101,25 @@ class GuidedSessionTests(unittest.TestCase):
         self.assertEqual(completed.returncode, 2)
         self.assertIn("GOAL_REFUSED", completed.stdout)
 
+    def test_duplicate_version_candidates_refused_before_access(self):
+        from flowpilot_goal_preview import process_goal
+        with patch("flowpilot_owner_local_audit._valid_root",
+                   side_effect=AssertionError("unexpected access")):
+            with self.assertRaises(WorkflowRefused):
+                process_goal("버전 비교", root=self.root,
+                    required=["README.md"],
+                    candidates={"README.md": ["README.md", "README.md"]},
+                    metadata_consent=True)
+
+    def test_excessive_version_candidates_refused_before_access(self):
+        from flowpilot_goal_preview import process_goal
+        with patch("flowpilot_owner_local_audit._valid_root",
+                   side_effect=AssertionError("unexpected access")):
+            with self.assertRaises(WorkflowRefused):
+                process_goal("버전 비교", root=self.root,
+                    required=["README.md"],
+                    candidates={"README.md": [f"candidate_{i}.txt" for i in range(101)]},
+                    metadata_consent=True)
+
 if __name__ == "__main__":
     unittest.main()
