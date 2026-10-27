@@ -29,6 +29,20 @@ class GuidedSessionTests(unittest.TestCase):
         self.assertEqual(result["review_queue"], [])
         self.assertNotIn(str(self.root), "\n".join(output))
 
+    def test_missing_file_is_indexed_in_redacted_review_queue(self):
+        output = []
+        answers = iter([str(self.root), "missing.pdf", "APPROVE"])
+        result = run_guided_session("파일 확인",
+            ask=lambda prompt: next(answers), emit=output.append)
+        self.assertEqual(result["status"], "BLOCKED")
+        self.assertEqual(result["next_action"], "RESOLVE_BLOCKED_CHECKS")
+        self.assertEqual(result["finding_counts"]["MISSING"], 1)
+        self.assertEqual(result["review_queue"], [
+            {"step": 1, "item_index": 1, "state": "MISSING"}
+        ])
+        self.assertNotIn("missing.pdf", "\\n".join(output))
+        self.assertNotIn(str(self.root), "\\n".join(output))
+
     def test_declined_without_root_access(self):
         with patch("flowpilot_owner_local_audit._valid_root",
                    side_effect=AssertionError("unexpected access")):
