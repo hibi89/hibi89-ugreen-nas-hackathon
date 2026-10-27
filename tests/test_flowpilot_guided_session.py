@@ -26,6 +26,7 @@ class GuidedSessionTests(unittest.TestCase):
         self.assertTrue(result["owner_folder_metadata_accessed"])
         self.assertEqual(result["next_action"], "REVIEW_LOCAL_FINDINGS")
         self.assertEqual(result["finding_counts"]["PRESENT"], 1)
+        self.assertEqual(result["review_queue"], [])
         self.assertNotIn(str(self.root), "\n".join(output))
 
     def test_declined_without_root_access(self):
@@ -37,6 +38,7 @@ class GuidedSessionTests(unittest.TestCase):
         self.assertEqual(result["status"], "DECLINED")
         self.assertEqual(result["next_action"], "NO_ACTION")
         self.assertEqual(sum(result["finding_counts"].values()), 0)
+        self.assertEqual(result["review_queue"], [])
         self.assertEqual(result["executed_steps"], 0)
 
     def test_missing_inputs_provide_next_action_without_access(self):
