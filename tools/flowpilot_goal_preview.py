@@ -103,6 +103,12 @@ def process_goal(goal: str, *, root: Path | None = None,
             raise WorkflowRefused("Unsafe candidate mapping") from exc
         if len(mapping) != len(candidates) or set(mapping) - set(items):
             raise WorkflowRefused("Invalid bound candidate")
+    if candidates is not None:
+        if (len(mapping) > 100 or any(not values or len(values) > 100
+                or len(values) != len(set(values)) for values in mapping.values())):
+            raise WorkflowRefused("Duplicate, empty or excessive version candidates")
+        if len(set(items).union(*(set(values) for values in mapping.values()))) > 100:
+            raise WorkflowRefused("Excessive combined file scope")
     if need_versions and not mapping:
         missing.append("version_candidate_mapping")
 
