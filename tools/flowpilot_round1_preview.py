@@ -14,7 +14,7 @@ from check_round1_proposal import PROMPTS
 ROOT=Path(__file__).resolve().parents[1]
 SKILL=ROOT/"skill/flowpilot-nas/SKILL.md"
 QA=ROOT/"docs/submission/flowpilot_round1_qas_20261027.json"
-PIN="985713d709aa36ad3e590557aac242be860716834f31eb27ff460bee960184b0"
+PIN="47d119123387ec46133a62fdec58ef42ca3852491b132d32798951a6430c233b"
 
 def build(output:Path):
     if SKILL.is_symlink() or not SKILL.is_file():raise ValueError("Candidate source missing, unsafe or symlink")

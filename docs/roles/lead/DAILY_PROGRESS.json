@@ -976,5 +976,22 @@
     "nas": "NOT_RUN",
     "owner_approval": "NOT_GIVEN",
     "devpost": "NOT_SUBMITTED"
+  },
+  "flowpilot_g49": {
+    "stage": "G49_NEW_SOURCE_AWAITING_FIRST_PARTY_CI",
+    "date_kst": "2026-10-27",
+    "old_static_run": 40498808367,
+    "old_static_status": "NOT_UPLOADABLE_6_ERRORS_2_WARNINGS",
+    "g48_offline_in_official_workflow": "50_50_PASS",
+    "g48_all_project_run": 40498808477,
+    "g48_all_project_status": "341_TESTS_1_G42_TEST_CALL_ERROR",
+    "g42_fix": "TEST_PASSES_REQUIREMENT_SCALAR",
+    "candidate_sha256": "47d119123387ec46133a62fdec58ef42ca3852491b132d32798951a6430c233b",
+    "first_party_checker_g49": "PENDING_NOT_OBSERVED",
+    "creator": "NOT_RUN_FOR_G49",
+    "nas": "NOT_RUN",
+    "owner_approval": "NOT_GIVEN",
+    "devpost": "NOT_SUBMITTED",
+    "original_g36_g37_g46": "PRESERVED"
   }
 }
