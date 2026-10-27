@@ -23,15 +23,15 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: G68 focused bounded natural-goal-to-real-local workflow
-        run: python -m unittest discover -s tests -p 'test_flowpilot_goal_preview.py' -v
+      - name: G69 focused guided goal-to-approved-local-execution E2E
+        run: python -m unittest discover -s tests -p 'test_flowpilot_guided_cli.py' -v
       - name: Full single-pass offline regressions (includes all prior security contracts)
         run: |
           python - <<'PY'
           import unittest
           suite=unittest.defaultTestLoader.discover("tests",pattern="test_*.py")
           count=suite.countTestCases()
-          assert count>=496, f"Offline suite unexpectedly small ({count})"
+          assert count>=505, f"Offline suite unexpectedly small ({count})"
           result=unittest.TextTestRunner(verbosity=1).run(suite)
           assert result.wasSuccessful(), f"Offline regressions failed ({count})"
           print(f"UGREEN OFFLINE {count}/{count} PASS; NAS/ULIYA NOT_RUN")

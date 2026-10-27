@@ -141,6 +141,75 @@ def process_goal(goal: str, *, root: Path | None = None,
     return public
 
 
+
+def _guided_paths(text: str, *, separator: str = ",") -> list[str]:
+    """Parse only exact, bounded user supplied relative file names."""
+    if len(text) > 4096 or not text.strip():
+        raise WorkflowRefused("Provide bounded exact local relative file names")
+    parts = [part.strip() for part in text.split(separator)]
+    if not 1 <= len(parts) <= 100 or any(not p for p in parts):
+        raise WorkflowRefused("Invalid path list")
+    return parts
+
+
+def _guided_versions(text: str) -> dict[str, list[str]]:
+    """Semicolon-separated required=candidate assignments, no dynamic lookup."""
+    if len(text) > 4096 or not text.strip():
+        raise WorkflowRefused("Version candidates required")
+    entries = _guided_paths(text, separator=";")
+    versions: dict[str, list[str]] = {}
+    for entry in entries:
+        if entry.count("=") != 1:
+            raise WorkflowRefused("Version mapping needs exactly one =")
+        required, candidate = (x.strip() for x in entry.split("=", 1))
+        if not required or not candidate:
+            raise WorkflowRefused("Empty version mapping")
+        versions.setdefault(required, []).append(candidate)
+    return versions
+
+
+def run_guided_session(goal: str, *, root: Path | None = None,
+                       required: list[str] | None = None,
+                       candidates: dict[str, list[str]] | None = None,
+                       ask=None, emit=None) -> dict:
+    """One CLI session: questions -> redacted plan -> APPROVE -> local metadata.
+
+    No implicit consent: even if the caller supplies all required arguments,
+    the exact string 'APPROVE' must be entered interactively. Never echo
+    selected root or file names in displayed previews/results.
+    """
+    if ask is None:
+        ask = input
+    if emit is None:
+        emit = print
+    intents = parse_goal(goal)  # Disallowed goals rejected before prompts.
+    if root is None:
+        answer = ask("LOCAL_ROOT (absolute local directory, not NAS): ").strip()
+        if not answer or len(answer) > 4096:
+            raise WorkflowRefused("Missing or excessive local root")
+        root = Path(answer)
+    if not required:
+        required = _guided_paths(ask("REQUIRED (exact relative files, comma-separated): "))
+    if "compare versions" in intents and not candidates:
+        candidates = _guided_versions(ask(
+            "VERSIONS (required=candidate; multiple separated by semicolons): "))
+    preview = process_goal(goal, root=root, required=required,
+                           candidates=candidates, metadata_consent=False)
+    if preview["status"] != "WAITING_APPROVAL":
+        raise WorkflowRefused("Incomplete or unsafe guided plan")
+    emit("FLOWPILOT_PREVIEW=" + json.dumps(preview, ensure_ascii=False))
+    consent = ask("Type APPROVE to inspect only local file metadata; anything else declines: ")
+    if consent != "APPROVE":
+        declined = dict(preview, status="DECLINED", executed_steps=0)
+        emit("FLOWPILOT_RESULT=" + json.dumps(declined, ensure_ascii=False))
+        return declined
+    result = process_goal(goal, root=root, required=required,
+                          candidates=candidates, metadata_consent=True)
+    emit("FLOWPILOT_RESULT=" + json.dumps(result, ensure_ascii=False))
+    return result
+
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description="Bounded natural-goal preview and approved LOCAL metadata run; NOT NAS")
@@ -149,6 +218,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--required", action="append")
     parser.add_argument("--candidate", action="append",
                         help="Exact required=candidate file name; repeatable")
+    parser.add_argument("--interactive", action="store_true",
+                        help="Ask for missing slots, show plan and obtain explicit APPROVE")
     parser.add_argument("--approve-local-metadata", action="store_true")
     args = parser.parse_args(argv)
     try:
@@ -160,12 +231,18 @@ def main(argv: list[str] | None = None) -> int:
                     raise WorkflowRefused("Invalid candidate pair")
                 key, val = item.split("=", 1)
                 versions.setdefault(key, []).append(val)
+        if args.interactive:
+            if args.approve_local_metadata:
+                raise WorkflowRefused("Interactive consent may not be supplied as a flag")
+            outcome = run_guided_session(args.goal, root=args.root,
+                                         required=args.required, candidates=versions)
+            return 1 if outcome["status"] == "BLOCKED" else 0
         outcome = process_goal(args.goal, root=args.root,
                                required=args.required, candidates=versions,
                                metadata_consent=args.approve_local_metadata)
         print(json.dumps(outcome, ensure_ascii=False, indent=2))
         return 1 if outcome["status"] == "BLOCKED" else 0
-    except (WorkflowRefused, OSError, ValueError, TypeError):
+    except (WorkflowRefused, OSError, ValueError, TypeError, EOFError, KeyboardInterrupt):
         print(json.dumps({"status": "GOAL_REFUSED", "release_gate": "HOLD"}))
         return 2
 
