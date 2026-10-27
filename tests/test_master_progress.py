@@ -22,8 +22,9 @@ class MasterTests(unittest.TestCase):
         last=next(x for x in self.m.splitlines() if x.startswith("| UGR-D24 |"))
         bad=self.m.replace(last,last.replace("| NOT_STARTED |","| DONE |"))
         self.assertTrue(integrity_errors(bad,self.p))
-    def test_missing_master_on_source_push_rejected(self):
-        self.assertTrue(closeout_errors({"src/projectready/presence.py"}))
+    def test_regular_source_push_does_not_require_master_document(self):
+        # 2026-10-28 owner directive: do not regenerate unrelated progress docs.
+        self.assertEqual([],closeout_errors({"src/projectready/presence.py"}))
     def test_missing_master_on_master_json_change_rejected(self):
         self.assertTrue(closeout_errors({"data/master_progress.json"}))
     def test_handoff_document_only_does_not_require_all_source_docs(self):
