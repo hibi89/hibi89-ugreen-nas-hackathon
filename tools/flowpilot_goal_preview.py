@@ -127,6 +127,7 @@ def process_goal(goal: str, *, root: Path | None = None,
         "planned_steps": len(goals),
         "executed_steps": 0,
         "finding_counts": {"PRESENT": 0, "MISSING": 0, "NOT_CHECKED": 0, "VERSION_REVIEW": 0},
+        "review_queue": [],
         "owner_folder_metadata_accessed": False,
         "raw_paths_returned": False,
         "file_contents_opened": False,
@@ -155,11 +156,15 @@ def process_goal(goal: str, *, root: Path | None = None,
     public["owner_folder_metadata_accessed"] = any(
         s["inspected_local_metadata"] for s in result["steps"])
     public["observed"] = result["steps"]
-    for step in result["steps"]:
+    for step_index, step in enumerate(result["steps"], start=1):
         for item in step["items"]:
             state = item["state"]
             if state in public["finding_counts"]:
                 public["finding_counts"][state] += 1
+            if state in ("MISSING", "NOT_CHECKED", "VERSION_REVIEW"):
+                public["review_queue"].append({"step": step_index,
+                                               "item_index": item["index"],
+                                               "state": state})
     return public
 
 
