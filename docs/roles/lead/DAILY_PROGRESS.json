@@ -432,8 +432,8 @@
   "closeout_sync_enforcement_active": true,
   "closeout_sync_quality_issue": "2026-10-24 CI #40067541841 detected stale daily JSON in previous policy commit; correcting in next commit",
   "closeout_sync_guard_tested_status": "PENDING_RECHECK",
-  "latest_repository_regression_tests_passed": 388,
-  "latest_repository_regression_ci_url": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40517777852",
+  "latest_repository_regression_tests_passed": 392,
+  "latest_repository_regression_ci_url": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40522638655",
   "latest_closeout_guard_verified": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40072583787",
   "notes_on_last_closeout": "One-line GitHub bootstrap and mandatory end-of-work handoff automated checks verified. No new SDK or NAS capability established.",
   "notes_on_new_chat_execution": "G1 official pinned catalog read-only reference bound into Skill; 4 Markdown files, 165/165 offline tests + actual skill preflight PASS at source 5772a8a9, closeout sync PASS. No official Uliya checker/NAS/PII permission tested; next G1 Oct25 1.5h base+1.5h reserve, ETA unknown. Oct24 finite-day scope remains 100%, 0h, not overall project completion.",
@@ -1154,6 +1154,19 @@
     "official_creator": "NOT_EVIDENCED",
     "nas": "NOT_RUN",
     "devpost": "NOT_SUBMITTED",
-    "elapsed_hours": null
+    "elapsed_hours": null,
+    "verification": "G56B_CORRECTED_SOURCE_392_FULL_TESTS_PASS",
+    "baseline_failed_sha": "11fc00f19e75bb468f37a6e0d0cc29fbc14bf3b1",
+    "verified_source_sha": "ec588a23d791f2a6569e23f33eae35a4dd5d5d33",
+    "full_tests": 392,
+    "full_ci_url": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40522638655",
+    "first_party_static_checker": "WORKFLOW_SUCCESS_40522638388",
+    "round1_draft_bundle": "WORKFLOW_SUCCESS_40522638730",
+    "owner_preview": "WORKFLOW_SUCCESS_40522638368",
+    "master": "WORKFLOW_SUCCESS_40522638772",
+    "closeout": "WORKFLOW_SUCCESS_40522638450",
+    "offline_readiness": "JOB_SUCCESS_40522638425",
+    "creator": "NOT_EVIDENCED",
+    "owner_release": "HOLD"
   }
 }
