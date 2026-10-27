@@ -96,5 +96,5 @@ jobs:
         with:
           name: G67-UGREEN-CREATOR-ROUND1-OWNER-REVIEW-NOT-SUBMITTED
           path: ${{ runner.temp }}/g67-preview/*
-          retention-days: 7
+          retention-days: 30
           if-no-files-found: error
