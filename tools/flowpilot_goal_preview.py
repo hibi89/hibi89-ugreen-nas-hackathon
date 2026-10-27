@@ -122,6 +122,8 @@ def process_goal(goal: str, *, root: Path | None = None,
         "plan": [{"index": i+1, "read_only_action": name}
                  for i,name in enumerate(goals)],
         "missing_inputs": missing,
+        "next_action": ("PROVIDE_MISSING_INPUTS" if missing else
+                        "APPROVE_LOCAL_METADATA_OR_DECLINE"),
         "planned_steps": len(goals),
         "executed_steps": 0,
         "owner_folder_metadata_accessed": False,
@@ -144,6 +146,9 @@ def process_goal(goal: str, *, root: Path | None = None,
     # Existing G63 engine preflights all stages *before* metadata access.
     result = run_workflow(Path(root), recipe, metadata_consent=metadata_consent)
     public["status"] = result["status"]
+    public["next_action"] = ("REVIEW_LOCAL_FINDINGS" if result["status"] == "NEEDS_REVIEW"
+                             else "RESOLVE_BLOCKED_CHECKS" if result["status"] == "BLOCKED"
+                             else "REVIEW_LOCAL_RESULT")
     public["executed_steps"] = result["executed_steps"]
     public["owner_folder_metadata_accessed"] = any(
         s["inspected_local_metadata"] for s in result["steps"])
@@ -210,7 +215,7 @@ def run_guided_session(goal: str, *, root: Path | None = None,
     emit("FLOWPILOT_PREVIEW=" + json.dumps(preview, ensure_ascii=False))
     consent = ask("Type APPROVE to inspect only local file metadata; anything else declines: ")
     if consent != "APPROVE":
-        declined = dict(preview, status="DECLINED", executed_steps=0)
+        declined = dict(preview, status="DECLINED", next_action="NO_ACTION", executed_steps=0)
         emit("FLOWPILOT_RESULT=" + json.dumps(declined, ensure_ascii=False))
         return declined
     result = process_goal(goal, root=root, required=required,
