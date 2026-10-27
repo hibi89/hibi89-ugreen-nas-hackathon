@@ -55,7 +55,7 @@ class G67CreatorPreview(unittest.TestCase):
         self.assertEqual(len(qs), 10)
         self.assertLessEqual(count, 500)
         self.assertGreater(count, 100)
-        self.assertIn("Creator", qs[7]["answer"])
+        self.assertIn("Skill Creation Tool", qs[7]["answer"])
         self.assertIn("40547404706", qs[7]["answer"])
         self.assertIn("Codex", disclosure)
         self.assertNotIn("has NOT yet been generated", disclosure)
