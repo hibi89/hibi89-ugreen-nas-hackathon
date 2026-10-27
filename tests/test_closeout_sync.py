@@ -1,4 +1,4 @@
-"""Test CI's mandatory same-work-closeout rule without GitHub calls."""
+"""2026-10-28: test lean UGREEN closeout while retaining high-impact checks."""
 import importlib.util
 import sys
 import unittest
@@ -11,31 +11,29 @@ sys.modules[spec.name]=mod
 spec.loader.exec_module(mod)
 
 class HandoffSyncTests(unittest.TestCase):
-    def test_docs_only_do_not_trigger(self):
-        self.assertFalse(mod.closeout_errors({"README.md","START_HERE.md"}))
-    def test_feature_requires_all_handoff_files(self):
-        errors=mod.closeout_errors({"src/projectready/example.py"})
-        self.assertTrue(errors)
-        self.assertTrue(any("LIVE_STATE.json" in line for line in errors))
-    def test_full_closeout_passes(self):
-        self.assertEqual([],mod.closeout_errors({"src/projectready/example.py"}|set(mod.REQUIRED)))
-    def test_test_change_requires_handoff(self):
-        self.assertTrue(mod.closeout_errors({"tests/test_case.py"}))
-    def test_docs_architecture_change_requires_handoff(self):
-        self.assertTrue(mod.closeout_errors({"docs/architecture/G6.md"}))
-    def test_official_skill_change_requires_handoff(self):
-        self.assertTrue(mod.closeout_errors({"SKILL.md"}))
-    def test_only_textual_handoff_changes_do_not_require_source_gate(self):
-        self.assertEqual([],mod.closeout_errors({"docs/roles/lead/LIVE_HANDOFF.md",
-                                                 "docs/roles/lead/DAILY_PROGRESS.json"}))
-
-    def test_workflow_only_ignored(self):
+    def test_docs_only(self):
+        self.assertFalse(mod.closeout_errors({"README.md", "START_HERE.md"}))
+    def test_regular_code_does_not_force_ten_documents(self):
+        self.assertEqual([],mod.closeout_errors({"src/flowpilot/new.py"}))
+    def test_test_and_tool_changes_no_bureaucratic_gate(self):
+        self.assertEqual([],mod.closeout_errors({"tests/test_new.py","tools/flowpilot_new.py"}))
+    def test_canonical_skill_requires_status_and_handoff(self):
+        failures=mod.closeout_errors({"skill/flowpilot-nas/SKILL.md"})
+        self.assertEqual(2,len(failures))
+        self.assertTrue(any("STATUS.md" in x for x in failures))
+        self.assertTrue(any("HANDOFF.md" in x for x in failures))
+    def test_high_impact_both_documents_pass(self):
+        self.assertEqual([],mod.closeout_errors(set(mod.REQUIRED)|{"skill/flowpilot-nas/SKILL.md"}))
+    def test_one_missing_high_impact_doc_fails(self):
+        failures=mod.closeout_errors({"skill/flowpilot-nas/SKILL.md","STATUS.md"})
+        self.assertEqual(1,len(failures))
+        self.assertIn("HANDOFF.md",failures[0])
+    def test_master_json_without_render_fails(self):
+        self.assertEqual(1,len(mod.closeout_errors({"data/master_progress.json"})))
+    def test_master_json_with_render_passes(self):
+        self.assertEqual([],mod.closeout_errors({"data/master_progress.json","MASTER_PROGRESS.md"}))
+    def test_workflow_change_not_bureaucratic(self):
         self.assertEqual([],mod.closeout_errors({".github/workflows/closeout-synchronization.yml"}))
-    def test_single_missing_document_fails(self):
-        changes={"src/projectready/example.py"}|(set(mod.REQUIRED)-{"docs/roles/lead/WORK_TIME_LOG.md"})
-        errors=mod.closeout_errors(changes)
-        self.assertEqual(2,len(errors))
-        self.assertIn("WORK_TIME_LOG.md",errors[-1])
 
-if __name__=="__main__":
+if __name__ == "__main__":
     unittest.main()

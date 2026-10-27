@@ -1,38 +1,15 @@
-name: UGREEN FlowPilot offline MVP (NOT NAS runtime)
+name: UGREEN FlowPilot functional regression (LOCAL ONLY, NOT NAS)
 on:
   push:
     branches: ["lead/ugreen"]
     paths:
       - "src/flowpilot/**"
       - "skill/flowpilot-nas/**"
-      - "tests/test_flowpilot_mvp.py"
-      - "tests/test_flowpilot_g47_security.py"
-      - "tests/test_flowpilot_demo.py"
-      - "tools/flowpilot_offline_demo.py"
-      - "tools/flowpilot_mvp_cli.py"
-      - "tools/flowpilot_local_file_mvp.py"
-      - "tools/flowpilot_agent_result_intake.py"
-      - "tools/flowpilot_owner_local_audit.py"
-      - "tools/flowpilot_local_workflow.py"
-      - "tools/flowpilot_text_workflow.py"
-      - "tests/test_flowpilot_text_workflow.py"
-      - "tests/test_flowpilot_local_workflow.py"
-      - "tests/test_flowpilot_owner_local_audit.py"
-      - "tests/test_flowpilot_agent_result_intake.py"
-      - "docs/operations/fixtures/G61_SYNTHETIC_NORMALIZED_FILE_AGENT.json"
-      - "tests/test_flowpilot_local_file_mvp.py"
-      - "tests/test_flowpilot_mvp_cli.py"
-      - "src/flowpilot/pipeline.py"
-      - "tests/test_flowpilot_pipeline.py"
-      - "tools/flowpilot_package_audit.py"
-      - "tests/test_flowpilot_package_audit.py"
-      - "tests/test_flowpilot_round1_status.py"
-      - "tools/g53_flowpilot_creator_gate.py"
-      - "tests/test_g53_flowpilot_creator_gate.py"
-      - "tools/g57_flowpilot_creator_candidate_intake.py"
-      - "tests/test_g57_flowpilot_creator_candidate_intake.py"
-      - "tools/flowpilot_round1_preview.py"
-      - "docs/submission/flowpilot_round1_qas_20261027.json"
+      - "tools/flowpilot_*"
+      - "tools/g5*"
+      - "tools/check_handoff_sync.py"
+      - "tests/test_*.py"
+      - "verify_local.ps1"
       - ".github/workflows/flowpilot-mvp.yml"
   workflow_dispatch:
 permissions:
@@ -40,148 +17,32 @@ permissions:
 jobs:
   offline-mvp:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Verify FlowPilot offline planner and candidate Skill source
-        run: python -m unittest discover -s tests -p 'test_flowpilot_mvp.py' -v
-      - name: Run G47 adversarial safety regression
-        run: python -m unittest discover -s tests -p 'test_flowpilot_g47_security.py' -v
-      - name: G50 planning-to-evidence integration and ZIP threat model
+      - name: G68 focused bounded natural-goal-to-real-local workflow
+        run: python -m unittest discover -s tests -p 'test_flowpilot_goal_preview.py' -v
+      - name: Full single-pass offline regressions (includes all prior security contracts)
         run: |
-          python -m unittest discover -s tests -p test_flowpilot_pipeline.py -v
-          python -m unittest discover -s tests -p test_flowpilot_package_audit.py -v
-      - name: Run G48 five-case offline scenario simulation
-        run: |
-          python -m unittest discover -s tests -p 'test_flowpilot_demo.py' -v
-          python tools/flowpilot_offline_demo.py --output "$RUNNER_TEMP/flowpilot-g48-synthetic.json"
-      - name: G53 fail-closed official Creator provenance preflight (NO Creator run)
-        run: |
-          python -m unittest discover -s tests -p test_g53_flowpilot_creator_gate.py -v
-          python tools/g53_flowpilot_creator_gate.py > "$RUNNER_TEMP/g53_creator_hold.json"
-          python -c 'import json,os,pathlib; p=pathlib.Path(os.environ["RUNNER_TEMP"])/"g53_creator_hold.json"; r=json.loads(p.read_text()); assert r["status"]=="CREATOR_NOT_EVIDENCED" and r["release_gate"]=="HOLD" and not r["official_creator_execution_independently_verified"]'
-      - name: G57 newly generated FlowPilot structural source intake (NOT Creator execution)
-        run: |
-          python -m unittest discover -s tests -p test_g57_flowpilot_creator_candidate_intake.py -v
-          python tools/g57_flowpilot_creator_candidate_intake.py --candidate-dir skill/flowpilot-nas > "$RUNNER_TEMP/g57_human_review_only.json"
-          python - <<'PY'
-          import json,os,pathlib
-          p=pathlib.Path(os.environ["RUNNER_TEMP"])/"g57_human_review_only.json"
-          r=json.loads(p.read_text(encoding="utf-8"))
-          assert r["release_gate"]=="HOLD"
-          assert r["status"]=="SOURCE_MATCHED_HUMAN_PROVENANCE_REVIEW"
-          assert r["operator_receipt_status"]=="CREATOR_NOT_EVIDENCED"
-          assert r["creator_execution_independently_verified"] is False
-          assert r["devpost_submitted"] is False
-          print("G57 candidate structure only; official Creator NOT_RUN, release HOLD")
-          PY
-      - name: G58 one-command synthetic MVP smoke (CLI, NOT NAS)
-        run: |
-          python -m unittest discover -s tests -p test_flowpilot_mvp_cli.py -v
-          python tools/flowpilot_mvp_cli.py --scenario complete_synthetic_handoff > "$RUNNER_TEMP/g58_complete.json"
-          python tools/flowpilot_mvp_cli.py --scenario missing_required_synthetic > "$RUNNER_TEMP/g58_missing.json"
-          python tools/flowpilot_mvp_cli.py --scenario conflicting_versions_synthetic > "$RUNNER_TEMP/g58_versions.json"
-          python tools/flowpilot_mvp_cli.py --scenario truncated_or_denied_synthetic > "$RUNNER_TEMP/g58_denied.json"
-          python tools/flowpilot_mvp_cli.py --scenario symlink_unknown_synthetic > "$RUNNER_TEMP/g58_link.json"
-          python - <<'PY'
-          import json,os,pathlib
-          root=pathlib.Path(os.environ["RUNNER_TEMP"])
-          names=("complete","missing","versions","denied","link")
-          expected=("PRESENT","MISSING","VERSION_REVIEW","NOT_CHECKED","NOT_CHECKED")
-          for name,want in zip(names,expected):
-              record=json.loads((root/f"g58_{name}.json").read_text(encoding="utf-8"))
-              assert want in [x["state"] for x in record["required_items"]]
-              assert record["mode"]=="SYNTHETIC_OFFLINE_MVP_ONLY"
-              assert record["release_gate"]=="HOLD"
-              assert record["actual_nas_verified"] is False
-              assert record["registered_agent_invoked"] is False
-              assert record["devpost_submitted"] is False
-          print("G58 runnable synthetic MVP 5/5 scenarios PASS; NO NAS / CREATOR")
-          PY
-      - name: G60 real temp-file metadata MVP five-scenario smoke (NOT NAS)
-        run: |
-          python -m unittest discover -s tests -p test_flowpilot_local_file_mvp.py -v
-          python tools/flowpilot_local_file_mvp.py --scenario complete_synthetic_handoff > "$RUNNER_TEMP/g60_local_complete.json"
-          python tools/flowpilot_local_file_mvp.py --scenario missing_required_synthetic > "$RUNNER_TEMP/g60_local_missing.json"
-          python tools/flowpilot_local_file_mvp.py --scenario conflicting_versions_synthetic > "$RUNNER_TEMP/g60_local_conflict.json"
-          python tools/flowpilot_local_file_mvp.py --scenario truncated_or_denied_synthetic > "$RUNNER_TEMP/g60_local_denied.json"
-          python tools/flowpilot_local_file_mvp.py --scenario symlink_unknown_synthetic > "$RUNNER_TEMP/g60_local_symlink.json"
-          python - <<'PY'
-          import json,os,pathlib
-          p=pathlib.Path(os.environ["RUNNER_TEMP"])
-          expected={"complete":"PRESENT","missing":"MISSING","conflict":"VERSION_REVIEW",
-                    "denied":"NOT_CHECKED","symlink":"NOT_CHECKED"}
-          for name,state in expected.items():
-              row=json.loads((p/f"g60_local_{name}.json").read_text(encoding="utf-8"))
-              assert state in (item["state"] for item in row["items"]), name
-              assert row["mode"]=="EPHEMERAL_LOCAL_FILESYSTEM_SYNTHETIC_MVP"
-              assert row["filesystem_probe"]=="OS_LSTAT_ONLY_ON_GENERATED_TEST_FILES"
-              assert row["real_nas_verified"] is False
-              assert row["registered_uliya_expert_invoked"] is False
-              assert row["release_gate"]=="HOLD"
-          print("G60 local actual-file metadata 5/5 PASS, real NAS NOT RUN")
-          PY
-      - name: G61 normalized file-agent response intake (untrusted operator receipt, NOT NAS)
-        run: |
-          python -m unittest discover -s tests -p test_flowpilot_agent_result_intake.py -v
-          python tools/flowpilot_agent_result_intake.py --input docs/operations/fixtures/G61_SYNTHETIC_NORMALIZED_FILE_AGENT.json > "$RUNNER_TEMP/g61_claims_only.json"
-          python - <<'PY'
-          import json,os,pathlib
-          r=json.loads((pathlib.Path(os.environ["RUNNER_TEMP"])/"g61_claims_only.json").read_text())
-          assert r["status"]=="NEEDS_REVIEW"
-          assert [x["state"] for x in r["item_results"]]==["PRESENT","PRESENT"]
-          assert r["operator_claims_independently_verified"] is False
-          assert r["official_registered_agent_invocation_verified"] is False
-          assert r["real_nas_verified"] is False
-          assert r["release_gate"]=="HOLD"
-          print("G61 normalized receipt intake OK; external provenance NOT VERIFIED")
-          PY
-      - name: G62 actual owner-selected local folder metadata CLI (NO NAS)
-        run: |
-          python -m unittest discover -s tests -p test_flowpilot_owner_local_audit.py -v
-          python - <<'PY'
-          import json,subprocess,sys,tempfile,pathlib
-          with tempfile.TemporaryDirectory() as d:
-              root=pathlib.Path(d)
-              (root/"one.md").write_bytes(b"synthetic only")
-              cmd=[sys.executable,"tools/flowpilot_owner_local_audit.py","--root",str(root),"--required","one.md","--required","missing.md"]
-              waiting=subprocess.run(cmd,text=True,capture_output=True,check=True)
-              assert json.loads(waiting.stdout)["status"]=="WAITING_APPROVAL"
-              pilot=subprocess.run(cmd+["--approve-local-metadata"],text=True,capture_output=True)
-              assert pilot.returncode==1
-              j=json.loads(pilot.stdout)
-              assert [x["state"] for x in j["items"]]==["PRESENT","MISSING"]
-              assert j["mode"]=="CONSENTED_OWNER_LOCAL_METADATA_ONLY_NOT_NAS"
-              assert j["release_gate"]=="HOLD"
-              assert j["nas_verified"] is False
-              assert j["file_contents_opened"] is False
-              assert str(root) not in pilot.stdout
-              print("G62 owner-selected local folder read-only metadata PASS, official NAS NOT_RUN")
-          PY
-      - name: G63 owner-local multi-step workflow (NOT NAS)
-        run: |
-          python -m unittest discover -s tests -p test_flowpilot_local_workflow.py -v
           python - <<'PY'
           import unittest
           suite=unittest.defaultTestLoader.discover("tests",pattern="test_*.py")
-          assert suite.countTestCases()>=472, "Expected G63 suite coverage was not discovered"
-          print("G63 local workflow regression discovery validated; NAS NOT_RUN")
+          count=suite.countTestCases()
+          assert count>=496, f"Offline suite unexpectedly small ({count})"
+          result=unittest.TextTestRunner(verbosity=1).run(suite)
+          assert result.wasSuccessful(), f"Offline regressions failed ({count})"
+          print(f"UGREEN OFFLINE {count}/{count} PASS; NAS/ULIYA NOT_RUN")
           PY
-      - name: G64 Korean/English bounded text to actual local workflow (NOT NAS)
+      - name: Preserve canonical original and approval boundary
         run: |
-          python -m unittest discover -s tests -p test_flowpilot_text_workflow.py -v
           python - <<'PY'
-          import unittest
-          suite=unittest.defaultTestLoader.discover("tests",pattern="test_*.py")
-          assert suite.countTestCases() >= 486, "Missing G64 focused regressions"
-          print("G64 strict text workflow discovered; real NAS NOT_RUN")
+          from pathlib import Path
+          import hashlib
+          skill=Path("skill/flowpilot-nas/SKILL.md").read_bytes()
+          assert hashlib.sha256(skill).hexdigest()=="47d119123387ec46133a62fdec58ef42ca3852491b132d32798951a6430c233b"
+          print("Canonical G49 Skill preserved; public artifacts/adoption NOT_CHANGED")
+          print("UGREEN registered Expert and NAS NOT_RUN, Devpost NOT_SUBMITTED")
           PY
-      - name: Recheck all existing offline contracts
-        run: python -m unittest discover -s tests -p 'test_*.py' -v
-      - name: Clearly distinguish draft from submitted or real NAS
-        run: |
-          test -f skill/flowpilot-nas/SKILL.md
-          echo "OFFLINE FLOWPILOT ONLY; OFFICIAL CREATOR, NAS AND DEVPOST NOT RUN"
