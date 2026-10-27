@@ -1070,11 +1070,13 @@
     "new_code": "tools/g53_flowpilot_creator_gate.py",
     "tests": "tests/test_g53_flowpilot_creator_gate.py",
     "reported_new_tests": 9,
-    "ci": "PENDING",
+    "ci": "GITHUB_JOB_PASS_G53_9_FULL_376",
     "official_creator": "NOT_EVIDENCED",
     "source_sha256": "47d119123387ec46133a62fdec58ef42ca3852491b132d32798951a6430c233b",
     "owner_release": "HOLD",
     "devpost": "NOT_SUBMITTED",
-    "actual_elapsed_hours": null
+    "actual_elapsed_hours": null,
+    "verified_source_sha": "caf00205db6f615c10461a81aa522f4c3d037357",
+    "verified_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40511850824"
   }
 }
