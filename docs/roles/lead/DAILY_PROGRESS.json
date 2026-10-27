@@ -1049,11 +1049,19 @@
     "first_party_static_status": "PASS_0_0_0_EXACT_SHA_47d119",
     "g51_pdf_zip_artifact": "12734542343",
     "g51_artifact_independent_binary_and_visual": "PASS_200DPI",
-    "g52_new_source_status": "STAGED_CI_PENDING",
+    "g52_new_source_status": "CI_VERIFIED_ALL_PASS",
     "g52_new_source_regressions": 4,
     "new_creator_status": "NOT_RUN",
     "nas_runtime": "NOT_RUN",
     "devpost": "NOT_SUBMITTED",
-    "elapsed_hours": "NOT_MEASURED"
+    "elapsed_hours": "NOT_MEASURED",
+    "g52_full_tests": "367/367_PASS",
+    "g52_preview_focused_tests": "76/76_PASS",
+    "g52_pdf_sha256": "0c95f3546cb7b415bc0ee1b27e1eb205a43021719205faa088fd751a6b771468",
+    "g52_zip_sha256": "31d918b4a8b962a63048767efd4972023d8767db0b0e19e3519bab44796d33e5",
+    "g52_200dpi_visual": "PASS",
+    "g52_artifact_id": 12735839183,
+    "official_creator": "NOT_RUN",
+    "actual_time": "NOT_MEASURED"
   }
 }
