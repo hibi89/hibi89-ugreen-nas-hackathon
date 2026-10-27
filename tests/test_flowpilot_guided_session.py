@@ -44,6 +44,22 @@ class GuidedSessionTests(unittest.TestCase):
         self.assertNotIn("missing.pdf", "\\n".join(output))
         self.assertNotIn(str(self.root), "\\n".join(output))
 
+    def test_version_review_queue_and_counts_agree(self):
+        (self.root / "final.pdf").write_bytes(b"v1")
+        (self.root / "final_v2.pdf").write_bytes(b"v2")
+        output = []
+        answers = iter([str(self.root), "final.pdf",
+                        "final.pdf=final_v2.pdf", "APPROVE"])
+        result = run_guided_session("버전 비교",
+            ask=lambda prompt: next(answers), emit=output.append)
+        self.assertEqual(result["finding_counts"]["VERSION_REVIEW"], 1)
+        self.assertEqual(result["review_queue"], [
+            {"step": 1, "item_index": 1, "state": "VERSION_REVIEW"}
+        ])
+        self.assertEqual(sum(result["finding_counts"].values()), 1)
+        self.assertNotIn("final.pdf", "\\n".join(output))
+        self.assertNotIn(str(self.root), "\\n".join(output))
+
     def test_declined_without_root_access(self):
         with patch("flowpilot_owner_local_audit._valid_root",
                    side_effect=AssertionError("unexpected access")):
