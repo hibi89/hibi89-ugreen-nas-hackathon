@@ -36,6 +36,7 @@ class GuidedSessionTests(unittest.TestCase):
         answers = iter([str(self.root), "missing.pdf", "APPROVE"])
         result = run_guided_session("파일 확인",
             ask=lambda prompt: next(answers), emit=output.append)
+        self.assertEqual(result["result_schema"], "flowpilot-review-result-v1")
         self.assertEqual(result["status"], "BLOCKED")
         self.assertEqual(result["next_action"], "RESOLVE_BLOCKED_CHECKS")
         self.assertEqual(result["finding_counts"]["MISSING"], 1)
@@ -84,6 +85,7 @@ class GuidedSessionTests(unittest.TestCase):
             answers = iter([str(self.root), "README.md", "NO"])
             result = run_guided_session("파일 확인",
                 ask=lambda prompt: next(answers), emit=lambda message: None)
+        self.assertEqual(result["result_schema"], "flowpilot-review-result-v1")
         self.assertEqual(result["status"], "DECLINED")
         self.assertEqual(result["next_action"], "NO_ACTION")
         self.assertEqual(sum(result["finding_counts"].values()), 0)
