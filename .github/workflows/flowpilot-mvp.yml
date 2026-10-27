@@ -12,6 +12,8 @@ on:
       - "tools/flowpilot_mvp_cli.py"
       - "tools/flowpilot_local_file_mvp.py"
       - "tools/flowpilot_agent_result_intake.py"
+      - "tools/flowpilot_owner_local_audit.py"
+      - "tests/test_flowpilot_owner_local_audit.py"
       - "tests/test_flowpilot_agent_result_intake.py"
       - "docs/operations/fixtures/G61_SYNTHETIC_NORMALIZED_FILE_AGENT.json"
       - "tests/test_flowpilot_local_file_mvp.py"
@@ -132,6 +134,28 @@ jobs:
           assert r["real_nas_verified"] is False
           assert r["release_gate"]=="HOLD"
           print("G61 normalized receipt intake OK; external provenance NOT VERIFIED")
+          PY
+      - name: G62 actual owner-selected local folder metadata CLI (NO NAS)
+        run: |
+          python -m unittest discover -s tests -p test_flowpilot_owner_local_audit.py -v
+          python - <<'PY'
+          import json,subprocess,sys,tempfile,pathlib
+          with tempfile.TemporaryDirectory() as d:
+              root=pathlib.Path(d)
+              (root/"one.md").write_bytes(b"synthetic only")
+              cmd=[sys.executable,"tools/flowpilot_owner_local_audit.py","--root",str(root),"--required","one.md","--required","missing.md"]
+              waiting=subprocess.run(cmd,text=True,capture_output=True,check=True)
+              assert json.loads(waiting.stdout)["status"]=="WAITING_APPROVAL"
+              pilot=subprocess.run(cmd+["--approve-local-metadata"],text=True,capture_output=True)
+              assert pilot.returncode==1
+              j=json.loads(pilot.stdout)
+              assert [x["state"] for x in j["items"]]==["PRESENT","MISSING"]
+              assert j["mode"]=="CONSENTED_OWNER_LOCAL_METADATA_ONLY_NOT_NAS"
+              assert j["release_gate"]=="HOLD"
+              assert j["nas_verified"] is False
+              assert j["file_contents_opened"] is False
+              assert str(root) not in pilot.stdout
+              print("G62 owner-selected local folder read-only metadata PASS, official NAS NOT_RUN")
           PY
       - name: Recheck all existing offline contracts
         run: python -m unittest discover -s tests -p 'test_*.py' -v

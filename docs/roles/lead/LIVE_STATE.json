@@ -1552,5 +1552,23 @@
     "official_creator": "NOT_EVIDENCED",
     "real_nas": "NOT_RUN",
     "release": "HOLD"
+  },
+  "g62": {
+    "date_kst": "2026-10-28",
+    "source_base": "f38afa5f86a2955020431c1ebb5c2fe550f228a6",
+    "focus": "G62_CONSENTED_LOCAL_OWNER_FOLDER_AUDIT",
+    "test_functions": 17,
+    "full_test_count_expected": 463,
+    "ci": "PENDING",
+    "actual_nas": "NOT_RUN",
+    "creator": "NOT_EVIDENCED",
+    "devpost": "NOT_SUBMITTED",
+    "owner_separate": [
+      "HAE",
+      "LA",
+      "REA_APP"
+    ],
+    "trial": "2026-11-03_TO_05_CONDITIONAL",
+    "user_root_access": "EXPLICIT_CLI_FLAG_REQUIRED"
   }
 }
