@@ -432,8 +432,8 @@
   "closeout_sync_enforcement_active": true,
   "closeout_sync_quality_issue": "2026-10-24 CI #40067541841 detected stale daily JSON in previous policy commit; correcting in next commit",
   "closeout_sync_guard_tested_status": "PENDING_RECHECK",
-  "latest_repository_regression_tests_passed": 392,
-  "latest_repository_regression_ci_url": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40522638655",
+  "latest_repository_regression_tests_passed": 404,
+  "latest_repository_regression_ci_url": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40524752615",
   "latest_closeout_guard_verified": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40072583787",
   "notes_on_last_closeout": "One-line GitHub bootstrap and mandatory end-of-work handoff automated checks verified. No new SDK or NAS capability established.",
   "notes_on_new_chat_execution": "G1 official pinned catalog read-only reference bound into Skill; 4 Markdown files, 165/165 offline tests + actual skill preflight PASS at source 5772a8a9, closeout sync PASS. No official Uliya checker/NAS/PII permission tested; next G1 Oct25 1.5h base+1.5h reserve, ETA unknown. Oct24 finite-day scope remains 100%, 0h, not overall project completion.",
@@ -1181,6 +1181,19 @@
     "official_creator": "NOT_EVIDENCED",
     "nas": "NOT_RUN",
     "devpost": "NOT_SUBMITTED",
-    "actual_elapsed_hours": null
+    "actual_elapsed_hours": null,
+    "source_sha_verified": "4bd755d23721414d070948dfac1b7b6281d6378b",
+    "test_full_suite": "404/404_PASS",
+    "new_synthetic_tests": "12/12_PASS",
+    "full_test_workflow": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40524752615",
+    "all_five_ci": "PASS",
+    "master_run": "40524752867",
+    "closeout_run": "40524752544",
+    "readiness_run": "40524752646",
+    "draft_run": "40524752516",
+    "creator_generated_output": "NOT_EVIDENCED",
+    "first_party_checker": "PREVIOUS_EXACT_SOURCE_STATIC_PASS_UNCHANGED",
+    "real_nas": "NOT_RUN",
+    "release": "HOLD"
   }
 }
