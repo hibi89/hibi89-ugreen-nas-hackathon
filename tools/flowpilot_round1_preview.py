@@ -28,6 +28,8 @@ def build(output:Path):
     questions=data["questions"]
     if data.get("status")!="OWNER_REVIEW_NOT_SUBMITTED" or len(questions)!=10:raise ValueError("Need ten owner-review QAs")
     if any(not q.get("question") or not q.get("answer") for q in questions):raise ValueError("Empty answer")
+    disclosure=data.get("disclosure")
+    if not isinstance(disclosure,str) or not disclosure.strip():raise ValueError("Missing mandatory AI/third-party disclosure")
     if [q["question"] for q in questions]!=PROMPTS:raise ValueError("Official question text mismatch")
     words=sum(len(re.findall(r"\b[\w-]+\b",q["answer"])) for q in questions)
     if words>500:raise ValueError("500 substantive-word limit exceeded")
@@ -51,6 +53,13 @@ def build(output:Path):
     from pypdf import PdfReader
     pages=PdfReader(pdf).pages
     if len(pages)!=1:raise ValueError("Expected exactly 1 page after official question expansion")
+    extracted=" ".join(page.extract_text() or "" for page in pages)
+    normalized=lambda value: re.sub(r"\\s+"," ",value).strip()
+    actual=normalized(extracted)
+    if any(normalized(q["question"]) not in actual or normalized(q["answer"]) not in actual for q in questions):
+        raise ValueError("Rendered PDF lost official question or answer text")
+    if normalized(disclosure) not in actual:
+        raise ValueError("Rendered PDF lost AI/third-party disclosure")
     if pdf.stat().st_size>1000000 or bundle.stat().st_size>10000000 or len(skill)>1000000:raise ValueError("Package exceeds limit")
     evidence={"state":"OWNER_REVIEW_NOT_SUBMITTED","source_sha256":PIN,"zip_sha256":hashlib.sha256(bundle.read_bytes()).hexdigest(),"pdf_sha256":hashlib.sha256(pdf.read_bytes()).hexdigest(),"zip_bytes":bundle.stat().st_size,"pdf_bytes":pdf.stat().st_size,"answers":10,"substantive_words":words,"zip_composition_audit":zip_audit,"official_creator":"NOT_RUN","official_checker":CHECKER_STATUS,"official_checker_run":CHECKER_RUN,"nas_runtime":"NOT_RUN","devpost":"NOT_SUBMITTED"}
     (output/"FlowPilot_Round1_OWNER_REVIEW_manifest.json").write_text(json.dumps(evidence,indent=2)+"\n",encoding="utf-8")
