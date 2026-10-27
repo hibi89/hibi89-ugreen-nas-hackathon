@@ -14,6 +14,8 @@ on:
       - "tools/flowpilot_agent_result_intake.py"
       - "tools/flowpilot_owner_local_audit.py"
       - "tools/flowpilot_local_workflow.py"
+      - "tools/flowpilot_text_workflow.py"
+      - "tests/test_flowpilot_text_workflow.py"
       - "tests/test_flowpilot_local_workflow.py"
       - "tests/test_flowpilot_owner_local_audit.py"
       - "tests/test_flowpilot_agent_result_intake.py"
@@ -167,6 +169,15 @@ jobs:
           suite=unittest.defaultTestLoader.discover("tests",pattern="test_*.py")
           assert suite.countTestCases()>=472, "Expected G63 suite coverage was not discovered"
           print("G63 local workflow regression discovery validated; NAS NOT_RUN")
+          PY
+      - name: G64 Korean/English bounded text to actual local workflow (NOT NAS)
+        run: |
+          python -m unittest discover -s tests -p test_flowpilot_text_workflow.py -v
+          python - <<'PY'
+          import unittest
+          suite=unittest.defaultTestLoader.discover("tests",pattern="test_*.py")
+          assert suite.countTestCases() >= 486, "Missing G64 focused regressions"
+          print("G64 strict text workflow discovered; real NAS NOT_RUN")
           PY
       - name: Recheck all existing offline contracts
         run: python -m unittest discover -s tests -p 'test_*.py' -v

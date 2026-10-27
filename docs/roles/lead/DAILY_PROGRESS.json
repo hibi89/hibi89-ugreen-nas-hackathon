@@ -1363,5 +1363,23 @@
     "focused_test_result": "9_OF_9_PASS",
     "master_ci": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40537126348",
     "closeout_ci": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40537126714"
+  },
+  "g64_followup": {
+    "date_kst": "2026-10-28",
+    "scope": "G64_KOREAN_ENGLISH_DETERMINISTIC_TEXT_TO_LOCAL_WORKFLOW",
+    "code": "tools/flowpilot_text_workflow.py",
+    "tests": "tests/test_flowpilot_text_workflow.py",
+    "new_regressions_expected": 14,
+    "full_suite_expected": 486,
+    "ci": "PENDING",
+    "source_sha_verified": null,
+    "nas": "NOT_RUN",
+    "official_creator": "NOT_EVIDENCED",
+    "registered_uliya_expert": "NOT_RUN",
+    "release": "HOLD",
+    "devpost": "NOT_SUBMITTED",
+    "original_skill": "UNCHANGED",
+    "trial": "2026-11-03_TO_05_CONDITIONAL",
+    "actual_hours": null
   }
 }
