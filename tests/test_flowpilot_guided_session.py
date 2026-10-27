@@ -56,7 +56,7 @@ class GuidedSessionTests(unittest.TestCase):
         self.assertTrue(result["review_required"])
         self.assertEqual(result["review_item_count"], 1)
         self.assertEqual(result["review_queue"], [
-            {"step": 2, "item_index": 2, "state": "MISSING"}
+            {"step": 1, "item_index": 2, "state": "MISSING"}
         ])
         self.assertEqual(result["finding_counts"]["MISSING"], 1)
 
