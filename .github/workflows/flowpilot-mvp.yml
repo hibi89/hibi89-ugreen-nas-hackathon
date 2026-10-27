@@ -13,6 +13,9 @@ on:
       - "tests/test_flowpilot_pipeline.py"
       - "tools/flowpilot_package_audit.py"
       - "tests/test_flowpilot_package_audit.py"
+      - "tests/test_flowpilot_round1_status.py"
+      - "tools/flowpilot_round1_preview.py"
+      - "docs/submission/flowpilot_round1_qas_20261027.json"
       - ".github/workflows/flowpilot-mvp.yml"
   workflow_dispatch:
 permissions:

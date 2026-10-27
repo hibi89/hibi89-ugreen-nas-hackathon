@@ -13,6 +13,7 @@ on:
       - "tests/test_flowpilot_pipeline.py"
       - "tools/flowpilot_package_audit.py"
       - "tests/test_flowpilot_package_audit.py"
+      - "tests/test_flowpilot_round1_status.py"
       - ".github/workflows/g45-flowpilot-round1-preview.yml"
   workflow_dispatch:
 permissions:
@@ -35,8 +36,8 @@ jobs:
           python - <<'PY'
           import unittest
           l=unittest.TestLoader()
-          s=unittest.TestSuite((l.discover("tests","test_flowpilot_mvp.py"),l.discover("tests","test_flowpilot_evidence.py"),l.discover("tests","test_flowpilot_g47_security.py"),l.discover("tests","test_flowpilot_demo.py"),l.discover("tests","test_flowpilot_pipeline.py"),l.discover("tests","test_flowpilot_package_audit.py")))
-          if s.countTestCases() < 66: raise SystemExit("Expected at least 66 FlowPilot unit tests")
+          s=unittest.TestSuite((l.discover("tests","test_flowpilot_mvp.py"),l.discover("tests","test_flowpilot_evidence.py"),l.discover("tests","test_flowpilot_g47_security.py"),l.discover("tests","test_flowpilot_demo.py"),l.discover("tests","test_flowpilot_pipeline.py"),l.discover("tests","test_flowpilot_package_audit.py"),l.discover("tests","test_flowpilot_round1_status.py")))
+          if s.countTestCases() < 76: raise SystemExit("Expected at least 76 FlowPilot unit tests")
           result=unittest.TextTestRunner(verbosity=2).run(s)
           if not result.wasSuccessful(): raise SystemExit("FlowPilot tests failed")
           PY
@@ -57,6 +58,7 @@ jobs:
           assert e["pdf_sha256"]==hashlib.sha256(d.read_bytes()).hexdigest()
           assert e["substantive_words"]<=500 and e["answers"]==10
           assert e["devpost"]=="NOT_SUBMITTED" and e["official_creator"]=="NOT_RUN"
+          assert e["official_checker"]=="FIRST_PARTY_STATIC_PASS_0_ERRORS_0_WARNINGS_0_INFO_EXACT_SOURCE"
           audit=e["zip_composition_audit"]
           assert audit["source_exact_match"] and audit["official_uliya_toolkit_files"]==0
           assert audit["third_party_binary_members"]==0 and audit["members"]==["flowpilot-nas/SKILL.md"]

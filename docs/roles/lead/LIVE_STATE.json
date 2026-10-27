@@ -5,7 +5,7 @@
   "authoritative_branch": "lead/ugreen",
   "role": "UGREEN lead and sole hands-on developer",
   "last_session_closeout_date_kst": "2026-10-27",
-  "last_source_verified_head_at_handoff": "1e11d7a522ef250c228f362009e7cd538c20e267",
+  "last_source_verified_head_at_handoff": "b869414c9a0467ab131bfef8eb4ab179032394a3",
   "source_verification_workflow": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40505339535",
   "offline_synthetic_tests_passed": 363,
   "official_sdk_cli_schema": "BLOCKED_UNVERIFIED",
@@ -25,10 +25,10 @@
     "sdk_gate_distinct": true
   },
   "next_work": {
-    "id": "G52_EXACT_ARTIFACT_AND_CREATOR_RELEASE_GATE",
+    "id": "G52_SUBMISSION_TRUTH_REVIEW_AND_CREATOR_GATE",
     "scheduled_kst": "2026-10-27",
-    "status": "G51_OFFLINE_CI_VERIFIED_CREATOR_AND_NAS_NOT_RUN",
-    "scope": "Independent actual PDF visual/ZIP audit and exact hashes, official Creator provenance on new FlowPilot Skill, entrant rights and Devpost approval; only then authorized NAS trial.",
+    "status": "SOURCE_STAGED_CI_PENDING",
+    "scope": "Run 4 status truth regressions + G52 updated proposal preview, verify actual PDF ZIP byte and rendered text, official Uliya Creator provenance remains NOT_RUN, owner exact release approval HOLD.",
     "planned_hours": 0,
     "separate_reserve_hours": 0,
     "actual_completion_eta_hours": null
@@ -1275,5 +1275,20 @@
     "devpost": "NOT_SUBMITTED",
     "user_signoff": "PENDING",
     "trial_runbook": "docs/operations/NAS_FREE_TRIAL_2H_EXECUTION_RUNBOOK_20261027.md"
+  },
+  "g52": {
+    "reference_commit": "b869414c9a0467ab131bfef8eb4ab179032394a3",
+    "date_kst": "2026-10-27",
+    "prior_source_checker_status": "STATIC_PASS_0_0_0",
+    "prior_checker_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40505339535",
+    "prior_full_tests_passed": 363,
+    "prior_focused_tests_passed": 72,
+    "archived_g51_pdf_visual": "PASS_200DPI_SHA_71e3f3e6f23f",
+    "archived_g51_zip": "PASS_ONE_MARKDOWN_SHA_539c1c652e40",
+    "editorial_correction": "Q8_Q10_FOOTER_MANIFEST_G52_CI_PENDING",
+    "official_new_creator": "NOT_RUN",
+    "live_nas": "NOT_RUN",
+    "devpost": "NOT_SUBMITTED",
+    "original_history": "docs/archive/pre-g52-20261027/docs/roles/lead/LIVE_STATE.json"
   }
 }

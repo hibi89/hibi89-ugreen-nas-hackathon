@@ -31,7 +31,7 @@
     },
     {
       "question": "What is the current development status? Identify what was implemented already, not yet implemented, or is pending NAS validation if selected to be a Finalist.",
-      "answer": "A new FlowPilot Markdown candidate and separate offline planning/evidence modules exist. The candidate has not yet been generated or validated by the official Creator/checker. Actual registered-agent calls, real NAS operation, final permissions and publication approval are pending."
+      "answer": "A new FlowPilot Markdown Skill and offline planning/evidence modules exist. Its exact source passed the first-party Uliya static checker with 0 errors, 0 warnings and 0 info (run 40505339535). Official Creator generation, registered-agent calls, real NAS operation, permissions and publication approval remain pending."
     },
     {
       "question": "What is your final validation plan? Name two core test cases and one edge case to validate if selected as a Finalist.",
@@ -39,7 +39,7 @@
     },
     {
       "question": "Are there any known limitations of your Project? Describe current known limitations, technical risks, and any external dependencies.",
-      "answer": "Official Creator compatibility, exact live dispatcher syntax, user permissions, data-processing location and real NAS completeness remain unverified. No scheduler, file mutation, generic n8n runtime or third-party SaaS connector is claimed. Final review requires explicit entrant approval."
+      "answer": "Static validation does not prove Creator provenance, registered-agent support, real NAS completeness, user permissions or data-processing location. No scheduler, file mutation, generic n8n runtime or third-party SaaS connector is claimed. Final submission requires entrant approval."
     }
   ],
   "disclosure": "OpenAI ChatGPT (GPT-6) assisted this FlowPilot Skill, proposal and offline tests; OpenAI Codex assisted earlier related ProjectReady development. This FlowPilot candidate has NOT yet been generated through the official Uliya Skill Creation Tool. No official Uliya toolkit code or third-party components are included or redistributed in the proposed Skill ZIP; it contains only entrant-authored SKILL.md. MIT is proposed only for entrant-owned material, not vendor assets. Actual NAS execution, Agent permissions, data processing location, rights and final submission remain unverified or pending."

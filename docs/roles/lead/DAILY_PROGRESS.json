@@ -1040,5 +1040,20 @@
       "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40505339597",
       "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40505339329"
     ]
+  },
+  "g52_followup": {
+    "date_kst": "2026-10-27",
+    "base_sha": "b869414c9a0467ab131bfef8eb4ab179032394a3",
+    "previous_verified_offline_tests": 363,
+    "previous_verified_focused_tests": 72,
+    "first_party_static_status": "PASS_0_0_0_EXACT_SHA_47d119",
+    "g51_pdf_zip_artifact": "12734542343",
+    "g51_artifact_independent_binary_and_visual": "PASS_200DPI",
+    "g52_new_source_status": "STAGED_CI_PENDING",
+    "g52_new_source_regressions": 4,
+    "new_creator_status": "NOT_RUN",
+    "nas_runtime": "NOT_RUN",
+    "devpost": "NOT_SUBMITTED",
+    "elapsed_hours": "NOT_MEASURED"
   }
 }
