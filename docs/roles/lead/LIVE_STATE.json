@@ -25,10 +25,10 @@
     "sdk_gate_distinct": true
   },
   "next_work": {
-    "id": "G53_OFFICIAL_CREATOR_ORIGINALITY_AND_OWNER_RELEASE",
+    "id": "G53_OFFICIAL_FLOWPILOT_CREATOR_SOURCE_AND_OPERATOR_EVIDENCE",
     "scheduled_kst": "2026-10-27",
-    "status": "G52_REAL_PDF_ZIP_STATIC_AND_OFFLINE_PASS_CREATOR_AND_NAS_NOT_RUN",
-    "scope": "Obtain official Creator provenance for exact new FlowPilot Skill without substituting old ProjectReady; review entrant rights and exact G52 PDF/ZIP hashes, then owner-authorized Devpost submission. Round1 NAS trial is optional.",
+    "status": "G53_SYNTHETIC_PROOF_GATE_CODE_CI_PENDING_OFFICIAL_CREATOR_NOT_RUN",
+    "scope": "Run G53 fail-closed creator provenance gate 9 synthetic tests and overall offline CI; use genuine official Uliya Skill Creation Tool in supported Codex/Claude/WorkBuddy environment only when explicitly activated, compare generated exact source SHA and checker receipt; never promote a self-attested declaration or G49 static pass to original Creator/owner release.",
     "planned_hours": 0,
     "separate_reserve_hours": 0,
     "actual_completion_eta_hours": null
@@ -1302,5 +1302,18 @@
     "pdf_render_200dpi": "PASS_VISUAL",
     "answers": 10,
     "substantive_words": 363
+  },
+  "g53": {
+    "reference_sha": "2478ddeacae9e458c5f99963d7324b299609a5db",
+    "ready_for_owner_codex_runbook": "docs/submission/G53_OFFICIAL_FLOWPILOT_CREATOR_GATE_20261027.md",
+    "creator_official_event": "NOT_EVIDENCED",
+    "automated_provenance_source_audit": "SOURCE_STAGED_CI_PENDING",
+    "synthetic_tests_added": 9,
+    "old_full_offline_pass": 367,
+    "skill_sha256": "47d119123387ec46133a62fdec58ef42ca3852491b132d32798951a6430c233b",
+    "official_first_party_checker": "STATIC_PASS_0_0_0_40505339535",
+    "live_nas": "NOT_RUN",
+    "user_release": "HOLD",
+    "devpost": "NOT_SUBMITTED"
   }
 }

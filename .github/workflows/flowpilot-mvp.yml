@@ -14,6 +14,8 @@ on:
       - "tools/flowpilot_package_audit.py"
       - "tests/test_flowpilot_package_audit.py"
       - "tests/test_flowpilot_round1_status.py"
+      - "tools/g53_flowpilot_creator_gate.py"
+      - "tests/test_g53_flowpilot_creator_gate.py"
       - "tools/flowpilot_round1_preview.py"
       - "docs/submission/flowpilot_round1_qas_20261027.json"
       - ".github/workflows/flowpilot-mvp.yml"
@@ -41,6 +43,11 @@ jobs:
         run: |
           python -m unittest discover -s tests -p 'test_flowpilot_demo.py' -v
           python tools/flowpilot_offline_demo.py --output "$RUNNER_TEMP/flowpilot-g48-synthetic.json"
+      - name: G53 fail-closed official Creator provenance preflight (NO Creator run)
+        run: |
+          python -m unittest discover -s tests -p test_g53_flowpilot_creator_gate.py -v
+          python tools/g53_flowpilot_creator_gate.py > "$RUNNER_TEMP/g53_creator_hold.json"
+          python -c 'import json,os,pathlib; p=pathlib.Path(os.environ["RUNNER_TEMP"])/"g53_creator_hold.json"; r=json.loads(p.read_text()); assert r["status"]=="CREATOR_NOT_EVIDENCED" and r["release_gate"]=="HOLD" and not r["official_creator_execution_independently_verified"]'
       - name: Recheck all existing offline contracts
         run: python -m unittest discover -s tests -p 'test_*.py' -v
       - name: Clearly distinguish draft from submitted or real NAS
