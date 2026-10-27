@@ -1,3 +1,5 @@
+> **2026-10-28 G64 VERIFIED:** Code SHA ef4f45bcabea198e97c41bbfb6983f16bf4eda77, [FlowPilot CI 40539218786](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40539218786) **486/486 full Python PASS; G64 14/14 PASS**; master 40539218779, closeout 40539218725, readiness 40539218783 all SUCCESS. Only deterministic Korean/English text-to-local metadata workflow; NOT official Uliya/NAS/Creator, release HOLD, Devpost NOT_SUBMITTED, hours NOT_MEASURED, owner separate HAE/LA/REA_APP and original Skill/G52 artifacts unchanged. 3h UGOS Nov3–5 conditional access and owner timer activation.
+
 # G64 — Korean/English bounded text workflow (2026-10-28 KST)
 
 Goal: remove JSON recipe authoring from the existing G63 **real local file-metadata** vertical slice. Parse a strictly documented tiny language into the same guarded G63 engine. This is deliberately not unrestricted natural-language understanding, ML, a NAS agent or a production-ready orchestration platform.

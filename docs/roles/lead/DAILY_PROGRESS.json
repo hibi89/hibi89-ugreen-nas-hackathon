@@ -1371,7 +1371,7 @@
     "tests": "tests/test_flowpilot_text_workflow.py",
     "new_regressions_expected": 14,
     "full_suite_expected": 486,
-    "ci": "PENDING",
+    "ci": "SUCCESS",
     "source_sha_verified": null,
     "nas": "NOT_RUN",
     "official_creator": "NOT_EVIDENCED",
@@ -1380,6 +1380,14 @@
     "devpost": "NOT_SUBMITTED",
     "original_skill": "UNCHANGED",
     "trial": "2026-11-03_TO_05_CONDITIONAL",
-    "actual_hours": null
+    "actual_hours": null,
+    "verified_code_sha": "ef4f45bcabea198e97c41bbfb6983f16bf4eda77",
+    "focused_tests": "14_OF_14_PASS",
+    "full_tests": "486_OF_486_PASS",
+    "full_ci_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40539218786",
+    "master_ci": "40539218779_SUCCESS",
+    "closeout_ci": "40539218725_SUCCESS",
+    "readiness_ci": "40539218783_SUCCESS",
+    "all_exact_source_workflows": "4_OF_4_SUCCESS"
   }
 }
