@@ -85,3 +85,6 @@ Verify G52 full offline CI and document checkpoint; download actual newly built 
 
 ## 10. Timestamp / verification bounds
 As-of 2026-10-27 KST; G51 CI and independent archived G51 PDF/ZIP inspected; G52 output/CI/Creator/real NAS still distinct. This document's final Git SHA is the enclosing commit; do not infer it from a planned hash.
+
+
+> **2026-10-28 G88 FlowPilot review summary added (CI pending for latest SHA):** Guided local-only goal workflow now returns redacted `finding_counts`, indexed `review_queue`, `review_required`, and `review_item_count`. Commits: feature `002189a`, tests `a125174`, follow-up regression `493e92e2`, feature `002189a224c52fa7204dc4d0c484ab35ea48d572`. Latest test commit `a12517414153639d8d316ea255234b0f728aa9b0`; its GitHub Actions was in progress at last check. Prior `1a0daaa` CI 4/4 success. No actual NAS, official Uliya Expert, official Creator or Devpost submission performed. Review queue only exposes stage/item indexes and state, not local file names or root paths. CI status must remain pending until exact latest SHA completes.
