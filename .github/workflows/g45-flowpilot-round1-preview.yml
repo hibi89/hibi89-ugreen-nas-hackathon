@@ -1,0 +1,61 @@
+name: G45 FlowPilot Round1 owner-review PDF ZIP (NOT SUBMITTED)
+on:
+  push:
+    branches: ["lead/ugreen"]
+    paths:
+      - "tools/flowpilot_round1_preview.py"
+      - "docs/submission/flowpilot_round1_qas_20261027.json"
+      - "skill/flowpilot-nas/SKILL.md"
+      - ".github/workflows/g45-flowpilot-round1-preview.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install PDF-only build and verification packages
+        run: python -m pip install "reportlab>=4,<5" "pypdf>=6,<7"
+      - name: Verify new FlowPilot offline MVP regressions
+        run: |
+          python -m unittest discover -s tests -p test_flowpilot_mvp.py -v
+          python -m unittest discover -s tests -p test_flowpilot_evidence.py -v
+      - name: Generate separate owner-review PDF ZIP and machine manifest
+        run: python tools/flowpilot_round1_preview.py --output "$RUNNER_TEMP/flowpilot-preview"
+      - name: Check exact source, PDF questions and ZIP contents
+        run: |
+          python - <<'PY'
+          import json,hashlib,os,pathlib,zipfile
+          from pypdf import PdfReader
+          p=pathlib.Path(os.environ["RUNNER_TEMP"])/"flowpilot-preview"
+          e=json.loads((p/"FlowPilot_Round1_OWNER_REVIEW_manifest.json").read_text())
+          z=p/"FlowPilot_Round1_OWNER_REVIEW.zip"
+          d=p/"FlowPilot_Round1_OWNER_REVIEW.pdf"
+          source=pathlib.Path("skill/flowpilot-nas/SKILL.md").read_bytes()
+          assert e["source_sha256"]==hashlib.sha256(source).hexdigest()
+          assert e["zip_sha256"]==hashlib.sha256(z.read_bytes()).hexdigest()
+          assert e["pdf_sha256"]==hashlib.sha256(d.read_bytes()).hexdigest()
+          assert e["substantive_words"]<=500 and e["answers"]==10
+          assert e["devpost"]=="NOT_SUBMITTED" and e["official_creator"]=="NOT_RUN"
+          with zipfile.ZipFile(z) as bundle:
+              assert bundle.namelist()==["flowpilot-nas/SKILL.md"]
+              assert bundle.read("flowpilot-nas/SKILL.md")==source
+          r=PdfReader(d)
+          content=" ".join(page.extract_text() or "" for page in r.pages)
+          assert 1 <= len(r.pages) <= 2
+          assert all("Q"+str(i)+"." in content for i in range(1,11))
+          print("G45 OWNER REVIEW PREVIEW PASSED. OFFICIAL CREATOR AND NAS NOT RUN")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G45-FLOWPILOT-PDF-ZIP-OWNER-REVIEW-NOT-SUBMITTED
+          path: ${{ runner.temp }}/flowpilot-preview/*
+          retention-days: 7
+          if-no-files-found: error

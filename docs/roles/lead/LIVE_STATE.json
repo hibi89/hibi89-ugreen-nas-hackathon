@@ -25,10 +25,10 @@
     "sdk_gate_distinct": true
   },
   "next_work": {
-    "id": "G44-CI-VERIFY-THEN-CREATOR",
+    "id": "G45-OFFICIAL-CHECKER-REVIEW",
     "scheduled_kst": "2026-10-27",
-    "status": "WAITING_CI_VERIFICATION",
-    "scope": "Verify latest new FlowPilot Python regression and handoff CI; use official Creator/checker on newly authored candidate when available; then PDF/ZIP and rights approval.",
+    "status": "CI_RESULT_AWAITING_VERIFICATION",
+    "scope": "Verify exact G45 GitHub Actions first-party checker and preview CI; correct real errors only; human review PDF/QAs; official Creator gate remains separate.",
     "planned_hours": 0,
     "separate_reserve_hours": 0,
     "actual_completion_eta_hours": null
@@ -1158,5 +1158,23 @@
     "owner_signoff": "NOT_GIVEN",
     "old_g36_g37": "UNCHANGED",
     "vendor_email": "PRIVATE_REPLY_RECEIVED_LICENSE_CHOICES_NOT_BLANKET_RELEASE"
+  },
+  "flowpilot_g45": {
+    "phase": "LOCAL_PREVIEW_VERIFIED_CI_UNVERIFIED",
+    "date_kst": "2026-10-27",
+    "source_skill": "skill/flowpilot-nas/SKILL.md",
+    "source_sha256": "985713d709aa36ad3e590557aac242be860716834f31eb27ff460bee960184b0",
+    "pdf_pages": 1,
+    "official_pdf_qas": 10,
+    "substantive_words": 359,
+    "local_pdf_sha256": "9832ae8d291b365afb2c026448aca4b7a83edd01fc5ce83eb348e8c5eae2f122",
+    "local_zip_sha256": "973ec305f479ba88963e8541ebd9e34de1394ca4e5cf76f2ee102ad46c823919",
+    "official_creator": "NOT_RUN_FOR_FLOWPILOT",
+    "new_g45_official_checker_ci": "PENDING_NOT_VERIFIED",
+    "new_g45_preview_ci": "PENDING_NOT_VERIFIED",
+    "nas_runtime": "NOT_RUN",
+    "owner_final_approval": "NOT_GIVEN",
+    "devpost": "NOT_SUBMITTED",
+    "historical_g36_g37": "PRESERVED"
   }
 }
