@@ -90,7 +90,7 @@ def process_goal(goal: str, *, root: Path | None = None,
         if len(items) != len(set(items)):
             raise WorkflowRefused("Duplicate checklist")
     need_versions = "compare versions" in goals
-    if candidates and not need_versions:
+    if candidates is not None and not need_versions:
         raise WorkflowRefused("Version candidates require compare versions goal")
     if candidates is None:
         mapping = {}
