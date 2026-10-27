@@ -1022,15 +1022,23 @@
   },
   "g51_followup": {
     "date_kst": "2026-10-27",
-    "last_verified_source_sha": "a95120db3ed796c85673e74e28a879281359259d",
+    "last_verified_source_sha": "1e11d7a522ef250c228f362009e7cd538c20e267",
     "prior_full_offline_ci_tests_passed": 357,
     "prior_official_static_checker": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40502768871",
     "g51_new_synthetic_tests_added": 6,
-    "g51_new_ci": "PENDING",
+    "g51_new_ci": "VERIFIED_PASS_6_NEW_TESTS_FULL_363_FOCUSED_72",
     "real_nas": "NOT_RUN",
     "official_creator_for_flowpilot": "NOT_RUN",
     "owner_release": "HOLD",
     "devpost": "NOT_SUBMITTED",
-    "actual_work_hours": null
+    "actual_work_hours": null,
+    "official_checker": "G49_SOURCE_STATIC_PASS_0_0_0",
+    "code_validation_runs": [
+      "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40505339535",
+      "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40505339429",
+      "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40505339532",
+      "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40505339597",
+      "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40505339329"
+    ]
   }
 }
