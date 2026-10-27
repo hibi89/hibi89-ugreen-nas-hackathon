@@ -43,7 +43,7 @@ class G42Adversarial(unittest.TestCase):
     def test_read_needs_separate_consent(self):
         self.assertEqual(assess(Action.READ,Policy(True,True,False,True)).decision,Result.BLOCKED)
     def test_versions_not_authoritative(self):
-        v=detect_version_candidates(R,snap("delivery/a.pdf","delivery/a_v2.pdf"))
+        v=detect_version_candidates(R[0],snap("delivery/a.pdf","delivery/a_v2.pdf"))
         self.assertEqual(v.signal,VersionSignal.CANDIDATES_REVIEW)
         self.assertFalse(v.authoritatively_verified_current_version)
     def test_g36_original_bytes_frozen(self):

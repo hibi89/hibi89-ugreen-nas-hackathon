@@ -24,7 +24,7 @@ jobs:
           set -euo pipefail
           SOURCE=skill/flowpilot-nas/SKILL.md
           test -f "$SOURCE"
-          echo "985713d709aa36ad3e590557aac242be860716834f31eb27ff460bee960184b0  $SOURCE" | sha256sum --check
+          echo "47d119123387ec46133a62fdec58ef42ca3852491b132d32798951a6430c233b  $SOURCE" | sha256sum --check
           HASH=$(sha256sum "$SOURCE" | cut -d' ' -f1)
           echo "G45_SKILL_SHA256=$HASH" >> "$GITHUB_ENV"
           echo "G45 CHECKOUT exact candidate SHA256=$HASH"
