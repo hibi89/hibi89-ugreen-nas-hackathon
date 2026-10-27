@@ -432,8 +432,8 @@
   "closeout_sync_enforcement_active": true,
   "closeout_sync_quality_issue": "2026-10-24 CI #40067541841 detected stale daily JSON in previous policy commit; correcting in next commit",
   "closeout_sync_guard_tested_status": "PENDING_RECHECK",
-  "latest_repository_regression_tests_passed": 429,
-  "latest_repository_regression_ci_url": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40530986782",
+  "latest_repository_regression_tests_passed": 446,
+  "latest_repository_regression_ci_url": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40532490956",
   "latest_closeout_guard_verified": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40072583787",
   "notes_on_last_closeout": "One-line GitHub bootstrap and mandatory end-of-work handoff automated checks verified. No new SDK or NAS capability established.",
   "notes_on_new_chat_execution": "G1 official pinned catalog read-only reference bound into Skill; 4 Markdown files, 165/165 offline tests + actual skill preflight PASS at source 5772a8a9, closeout sync PASS. No official Uliya checker/NAS/PII permission tested; next G1 Oct25 1.5h base+1.5h reserve, ETA unknown. Oct24 finite-day scope remains 100%, 0h, not overall project completion.",
@@ -1296,6 +1296,19 @@
     "trial": "2026-11-03_TO_05_CONDITIONAL",
     "devpost": "NOT_SUBMITTED",
     "owner_approval": "HOLD",
-    "actual_hours": null
+    "actual_hours": null,
+    "verified_code_sha": "b643fbba03a7b9ff4f950f5ab98a520f7139f2ea",
+    "full_tests": "446_OF_446_PASS",
+    "new_intake_tests": "17_OF_17_PASS",
+    "workflow": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40532490956",
+    "ci_workflows": "4_OF_4_SUCCESS",
+    "readiness_run": "40532490780",
+    "master_run": "40532491049",
+    "closeout_run": "40532490977",
+    "native_vendor_sdk": "NOT_CONNECTED",
+    "independently_verified_agent": "FALSE",
+    "official_creator": "NOT_EVIDENCED",
+    "real_nas": "NOT_RUN",
+    "release": "HOLD"
   }
 }
