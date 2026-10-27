@@ -15,6 +15,8 @@ class G75PDFTextTests(unittest.TestCase):
         self.assertIn("Rendered PDF lost official question or answer text",source)
         self.assertIn("Rendered PDF lost AI/third-party disclosure",source)
         self.assertIn("autojunk=False",source)
+        self.assertIn("qa_source_sha256",source)
+        self.assertIn("hashlib.sha256(qa_bytes).hexdigest()",source)
 
     def test_source_answers_and_disclosure_nonempty(self):
         import json
