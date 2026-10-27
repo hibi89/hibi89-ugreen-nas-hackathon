@@ -40,6 +40,7 @@ class GuidedSessionTests(unittest.TestCase):
         self.assertEqual(result["review_queue"], [
             {"step": 1, "item_index": 1, "state": "MISSING"}
         ])
+        self.assertEqual(sum(result["finding_counts"].values()), 1)
         self.assertNotIn("missing.pdf", "\\n".join(output))
         self.assertNotIn(str(self.root), "\\n".join(output))
 
