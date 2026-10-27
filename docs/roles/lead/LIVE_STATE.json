@@ -1590,7 +1590,7 @@
     "tests": "tests/test_flowpilot_local_workflow.py",
     "focused_tests_expected": 9,
     "full_tests_expected": 472,
-    "exact_source_ci": "PENDING",
+    "exact_source_ci": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40537126475",
     "owner_local_metadata": "OPT_IN",
     "real_ugos_nas": "NOT_RUN",
     "registered_uliya_agent": "NOT_RUN",
@@ -1598,6 +1598,11 @@
     "entrant_release": "HOLD",
     "devpost": "NOT_SUBMITTED",
     "planned_three_hour_trial": "2026-11-03_TO_05_CONDITIONAL",
-    "actual_hours": null
+    "actual_hours": null,
+    "source_sha_verified": "7a1c98cbd1113faa7a04b5cf7844576178b7f570",
+    "full_test_result": "472_OF_472_PASS",
+    "focused_test_result": "9_OF_9_PASS",
+    "master_ci": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40537126348",
+    "closeout_ci": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40537126714"
   }
 }
