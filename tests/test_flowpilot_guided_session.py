@@ -27,6 +27,8 @@ class GuidedSessionTests(unittest.TestCase):
         self.assertEqual(result["next_action"], "REVIEW_LOCAL_FINDINGS")
         self.assertEqual(result["finding_counts"]["PRESENT"], 1)
         self.assertEqual(result["review_queue"], [])
+        self.assertFalse(result["review_required"])
+        self.assertEqual(result["review_item_count"], 0)
         self.assertNotIn(str(self.root), "\n".join(output))
 
     def test_missing_file_is_indexed_in_redacted_review_queue(self):
@@ -41,6 +43,8 @@ class GuidedSessionTests(unittest.TestCase):
             {"step": 1, "item_index": 1, "state": "MISSING"}
         ])
         self.assertEqual(sum(result["finding_counts"].values()), 1)
+        self.assertTrue(result["review_required"])
+        self.assertEqual(result["review_item_count"], 1)
         self.assertNotIn("missing.pdf", "\\n".join(output))
         self.assertNotIn(str(self.root), "\\n".join(output))
 
@@ -57,6 +61,8 @@ class GuidedSessionTests(unittest.TestCase):
             {"step": 1, "item_index": 1, "state": "VERSION_REVIEW"}
         ])
         self.assertEqual(sum(result["finding_counts"].values()), 1)
+        self.assertTrue(result["review_required"])
+        self.assertEqual(result["review_item_count"], 1)
         self.assertNotIn("final.pdf", "\\n".join(output))
         self.assertNotIn(str(self.root), "\\n".join(output))
 
