@@ -6,6 +6,7 @@ on:
       - "tools/flowpilot_round1_preview.py"
       - "docs/submission/flowpilot_round1_qas_20261027.json"
       - "skill/flowpilot-nas/SKILL.md"
+      - "tests/test_flowpilot_g47_security.py"
       - ".github/workflows/g45-flowpilot-round1-preview.yml"
   workflow_dispatch:
 permissions:
@@ -28,8 +29,8 @@ jobs:
           python - <<'PY'
           import unittest
           l=unittest.TestLoader()
-          s=unittest.TestSuite((l.discover("tests","test_flowpilot_mvp.py"),l.discover("tests","test_flowpilot_evidence.py")))
-          if s.countTestCases() < 34: raise SystemExit("Expected at least 34 FlowPilot unit tests")
+          s=unittest.TestSuite((l.discover("tests","test_flowpilot_mvp.py"),l.discover("tests","test_flowpilot_evidence.py"),l.discover("tests","test_flowpilot_g47_security.py")))
+          if s.countTestCases() < 42: raise SystemExit("Expected at least 42 FlowPilot unit tests")
           result=unittest.TextTestRunner(verbosity=2).run(s)
           if not result.wasSuccessful(): raise SystemExit("FlowPilot tests failed")
           PY

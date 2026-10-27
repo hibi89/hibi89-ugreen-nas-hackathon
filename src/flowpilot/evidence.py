@@ -61,9 +61,9 @@ class EvidenceReport:
 
 
 _RESTRICTED = re.compile(
-    r"(^|[._-])(env|ssh|git|token|secret|password|credential|private[._-]?key)([._-]|$)"
-    r"|(^|[.])(pem|p12|pfx|key|kdbx)$"
-    r"|^(config[.]json|id_rsa|id_ed25519)$", re.IGNORECASE
+    r"(^|[._-])(env|ssh|git|token|tokens|secret|secrets|password|passwords|credential|credentials|private[._-]?key|api[._-]?key|access[._-]?key|service[._-]?account|session|sessions|auth)([._-]|$)"
+    r"|(^|[.])(pem|p12|pfx|key|kdbx|asc|gpg)$"
+    r"|^(config[.]json|id_rsa|id_ed25519|authorized_keys|known_hosts|[.]npmrc|[.]netrc|[.]aws|[.]kube|[.]gnupg|[.]docker)$", re.IGNORECASE
 )
 
 
@@ -77,7 +77,7 @@ def safe_path(path: str) -> str:
         raise ValueError("Invalid scoped path")
     if unicodedata.normalize("NFKC", path) != path or path.startswith(("/", "~")):
         raise ValueError("Not a canonical relative path")
-    if "\\" in path or any(ord(ch) < 32 or ord(ch) == 127 for ch in path):
+    if ":" in path or "%" in path or "\\" in path or any(ord(ch) < 32 or ord(ch) == 127 or unicodedata.category(ch) == "Cf" for ch in path):
         raise ValueError("Ambiguous separator or control character")
     pieces = path.split("/")
     if any(not part or part in (".", "..") or part.endswith((".", " ")) for part in pieces):

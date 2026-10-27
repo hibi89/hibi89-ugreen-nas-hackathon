@@ -47,13 +47,13 @@ class Plan:
 
 
 _RESTRICTED = re.compile(
-    r"(^|[._-])(env|ssh|git|token|secret|password|credential|private[._-]?key)([._-]|$)"
-    r"|(^|[.])(pem|p12|pfx|key|kdbx)$"
-    r"|^(config[.]json|id_rsa|id_ed25519)$", re.IGNORECASE
+    r"(^|[._-])(env|ssh|git|token|tokens|secret|secrets|password|passwords|credential|credentials|private[._-]?key|api[._-]?key|access[._-]?key|service[._-]?account|session|sessions|auth)([._-]|$)"
+    r"|(^|[.])(pem|p12|pfx|key|kdbx|asc|gpg)$"
+    r"|^(config[.]json|id_rsa|id_ed25519|authorized_keys|known_hosts|[.]npmrc|[.]netrc|[.]aws|[.]kube|[.]gnupg|[.]docker)$", re.IGNORECASE
 )
 _WRITES = re.compile(
-    r"\b(delete|remove|rename|move|upload|transfer|send|overwrite|wipe|modify|"
-    r"삭제|이동|업로드|전송|수정|덮어쓰기)\b", re.IGNORECASE
+    r"\b(?:delete|remove|rename|move|upload|transfer|send|overwrite|wipe|modify|copy|share|publish|export|edit|erase)\b"
+    r"|(?:삭제|이동|업로드|전송|수정|덮어쓰기|복사|공유|지워|지우기|보내|내보내기|게시|발행)", re.IGNORECASE
 )
 
 
@@ -62,7 +62,7 @@ def _safe(value: str, *, root: bool) -> str:
         raise ValueError("Missing or noncanonical path")
     if unicodedata.normalize("NFKC", value) != value:
         raise ValueError("Noncanonical Unicode path")
-    if "\\" in value or "\x00" in value or any(ord(x) < 32 or ord(x) == 127 for x in value):
+    if ":" in value or "%" in value or "\\" in value or any(ord(x) < 32 or ord(x) == 127 or unicodedata.category(x) == "Cf" for x in value):
         raise ValueError("Control or alternate path separator")
     if root:
         if not value.startswith("/") or value == "/" or value.startswith("//"):

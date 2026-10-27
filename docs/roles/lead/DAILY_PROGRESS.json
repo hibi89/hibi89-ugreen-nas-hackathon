@@ -936,5 +936,22 @@
     "owner_approval": "HOLD",
     "devpost": "NOT_SUBMITTED",
     "ci_test_gate": "AT_LEAST_34_MUST_RUN"
+  },
+  "flowpilot_g47": {
+    "phase": "SECURITY_PATCH_STAGED_REMOTE_CI_UNVERIFIED",
+    "date_kst": "2026-10-27",
+    "offZipPlanner": "src/flowpilot/planner.py",
+    "offZipEvidence": "src/flowpilot/evidence.py",
+    "newTests": "tests/test_flowpilot_g47_security.py",
+    "minimum_discovered_tests": 42,
+    "local_evidence_tests": "22/22_PASS_PYTHON_3_13",
+    "local_writes_regex_smoke": "9/9_PASS",
+    "full_42_suite": "NOT_INDEPENDENTLY_RUN",
+    "official_first_party_checker": "NOT_VERIFIED",
+    "official_creator": "NOT_RUN",
+    "nas": "NOT_RUN",
+    "owner_approval": "NOT_GIVEN",
+    "devpost": "NOT_SUBMITTED",
+    "submission_candidate": "G46_SKILL_PDF_ZIP_BYTES_UNCHANGED"
   }
 }

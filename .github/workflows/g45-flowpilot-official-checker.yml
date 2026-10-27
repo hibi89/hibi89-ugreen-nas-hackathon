@@ -5,6 +5,7 @@ on:
     paths:
       - ".github/workflows/g45-flowpilot-official-checker.yml"
       - "skill/flowpilot-nas/SKILL.md"
+      - "tests/test_flowpilot_g47_security.py"
       - "tests/test_flowpilot_mvp.py"
   workflow_dispatch:
 permissions:
@@ -31,10 +32,11 @@ jobs:
           suite=unittest.TestSuite((
               loader.discover("tests", pattern="test_flowpilot_mvp.py"),
               loader.discover("tests", pattern="test_flowpilot_evidence.py"),
+              loader.discover("tests", pattern="test_flowpilot_g47_security.py"),
           ))
           count=suite.countTestCases()
-          if count < 34:
-              raise SystemExit("G46: expected at least 34 discovered tests; got "+str(count))
+          if count < 42:
+              raise SystemExit("G46: expected at least 42 discovered tests; got "+str(count))
           result=unittest.TextTestRunner(verbosity=2).run(suite)
           if not result.wasSuccessful():
               raise SystemExit("FlowPilot unit test gate failed")
