@@ -8,6 +8,10 @@ on:
       - "tests/test_flowpilot_g47_security.py"
       - "tests/test_flowpilot_demo.py"
       - "tools/flowpilot_offline_demo.py"
+      - "src/flowpilot/pipeline.py"
+      - "tests/test_flowpilot_pipeline.py"
+      - "tools/flowpilot_package_audit.py"
+      - "tests/test_flowpilot_package_audit.py"
       - "tests/test_flowpilot_mvp.py"
   workflow_dispatch:
 permissions:
@@ -36,10 +40,12 @@ jobs:
               loader.discover("tests", pattern="test_flowpilot_evidence.py"),
               loader.discover("tests", pattern="test_flowpilot_g47_security.py"),
               loader.discover("tests", pattern="test_flowpilot_demo.py"),
+              loader.discover("tests", pattern="test_flowpilot_pipeline.py"),
+              loader.discover("tests", pattern="test_flowpilot_package_audit.py"),
           ))
           count=suite.countTestCases()
-          if count < 50:
-              raise SystemExit("G46: expected at least 50 discovered tests; got "+str(count))
+          if count < 66:
+              raise SystemExit("G46: expected at least 66 discovered tests; got "+str(count))
           result=unittest.TextTestRunner(verbosity=2).run(suite)
           if not result.wasSuccessful():
               raise SystemExit("FlowPilot unit test gate failed")

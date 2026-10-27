@@ -10,6 +10,7 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import mm
 from reportlab.platypus import SimpleDocTemplate,Paragraph,Spacer,KeepTogether
 from check_round1_proposal import PROMPTS
+from flowpilot_package_audit import audit_zip_bytes
 
 ROOT=Path(__file__).resolve().parents[1]
 SKILL=ROOT/"skill/flowpilot-nas/SKILL.md"
@@ -32,8 +33,8 @@ def build(output:Path):
     pdf=output/"FlowPilot_Round1_OWNER_REVIEW.pdf"
     bundle=output/"FlowPilot_Round1_OWNER_REVIEW.zip"
     with ZipFile(bundle,"w",ZIP_DEFLATED,compresslevel=9) as z:z.writestr("flowpilot-nas/SKILL.md",skill)
-    with ZipFile(bundle) as z:
-        if z.namelist()!=["flowpilot-nas/SKILL.md"] or z.read("flowpilot-nas/SKILL.md")!=skill:raise ValueError("ZIP source mismatch")
+    zip_audit=audit_zip_bytes(bundle.read_bytes(),skill)
+    if zip_audit["official_uliya_toolkit_files"]!=0 or zip_audit["third_party_binary_members"]!=0:raise ValueError("Unexpected vendor files")
     styles=getSampleStyleSheet()
     body=ParagraphStyle("FPBody",parent=styles["Normal"],fontName="Helvetica",fontSize=9.0,leading=12.2,spaceAfter=4)
     qstyle=ParagraphStyle("FPQ",parent=body,fontName="Helvetica-Bold",fontSize=9.3,leading=11.8,spaceAfter=1,textColor=colors.HexColor("#153454"))
@@ -49,7 +50,7 @@ def build(output:Path):
     pages=PdfReader(pdf).pages
     if len(pages)!=1:raise ValueError("Expected exactly 1 page after official question expansion")
     if pdf.stat().st_size>1000000 or bundle.stat().st_size>10000000 or len(skill)>1000000:raise ValueError("Package exceeds limit")
-    evidence={"state":"OWNER_REVIEW_NOT_SUBMITTED","source_sha256":PIN,"zip_sha256":hashlib.sha256(bundle.read_bytes()).hexdigest(),"pdf_sha256":hashlib.sha256(pdf.read_bytes()).hexdigest(),"zip_bytes":bundle.stat().st_size,"pdf_bytes":pdf.stat().st_size,"answers":10,"substantive_words":words,"official_creator":"NOT_RUN","official_checker":"NOT_RUN","nas_runtime":"NOT_RUN","devpost":"NOT_SUBMITTED"}
+    evidence={"state":"OWNER_REVIEW_NOT_SUBMITTED","source_sha256":PIN,"zip_sha256":hashlib.sha256(bundle.read_bytes()).hexdigest(),"pdf_sha256":hashlib.sha256(pdf.read_bytes()).hexdigest(),"zip_bytes":bundle.stat().st_size,"pdf_bytes":pdf.stat().st_size,"answers":10,"substantive_words":words,"zip_composition_audit":zip_audit,"official_creator":"NOT_RUN","official_checker":"NOT_RUN","nas_runtime":"NOT_RUN","devpost":"NOT_SUBMITTED"}
     (output/"FlowPilot_Round1_OWNER_REVIEW_manifest.json").write_text(json.dumps(evidence,indent=2)+"\n",encoding="utf-8")
     return evidence
 

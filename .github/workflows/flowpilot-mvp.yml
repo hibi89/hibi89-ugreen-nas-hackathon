@@ -9,6 +9,10 @@ on:
       - "tests/test_flowpilot_g47_security.py"
       - "tests/test_flowpilot_demo.py"
       - "tools/flowpilot_offline_demo.py"
+      - "src/flowpilot/pipeline.py"
+      - "tests/test_flowpilot_pipeline.py"
+      - "tools/flowpilot_package_audit.py"
+      - "tests/test_flowpilot_package_audit.py"
       - ".github/workflows/flowpilot-mvp.yml"
   workflow_dispatch:
 permissions:
@@ -26,6 +30,10 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_flowpilot_mvp.py' -v
       - name: Run G47 adversarial safety regression
         run: python -m unittest discover -s tests -p 'test_flowpilot_g47_security.py' -v
+      - name: G50 planning-to-evidence integration and ZIP threat model
+        run: |
+          python -m unittest discover -s tests -p test_flowpilot_pipeline.py -v
+          python -m unittest discover -s tests -p test_flowpilot_package_audit.py -v
       - name: Run G48 five-case offline scenario simulation
         run: |
           python -m unittest discover -s tests -p 'test_flowpilot_demo.py' -v

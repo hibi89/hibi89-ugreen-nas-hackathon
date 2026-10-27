@@ -1,0 +1,63 @@
+"""G50 owner-authorized intent -> evidence result offline reference implementation.
+
+Consumes in-memory, already-returned *synthetic* metadata only. No NAS or Uliya
+client, filesystem access, network I/O, automation or external transfers.
+A caller's claimed permission flags cannot certify any real platform action.
+"""
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Sequence
+
+from .planner import Intent, Plan, State, draft_plan
+from .evidence import EvidenceReport, ObservationBatch, Overall, report
+
+
+@dataclass(frozen=True)
+class FlowResult:
+    status: str
+    plan: Plan
+    report: EvidenceReport | None
+    limitations: tuple[str, ...]
+    actual_nas_verified: bool = False
+
+
+def evaluate_offline(
+    request: str,
+    root: str = "",
+    required_paths: Sequence[str] = (),
+    *,
+    metadata_approved: bool = False,
+    unknown_processing_accepted: bool = False,
+    batch: ObservationBatch | None = None,
+    document_approved: bool = False,
+    returned_document_refs: Sequence[str] = (),
+    version_candidates: dict[str, Sequence[str]] | None = None,
+) -> FlowResult:
+    """Compose pure plan and evidence stages; never execute registered agents."""
+    plan = draft_plan(
+        request, root, required_paths,
+        metadata_approved=metadata_approved,
+        unknown_processing_accepted=unknown_processing_accepted,
+        document_approved=document_approved,
+        returned_document_refs=returned_document_refs,
+    )
+    base = ("OFFLINE_ONLY", "LIVE_REGISTERED_AGENT_NOT_INVOKED",
+            "PERMISSION_FLAGS_ARE_UNVERIFIED_CALLER_ASSERTIONS")
+    if plan.state is not State.READY_FOR_ADAPTER_CHECK:
+        return FlowResult(plan.state.value, plan, None, base + plan.limitations)
+    if batch is None:
+        return FlowResult("NEEDS_REVIEW", plan, None, base + ("NO_OBSERVED_METADATA",))
+    if batch.authorized_root != plan.authorized_root:
+        return FlowResult("BLOCKED", plan, None, base + ("ROOT_MISMATCH",))
+    if plan.intent is Intent.SUMMARIZE_SELECTED and document_approved and returned_document_refs:
+        observed_refs = {
+            item.reference for item in batch.observations
+            if item.contained is True and not item.is_symlink and item.reference.strip()
+        }
+        if not set(returned_document_refs).issubset(observed_refs):
+            return FlowResult("BLOCKED", plan, None, base + ("UNATTRIBUTABLE_DOCUMENT_REFERENCE",))
+    findings = report(plan.required_paths, batch, version_candidates=version_candidates)
+    # An offline fixture cannot establish a real NAS READY state.
+    status = Overall.BLOCKED.value if findings.overall is Overall.BLOCKED else Overall.NEEDS_REVIEW.value
+    return FlowResult(status, plan, findings, base + findings.limitations)

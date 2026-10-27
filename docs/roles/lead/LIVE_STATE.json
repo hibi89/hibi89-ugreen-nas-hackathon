@@ -25,10 +25,10 @@
     "sdk_gate_distinct": true
   },
   "next_work": {
-    "id": "G49-ACTUAL-CHECKER-LOGS-THEN-CREATOR",
+    "id": "G50_FIRST_PARTY_CHECKER_AND_PACKAGE_PARITY",
     "scheduled_kst": "2026-10-27",
-    "status": "WAITING_NEW_CI",
-    "scope": "Read first-party G49 action run and repo regression, resolve static diagnostics exactly, then separate official Uliya Creator requirement and owner release approval.",
+    "status": "CI_AND_CREATOR_EXTERNAL_GATES",
+    "scope": "Observe G49/G50 official first-party checker and 66-test CI; independent actual G49 ZIP binary audit/PDF render and hash; official Skill Creator provenance, then authorized 2h NAS runbook if Uliya available.",
     "planned_hours": 0,
     "separate_reserve_hours": 0,
     "actual_completion_eta_hours": null
@@ -1249,5 +1249,31 @@
     "owner_approval": "NOT_GIVEN",
     "devpost": "NOT_SUBMITTED",
     "original_g36_g37_g46": "PRESERVED"
+  },
+  "flowpilot_g50": {
+    "date_kst": "2026-10-27",
+    "status": "OFFLINE_CORE_INTEGRATION_AND_ZIP_AUDIT_STAGED",
+    "support_reply": "SANITIZED_CLARIFICATION_3_POINTS_RECEIVED",
+    "license_choice": "MIT_FOR_ENTRANT_OWNED_CONTENT_RECOMMENDED_OWNER_APPROVAL_PENDING",
+    "third_party_sdk_redistribution": "G46_ARCHIVED_ZIP_NO_SDK_FILES_G49_PACKAGE_AUDIT_PENDING",
+    "local_unit_tests": "66/66_PASS_PYTHON3_13",
+    "new_pipeline": "src/flowpilot/pipeline.py",
+    "new_tests": [
+      "tests/test_flowpilot_pipeline.py",
+      "tests/test_flowpilot_package_audit.py"
+    ],
+    "zip_audit": "tools/flowpilot_package_audit.py",
+    "github_ci_gate": "MIN_66_ALL_PASS_NOT_YET_OBSERVED",
+    "g49_skill_sha256": "47d119123387ec46133a62fdec58ef42ca3852491b132d32798951a6430c233b",
+    "g50_pdf_source": "docs/submission/flowpilot_round1_qas_20261027.json",
+    "g50_preview_pdf_sha256": "613df37998292cad6fa003fa35f9cf07486b675ec28c6a41818c6fa0475d74b8",
+    "g50_pdf_pages": 1,
+    "g50_substantive_words": 359,
+    "official_creator": "NOT_RUN",
+    "g49_official_checker_result": "NOT_OBSERVED",
+    "real_nas": "NOT_RUN",
+    "devpost": "NOT_SUBMITTED",
+    "user_signoff": "PENDING",
+    "trial_runbook": "docs/operations/NAS_FREE_TRIAL_2H_EXECUTION_RUNBOOK_20261027.md"
   }
 }
