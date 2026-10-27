@@ -48,6 +48,18 @@ class GuidedSessionTests(unittest.TestCase):
         self.assertNotIn("missing.pdf", "\\n".join(output))
         self.assertNotIn(str(self.root), "\\n".join(output))
 
+    def test_review_queue_uses_correct_step_index_in_multistep_flow(self):
+        output = []
+        answers = iter([str(self.root), "README.md,missing.pdf", "APPROVE"])
+        result = run_guided_session("인계 확인하고 파일 누락 확인",
+            ask=lambda prompt: next(answers), emit=output.append)
+        self.assertTrue(result["review_required"])
+        self.assertEqual(result["review_item_count"], 1)
+        self.assertEqual(result["review_queue"], [
+            {"step": 2, "item_index": 2, "state": "MISSING"}
+        ])
+        self.assertEqual(result["finding_counts"]["MISSING"], 1)
+
     def test_version_review_queue_and_counts_agree(self):
         (self.root / "final.pdf").write_bytes(b"v1")
         (self.root / "final_v2.pdf").write_bytes(b"v2")
