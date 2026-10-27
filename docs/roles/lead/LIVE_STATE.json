@@ -25,10 +25,10 @@
     "sdk_gate_distinct": true
   },
   "next_work": {
-    "id": "G47-VALIDATE_CHECKER-AND-OFFICIAL_CREATOR",
+    "id": "G48-GITHUB-CI-AND-CREATOR_GATE",
     "scheduled_kst": "2026-10-27",
-    "status": "REMOTE_CI_EVIDENCE_UNAVAILABLE",
-    "scope": "Obtain observed GitHub 42-test and first-party checker results; correct only verified errors; Creator source provenance and release gate still external.",
+    "status": "CI_EVIDENCE_NOT_ACCESSIBLE",
+    "scope": "Obtain 50 test CI and first-party static checker receipt, then new FlowPilot official Creator provenance and entrant approval. Never assume NAS execution.",
     "planned_hours": 0,
     "separate_reserve_hours": 0,
     "actual_completion_eta_hours": null
@@ -1209,5 +1209,28 @@
     "owner_approval": "NOT_GIVEN",
     "devpost": "NOT_SUBMITTED",
     "submission_candidate": "G46_SKILL_PDF_ZIP_BYTES_UNCHANGED"
+  },
+  "flowpilot_g48": {
+    "status": "FIVE_SYNTHETIC_SCENARIOS_LOCAL_PASS_REMOTE_CI_UNVERIFIED",
+    "date_kst": "2026-10-27",
+    "demo_source": "tools/flowpilot_offline_demo.py",
+    "source_git_blob_sha": "3ff02254c83132640cf94de951e1dee4c4e8dc6b",
+    "test_path": "tests/test_flowpilot_demo.py",
+    "test_git_blob_sha": "aaf3a6ad7f48310a2fd4345bf9b22683e65ca42b",
+    "local_evidence_and_demo": "30/30_PASS",
+    "scenario_results": [
+      "COMPLETE_NEEDS_REVIEW",
+      "MISSING_BLOCKED",
+      "VERSION_REVIEW",
+      "DENIED_NOT_CHECKED",
+      "SYMLINK_NOT_CHECKED"
+    ],
+    "github_min_discovery": 50,
+    "full_suite_50": "NOT_OBSERVED",
+    "first_party_checker": "NOT_OBSERVED",
+    "creator": "NOT_RUN",
+    "nas": "NOT_RUN",
+    "owner_approval": "NOT_GIVEN",
+    "devpost": "NOT_SUBMITTED"
   }
 }
