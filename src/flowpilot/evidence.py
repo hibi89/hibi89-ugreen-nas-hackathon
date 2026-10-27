@@ -124,18 +124,23 @@ def report(
     rows = []
     for wanted in requested:
         found = [o for o in batch.observations if o.relative_path == wanted]
-        usable = [o for o in found if o.reference.strip() and not o.is_symlink and o.contained is True]
+        usable = [o for o in found if o.reference.strip() and o.is_symlink is False and o.contained is True]
         untrusted_found = bool(found) and len(usable) != len(found)
-        # Unresolved competing versions always require explicit review, even
-        # if the requested exact file happens to be present.
+        # A single alternative version is not proof that a requirement is missing.
+        # Unverified symlink or containment for any candidate invalidates the scan.
         candidate_paths = set(versions.get(wanted, ()))
-        detected = {o.relative_path for o in batch.observations
-                    if o.relative_path in candidate_paths | {wanted}
-                    and o.reference.strip() and not o.is_symlink and o.contained is True}
-        if not complete or untrusted_found:
+        candidates = [o for o in batch.observations
+                      if o.relative_path in candidate_paths | {wanted}]
+        untrusted_candidate = any(
+            not o.reference.strip() or o.is_symlink is not False or o.contained is not True
+            for o in candidates
+        )
+        detected = {o.relative_path for o in candidates
+                    if o.reference.strip() and o.is_symlink is False and o.contained is True}
+        if not complete or untrusted_found or untrusted_candidate:
             state, refs, reason = ItemState.NOT_CHECKED, (), "Scan, permission, symlink target or evidence unverified"
-        elif len(detected) > 1 or len(usable) > 1:
-            state, refs, reason = ItemState.VERSION_REVIEW, (), "Multiple evidence candidates; do not choose final by name"
+        elif detected - {wanted} or len(usable) > 1:
+            state, refs, reason = ItemState.VERSION_REVIEW, (), "Alternative or competing version requires owner review"
         elif usable:
             state, refs, reason = ItemState.PRESENT, (usable[0].reference,), "Exact scoped file has attributable metadata"
         else:

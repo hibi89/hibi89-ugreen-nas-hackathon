@@ -6,7 +6,7 @@ A caller's claimed permission flags cannot certify any real platform action.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Sequence
 
 from .planner import Intent, Plan, State, draft_plan
@@ -35,12 +35,19 @@ def evaluate_offline(
     version_candidates: dict[str, Sequence[str]] | None = None,
 ) -> FlowResult:
     """Compose pure plan and evidence stages; never execute registered agents."""
+    # Offline flags are untrusted caller claims. Never plan a document stage
+    # from a partial, failed, permission-denied or unregistered file inventory.
+    inventory_claimed_complete = batch is not None and all((
+        batch.permission_confirmed, batch.registered_adapter_confirmed,
+        batch.scan_complete, batch.pagination_complete, not batch.failed,
+    ))
+    eligible_refs = returned_document_refs if inventory_claimed_complete else ()
     plan = draft_plan(
         request, root, required_paths,
         metadata_approved=metadata_approved,
         unknown_processing_accepted=unknown_processing_accepted,
         document_approved=document_approved,
-        returned_document_refs=returned_document_refs,
+        returned_document_refs=eligible_refs,
     )
     base = ("OFFLINE_ONLY", "LIVE_REGISTERED_AGENT_NOT_INVOKED",
             "PERMISSION_FLAGS_ARE_UNVERIFIED_CALLER_ASSERTIONS")
@@ -51,12 +58,20 @@ def evaluate_offline(
     if batch.authorized_root != plan.authorized_root:
         return FlowResult("BLOCKED", plan, None, base + ("ROOT_MISMATCH",))
     if plan.intent is Intent.SUMMARIZE_SELECTED and document_approved and returned_document_refs:
+        if not inventory_claimed_complete:
+            return FlowResult("NEEDS_REVIEW", plan, None,
+                              base + ("DOCUMENT_STAGE_BLOCKED_UNVERIFIED_INVENTORY",))
+        # A file merely found in the root is not an authorized checklist item.
         observed_refs = {
             item.reference for item in batch.observations
-            if item.contained is True and not item.is_symlink and item.reference.strip()
+            if item.relative_path in plan.required_paths
+            and item.contained is True and item.is_symlink is False
+            and item.reference.strip()
         }
         if not set(returned_document_refs).issubset(observed_refs):
-            return FlowResult("BLOCKED", plan, None, base + ("UNATTRIBUTABLE_DOCUMENT_REFERENCE",))
+            no_document = replace(plan, steps=tuple(s for s in plan.steps if s.id != "document"))
+            return FlowResult("BLOCKED", no_document, None,
+                              base + ("UNATTRIBUTABLE_DOCUMENT_REFERENCE",))
     findings = report(plan.required_paths, batch, version_candidates=version_candidates)
     # An offline fixture cannot establish a real NAS READY state.
     status = Overall.BLOCKED.value if findings.overall is Overall.BLOCKED else Overall.NEEDS_REVIEW.value

@@ -58,4 +58,31 @@ class FlowPilotPipeline(unittest.TestCase):
         x=evaluate_offline(**{**BASE,'request':'파일 삭제해줘'},batch=fixture(seen('README.md','synthetic://a')))
         self.assertEqual(x.status,'BLOCKED');self.assertIsNone(x.report)
 
+    def test_document_outside_required_checklist_is_blocked(self):
+        batch=fixture(seen('README.md','synthetic://approved'),
+                      seen('release/output.pdf','synthetic://output'),
+                      seen('unselected/secret.txt','synthetic://unselected'))
+        x=evaluate_offline(**{**BASE,'request':'summarize document'},batch=batch,
+                           document_approved=True,
+                           returned_document_refs=('synthetic://unselected',))
+        self.assertEqual(x.status,'BLOCKED')
+        self.assertNotIn('document',[s.id for s in x.plan.steps])
+
+    def test_partial_inventory_blocks_document_stage(self):
+        batch=fixture(seen('README.md','synthetic://a'),complete=False)
+        x=evaluate_offline(**{**BASE,'request':'summarize document'},batch=batch,
+                           document_approved=True,returned_document_refs=('synthetic://a',))
+        self.assertEqual(x.status,'NEEDS_REVIEW')
+        self.assertIn('DOCUMENT_STAGE_BLOCKED_UNVERIFIED_INVENTORY',x.limitations)
+        self.assertNotIn('document',[s.id for s in x.plan.steps])
+
+    def test_unverified_registered_agent_blocks_document_stage(self):
+        batch=ObservationBatch(ROOT_DIR,(seen('README.md','synthetic://a'),),
+                               permission_confirmed=True,registered_adapter_confirmed=False,
+                               scan_complete=True,pagination_complete=True)
+        x=evaluate_offline(**{**BASE,'request':'summarize document'},batch=batch,
+                           document_approved=True,returned_document_refs=('synthetic://a',))
+        self.assertEqual(x.status,'NEEDS_REVIEW')
+        self.assertNotIn('document',[s.id for s in x.plan.steps])
+
 if __name__=='__main__':unittest.main()

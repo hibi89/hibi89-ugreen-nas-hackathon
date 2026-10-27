@@ -88,5 +88,22 @@ class EvidenceTests(unittest.TestCase):
         self.assertFalse(r.actual_nas_verified)
         self.assertIn("NOT_VERIFIED", r.limitations[0])
 
+    def test_only_alternative_version_requires_review_not_missing(self):
+        result = report(["a.pdf"], good(obs("a_v2.pdf", "ref-new")),
+                        version_candidates={"a.pdf": ["a_v2.pdf"]})
+        self.assertEqual(result.items[0].state, ItemState.VERSION_REVIEW)
+        self.assertEqual(result.overall, Overall.NEEDS_REVIEW)
+
+    def test_untrusted_alternate_candidate_fails_closed(self):
+        batch = good(obs("a.pdf", "ref-ok"),
+                     Observed("a_v2.pdf", "ref-link", is_symlink=True, contained=None))
+        result = report(["a.pdf"], batch,
+                        version_candidates={"a.pdf": ["a_v2.pdf"]})
+        self.assertEqual(result.items[0].state, ItemState.NOT_CHECKED)
+
+    def test_unknown_symlink_type_is_not_trusted(self):
+        batch = good(Observed("a.pdf", "ref-unknown", is_symlink=None, contained=True))
+        self.assertEqual(report(["a.pdf"], batch).items[0].state, ItemState.NOT_CHECKED)
+
 if __name__ == "__main__":
     unittest.main()
