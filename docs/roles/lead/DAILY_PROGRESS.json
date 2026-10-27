@@ -432,8 +432,8 @@
   "closeout_sync_enforcement_active": true,
   "closeout_sync_quality_issue": "2026-10-24 CI #40067541841 detected stale daily JSON in previous policy commit; correcting in next commit",
   "closeout_sync_guard_tested_status": "PENDING_RECHECK",
-  "latest_repository_regression_tests_passed": 165,
-  "latest_repository_regression_ci_url": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40072583689",
+  "latest_repository_regression_tests_passed": 388,
+  "latest_repository_regression_ci_url": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40517777852",
   "latest_closeout_guard_verified": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40072583787",
   "notes_on_last_closeout": "One-line GitHub bootstrap and mandatory end-of-work handoff automated checks verified. No new SDK or NAS capability established.",
   "notes_on_new_chat_execution": "G1 official pinned catalog read-only reference bound into Skill; 4 Markdown files, 165/165 offline tests + actual skill preflight PASS at source 5772a8a9, closeout sync PASS. No official Uliya checker/NAS/PII permission tested; next G1 Oct25 1.5h base+1.5h reserve, ETA unknown. Oct24 finite-day scope remains 100%, 0h, not overall project completion.",
@@ -1102,6 +1102,15 @@
     "official_creator": "NOT_EVIDENCED",
     "nas": "NOT_RUN",
     "devpost": "NOT_SUBMITTED",
-    "actual_hours": null
+    "actual_hours": null,
+    "verified_full_tests": 388,
+    "verified_source_sha": "9f1ca7bbb0d6e67867bf5bc2a5c3774c9fbf4bfb",
+    "full_test_run": "https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/40517777852",
+    "official_checker": "G55_FIRST_PARTY_STATIC_WORKFLOW_PASS",
+    "master": "PASS",
+    "closeout": "PASS",
+    "offline_readiness": "PASS",
+    "draft_bundle": "IN_PROGRESS",
+    "owner_preview": "QUEUED"
   }
 }
