@@ -1,0 +1,46 @@
+{
+  "status": "OWNER_REVIEW_NOT_SUBMITTED",
+  "questions": [
+    {
+      "question": "One sentence: What does the Skill do?",
+      "answer": "NAS FlowPilot converts a project handoff request into a scoped, read-only NAS evidence review with a previewed plan and uncertainty-aware report."
+    },
+    {
+      "question": "Who is the target user and problem?",
+      "answer": "Solo creators, small teams and project owners repeatedly need to verify required deliverables and conflicting file versions. Manual NAS browsing is slow and can falsely certify incomplete folders."
+    },
+    {
+      "question": "What is your proposed solution?",
+      "answer": "An interactive NAS-native Skill asks for one approved project folder, exact deliverables and metadata permission, then coordinates only supported registered experts. Every reported finding is tied to evidence, with an explicit unknown state."
+    },
+    {
+      "question": "What is the Core User Flow?",
+      "answer": "Owner requests a handoff check; the Skill clarifies folder and checklist, explains processing uncertainty, previews steps and seeks approval. The file expert lists authorized metadata; optional document review needs separate consent. The Skill returns PRESENT, MISSING, VERSION_REVIEW or NOT_CHECKED with next actions."
+    },
+    {
+      "question": "What substantive difference does your idea offer compared with existing tools or conventional AI solutions?",
+      "answer": "Unlike a static checklist or generic chatbot, the plan adapts among handoff, missing-file, version-review and selected-document tasks, while disallowing scope expansion and fabricated complete scans. Owner-controlled NAS data remains the workflow's starting point."
+    },
+    {
+      "question": "Which UGREEN AI NAS capabilities will be used, and at which step in the workflow?",
+      "answer": "The proposed registered file-agent uses catalog-listed ug-filesystem ls/find/stat for scoped discovery. An optional registered document-agent uses ug-document metadata/qa/extract/reconcile on consented exact references. Installed support and permissions require runtime verification."
+    },
+    {
+      "question": "What was your technical approach? Describe the planned Skill workflow, supported NAS CLI capabilities, expert agent orchestration, required inputs, permissions, AI model choices, and data handling, as applicable;",
+      "answer": "A Markdown SKILL.md implements conversational input slots, plan preview, read-only expert delegation and evidence-based failure handling. Offline Python tests exercise parsing, permissions, version ambiguity and restricted paths but are not included in the ZIP. Data location is not assumed to be local; no arbitrary REST or external integrations are used."
+    },
+    {
+      "question": "What is the current development status? Identify what was implemented already, not yet implemented, or is pending NAS validation if selected to be a Finalist.",
+      "answer": "The FlowPilot Markdown Skill was generated in Codex following the official UGREEN Uliya Skill Creation Tool v0.7.3-en (operator-reported). Its corrected exact source passed the official static Checker in GitHub Actions run 40547404706 (0 errors, 0 warnings, 0 info). Offline Python tests passed 486/486. Real NAS, registered-agent operation, entrant adoption and release have not occurred."
+    },
+    {
+      "question": "What is your final validation plan? Name two core test cases and one edge case to validate if selected as a Finalist.",
+      "answer": "Core case one: a complete authorized delivery folder produces referenced file findings. Core case two: two plausible final versions cause VERSION_REVIEW, never automatic selection. Edge case: denied or truncated listing, restricted target or unverified symlink must produce NOT_CHECKED without data leakage."
+    },
+    {
+      "question": "Are there any known limitations of your Project? Describe current known limitations, technical risks, and any external dependencies.",
+      "answer": "Static checking and local regression tests do not prove real NAS compatibility, registered-agent access, folder completeness, processing location or owner licensing clearance. The official Creator workflow is operator-reported, while exact-byte static Checker success is independently reproducible. Generic n8n orchestration, external services, file mutation and automated jobs are outside Round 1 scope."
+    }
+  ],
+  "disclosure": "Entrant-directed FlowPilot was authored with assistance from ChatGPT GPT-6 and Codex, using the official UGREEN Uliya Skill Creation Tool v0.7.3-en (Codex operator report). Its corrected exact source passed UGREEN official static Checker in isolated GitHub CI; no live NAS or registered Expert run is claimed. Development-only Python is excluded from the Skill ZIP. That ZIP contains one entrant-authored Markdown SKILL.md, with no redistributed UGREEN toolkit or third-party binaries. MIT is proposed only for entrant-owned text, subject to rights review. Data-processing location, real permissions, entrant release and Devpost submission remain unverified or pending."
+}

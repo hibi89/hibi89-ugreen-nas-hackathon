@@ -1,0 +1,100 @@
+name: G67 Official-Creator-origin FlowPilot Round1 owner preview (NOT SUBMITTED)
+on:
+  push:
+    branches: ["codex/ugreen-flowpilot-creator"]
+    paths:
+      - ".github/workflows/g67-creator-round1-preview.yml"
+      - "skill/creator-candidate/flowpilot-nas/SKILL.md"
+      - "docs/submission/flowpilot_round1_qas_G67_owner_review.json"
+      - "tools/g67_creator_round1_preview.py"
+      - "tests/test_g67_creator_round1_preview.py"
+      - "tools/flowpilot_package_audit.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  owner-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install existing PDF builder dependencies
+        run: python -m pip install "reportlab>=4,<5" "pypdf>=6,<7" "pypdfium2>=4,<5"
+      - name: Full offline Python regression suite including G67 (NOT NAS)
+        run: |
+          python - <<'PY'
+          import unittest
+          s=unittest.defaultTestLoader.discover("tests",pattern="test_*.py")
+          n=s.countTestCases()
+          assert n>=493, f"G67 tests missing, discovered {n}"
+          result=unittest.TextTestRunner(verbosity=1).run(s)
+          assert result.wasSuccessful(), f"Python regressions failed {n}"
+          print(f"G67 offline full suite {n}/{n} PASS; registered NAS expert NOT_RUN")
+          PY
+      - name: Generate G67 frozen new-candidate ZIP, 1-page PDF and audit manifest
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: |
+          set -euo pipefail
+          python tools/g67_creator_round1_preview.py --output "$RUNNER_TEMP/g67-preview"
+          python - <<'PY'
+          import os,pathlib,hashlib,json,zipfile
+          from pypdf import PdfReader
+          root=pathlib.Path(os.environ["RUNNER_TEMP"])/"g67-preview"
+          stem="FlowPilot_G67_CREATOR_OWNER_REVIEW"
+          manifest=json.loads((root/(stem+"_manifest.json")).read_text())
+          source=pathlib.Path("skill/creator-candidate/flowpilot-nas/SKILL.md").read_bytes()
+          assert manifest["skill_sha256"]==hashlib.sha256(source).hexdigest()
+          assert manifest["skill_sha256"]=="f7982feae70e773440486fd8b0bee408fbadc69ced82d96d6e761c686f6131a5"
+          with zipfile.ZipFile(root/(stem+".zip")) as z:
+              assert z.namelist()==["flowpilot-nas/SKILL.md"]
+              assert z.read(z.namelist()[0])==source
+          pdf=PdfReader(root/(stem+".pdf"))
+          assert len(pdf.pages)==1
+          body=" ".join(p.extract_text() or "" for p in pdf.pages)
+          assert all(f"Q{i}." in body for i in range(1,11))
+          assert "40547404706" in body
+          assert "Creator" in body
+          assert "NOT SUBMITTED" in body
+          assert manifest["substantive_answer_words"]<=500 and manifest["official_questions"]==10
+          assert manifest["owner_release"]=="HOLD" and manifest["devpost"]=="NOT_SUBMITTED"
+          assert manifest["nas_runtime"]=="NOT_RUN"
+          assert manifest["zip_composition"]["official_uliya_toolkit_files"]==0
+          assert manifest["zip_composition"]["third_party_binary_members"]==0
+          print("G67 exact-byte owner preview: 1-page official QAs and 1 Markdown file; NOT SUBMITTED")
+          PY
+      - name: Render actual PDF to PNG and verify unclipped page margins
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os,pathlib
+          import pypdfium2 as pdfium
+          from PIL import Image, ImageChops
+          p=pathlib.Path(os.environ["RUNNER_TEMP"])/"g67-preview"
+          doc=pdfium.PdfDocument(str(p/"FlowPilot_G67_CREATOR_OWNER_REVIEW.pdf"))
+          assert len(doc)==1
+          page=doc[0]
+          bitmap=page.render(scale=160/72)
+          image=bitmap.to_pil().convert("RGB")
+          target=p/"FlowPilot_G67_PAGE_1_RENDER.png"
+          image.save(target)
+          background=Image.new("RGB", image.size, (255,255,255))
+          bbox=ImageChops.difference(image,background).getbbox()
+          assert bbox is not None, "Blank preview page"
+          w,h=image.size
+          assert bbox[0]>=16 and bbox[1]>=16, "Text clipped top/left"
+          assert bbox[2]<w-16 and bbox[3]<h-16, "Text clipped bottom/right"
+          print("G67 PDF visually rendered; page",image.size,"ink bounds",bbox,"no border clipping")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G67-UGREEN-CREATOR-ROUND1-OWNER-REVIEW-NOT-SUBMITTED
+          path: ${{ runner.temp }}/g67-preview/*
+          retention-days: 30
+          if-no-files-found: error

@@ -1,0 +1,158 @@
+name: G66 FlowPilot G65 Creator candidate exact-byte official static check
+on:
+  push:
+    branches: ["codex/ugreen-flowpilot-creator"]
+    paths:
+      - "skill/creator-candidate/flowpilot-nas/SKILL.md"
+      - "docs/submission/G65_OFFICIAL_FLOWPILOT_CREATOR_EXECUTION_20261028.md"
+      - ".github/workflows/g66-creator-candidate-check.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  g66-reviewed-candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Exact candidate and evidence-link integrity; Python regression suite
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import pathlib, hashlib, unittest
+          c=pathlib.Path("skill/creator-candidate/flowpilot-nas/SKILL.md")
+          b=c.read_bytes()
+          assert b.startswith(b"---\nname: flowpilot-nas\n")
+          assert b"G65_OFFICIAL_FLOWPILOT_CREATOR_EXECUTION_20261028.md" in b
+          assert b"G58_OFFICIAL_FLOWPILOT_CREATOR_EXECUTION_20261028.md" not in b
+          assert pathlib.Path("docs/submission/G65_OFFICIAL_FLOWPILOT_CREATOR_EXECUTION_20261028.md").is_file()
+          sha=hashlib.sha256(b).hexdigest()
+          pathlib.Path("/tmp/g66-skill-hash").write_text(sha)
+          print("G66 exact checked Skill SHA256",sha)
+          suite=unittest.TestLoader().discover("tests",pattern="test_*.py")
+          n=suite.countTestCases()
+          assert n>=486, f"Insufficient Python tests {n}"
+          results=unittest.TextTestRunner(verbosity=1).run(suite)
+          assert results.wasSuccessful(), "Python regressions failed"
+          print("G66 Python regressions",n,"PASS; no NAS or Expert called")
+          PY
+          python tools/g57_flowpilot_creator_candidate_intake.py --candidate-dir skill/creator-candidate/flowpilot-nas > /tmp/g66-intake.json
+          python - <<'PY'
+          import json
+          d=json.load(open("/tmp/g66-intake.json"))
+          assert d["status"]=="SOURCE_DIFF_HUMAN_REVIEW_REQUIRED"
+          assert d["release_gate"]=="HOLD"
+          assert not d["missing_design_signals_for_owner_review"]
+          assert not d["missing_disclosure_signals_for_owner_review"]
+          print("G66 candidate safe structure; release still HOLD")
+          PY
+      - name: Fetch pinned genuine UGREEN 0.7.3-en vendor kit into temporary runner only
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/g66-kit"
+          curl --fail --silent --show-error --location --max-time 90 --retry 1 \
+            'https://cdn.shopify.com/s/files/1/0630/9416/1602/files/uliya-skill-kit-0.7.3-en.zip?v=1790578898' \
+            --output "$RUNNER_TEMP/g66-kit/vendor.zip"
+          echo "cf557e5a022e4297892f39768132855154232efdedeb726b2845450ccd70e1b3  $RUNNER_TEMP/g66-kit/vendor.zip" | sha256sum --check
+          python - <<'PY'
+          import os,pathlib,zipfile,stat
+          d=pathlib.Path(os.environ["RUNNER_TEMP"])/"g66-kit"
+          with zipfile.ZipFile(d/"vendor.zip") as z:
+              entries=z.infolist()
+              assert 2<len(entries)<1000
+              assert sum(i.file_size for i in entries)<64*1024*1024
+              seen=set()
+              for i in entries:
+                  p=i.filename
+                  assert p and not p.startswith("/") and "\\" not in p and ":" not in p
+                  assert all(s not in ("",".","..") for s in p.rstrip("/").split("/"))
+                  assert not stat.S_ISLNK((i.external_attr>>16)&0xffff)
+                  assert i.file_size<8*1024*1024
+                  key=p.rstrip("/").casefold()
+                  assert key not in seen
+                  seen.add(key)
+              root=d/"unzipped"
+              root.mkdir()
+              z.extractall(root)
+          matches=list((d/"unzipped").rglob("scripts/check-skill.mjs"))
+          assert len(matches)==1
+          with open(os.environ["GITHUB_ENV"],"a") as f:
+              f.write("G66_VENDOR_DIR="+str(matches[0].parent.parent)+"\n")
+          print("Verified official vendor archive; ephemeral")
+          PY
+      - name: Recheck corrected exact candidate using isolated first-party Uliya checker
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker pull node:22-alpine >/dev/null
+          mkdir -p g66-evidence
+          set +e
+          docker run --rm --network none --read-only --cap-drop ALL \
+            --security-opt no-new-privileges --pids-limit 96 \
+            --memory 384m --cpus 1 --user 65534:65534 \
+            -v "$G66_VENDOR_DIR:/vendor:ro" \
+            -v "$GITHUB_WORKSPACE/skill/creator-candidate/flowpilot-nas:/candidate/flowpilot-nas:ro" \
+            --workdir /candidate node:22-alpine \
+            node /vendor/scripts/check-skill.mjs /candidate/flowpilot-nas \
+            >g66-evidence/vendor-output.private 2>g66-evidence/vendor-errors.private
+          code=$?
+          set -e
+          echo "$code" >g66-evidence/exit.private
+          python - <<'PY'
+          import os,pathlib,json,hashlib
+          dir=pathlib.Path("g66-evidence")
+          raw=(dir/"vendor-output.private").read_text(encoding="utf-8",errors="replace")
+          stderr=(dir/"vendor-errors.private").read_text(encoding="utf-8",errors="replace")
+          code=int((dir/"exit.private").read_text())
+          try:
+              report=json.loads(raw.strip())
+          except (ValueError,TypeError):
+              report={}
+          skill=pathlib.Path("skill/creator-candidate/flowpilot-nas/SKILL.md").read_bytes()
+          sha=hashlib.sha256(skill).hexdigest()
+          assert sha==pathlib.Path("/tmp/g66-skill-hash").read_text()
+          summary=report.get("summary") or {}
+          output={
+              "candidate":"flowpilot-nas",
+              "source_sha256":sha,
+              "kit_sha256":"cf557e5a022e4297892f39768132855154232efdedeb726b2845450ccd70e1b3",
+              "checker":"official UGREEN check-skill.mjs",
+              "isolated_checker_invoked":True,
+              "checker_exit_code":code,
+              "checker_status":report.get("status"),
+              "checker_summary":{k:summary.get(k) for k in ("errors","warnings","info")},
+              "diagnostics_count":len(report.get("diagnostics",[])),
+              "stderr_present":bool(stderr.strip()),
+              "real_nas_or_expert_called":False,
+              "creator_invoked_on_ci":False,
+              "owner_release_approved":False,
+              "devpost_submitted":False,
+              "release_gate":"HOLD"
+          }
+          (dir/"G66_CHECKER_RESULT.json").write_text(json.dumps(output,indent=2)+"\n")
+          for p in ("vendor-output.private","vendor-errors.private","exit.private"):
+              (dir/p).unlink()
+          print(json.dumps(output))
+          assert code==0
+          assert report.get("status")=="static-pass"
+          assert output["checker_summary"]=={"errors":0,"warnings":0,"info":0}
+          assert output["diagnostics_count"]==0 and not output["stderr_present"]
+          print("G66 exact-source official checker: static-pass; NOT REAL NAS")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: G66-REVIEWED-CANDIDATE-OFFICIAL-STATIC-RESULT
+          path: g66-evidence/G66_CHECKER_RESULT.json
+          retention-days: 7
+      - name: Never retain the vendor kit
+        if: always()
+        shell: bash
+        run: |
+          rm -rf "$RUNNER_TEMP/g66-kit"
+          echo "Vendor code removed; unbundled"
