@@ -101,6 +101,16 @@ class GuidedSessionTests(unittest.TestCase):
         self.assertEqual(completed.returncode, 2)
         self.assertIn("GOAL_REFUSED", completed.stdout)
 
+    def test_version_candidates_without_version_goal_refused_before_access(self):
+        from flowpilot_goal_preview import process_goal
+        with patch("flowpilot_owner_local_audit._valid_root",
+                   side_effect=AssertionError("unexpected access")):
+            with self.assertRaises(WorkflowRefused):
+                process_goal("파일 확인", root=self.root,
+                    required=["README.md"],
+                    candidates={"README.md": ["README_v2.md"]},
+                    metadata_consent=True)
+
     def test_duplicate_version_candidates_refused_before_access(self):
         from flowpilot_goal_preview import process_goal
         with patch("flowpilot_owner_local_audit._valid_root",
