@@ -101,6 +101,19 @@ class GuidedSessionTests(unittest.TestCase):
         self.assertEqual(completed.returncode, 2)
         self.assertIn("GOAL_REFUSED", completed.stdout)
 
+    def test_partial_version_mapping_requests_missing_inputs_without_access(self):
+        from flowpilot_goal_preview import process_goal
+        with patch("flowpilot_owner_local_audit._valid_root",
+                   side_effect=AssertionError("unexpected access")):
+            result = process_goal("버전 비교", root=self.root,
+                required=["README.md", "final.pdf"],
+                candidates={"README.md": ["README_v2.md"]},
+                metadata_consent=True)
+        self.assertEqual(result["status"], "WAITING_USER")
+        self.assertIn("version_candidate_mapping", result["missing_inputs"])
+        self.assertEqual(result["executed_steps"], 0)
+        self.assertFalse(result["owner_folder_metadata_accessed"])
+
     def test_duplicate_version_candidates_refused_before_access(self):
         from flowpilot_goal_preview import process_goal
         with patch("flowpilot_owner_local_audit._valid_root",
