@@ -116,8 +116,12 @@ def report(
     for variants in versions.values():
         for path in variants:
             safe_path(path)
-    complete = all((batch.permission_confirmed, batch.registered_adapter_confirmed,
-                    batch.scan_complete, batch.pagination_complete, not batch.failed))
+    # Dataclass annotations do not enforce booleans at runtime: a nonempty
+    # string such as "false" must never authorize an evidence report.
+    complete = all((batch.permission_confirmed is True,
+                    batch.registered_adapter_confirmed is True,
+                    batch.scan_complete is True, batch.pagination_complete is True,
+                    batch.failed is False))
     limitations = ["OFFLINE_EVIDENCE_ASSEMBLY_ONLY; live NAS and Agent provenance NOT_VERIFIED"]
     if not complete:
         limitations.append("No complete verified and authorized file enumeration")

@@ -85,4 +85,59 @@ class FlowPilotPipeline(unittest.TestCase):
         self.assertEqual(x.status,'NEEDS_REVIEW')
         self.assertNotIn('document',[s.id for s in x.plan.steps])
 
+
+    def test_untrusted_duplicate_selected_document_does_not_plan_content(self):
+        batch = fixture(seen('README.md', 'synthetic://good'),
+                        Observed('README.md', 'synthetic://symlink', is_symlink=True, contained=None),
+                        seen('release/output.pdf', 'synthetic://pdf'))
+        x = evaluate_offline(**{**BASE, 'request': 'summarize document'},
+                             batch=batch, document_approved=True,
+                             returned_document_refs=('synthetic://good',))
+        self.assertEqual(x.status, 'NEEDS_REVIEW')
+        self.assertEqual(x.report.items[0].state, ItemState.NOT_CHECKED)
+        self.assertNotIn('document', [s.id for s in x.plan.steps])
+        self.assertIn('DOCUMENT_STAGE_BLOCKED_UNVERIFIED_SELECTED_REFERENCE', x.limitations)
+
+    def test_competing_version_selected_document_does_not_plan_content(self):
+        batch = fixture(seen('README.md', 'synthetic://good'),
+                        seen('README_v2.md', 'synthetic://other'),
+                        seen('release/output.pdf', 'synthetic://pdf'))
+        x = evaluate_offline(**{**BASE, 'request': 'summarize document'},
+                             batch=batch, document_approved=True,
+                             returned_document_refs=('synthetic://good',),
+                             version_candidates={'README.md': ('README_v2.md',)})
+        self.assertEqual(x.report.items[0].state, ItemState.VERSION_REVIEW)
+        self.assertNotIn('document', [s.id for s in x.plan.steps])
+        self.assertIn('DOCUMENT_STAGE_BLOCKED_UNVERIFIED_SELECTED_REFERENCE', x.limitations)
+
+    def test_reused_reference_for_two_required_paths_does_not_plan_content(self):
+        batch = fixture(seen('README.md', 'synthetic://shared'),
+                        seen('release/output.pdf', 'synthetic://shared'))
+        x = evaluate_offline(**{**BASE, 'request': 'summarize document'},
+                             batch=batch, document_approved=True,
+                             returned_document_refs=('synthetic://shared',))
+        self.assertNotIn('document', [s.id for s in x.plan.steps])
+        self.assertIn('DOCUMENT_STAGE_BLOCKED_UNVERIFIED_SELECTED_REFERENCE', x.limitations)
+
+    def test_root_mismatch_removes_document_plan(self):
+        batch = fixture(seen('README.md', 'synthetic://good'),
+                        root='/volume1/projects/different')
+        x = evaluate_offline(**{**BASE, 'request': 'summarize document'},
+                             batch=batch, document_approved=True,
+                             returned_document_refs=('synthetic://good',))
+        self.assertEqual(x.status, 'BLOCKED')
+        self.assertIn('ROOT_MISMATCH', x.limitations)
+        self.assertNotIn('document', [s.id for s in x.plan.steps])
+
+    def test_string_permission_cannot_enable_document_inventory(self):
+        batch = ObservationBatch(ROOT_DIR, (seen('README.md', 'synthetic://good'),),
+                                 permission_confirmed='true', registered_adapter_confirmed=True,
+                                 scan_complete=True, pagination_complete=True)
+        x = evaluate_offline(**{**BASE, 'request': 'summarize document'},
+                             batch=batch, document_approved=True,
+                             returned_document_refs=('synthetic://good',))
+        self.assertEqual(x.status, 'NEEDS_REVIEW')
+        self.assertIn('DOCUMENT_STAGE_BLOCKED_UNVERIFIED_INVENTORY', x.limitations)
+        self.assertNotIn('document', [s.id for s in x.plan.steps])
+
 if __name__=='__main__':unittest.main()

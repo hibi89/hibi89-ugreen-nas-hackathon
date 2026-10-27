@@ -105,5 +105,15 @@ class EvidenceTests(unittest.TestCase):
         batch = good(Observed("a.pdf", "ref-unknown", is_symlink=None, contained=True))
         self.assertEqual(report(["a.pdf"], batch).items[0].state, ItemState.NOT_CHECKED)
 
+
+    def test_truthy_string_permission_cannot_prove_complete(self):
+        batch = ObservationBatch("approved-root-opaque", (obs("a.pdf"),),
+                                 permission_confirmed="true",
+                                 registered_adapter_confirmed=True,
+                                 scan_complete=True, pagination_complete=True)
+        result = report(["a.pdf"], batch)
+        self.assertEqual(result.items[0].state, ItemState.NOT_CHECKED)
+        self.assertFalse(result.scope_complete)
+
 if __name__ == "__main__":
     unittest.main()
