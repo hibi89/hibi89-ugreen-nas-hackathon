@@ -14,6 +14,8 @@ on:
       - "tools/flowpilot_package_audit.py"
       - "tests/test_flowpilot_package_audit.py"
       - "tests/test_flowpilot_round1_status.py"
+      - "tests/test_g72_round1_current_source_gate.py"
+      - "tests/test_g75_pdf_text_coverage.py"
       - ".github/workflows/g45-flowpilot-round1-preview.yml"
   workflow_dispatch:
 permissions:
@@ -54,6 +56,8 @@ jobs:
           d=p/"FlowPilot_Round1_OWNER_REVIEW.pdf"
           source=pathlib.Path("skill/flowpilot-nas/SKILL.md").read_bytes()
           assert e["source_sha256"]==hashlib.sha256(source).hexdigest()
+          qa_source=pathlib.Path("docs/submission/flowpilot_round1_qas_20261027.json").read_bytes()
+          assert e["qa_source_sha256"]==hashlib.sha256(qa_source).hexdigest()
           assert e["zip_sha256"]==hashlib.sha256(z.read_bytes()).hexdigest()
           assert e["pdf_sha256"]==hashlib.sha256(d.read_bytes()).hexdigest()
           assert e["substantive_words"]<=500 and e["answers"]==10
