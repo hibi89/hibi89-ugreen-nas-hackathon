@@ -11,6 +11,9 @@ on:
       - "tools/flowpilot_offline_demo.py"
       - "tools/flowpilot_mvp_cli.py"
       - "tools/flowpilot_local_file_mvp.py"
+      - "tools/flowpilot_agent_result_intake.py"
+      - "tests/test_flowpilot_agent_result_intake.py"
+      - "docs/operations/fixtures/G61_SYNTHETIC_NORMALIZED_FILE_AGENT.json"
       - "tests/test_flowpilot_local_file_mvp.py"
       - "tests/test_flowpilot_mvp_cli.py"
       - "src/flowpilot/pipeline.py"
@@ -114,6 +117,21 @@ jobs:
               assert row["registered_uliya_expert_invoked"] is False
               assert row["release_gate"]=="HOLD"
           print("G60 local actual-file metadata 5/5 PASS, real NAS NOT RUN")
+          PY
+      - name: G61 normalized file-agent response intake (untrusted operator receipt, NOT NAS)
+        run: |
+          python -m unittest discover -s tests -p test_flowpilot_agent_result_intake.py -v
+          python tools/flowpilot_agent_result_intake.py --input docs/operations/fixtures/G61_SYNTHETIC_NORMALIZED_FILE_AGENT.json > "$RUNNER_TEMP/g61_claims_only.json"
+          python - <<'PY'
+          import json,os,pathlib
+          r=json.loads((pathlib.Path(os.environ["RUNNER_TEMP"])/"g61_claims_only.json").read_text())
+          assert r["status"]=="NEEDS_REVIEW"
+          assert [x["state"] for x in r["item_results"]]==["PRESENT","PRESENT"]
+          assert r["operator_claims_independently_verified"] is False
+          assert r["official_registered_agent_invocation_verified"] is False
+          assert r["real_nas_verified"] is False
+          assert r["release_gate"]=="HOLD"
+          print("G61 normalized receipt intake OK; external provenance NOT VERIFIED")
           PY
       - name: Recheck all existing offline contracts
         run: python -m unittest discover -s tests -p 'test_*.py' -v

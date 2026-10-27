@@ -1524,5 +1524,20 @@
     "trial_window": "2026-11-03_TO_05_CONDITIONAL",
     "demo_account": "UNVERIFIED",
     "owner_activation": "NOT_APPROVED_YET"
+  },
+  "g61": {
+    "date_kst": "2026-10-28",
+    "base_sha": "b20cff20f5a4cba39960c83377d55f6a68ba5308",
+    "work": "NORMALIZED_FILE_AGENT_OBSERVATION_INTAKE",
+    "tests_added": 17,
+    "source_kind": "LOCAL_USER_TRANSCRIBED_UNVERIFIED_ONLY",
+    "cli": "python tools/flowpilot_agent_result_intake.py --input <normalized-json>",
+    "ci": "PENDING",
+    "actual_agent": "NOT_INVOKED",
+    "nas": "NOT_RUN",
+    "creator": "NOT_EVIDENCED",
+    "trial": "2026-11-03_TO_05_CONDITIONAL",
+    "devpost": "NOT_SUBMITTED",
+    "owner_approval": "HOLD"
   }
 }

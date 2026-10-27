@@ -1,0 +1,36 @@
+{
+  "schema": "flowpilot-agent-observation-v1",
+  "origin": "SYNTHETIC_TEST",
+  "goal": "check required files",
+  "authorized_root": "/volume1/projects/synthetic-flowpilot",
+  "required_paths": [
+    "README.md",
+    "release/output.pdf"
+  ],
+  "metadata_approved": true,
+  "unknown_processing_accepted": true,
+  "file_agent_report": {
+    "agent": "file-agent",
+    "operation": "ug-filesystem find",
+    "authorized_root": "/volume1/projects/synthetic-flowpilot",
+    "permission_confirmed": true,
+    "registered_adapter_confirmed": true,
+    "scan_complete": true,
+    "pagination_complete": true,
+    "failed": false,
+    "observations": [
+      {
+        "relative_path": "README.md",
+        "reference": "synthetic://README-1",
+        "contained": true,
+        "is_symlink": false
+      },
+      {
+        "relative_path": "release/output.pdf",
+        "reference": "synthetic://output-1",
+        "contained": true,
+        "is_symlink": false
+      }
+    ]
+  }
+}
