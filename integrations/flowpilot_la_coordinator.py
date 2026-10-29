@@ -26,6 +26,8 @@ def compose_previews(
     owner_request: Mapping[str, Any],
     flowpilot_preview: Callable[..., dict[str, Any]],
     la_api: object | None,
+    sovia_assess: object | None = None,
+    sovia_policy: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Return a bounded decision summary with zero filesystem operations.
 
@@ -74,5 +76,8 @@ def compose_previews(
         return result
     # LA's preflight is metadata-only and must reject unsupported versions;
     # local write execution is deliberately not invoked.
-    result["la"] = preflight_la(owner_request, la_plan, la_api)
+    result["la"] = preflight_la(
+        owner_request, la_plan, la_api,
+        sovia_assess=sovia_assess, sovia_policy=sovia_policy,
+    )
     return result
