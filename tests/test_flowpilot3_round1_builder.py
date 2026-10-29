@@ -1,6 +1,7 @@
 """Focused offline tests for Round 1 owner-review builder; no NAS or Devpost."""
 from __future__ import annotations
 import copy
+import importlib.util
 import json
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -23,6 +24,7 @@ class Round1BuilderTests(unittest.TestCase):
         self.assertEqual([x['question'] for x in self.qa['questions']], PROMPTS)
         self.assertEqual(validate(self.skill, self.qa), 360)
 
+    @unittest.skipUnless(importlib.util.find_spec('reportlab') and importlib.util.find_spec('pypdf'), 'PDF build dependencies not installed in general regression job')
     def test_pdf_zip_evidence_and_scope(self):
         with TemporaryDirectory() as d:
             result = build(ROOT / 'skill/flowpilot-nas/SKILL.md',
