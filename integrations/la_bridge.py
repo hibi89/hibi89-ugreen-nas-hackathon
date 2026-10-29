@@ -77,3 +77,40 @@ def read_la_audit(request: Mapping[str, Any], run_id: str, la_api: object | None
         "allowed": True, "state": "METADATA_ONLY",
         "audit": {"run_id": run_id, "event_count": len(events), "approval_count": len(approvals)},
     }
+
+
+def inspect_la_capabilities(
+    request: Mapping[str, Any], la_api: object | None
+) -> dict[str, Any]:
+    """Fail closed when a local LA engine is mistaken for a NAS Expert.
+
+    An approved local synthetic plan preview does not imply that LA can
+    access UGREEN NAS files or that a Uliya Expert is registered.
+    """
+    blocked = _block_if_unapproved(request)
+    if blocked is not None:
+        return blocked
+    method = getattr(la_api, "capabilities", None)
+    if not callable(method):
+        raise LABridgeUnavailable("LA capabilities unavailable")
+    result = method()
+    if not isinstance(result, dict):
+        raise LABridgeUnavailable("invalid LA capabilities")
+    if result.get("api_version") != "azent.api.v0":
+        raise LABridgeUnavailable("unsupported LA interface version")
+    if result.get("scope") != "synthetic-local-only":
+        raise LABridgeUnavailable("unsupported LA execution scope")
+    if result.get("external_connectors") != []:
+        raise LABridgeUnavailable("external connector state requires separate review")
+    operations = result.get("implemented_operations")
+    if not isinstance(operations, list) or not all(isinstance(op, str) for op in operations):
+        raise LABridgeUnavailable("unverifiable LA operations")
+    return {
+        "allowed": True,
+        "state": "LOCAL_PLAN_ONLY",
+        "api_version": "azent.api.v0",
+        "can_preflight_local_plan": True,
+        "can_read_nas": False,
+        "can_delegate_uliya_experts": False,
+        "nas_state": "NOT_CHECKED",
+    }
