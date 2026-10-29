@@ -189,6 +189,20 @@ class Stage3DocumentResultTests(unittest.TestCase):
         with self.assertRaises(IntakeRefused):
             assess(receipt=claim)
 
+    def test_unhashable_status_or_operation_is_cleanly_rejected(self):
+        for field, value in (("operation", ["ug-document qa"]),
+                             ("results", [{"reference": REF, "state": {"bad": True}, "answer": None}])):
+            claim = document_claim()
+            claim[field] = value
+            with self.subTest(field=field), self.assertRaises(IntakeRefused):
+                assess(receipt=claim)
+
+    def test_oversized_payload_is_refused(self):
+        claim = document_claim()
+        claim["results"][0]["answer"] = "X" * 65537
+        with self.assertRaises(IntakeRefused):
+            assess(receipt=claim)
+
     def test_operator_receipt_cannot_make_synthetic_execution_claim(self):
         first = stage1()
         first["origin"] = "OPERATOR_TRANSCRIBED_UNVERIFIED"
