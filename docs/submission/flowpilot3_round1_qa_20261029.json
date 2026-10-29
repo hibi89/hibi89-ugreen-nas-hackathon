@@ -1,0 +1,49 @@
+{
+  "status": "OWNER_REVIEW_NOT_SUBMITTED",
+  "date_kst": "2026-10-29",
+  "project": "NAS FlowPilot 3.0",
+  "source_skill_sha256": "47d119123387ec46133a62fdec58ef42ca3852491b132d32798951a6430c233b",
+  "questions": [
+    {
+      "question": "One sentence: What does the Skill do?",
+      "answer": "NAS FlowPilot converts a natural-language project handoff request into a previewed, consent-gated, read-only NAS file evidence workflow and an uncertainty-aware report."
+    },
+    {
+      "question": "Who is the target user and problem?",
+      "answer": "Solo creators and small teams struggle to verify required deliverables and conflicting file versions across NAS folders. Manual checks are repetitive; partial scans can falsely suggest completion."
+    },
+    {
+      "question": "What is your proposed solution?",
+      "answer": "A Uliya Markdown Skill selects one of four bounded review intents, clarifies the exact folder and checklist, and conditionally delegates supported read-only tasks to registered file and document experts."
+    },
+    {
+      "question": "What is the Core User Flow?",
+      "answer": "The owner describes a handoff review. FlowPilot asks for missing scope and exact files, discloses unknown data-processing location, previews its plan and requests approval. It then uses eligible NAS experts and reports referenced PRESENT, MISSING, VERSION_REVIEW or NOT_CHECKED findings; document content needs separate consent."
+    },
+    {
+      "question": "What substantive difference does your idea offer compared with existing tools or conventional AI solutions?",
+      "answer": "Instead of a generic chatbot's untraceable answer, FlowPilot uses adaptive intent selection, explicit owner scope, provenance-bound findings and fail-closed uncertainty handling. It is a narrow NAS-native step toward a broader natural-language workflow vision."
+    },
+    {
+      "question": "Which UGREEN AI NAS capabilities will be used, and at which step in the workflow?",
+      "answer": "After approval, the proposed registered file-agent may use catalog-listed ug-filesystem ls/find/stat for scoped metadata. An optional document-agent may use ug-document metadata/qa/extract/reconcile only for separately approved exact references. Runtime registration and permissions remain unverified."
+    },
+    {
+      "question": "What was your technical approach? Describe the planned Skill workflow, supported NAS CLI capabilities, expert agent orchestration, required inputs, permissions, AI model choices, and data handling, as applicable;",
+      "answer": "SKILL.md defines bounded conversational slots, delegated expert requests, read-only permissions, rejection paths and evidence states. Separate offline Python prototypes demonstrate local CSV aggregation, explicit approval and SQLite traces, but are excluded from the Skill ZIP and are not Uliya, Lightning Azent or NAS integration evidence."
+    },
+    {
+      "question": "What is the current development status? Identify what was implemented already, not yet implemented, or is pending NAS validation if selected to be a Finalist.",
+      "answer": "The new read-only FlowPilot Skill and offline local prototypes exist. The pinned Skill passed the first-party static checker with zero findings; this does not prove installation. Official Skill Creation Tool provenance, registered expert calls, real NAS tests, workflow-engine integration and final release approval remain pending."
+    },
+    {
+      "question": "What is your final validation plan? Name two core test cases and one edge case to validate if selected as a Finalist.",
+      "answer": "Core one: a complete authorized delivery folder returns referenced evidence. Core two: ambiguous competing final versions return VERSION_REVIEW without automatic selection. Edge: denied, incomplete or restricted listings return NOT_CHECKED without scope expansion or private content disclosure."
+    },
+    {
+      "question": "Are there any known limitations of your Project? Describe current known limitations, technical risks, and any external dependencies.",
+      "answer": "Uliya expert availability, effective permissions, result completeness and processing location are unknown. The submitted Skill is read-only; broader CSV automation, custom LA execution, SOVIA integration and the local dashboard are not claimed as NAS capabilities. Final submission requires entrant approval."
+    }
+  ],
+  "disclosure": "OpenAI ChatGPT (GPT-6) assisted Skill design, proposal editing, integration-code generation and tests; OpenAI Codex assisted earlier related ProjectReady work. The submitted candidate is entrant-authored Markdown, not previously submitted ProjectReady material. Separate Python local prototypes and the Command Center are NOT included in the ZIP, and no n8n, Lightning Azent, SOVIA, UGREEN toolkit code, third-party runtime, binaries or vendor assets are redistributed. The proposed MIT license applies only to entrant-owned work, not sponsor resources. Official Uliya Skill Creation Tool invocation for this FlowPilot candidate is NOT_RUN, exact NAS expert registration and data-processing location are UNKNOWN, and rights/release/Devpost submission remain pending."
+}
