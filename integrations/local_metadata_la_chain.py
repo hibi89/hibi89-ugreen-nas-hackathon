@@ -61,7 +61,7 @@ def _base(status: str) -> dict[str, Any]:
     }
 
 
-def _checked_observations(observed: dict, expected_items: int) -> tuple[list[dict], dict]:
+def _checked_observations(observed: dict, expected_items: int) -> tuple[list[dict], dict, list[list[str]]]:
     """Verify complete redacted metadata receipts before any LA plan is built."""
     if (type(observed) is not dict
             or observed.get("status") not in ("NEEDS_REVIEW", "BLOCKED")
@@ -79,6 +79,7 @@ def _checked_observations(observed: dict, expected_items: int) -> tuple[list[dic
             or type(steps) is not list or len(steps) != completed):
         raise LocalObservationRefused("INCOMPLETE_LOCAL_STEP_RECEIPTS")
     values: list[dict] = []
+    ordered_states: list[list[str]] = []
     totals: Counter[str] = Counter()
     for index, step in enumerate(steps, 1):
         if (type(step) is not dict or step.get("index") != index
@@ -89,6 +90,7 @@ def _checked_observations(observed: dict, expected_items: int) -> tuple[list[dic
         if type(items) is not list or len(items) != expected_items:
             raise LocalObservationRefused("INVALID_LOCAL_ITEM_COUNT")
         counts: Counter[str] = Counter()
+        step_states: list[str] = []
         for item_index, item in enumerate(items, 1):
             if (type(item) is not dict
                     or set(item) != {"index", "state", "local_reference_count"}
@@ -102,8 +104,10 @@ def _checked_observations(observed: dict, expected_items: int) -> tuple[list[dic
                 raise LocalObservationRefused("INCONSISTENT_LOCAL_REFERENCE")
             counts[item["state"]] += 1
             totals[item["state"]] += 1
+            step_states.append(item["state"])
+        ordered_states.append(step_states)
         values.append({state: counts[state] for state in STATES})
-    return values, {state: totals[state] for state in STATES}
+    return values, {state: totals[state] for state in STATES}, ordered_states
 
 
 def _read_rows(business: Path) -> list[tuple[str, str]]:
@@ -192,7 +196,7 @@ def run_local_observation_chain(
         )
     except (ValueError, TypeError, OSError) as exc:
         raise LocalObservationRefused("CONSENTED_LOCAL_INSPECTION_REFUSED") from exc
-    per_intent, total = _checked_observations(inspected, len(required))
+    per_intent, total, ordered_states = _checked_observations(inspected, len(required))
     output["local_inspection_performed"] = True
     output["local_state_counts"] = total
     if (inspected["status"] != "NEEDS_REVIEW"
@@ -219,7 +223,8 @@ def run_local_observation_chain(
     scope_hash = canonical_hash({
         "schema": "ugreen-local-lstat-plan-approval.v1",
         "goal": goal, "root": str(path), "required": required,
-        "candidates": candidates or {}, "plan": plan,
+        "candidates": candidates or {}, "ordered_states": ordered_states,
+        "plan": plan,
     })
     request = {
         "intent": intents[0],
