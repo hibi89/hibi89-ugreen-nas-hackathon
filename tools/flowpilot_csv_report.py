@@ -25,7 +25,7 @@ class ReportRefused(ValueError):
 
 
 def _inside(root: Path, relative: str, *, existing: bool) -> Path:
-    if not isinstance(relative, str) or not relative or "\\x00" in relative:
+    if not isinstance(relative, str) or not relative or "\x00" in relative:
         raise ReportRefused("Invalid relative path")
     p = Path(relative)
     if p.is_absolute() or any(part in ("..", ".") for part in p.parts):
@@ -76,8 +76,16 @@ def execute(root: Path, plan: dict, *, approval: str, audit_db: Path) -> dict:
         raise ReportRefused("Plan changed since preview")
     root = root.resolve(strict=True)
     output = _inside(root, plan["output"], existing=False)
-    if audit_db.resolve() == output.resolve():
-        raise ReportRefused("Audit database conflicts with output")
+    audit_db = Path(audit_db)
+    if audit_db.is_symlink() or audit_db.suffix.lower() not in (".db", ".sqlite", ".sqlite3"):
+        raise ReportRefused("Unsafe audit database path")
+    if audit_db.resolve() == output.resolve() or any(
+        audit_db.resolve() == _inside(root, name, existing=True).resolve()
+        for name in plan["sources"]
+    ):
+        raise ReportRefused("Audit database conflicts with source or output")
+    if audit_db.exists() and not audit_db.is_file():
+        raise ReportRefused("Invalid audit database")
     totals: dict[str, Decimal] = {}
     rows = 0
     for name in plan["sources"]:
