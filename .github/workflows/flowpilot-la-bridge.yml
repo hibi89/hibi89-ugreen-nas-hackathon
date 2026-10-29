@@ -13,7 +13,9 @@ on:
       - "tests/test_ecosystem_contract.py"
       - "tests/test_approval_scope.py"
       - "tests/test_verify_la_runtime_bridge.py"
-      - "tools/verify_la_runtime_bridge.py"
+      - "tests/test_flowpilot_ecosystem_showcase.py"
+      - "tools/flowpilot_ecosystem_showcase.py"
+      - "tools/verify_la_runtime_bridge.py tools/flowpilot_ecosystem_showcase.py"
       - ".github/workflows/flowpilot-la-bridge.yml"
   workflow_dispatch:
 
@@ -49,6 +51,8 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_sovia_bridge.py' -v
       - name: Verify one-pass FlowPilot, LA, and SOVIA integration contract
         run: python -m unittest discover -s tests -p 'test_flowpilot_la_sovia_pipeline.py' -v
+      - name: Test four bounded synthetic showcase states
+        run: python -m unittest discover -s tests -p 'test_flowpilot_ecosystem_showcase.py' -v
       - name: Checkout pinned public SOVIA source for synthetic cross-repo contract test
         uses: actions/checkout@v4
         with:
@@ -116,6 +120,25 @@ jobs:
           assert three["nas_state"] == "NOT_CHECKED"
           print("PASS: actual UGREEN goal planner -> injected LA -> real SOVIA source")
           print("PASS: actual SOVIA source reviewed synthetic LA-shaped metadata; LA/NAS NOT_RUN")
+          PY
+      - name: Run synthetic reviewer demo with actual pinned SOVIA assessor
+        run: |
+          python tools/flowpilot_ecosystem_showcase.py --sovia-root sovia-public --scenario write_review > /tmp/ugreen-write.json
+          python tools/flowpilot_ecosystem_showcase.py --sovia-root sovia-public --scenario read_only > /tmp/ugreen-read.json
+          python tools/flowpilot_ecosystem_showcase.py --sovia-root sovia-public --scenario missing_input > /tmp/ugreen-missing.json
+          python tools/flowpilot_ecosystem_showcase.py --sovia-root sovia-public --scenario declined > /tmp/ugreen-declined.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          results = {name: json.loads(Path('/tmp/ugreen-'+name+'.json').read_text()) for name in ('write','read','missing','declined')}
+          assert results['write']['advisory_finding_count'] == 1
+          assert results['write']['sovia'] == 'ADVISORY_ONLY'
+          assert results['read']['advisory_finding_count'] == 0
+          assert results['missing']['flowpilot'] == 'WAITING_USER'
+          assert results['missing']['la'] == 'NOT_CHECKED'
+          assert results['declined']['la'] == 'NOT_CHECKED'
+          assert all(row['release_gate'] == 'HOLD' and row['actual_nas_verified'] is False and row['la_workflow_executed'] is False for row in results.values())
+          print('SHOWCASE 4/4 PASS: real FlowPilot planner + simulated LA preflight + pinned SOVIA assessor; NAS NOT_TESTED')
           PY
       - name: Syntax-check adapter and opt-in LA runtime verifier
         run: python -m py_compile integrations/ecosystem_contract.py integrations/approval_scope.py integrations/la_bridge.py integrations/flowpilot_la_coordinator.py integrations/sovia_bridge.py tools/verify_la_runtime_bridge.py
