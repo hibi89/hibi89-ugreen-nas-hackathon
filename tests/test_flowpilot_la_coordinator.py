@@ -15,7 +15,7 @@ from flowpilot_goal_preview import process_goal, WorkflowRefused
 
 REQUEST = {
     "intent": "CHECK_REQUIRED",
-    "folder": "/synthetic-only",
+    "folder": "/synthetic-preview",
     "required_paths": ["README.md"],
     "owner_approved_metadata": True,
     "runtime_permissions_verified": True,
