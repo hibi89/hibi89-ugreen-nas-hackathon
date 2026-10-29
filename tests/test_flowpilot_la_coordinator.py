@@ -9,6 +9,7 @@ from unittest.mock import patch
 
 from integrations.flowpilot_la_coordinator import compose_previews, FlowPilotPreviewError
 from integrations.la_bridge import LABridgeUnavailable
+from integrations.approval_scope import ApprovalScopeMismatch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 from flowpilot_goal_preview import process_goal, WorkflowRefused
@@ -104,6 +105,21 @@ class FlowPilotLABridgeIntegrationTests(unittest.TestCase):
             }
         with self.assertRaises(FlowPilotPreviewError):
             combine(preview=bad_provider)
+
+    def test_other_folder_approval_never_reaches_la(self):
+        with self.assertRaises(ApprovalScopeMismatch):
+            combine(root=Path("/not-the-approved-folder"))
+        self.assertEqual(FakeLA.invoked, 0)
+
+    def test_other_file_approval_never_reaches_la(self):
+        with self.assertRaises(ApprovalScopeMismatch):
+            combine(required=["unexpected.md"])
+        self.assertEqual(FakeLA.invoked, 0)
+
+    def test_multi_action_requires_exact_authorized_intents(self):
+        with self.assertRaises(ApprovalScopeMismatch):
+            combine(goal="파일 누락 확인하고 인계 확인")
+        self.assertEqual(FakeLA.invoked, 0)
 
     def test_private_file_names_never_echoed(self):
         row = combine()
