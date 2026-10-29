@@ -4,6 +4,8 @@ This is NOT an integration with SOVIA or DBVORA, nor a Uliya/NAS runtime.
 """
 from __future__ import annotations
 
+from contextlib import closing
+
 import json
 import sqlite3
 from pathlib import Path
@@ -21,7 +23,7 @@ def recent_runs(db_path: Path, *, limit: int = 20) -> dict:
         raise AuditReadRefused("Audit database not found")
     try:
         # URI read-only mode prevents implicit creation and all writes.
-        with sqlite3.connect(db_path.resolve().as_uri() + "?mode=ro", uri=True) as db:
+        with closing(sqlite3.connect(db_path.resolve().as_uri() + "?mode=ro", uri=True)) as db:
             db.execute("PRAGMA query_only=ON")
             db.execute("PRAGMA busy_timeout=1000")
             rows = db.execute(
