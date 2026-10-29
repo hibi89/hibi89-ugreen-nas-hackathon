@@ -57,9 +57,9 @@ class DemoController:
         if not isinstance(goal, str) or len(goal) > 200:
             raise ValueError("Invalid goal")
         if (not isinstance(sources, list) or not 1 <= len(sources) <= 2
-                or len(sources) != len(set(sources))
                 or any(type(name) is not str or name not in ("jan.csv", "feb.csv")
-                       for name in sources)):
+                       for name in sources)
+                or len(sources) != len(set(sources))):
             raise ValueError("Only explicit synthetic example files are supported")
         if type(output) is not str or output not in ("summary.csv", "monthly-summary.csv"):
             raise ValueError("Only bounded output paths are supported")
@@ -182,6 +182,7 @@ try{const r=await fetch('/api/configure',{method:'POST',headers:{'X-Flowpilot-To
 const data=await r.json();if(!r.ok)throw Error(data.error||'Configuration refused');show(data);
 }catch(e){el('approve').disabled=true;el('reject').disabled=true;el('status').textContent=e.message;}}
 el('preview').addEventListener('click',previewSelection);
+for(const id of ['goal','jan','feb','output'])el(id).addEventListener('input',()=>{el('approve').disabled=true;el('reject').disabled=true;el('status').textContent='Inputs changed — preview again before approval';});
 for(const a of ['approve','reject'])el(a).addEventListener('click',()=>action(a));update().catch(e=>el('status').textContent=e.message);
 </script></main></body></html>'''
 
