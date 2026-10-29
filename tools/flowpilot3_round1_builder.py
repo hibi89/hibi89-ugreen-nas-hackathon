@@ -16,12 +16,6 @@ import re
 from xml.sax.saxutils import escape
 from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 
-from reportlab.lib import colors
-from reportlab.lib.pagesizes import A4
-from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
-from reportlab.lib.units import mm
-from reportlab.platypus import KeepTogether, Paragraph, SimpleDocTemplate, Spacer
-from pypdf import PdfReader
 
 PIN = '47d119123387ec46133a62fdec58ef42ca3852491b132d32798951a6430c233b'
 MEMBER = 'flowpilot-nas/SKILL.md'
@@ -69,6 +63,7 @@ def validate(skill: bytes, qa: dict) -> int:
 
 
 def verify_pdf(pdf: Path, qa: dict) -> int:
+    from pypdf import PdfReader
     reader = PdfReader(pdf)
     pages = len(reader.pages)
     if not 1 <= pages <= 2:
@@ -114,6 +109,11 @@ def build(skill_path: Path, qa_path: Path, out: Path) -> dict:
         if infos[0].file_size > 1_000_000 or infos[0].file_size > 10_000_000:
             raise ValueError('ZIP oversized')
 
+    from reportlab.lib import colors
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+    from reportlab.lib.units import mm
+    from reportlab.platypus import KeepTogether, Paragraph, SimpleDocTemplate, Spacer
     styles = getSampleStyleSheet()
     title = ParagraphStyle('Title3', parent=styles['Normal'], fontName='Helvetica-Bold',
                            fontSize=15, leading=19, textColor=colors.HexColor('#193a5b'), spaceAfter=8)
