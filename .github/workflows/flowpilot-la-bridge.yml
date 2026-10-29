@@ -8,6 +8,7 @@ on:
       - "integrations/**"
       - "tests/test_la_bridge.py"
       - "tests/test_sovia_bridge.py"
+      - "tests/test_flowpilot_la_sovia_pipeline.py"
       - "tests/test_flowpilot_la_coordinator.py"
       - "tests/test_ecosystem_contract.py"
       - "tools/verify_la_runtime_bridge.py"
@@ -35,6 +36,8 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_flowpilot_la_coordinator.py' -v
       - name: Verify UGREEN SOVIA adapter contract
         run: python -m unittest discover -s tests -p 'test_sovia_bridge.py' -v
+      - name: Verify one-pass FlowPilot, LA, and SOVIA integration contract
+        run: python -m unittest discover -s tests -p 'test_flowpilot_la_sovia_pipeline.py' -v
       - name: Checkout pinned public SOVIA source for synthetic cross-repo contract test
         uses: actions/checkout@v4
         with:
@@ -75,6 +78,32 @@ jobs:
           assert bridged["execution_authorized"] is False
           assert bridged["nas_state"] == "NOT_CHECKED"
           print("PASS: UGREEN sanitized adapter -> real SOVIA assessor with synthetic metadata")
+          import sys
+          from pathlib import Path
+          sys.path.insert(0, str(Path("tools").resolve()))
+          from flowpilot_goal_preview import process_goal
+          from integrations.flowpilot_la_coordinator import compose_previews
+          class LocalLA:
+              @staticmethod
+              def preflight(plan):
+                  return {"source_version": "azent.ir.v0", "trigger_type": "manual",
+                          "step_count": 1, "requires_write_approval": True,
+                          "requires_input_root": False,
+                          "executes_workflow": False, "scope": "synthetic-local-only",
+                          "steps": [{"id": "synthetic_local_step", "op": "sqlite_put"}]}
+          three = compose_previews(
+              "필수 파일 확인", root=Path("/synthetic-preview"), required=["README.md"],
+              candidates=None, la_plan={"version": "azent.ir.v0", "steps": []},
+              owner_request=request, flowpilot_preview=process_goal, la_api=LocalLA,
+              sovia_assess=assess, sovia_policy=policy,
+          )
+          assert three["status"] == "WAITING_APPROVAL"
+          assert three["la"]["sovia"]["finding_count"] == 1
+          assert three["la"]["sovia"]["execution_authorized"] is False
+          assert three["la_workflow_executed"] is False
+          assert three["owner_folder_metadata_accessed"] is False
+          assert three["nas_state"] == "NOT_CHECKED"
+          print("PASS: actual UGREEN goal planner -> injected LA -> real SOVIA source")
           print("PASS: actual SOVIA source reviewed synthetic LA-shaped metadata; LA/NAS NOT_RUN")
           PY
       - name: Syntax-check adapter and opt-in LA runtime verifier
