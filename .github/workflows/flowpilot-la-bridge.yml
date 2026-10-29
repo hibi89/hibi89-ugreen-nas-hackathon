@@ -13,6 +13,8 @@ on:
       - "tests/test_ecosystem_contract.py"
       - "tests/test_approval_scope.py"
       - "tests/test_verify_la_runtime_bridge.py"
+      - "tests/test_verify_private_hae_chain.py"
+      - "tools/verify_private_hae_chain.py"
       - "tests/test_flowpilot_ecosystem_showcase.py"
       - "tools/flowpilot_ecosystem_showcase.py"
       - "tools/verify_la_runtime_bridge.py"
@@ -43,6 +45,8 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_approval_scope.py' -v
       - name: Verify local SQLite runtime proof harness with synthetic fake LA
         run: python -m unittest discover -s tests -p 'test_verify_la_runtime_bridge.py' -v
+      - name: Verify owner-private HAE git SHA and dirty-worktree refusal
+        run: python -m unittest discover -s tests -p 'test_verify_private_hae_chain.py' -v
       - name: Verify LA read-only adapter contract
         run: python -m unittest discover -s tests -p 'test_la_bridge.py' -v
       - name: Verify real FlowPilot goal preview to injected LA preflight composition
@@ -190,7 +194,7 @@ jobs:
           if-no-files-found: error
           retention-days: 7
       - name: Syntax-check adapter and opt-in LA runtime verifier
-        run: python -m py_compile integrations/ecosystem_contract.py integrations/approval_scope.py integrations/la_bridge.py integrations/flowpilot_la_coordinator.py integrations/sovia_bridge.py tools/verify_la_runtime_bridge.py tools/flowpilot_ecosystem_showcase.py
+        run: python -m py_compile integrations/ecosystem_contract.py integrations/approval_scope.py integrations/la_bridge.py integrations/flowpilot_la_coordinator.py integrations/sovia_bridge.py tools/verify_la_runtime_bridge.py tools/flowpilot_ecosystem_showcase.py tools/verify_private_hae_chain.py
       - name: Check no source secrets or private runtime assumptions
         run: |
           python - <<'PY'
