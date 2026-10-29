@@ -60,7 +60,7 @@ def verify_checkout(
     if (len(expected_sha) != 40
             or any(char not in "0123456789abcdef" for char in expected_sha)):
         raise ProofRefused("EXPECTED_SOURCE_SHA_INVALID")
-    if _git(checked, "rev-parse", "--show-toplevel") != str(checked):
+    if Path(_git(checked, "rev-parse", "--show-toplevel")).resolve() != checked:
         raise ProofRefused("SOURCE_ROOT_NOT_GIT_TOPLEVEL")
     if _git(checked, "rev-parse", "HEAD") != expected_sha:
         raise ProofRefused("SOURCE_SHA_MISMATCH")
