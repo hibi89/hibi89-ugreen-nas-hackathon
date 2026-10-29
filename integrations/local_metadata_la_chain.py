@@ -23,7 +23,7 @@ from .approval_scope import INTENT_LABELS
 from .bounded_goal_compiler import canonical_hash
 from .flowpilot_la_coordinator import compose_previews
 from .la_bridge import read_la_audit
-from tools.flowpilot_goal_preview import process_goal
+from tools.flowpilot_ecosystem_showcase import process_goal
 
 STATES = ("PRESENT", "MISSING", "NOT_CHECKED", "VERSION_REVIEW")
 RUN_ID = "flowpilot_local_metadata_proof"
