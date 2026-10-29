@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from .la_bridge import preflight_la
+from .approval_scope import require_exact_approval_scope
 
 
 class FlowPilotPreviewError(RuntimeError):
@@ -74,6 +75,10 @@ def compose_previews(
     }
     if preview["status"] == "WAITING_USER":
         return result
+    require_exact_approval_scope(
+        owner_request, root=root, required=required,
+        candidates=candidates, preview=preview,
+    )
     # LA's preflight is metadata-only and must reject unsupported versions;
     # local write execution is deliberately not invoked.
     result["la"] = preflight_la(
