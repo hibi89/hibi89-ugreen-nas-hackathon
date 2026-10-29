@@ -56,6 +56,7 @@ def _validate(receipt: Any, draft: dict) -> list[dict]:
         raise IntakeRefused("Document result exceeds bounded size")
     if (receipt["schema"] != SCHEMA or receipt["origin"] != "SYNTHETIC_TEST"
             or receipt["agent"] != "document-agent"
+            or not isinstance(receipt["operation"], str)
             or receipt["operation"] not in OPERATIONS):
         raise IntakeRefused("Unrecognized or non-synthetic document result")
     if (receipt["authorized_root"] != draft["authorized_root"]
@@ -79,7 +80,7 @@ def _validate(receipt: Any, draft: dict) -> list[dict]:
         if not isinstance(ref, str) or ref not in expected_refs or ref in seen:
             raise IntakeRefused("Unknown, duplicate, or unauthorized document reference")
         seen.add(ref)
-        if row["state"] not in ITEM_STATES:
+        if not isinstance(row["state"], str) or row["state"] not in ITEM_STATES:
             raise IntakeRefused("Unknown document result state")
         text = row["answer"]
         if row["state"] == "ANSWERED":
