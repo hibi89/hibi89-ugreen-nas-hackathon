@@ -106,3 +106,37 @@ py -3.11 tools\verify_bounded_goal_chain.py --hae-root ..\HAE --sovia-root ..\SO
 Read the returned `approve_plan_sha256` field and pass **that exact 64-character value** as `--approve-plan-sha256` while repeating all the same arguments. Do not substitute the separately returned `plan_sha256`: the approval hash additionally covers the user-supplied scope. Version comparisons require explicit `--candidate required=alternative` matching the approved `--required` path. All runs are isolated to temporary local SQLite under a disposable directory, and run receipts are redacted.
 
 Public GitHub CI checks 15 negative/positive regression scenarios with a simulated LA runtime and also runs two distinct real UGREEN goal intents through the actual pinned **public SOVIA assessor**. No private HAE runtime is available in public CI. **Owner-local multi-intent E2E observed 2026-10-30 KST (user-provided PowerShell stdout):** After fast-forwarding UGREEN to `8de244114b4c2569c4f926d9ad289f11c3cddf53`, the owner ran the real-source local verifier with two allowlisted goals (`CHECK_REQUIRED`, `HANDOFF_AUDIT`). The first run reported `WAITING_PLAN_SHA256_APPROVAL` and zero SQLite writes. The owner then ran the exact same goal and scope with matching explicit approval SHA, producing `status=PASS`, two synthetic SQLite rows, one approval receipt, zero replay duplicates, SOVIA two advisory findings, and temporary database cleanup. Reported exact sources: HAE `9cba6424dadf3fadb0ccd6ed10040e322c4a62fa`, SOVIA `7418b23aff9b3abbd3faf5d1477e7244ec82b681`. The sanitized owner-supplied proof is `integrations/evidence/owner_reported_bounded_multi_intent_e2e_20261030.json`. This is real local LA/SOVIA synthetic execution **as reported by the owner**, not independent private HAE execution in public CI and not general natural-language execution. Vendor NAS/Uliya remain `NOT_TESTED`, submission/release `HOLD`. No official Skill/PDF/ZIP, access grant, timed trial or Devpost action was altered.
+
+## Consented *actual local filesystem metadata* to synthetic LA/SOVIA receipts
+
+The independent `integrations/local_metadata_la_chain.py` combines the existing bounded FlowPilot goal parser and exact-relative-path `lstat` inspector with the existing LA/SOVIA plan preview. Unlike the earlier entirely hardcoded `NOT_CHECKED` fixture, this path gets `PRESENT`, `MISSING`, `VERSION_REVIEW` or `NOT_CHECKED` from **local filesystem metadata**. It does not read file contents, enumerate owner directories or call the vendor NAS/Uliya Agents. **File names and filesystem metadata themselves may be personal/sensitive data**, so the local inspection requires its own explicit user consent and must be used only on owner-approved, trustworthy local paths. It is **NOT a network-drive/NAS inspector**, and a mounted remote drive cannot be presumed safe.
+
+Approval flow:
+1. Without `--approve-local-metadata`: bounded goal/scope preview only. No local root metadata access, no LA instance, no database.
+2. With `--approve-local-metadata`: selected LOCAL file metadata `lstat` only, then real injected LA plan preflight and SOVIA advisory. No SQLite write; show `approve_plan_sha256` for exact path/goal/ordered observed states.
+3. Separately provide that exact hash with `--approve-local-metadata --approve-plan-sha256 VALUE` to write **only redacted state counts, never filenames or contents**, to disposable LA SQLite; validate approval receipt, row count and idempotent replay. A changed state/order/scope invalidates the hash. This is a consistency hash, not an identity-authenticated signature or atomic filesystem snapshot.
+
+Missing, symlink, unreadable or otherwise unverified local paths **block LA writes** rather than claiming `MISSING` without evidence. A version conflict can be recorded as `VERSION_REVIEW`, but no version is chosen or modified. Any return with `actual_nas_verified=false` and `release_gate=HOLD` must remain unpromoted. This is still development-only and outside the official submission Skill/ZIP.
+
+Example using only a **new, disposable local folder** (do not point to an owner project, OneDrive working tree, mapped remote drive or customer records):
+
+```powershell
+# From the trusted local UGREEN checkout beside the exact pinned HAE/SOVIA clones
+$fixture = Join-Path $env:TEMP ("ugreen-local-" + [guid]::NewGuid().ToString("N"))
+New-Item -ItemType Directory -Path $fixture | Out-Null
+Set-Content -Path (Join-Path $fixture "README.md") -Value "synthetic fixture only"
+
+# Preview only: no local path metadata read
+py -3.11 tools\verify_local_metadata_la_chain.py --hae-root ..\HAE --sovia-root ..\SOVIA --root "$fixture" --goal "파일 누락 확인" --required README.md
+
+# Explicitly consent to local-file metadata; returns an exact approval SHA
+py -3.11 tools\verify_local_metadata_la_chain.py --hae-root ..\HAE --sovia-root ..\SOVIA --root "$fixture" --goal "파일 누락 확인" --required README.md --approve-local-metadata
+
+# Optional second step: repeat the command and append
+# --approve-plan-sha256 EXACT_APPROVE_PLAN_SHA256_FROM_PREVIEW
+# Only disposable local LA SQLite is written, outside the selected fixture.
+```
+
+A safe fixture can also test `--required missing.txt` (blocked) or `--goal "버전 비교" --candidate README.md=README_final.md` with a separately created synthetic `README_final.md` (review needed). Exact-source HAE and SOVIA must still be verified on the owner's PC; **public CI has real OS synthetic lstat, simulated LA SQLite and real pinned public SOVIA, not private HAE or NAS**. This module makes no official NAS readiness or Devpost claim.
+
+**Safety limitation:** the underlying local metadata inspector is not an atomic file snapshot; on an untrusted concurrently changing filesystem or Windows reparse points, only its conservative `NOT_CHECKED`/BLOCKED reporting is meaningful. Do not use it to claim production path security or privacy compliance.
