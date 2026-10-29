@@ -1,0 +1,44 @@
+{
+  "schema": "ugreen-owner-reported-bounded-multi-intent-synthetic-e2e.v1",
+  "date_kst": "2026-10-30",
+  "evidence_source": "USER_SUPPLIED_WINDOWS_POWERSHELL_STDOUT",
+  "operator_action": "Preview then explicit matching SHA256 approval for synthetic local SQLite execution",
+  "ugreen_checked_out_commit": "8de244114b4c2569c4f926d9ad289f11c3cddf53",
+  "command_shape": "py -3.11 tools/verify_bounded_goal_chain.py --hae-root ../HAE --sovia-root ../SOVIA --goal '파일 누락 확인 그리고 인계 확인' --required README.md [--approve-plan-sha256 exact_previous_preview_value]",
+  "proof": {
+    "approval_sha256": "3cf06f21ac486f68abc8b3d51048b870ae5a75ec61f27c8dde70746913c57234",
+    "plan_sha256": "5b927d598c1220007db883ee55b65d1014ed8aaa716dc756adf03cd6a64d351c",
+    "hae_la_commit": "9cba6424dadf3fadb0ccd6ed10040e322c4a62fa",
+    "sovia_commit": "7418b23aff9b3abbd3faf5d1477e7244ec82b681",
+    "preview_status": "WAITING_PLAN_SHA256_APPROVAL",
+    "preview_approval_receipts": 0,
+    "preview_synthetic_write_rows": 0,
+    "execution_status": "PASS",
+    "intent_count": 2,
+    "intents": [
+      "CHECK_REQUIRED",
+      "HANDOFF_AUDIT"
+    ],
+    "la_step_count": 4,
+    "la_execution_verified": true,
+    "sovia_advisory": "REVIEW_ONLY",
+    "sovia_finding_count": 2,
+    "approval_receipts": 1,
+    "synthetic_write_rows": 2,
+    "duplicate_replay_writes": 0,
+    "ephemeral_sqlite_deleted_after_run": true,
+    "pinned_source_check": "PASS",
+    "owner_folder_metadata_accessed": false,
+    "customer_data_used": false,
+    "actual_nas_verified": false,
+    "registered_uliya_expert_invoked": false,
+    "devpost_submitted": false,
+    "release_gate": "HOLD"
+  },
+  "limitations": [
+    "Source is user-supplied stdout; not independently executed by public GitHub CI or this reporting tool.",
+    "Only 2 allowlisted natural-goal intents and local synthetic NOT_CHECKED markers, not real file-agent functionality.",
+    "Exact owner-local HAE and SOVIA provenance is reported by local verifier; no public private-repo source copied.",
+    "NAS, official Uliya registered agents, customer data, hackathon submission, and live release not tested or authorized."
+  ]
+}
