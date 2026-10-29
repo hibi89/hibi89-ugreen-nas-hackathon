@@ -10,9 +10,7 @@ from contextlib import closing
 import csv
 import hashlib
 import json
-import os
 import sqlite3
-import tempfile
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
@@ -45,6 +43,14 @@ def _inside(root: Path, relative: str, *, existing: bool) -> Path:
         raise ReportRefused("Out-of-root path")
     return target
 
+
+def _sha256_file(path: Path) -> str:
+    """Bounded-memory digest for source and report evidence."""
+    digest = hashlib.sha256()
+    with path.open("rb") as source:
+        for chunk in iter(lambda: source.read(65536), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 def preview(root: Path, sources: list[str], output: str, *, group: str, amount: str) -> dict:
     if not isinstance(sources, list) or not 1 <= len(sources) <= MAX_FILES or len(set(sources)) != len(sources):
@@ -88,6 +94,8 @@ def execute(root: Path, plan: dict, *, approval: str, audit_db: Path) -> dict:
         raise ReportRefused("Audit database conflicts with source or output")
     if audit_db.exists() and not audit_db.is_file():
         raise ReportRefused("Invalid audit database")
+    sources = [_inside(root, name, existing=True) for name in plan["sources"]]
+    source_hashes = [_sha256_file(src) for src in sources]
     totals: dict[str, Decimal] = {}
     rows = 0
     for name in plan["sources"]:
@@ -103,6 +111,9 @@ def execute(root: Path, plan: dict, *, approval: str, audit_db: Path) -> dict:
                 if rows > MAX_ROWS:
                     raise ReportRefused("Row limit exceeded")
                 key = row[plan["group"]]
+                if (None in row or key is None or not isinstance(key, str)
+                        or not key or len(key) > 255 or key.lstrip().startswith(("=", "+", "-", "@"))):
+                    raise ReportRefused("Invalid or spreadsheet-unsafe grouping key")
                 try:
                     value = Decimal(row[plan["amount"]])
                 except (InvalidOperation, TypeError):
@@ -112,14 +123,34 @@ def execute(root: Path, plan: dict, *, approval: str, audit_db: Path) -> dict:
                 totals[key] = totals.get(key, Decimal(0)) + value
     if not totals:
         raise ReportRefused("No data rows")
+    if any(_sha256_file(src) != digest for src, digest in zip(sources, source_hashes)):
+        raise ReportRefused("Source changed during report computation")
     # Exclusive creation avoids overwriting any pre-existing output.
     with output.open("x", encoding="utf-8", newline="") as handle:
         writer = csv.writer(handle)
         writer.writerow([plan["group"], "total_" + plan["amount"]])
         for key in sorted(totals):
             writer.writerow([key, str(totals[key])])
+    report_sha256 = _sha256_file(output)
+    # Exact node IDs match the deterministic FlowPilot preview graph. This is
+    # local evidence, NOT a SOVIA risk rating or an LA execution trace.
+    node_trace = [
+        {"node_id": f"read_{index}", "action": "csv_read", "status": "COMPLETED",
+         "source_sha256": digest}
+        for index, digest in enumerate(source_hashes, 1)
+    ]
+    node_trace.extend([
+        {"node_id": "aggregate", "action": "decimal_group_sum", "status": "COMPLETED",
+         "rows": rows, "groups": len(totals)},
+        {"node_id": "write", "action": "csv_write_new", "status": "COMPLETED",
+         "report_sha256": report_sha256},
+        {"node_id": "audit", "action": "sqlite_audit", "status": "COMPLETED"},
+    ])
     record = {"timestamp": datetime.now(timezone.utc).isoformat(), "output": plan["output"],
               "source_count": len(plan["sources"]), "rows": rows, "groups": len(totals),
+              "report_sha256": report_sha256,
+              "node_trace": node_trace,
+              "audit_kind": "FLOWPILOT_LOCAL_EVIDENCE_NOT_SOVIA",
               "status": "LOCAL_REPORT_CREATED_NOT_NAS"}
     # This is a generic local SQLite trace, NOT a SOVIA/DBVORA integration.
     with closing(sqlite3.connect(audit_db)) as db, db:
