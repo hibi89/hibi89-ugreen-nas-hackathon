@@ -15,7 +15,7 @@ on:
       - "tests/test_verify_la_runtime_bridge.py"
       - "tests/test_flowpilot_ecosystem_showcase.py"
       - "tools/flowpilot_ecosystem_showcase.py"
-      - "tools/verify_la_runtime_bridge.py tools/flowpilot_ecosystem_showcase.py"
+      - "tools/verify_la_runtime_bridge.py"
       - ".github/workflows/flowpilot-la-bridge.yml"
   workflow_dispatch:
 
@@ -141,7 +141,7 @@ jobs:
           print('SHOWCASE 4/4 PASS: real FlowPilot planner + simulated LA preflight + pinned SOVIA assessor; NAS NOT_TESTED')
           PY
       - name: Syntax-check adapter and opt-in LA runtime verifier
-        run: python -m py_compile integrations/ecosystem_contract.py integrations/approval_scope.py integrations/la_bridge.py integrations/flowpilot_la_coordinator.py integrations/sovia_bridge.py tools/verify_la_runtime_bridge.py
+        run: python -m py_compile integrations/ecosystem_contract.py integrations/approval_scope.py integrations/la_bridge.py integrations/flowpilot_la_coordinator.py integrations/sovia_bridge.py tools/verify_la_runtime_bridge.py tools/flowpilot_ecosystem_showcase.py
       - name: Check no source secrets or private runtime assumptions
         run: |
           python - <<'PY'
