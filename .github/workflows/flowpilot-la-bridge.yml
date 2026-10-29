@@ -32,6 +32,34 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_la_bridge.py' -v
       - name: Verify real FlowPilot goal preview to injected LA preflight composition
         run: python -m unittest discover -s tests -p 'test_flowpilot_la_coordinator.py' -v
+      - name: Checkout pinned public SOVIA source for synthetic cross-repo contract test
+        uses: actions/checkout@v4
+        with:
+          repository: hibi89/SOVIA_sovereign
+          ref: 7418b23aff9b3abbd3faf5d1477e7244ec82b681
+          path: sovia-public
+          persist-credentials: false
+      - name: Verify actual SOVIA sanitized LA plan assessor (public source, no NAS)
+        run: |
+          PYTHONPATH=sovia-public python - <<'PY'
+          from sovia_la_plan_preflight import assess
+          plan = {
+              "schema_version": "sovia.plan_review.v1",
+              "plan_ref": "ugreen_synthetic",
+              "steps": [{"step_id": "sample_1", "tool_code": "la_sqlite_put",
+                         "side_effect": "local_write", "permission_asserted": False}]
+          }
+          policy = {"schema_version": "1.0", "policy": {
+              "allowed_tools": ["la_sqlite_put"], "approved_destinations": [],
+              "sensitive_targets": []
+          }}
+          result = assess(plan, policy)
+          assert result["finding_count"] == 1
+          assert result["execution_authorized"] is False
+          assert result["real_la_integration_verified"] is False
+          assert result["offline_only"] is True
+          print("PASS: actual SOVIA source reviewed synthetic LA-shaped metadata; LA/NAS NOT_RUN")
+          PY
       - name: Syntax-check adapter and opt-in LA runtime verifier
         run: python -m py_compile integrations/ecosystem_contract.py integrations/la_bridge.py integrations/flowpilot_la_coordinator.py tools/verify_la_runtime_bridge.py
       - name: Check no source secrets or private runtime assumptions
