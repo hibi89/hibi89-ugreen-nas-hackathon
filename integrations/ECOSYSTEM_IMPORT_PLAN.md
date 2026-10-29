@@ -16,11 +16,13 @@ Branch: `feature/flowpilot-ecosystem-integration` (based on `lead/ugreen`).
 5. No cross-repository merges, vendoring, git submodules pointing to private sources, live NAS calls, external submissions or paid services in this staging phase.
 
 ## Work status (2026-10-30)
-- [x] Created isolated integration branch.
-- [x] Located source repositories and HAE README architecture boundaries.
-- [ ] Review source-level interfaces and license compatibility.
-- [ ] Implement independent UGREEN adapters with mocked contract tests.
-- [ ] Connect approved real interfaces and run cross-project E2E.
-- [ ] Verify actual NAS runtime only with owner authorization.
+- [x] Created isolated UGREEN integration branch, preserving the original `lead/ugreen` source.
+- [x] Reviewed actual HAE `LAExecutor` interfaces (`preflight`, `audit`, `capabilities`, `execute`) and versioned `azent.api.v0` contract.
+- [x] Implemented independent UGREEN consent gates, LA read-only adapter, capability fail-closed guard, and actual FlowPilot natural-goal preview composition.
+- [x] Added offline contract and orchestration tests on public UGREEN feature branch; isolated adapter CI at `374dd990`, `dc5b97d5`, and `54db9746` passed.
+- [ ] Verify latest natural-goal integration CI run (`4383ae00`) before claiming its new tests pass.
+- [ ] Run **real** LA package cross-repository E2E. An isolated **private HAE** verification branch (`verify/ugreen-la-bridge-20261030`) was created without altering HAE's `feature/lightning-azent`; workflow #40906163642 failed before usable test steps/logs, so evidence is **NOT_RUN/UNVERIFIED**.
+- [ ] Verify UGREEN registered Uliya/NAS runtime and processing location only with owner authorization.
+- [ ] Review separate SOVIA and DBVORA interfaces before proposing any actual adapter; no private-source imports.
 
-**Completion:** staging created; no source import or E2E completion is claimed.
+**Release truth:** UGREEN submission Skill/PDF/ZIP unchanged, no NAS or registered expert execution, no actual LA runtime integration success yet. The 14/24 master ledger measures **calendar work items**, not product completion. The private HAE verification branch contains a CI-only workflow; no private HAE code is moved to this public repo.
