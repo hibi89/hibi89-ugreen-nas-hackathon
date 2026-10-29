@@ -190,7 +190,7 @@ class LocalMetadataLAChainTests(unittest.TestCase):
 
     def test_invalid_root_fails_without_exposing_root_path(self):
         missing_root = self.root / "unavailable"
-        with self.assertRaisesRegex(LocalObservationRefused, "CONSENTED_LOCAL_INSPECTION_REFUSED"):
+        with self.assertRaisesRegex(LocalObservationRefused, "UNVERIFIED_LOCAL_METADATA"):
             run_local_observation_chain(
                 "파일 누락 확인", missing_root, ["README.md"],
                 FakeMultipleLA, fake_assess, approve_local_metadata=True,
