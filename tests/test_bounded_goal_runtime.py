@@ -175,7 +175,7 @@ class BoundedGoalCompilationTests(unittest.TestCase):
     def test_unapproved_or_unsafe_goal_rejected_before_lasql(self):
         with self.assertRaisesRegex(BoundedGoalExecutionRefused, "FLOWPILOT_GOAL_REFUSED"):
             evaluate("폴더 삭제해줘")
-        with self.assertRaisesRegex(BoundedGoalExecutionRefused, "FLOWPILOT_GOAL_REFUSED"):
+        with self.assertRaisesRegex(BoundedGoalExecutionRefused, "FLOWPILOT_APPROVAL_SCOPE_REFUSED"):
             evaluate("버전 비교")
         with self.assertRaisesRegex(BoundedGoalExecutionRefused, "FLOWPILOT_GOAL_REFUSED"):
             evaluate("파일 누락 확인 그리고 파일 누락 확인")
