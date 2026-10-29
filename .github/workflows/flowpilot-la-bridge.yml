@@ -1,0 +1,46 @@
+name: UGREEN LA bridge isolated integration checks
+
+on:
+  push:
+    branches:
+      - feature/flowpilot-ecosystem-integration
+    paths:
+      - "integrations/**"
+      - "tests/test_la_bridge.py"
+      - "tests/test_ecosystem_contract.py"
+      - "tools/verify_la_runtime_bridge.py"
+      - ".github/workflows/flowpilot-la-bridge.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  la-bridge-contract:
+    name: Offline adapter contracts (NO NAS, NO PRIVATE HAE)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Verify UGREEN integration contract
+        run: python -m unittest discover -s tests -p 'test_ecosystem_contract.py' -v
+      - name: Verify LA read-only adapter contract
+        run: python -m unittest discover -s tests -p 'test_la_bridge.py' -v
+      - name: Syntax-check adapter and opt-in LA runtime verifier
+        run: python -m py_compile integrations/ecosystem_contract.py integrations/la_bridge.py tools/verify_la_runtime_bridge.py
+      - name: Check no source secrets or private runtime assumptions
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path("integrations/la_bridge.py")
+          code = p.read_text(encoding="utf-8")
+          assert "from lightning_azent" not in code
+          assert "import lightning_azent" not in code
+          assert "executes_workflow" in code
+          print("PASS: external LA source not bundled; local synthetic contract only")
+          print("ACTUAL HAE/LA RUNTIME: NOT RUN")
+          print("REAL NAS/ULIYA EXPERTS: NOT RUN")
+          PY
