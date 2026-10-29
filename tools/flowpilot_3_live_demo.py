@@ -6,6 +6,7 @@ Explicit per-preview approval is mandatory before synthetic CSV output is create
 from __future__ import annotations
 
 import csv
+import hashlib
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 from pathlib import Path
@@ -85,7 +86,12 @@ class DemoController:
             path = self.root / self.args["output"]
             if path.is_symlink() or not path.is_file() or path.stat().st_size > 1_000_000:
                 raise ValueError("Report unavailable")
-            return path.read_bytes()
+            contents = path.read_bytes()
+            receipt = self._last.get("execution", {}).get("result", {})
+            expected = receipt.get("report_sha256")
+            if not isinstance(expected, str) or hashlib.sha256(contents).hexdigest() != expected:
+                raise ValueError("Report digest differs from approved audit receipt")
+            return contents
 
     def act(self, action: str) -> dict:
         with self._lock:
@@ -150,7 +156,7 @@ pre{white-space:pre-wrap;word-break:break-word;max-height:290px;overflow:auto;ba
 <p>Step 2 · Preview the workflow, then approve or reject it.</p>
 <button id="preview">Preview selected workflow</button><button class="approve" id="approve" disabled>Approve &amp; run</button>
 <button class="reject" id="reject" disabled>Reject</button><p id="status" role="status">Loading...</p><h3>Workflow graph</h3>
-<pre id="graph">No preview yet.</pre></div><div class="card"><h3>Output &amp; audit</h3><pre id="result">Awaiting preview.</pre><button id="download" disabled>Download approved CSV</button><pre id="csv">Report not created.</pre></div></div>
+<pre id="graph">No preview yet.</pre></div><div class="card"><h3>Output &amp; audit</h3><pre id="result">Awaiting preview.</pre><h3>Local evidence chain</h3><pre id="trace">No executed nodes.</pre><button id="download" disabled>Download approved CSV</button><pre id="csv">Report not created.</pre></div></div>
 <h2>Submission package · target</h2><div class="artifacts"><div class="card"><b>Skill ZIP</b><p>Official compatibility pending</p></div>
 <div class="card"><b>English Summary PDF</b><p>500 words max · 1MB max</p></div>
 <div class="card"><b>Demo video</b><p>2–3 min proposal; mandatory status unverified</p></div>
@@ -162,7 +168,10 @@ const el = id => document.getElementById(id);
 async function update(){ const r = await fetch('/api/state',{cache:'no-store'}); if(!r.ok)throw Error('State unavailable'); show(await r.json()); }
 function show(s){ const state=s.status || 'UNKNOWN'; el('status').textContent=state;
 const graph=s.workflow_graph?.nodes || []; el('graph').textContent=JSON.stringify(graph,null,2);
-const audit=s.audit?.runs || []; el('result').textContent=JSON.stringify({execution:s.execution?.result || null,audit:audit,la_compatibility:s.la_compatibility?.status || 'NOT_CHECKED'},null,2);
+const audit=s.audit?.runs || []; const receipt=s.execution?.result || null;
+el('result').textContent=JSON.stringify({execution:receipt,audit:audit,la_compatibility:s.la_compatibility?.status || 'NOT_CHECKED'},null,2);
+el('trace').textContent=JSON.stringify({audit_record_id:audit[0]?.id || null,report_sha256:receipt?.report_sha256 || null,
+  node_trace:receipt?.node_trace || [],source:"FLOWPILOT LOCAL ONLY — NOT SOVIA OR LA"},null,2);
 const ready=state==='WAITING_EXECUTION_APPROVAL'; el('approve').disabled=!ready;el('reject').disabled=!ready;
 el('preview').disabled=state==='LOCAL_REPORT_CREATED_NOT_NAS'; el('download').disabled=state!=='LOCAL_REPORT_CREATED_NOT_NAS'; }
 async function action(type){ try {const r=await fetch('/api/'+type,{method:'POST',headers:{'X-Flowpilot-Token':secret,'Content-Type':'application/json'},body:'{}'});
