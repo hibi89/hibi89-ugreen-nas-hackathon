@@ -12,6 +12,7 @@ from pathlib import Path
 
 from flowpilot_csv_goal_bridge import plan_request, run_approved_request
 from flowpilot_audit_view import recent_runs
+from flowpilot_workflow_graph import build_graph
 from flowpilot_csv_report import ReportRefused
 
 
@@ -25,7 +26,7 @@ def run_session(goal: str, *, root: Path | None = None,
         return {"status": "WAITING_USER", "request": request, "executed": False}
     if approval is None:
         return {"status": "WAITING_EXECUTION_APPROVAL", "request": request,
-                "executed": False}
+                "workflow_graph": build_graph(request["plan"]), "executed": False}
     if approval != "APPROVE_EXECUTION":
         return {"status": "DECLINED", "request": request, "executed": False}
     if audit_db is None:
@@ -34,7 +35,8 @@ def run_session(goal: str, *, root: Path | None = None,
                                   audit_db=audit_db)
     history = recent_runs(audit_db, limit=1)
     return {"status": result["status"], "request": request, "execution": result,
-            "audit": history, "executed": True, "nas_verified": False,
+            "audit": history, "workflow_graph": build_graph(request["plan"]),
+            "executed": True, "nas_verified": False,
             "actual_la_integrated": False, "actual_sovia_integrated": False,
             "actual_dbvora_integrated": False}
 
