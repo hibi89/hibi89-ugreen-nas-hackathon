@@ -62,8 +62,8 @@ def render_dashboard(payload: dict) -> str:
     packages = [
         ("Skill ZIP", "Official compatible Skill package verification pending"),
         ("English Summary PDF", "Up to 500 words · at most 1 MB"),
-        ("Demo Video", "2–3 min concept · official requirement unverified"),
-        ("Devpost", "Submission not performed by this local prototype"),
+        ("Demo Video", "Round 1: not required; finalist Round 2: real NAS demo <=3 min"),
+        ("Devpost", "Round 1: SKILL ZIP + English PDF; NOT SUBMITTED"),
     ]
     package_html = "".join(
         '<article class="artifact"><h3>' + _t(name) + '</h3><p>' + _t(desc) +
