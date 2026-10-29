@@ -16,6 +16,10 @@ on:
       - "tests/test_verify_private_hae_chain.py"
       - "tests/test_local_proof_receipt.py"
       - "tests/test_goal_la_sovia_runtime.py"
+      - "tests/test_bounded_goal_runtime.py"
+      - "tools/verify_bounded_goal_chain.py"
+      - "integrations/bounded_goal_compiler.py"
+      - "integrations/bounded_goal_runtime.py"
       - "tools/verify_connected_goal_runtime.py"
       - "integrations/goal_la_sovia_runtime.py"
       - "tools/verify_local_proof_receipt.py"
@@ -71,6 +75,8 @@ jobs:
           PY
       - name: Verify contiguous UGREEN goal to injected synthetic LA runtime with consent and audit
         run: python -m unittest discover -s tests -p 'test_goal_la_sovia_runtime.py' -v
+      - name: Verify 1-3 bounded FlowPilot intent compilation, SHA consent and synthetic receipts
+        run: python -m unittest discover -s tests -p 'test_bounded_goal_runtime.py' -v
       - name: Verify LA read-only adapter contract
         run: python -m unittest discover -s tests -p 'test_la_bridge.py' -v
       - name: Verify real FlowPilot goal preview to injected LA preflight composition
@@ -166,6 +172,31 @@ jobs:
           assert proved['actual_nas_verified'] is False and proved['release_gate'] == 'HOLD'
           print('PASS: real SOVIA source + actual FlowPilot preview + simulated LA SQLite; private HAE not imported')
           PY
+      - name: Verify real SOVIA on two dynamic synthetic goal intents with fake LA SQLite
+        run: |
+          PYTHONPATH=sovia-public:tests python - <<'PY'
+          from sovia_la_plan_preflight import assess
+          from test_bounded_goal_runtime import FakeMultipleLA
+          from integrations.bounded_goal_runtime import run_bounded_compiled_goal
+          goal = '파일 누락 확인 그리고 인계 확인'
+          kwargs = {'required': ['README.md']}
+          pending = run_bounded_compiled_goal(goal, FakeMultipleLA, assess, **kwargs)
+          assert pending['status'] == 'WAITING_PLAN_SHA256_APPROVAL'
+          assert pending['intents'] == ['CHECK_REQUIRED', 'HANDOFF_AUDIT']
+          assert pending['la_step_count'] == 4
+          assert pending['sovia_finding_count'] == 2
+          assert pending['actual_nas_verified'] is False
+          passed = run_bounded_compiled_goal(
+              goal, FakeMultipleLA, assess,
+              approve_plan_sha256=pending['approve_plan_sha256'], **kwargs
+          )
+          assert passed['status'] == 'PASS'
+          assert passed['synthetic_write_rows'] == 2
+          assert passed['duplicate_replay_writes'] == 0
+          assert passed['approval_receipts'] == 1
+          assert passed['release_gate'] == 'HOLD'
+          print('PASS: 2 real UGREEN goal intents + simulated LA SQLite + real pinned SOVIA assessor, NO HAE/NAS')
+          PY
       - name: Run synthetic reviewer demo with actual pinned SOVIA assessor
         run: |
           python tools/flowpilot_ecosystem_showcase.py --sovia-root sovia-public --scenario write_review > /tmp/ugreen-write.json
@@ -235,7 +266,7 @@ jobs:
           if-no-files-found: error
           retention-days: 7
       - name: Syntax-check adapter and opt-in LA runtime verifier
-        run: python -m py_compile integrations/ecosystem_contract.py integrations/approval_scope.py integrations/la_bridge.py integrations/flowpilot_la_coordinator.py integrations/sovia_bridge.py tools/verify_la_runtime_bridge.py tools/flowpilot_ecosystem_showcase.py tools/verify_private_hae_chain.py tools/verify_local_proof_receipt.py integrations/local_proof_receipt.py tools/verify_connected_goal_runtime.py integrations/goal_la_sovia_runtime.py
+        run: python -m py_compile integrations/ecosystem_contract.py integrations/approval_scope.py integrations/la_bridge.py integrations/flowpilot_la_coordinator.py integrations/sovia_bridge.py tools/verify_la_runtime_bridge.py tools/flowpilot_ecosystem_showcase.py tools/verify_private_hae_chain.py tools/verify_local_proof_receipt.py integrations/local_proof_receipt.py tools/verify_connected_goal_runtime.py integrations/goal_la_sovia_runtime.py tools/verify_bounded_goal_chain.py integrations/bounded_goal_compiler.py integrations/bounded_goal_runtime.py
       - name: Check no source secrets or private runtime assumptions
         run: |
           python - <<'PY'
