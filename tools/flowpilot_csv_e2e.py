@@ -13,6 +13,7 @@ from pathlib import Path
 from flowpilot_csv_goal_bridge import plan_request, run_approved_request
 from flowpilot_audit_view import recent_runs
 from flowpilot_workflow_graph import build_graph
+from flowpilot_la_capabilities import assess_la_compatibility
 from flowpilot_csv_report import ReportRefused
 
 
@@ -25,8 +26,10 @@ def run_session(goal: str, *, root: Path | None = None,
     if request["status"] == "WAITING_USER":
         return {"status": "WAITING_USER", "request": request, "executed": False}
     if approval is None:
+        graph = build_graph(request["plan"])
         return {"status": "WAITING_EXECUTION_APPROVAL", "request": request,
-                "workflow_graph": build_graph(request["plan"]), "executed": False}
+                "workflow_graph": graph, "la_compatibility": assess_la_compatibility(graph),
+                "executed": False}
     if approval != "APPROVE_EXECUTION":
         return {"status": "DECLINED", "request": request, "executed": False}
     if audit_db is None:
@@ -34,8 +37,10 @@ def run_session(goal: str, *, root: Path | None = None,
     result = run_approved_request(request, root=root, approval=approval,
                                   audit_db=audit_db)
     history = recent_runs(audit_db, limit=1)
+    graph = build_graph(request["plan"])
     return {"status": result["status"], "request": request, "execution": result,
-            "audit": history, "workflow_graph": build_graph(request["plan"]),
+            "audit": history, "workflow_graph": graph,
+            "la_compatibility": assess_la_compatibility(graph),
             "executed": True, "nas_verified": False,
             "actual_la_integrated": False, "actual_sovia_integrated": False,
             "actual_dbvora_integrated": False}
