@@ -5,6 +5,8 @@ no arbitrary code execution, and no network access.
 """
 from __future__ import annotations
 
+from contextlib import closing
+
 import csv
 import hashlib
 import json
@@ -120,7 +122,7 @@ def execute(root: Path, plan: dict, *, approval: str, audit_db: Path) -> dict:
               "source_count": len(plan["sources"]), "rows": rows, "groups": len(totals),
               "status": "LOCAL_REPORT_CREATED_NOT_NAS"}
     # This is a generic local SQLite trace, NOT a SOVIA/DBVORA integration.
-    with sqlite3.connect(audit_db) as db:
+    with closing(sqlite3.connect(audit_db)) as db, db:
         db.execute("CREATE TABLE IF NOT EXISTS flowpilot_runs (id INTEGER PRIMARY KEY, timestamp TEXT NOT NULL, record_json TEXT NOT NULL)")
         db.execute("INSERT INTO flowpilot_runs(timestamp, record_json) VALUES (?,?)",
                    (record["timestamp"], json.dumps(record, sort_keys=True)))
