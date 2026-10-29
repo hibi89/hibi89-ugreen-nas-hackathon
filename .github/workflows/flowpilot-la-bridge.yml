@@ -15,6 +15,9 @@ on:
       - "tests/test_verify_la_runtime_bridge.py"
       - "tests/test_verify_private_hae_chain.py"
       - "tests/test_local_proof_receipt.py"
+      - "tests/test_goal_la_sovia_runtime.py"
+      - "tools/verify_connected_goal_runtime.py"
+      - "integrations/goal_la_sovia_runtime.py"
       - "tools/verify_local_proof_receipt.py"
       - "tools/verify_private_hae_chain.py"
       - "tests/test_flowpilot_ecosystem_showcase.py"
@@ -66,6 +69,8 @@ jobs:
           assert r['release_gate'] == 'HOLD'
           print('PASS: owner report classified without misrepresenting HAE execution or NAS status')
           PY
+      - name: Verify contiguous UGREEN goal to injected synthetic LA runtime with consent and audit
+        run: python -m unittest discover -s tests -p 'test_goal_la_sovia_runtime.py' -v
       - name: Verify LA read-only adapter contract
         run: python -m unittest discover -s tests -p 'test_la_bridge.py' -v
       - name: Verify real FlowPilot goal preview to injected LA preflight composition
@@ -144,6 +149,23 @@ jobs:
           print("PASS: actual UGREEN goal planner -> injected LA -> real SOVIA source")
           print("PASS: actual SOVIA source reviewed synthetic LA-shaped metadata; LA/NAS NOT_RUN")
           PY
+      - name: Verify real pinned SOVIA advisory in contiguous goal-to-SQLite synthetic fixture (fake LA)
+        run: |
+          PYTHONPATH=sovia-public:tests python - <<'PY'
+          from sovia_la_plan_preflight import assess
+          from test_goal_la_sovia_runtime import ReceiptCapableLA
+          from integrations.goal_la_sovia_runtime import run_connected_synthetic
+          pending = run_connected_synthetic(ReceiptCapableLA, assess)
+          assert pending['status'] == 'WAITING_EXPLICIT_SYNTHETIC_WRITE_APPROVAL'
+          assert pending['la_execution_verified'] is False
+          proved = run_connected_synthetic(ReceiptCapableLA, assess, approve_synthetic_write=True)
+          assert proved['status'] == 'PASS'
+          assert proved['synthetic_write_rows'] == 1
+          assert proved['approval_receipts'] == 1
+          assert proved['replay_duplicate_writes'] == 0
+          assert proved['actual_nas_verified'] is False and proved['release_gate'] == 'HOLD'
+          print('PASS: real SOVIA source + actual FlowPilot preview + simulated LA SQLite; private HAE not imported')
+          PY
       - name: Run synthetic reviewer demo with actual pinned SOVIA assessor
         run: |
           python tools/flowpilot_ecosystem_showcase.py --sovia-root sovia-public --scenario write_review > /tmp/ugreen-write.json
@@ -213,7 +235,7 @@ jobs:
           if-no-files-found: error
           retention-days: 7
       - name: Syntax-check adapter and opt-in LA runtime verifier
-        run: python -m py_compile integrations/ecosystem_contract.py integrations/approval_scope.py integrations/la_bridge.py integrations/flowpilot_la_coordinator.py integrations/sovia_bridge.py tools/verify_la_runtime_bridge.py tools/flowpilot_ecosystem_showcase.py tools/verify_private_hae_chain.py tools/verify_local_proof_receipt.py integrations/local_proof_receipt.py
+        run: python -m py_compile integrations/ecosystem_contract.py integrations/approval_scope.py integrations/la_bridge.py integrations/flowpilot_la_coordinator.py integrations/sovia_bridge.py tools/verify_la_runtime_bridge.py tools/flowpilot_ecosystem_showcase.py tools/verify_private_hae_chain.py tools/verify_local_proof_receipt.py integrations/local_proof_receipt.py tools/verify_connected_goal_runtime.py integrations/goal_la_sovia_runtime.py
       - name: Check no source secrets or private runtime assumptions
         run: |
           python - <<'PY'
