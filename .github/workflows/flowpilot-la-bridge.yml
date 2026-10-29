@@ -14,6 +14,8 @@ on:
       - "tests/test_approval_scope.py"
       - "tests/test_verify_la_runtime_bridge.py"
       - "tests/test_verify_private_hae_chain.py"
+      - "tests/test_local_proof_receipt.py"
+      - "tools/verify_local_proof_receipt.py"
       - "tools/verify_private_hae_chain.py"
       - "tests/test_flowpilot_ecosystem_showcase.py"
       - "tools/flowpilot_ecosystem_showcase.py"
@@ -47,6 +49,23 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_verify_la_runtime_bridge.py' -v
       - name: Verify owner-private HAE git SHA and dirty-worktree refusal
         run: python -m unittest discover -s tests -p 'test_verify_private_hae_chain.py' -v
+      - name: Classify owner-reported real LA plus SOVIA synthetic proof (not replay)
+        run: |
+          python -m unittest discover -s tests -p 'test_local_proof_receipt.py' -v
+          python tools/verify_local_proof_receipt.py > /tmp/ugreen-owner-reported-proof.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r = json.loads(Path('/tmp/ugreen-owner-reported-proof.json').read_text())
+          assert r['result'] == 'ACCEPTED_OWNER_REPORTED_SYNTHETIC_PROOF'
+          assert r['independently_replayed_in_ugreen_ci'] is False
+          assert r['reported_actual_la_sqlite'] == 'PASS'
+          assert r['reported_actual_sovia_advisory'] == 'PASS'
+          assert r['actual_nas_verified'] is False
+          assert r['registered_uliya_expert_invoked'] is False
+          assert r['release_gate'] == 'HOLD'
+          print('PASS: owner report classified without misrepresenting HAE execution or NAS status')
+          PY
       - name: Verify LA read-only adapter contract
         run: python -m unittest discover -s tests -p 'test_la_bridge.py' -v
       - name: Verify real FlowPilot goal preview to injected LA preflight composition
@@ -194,7 +213,7 @@ jobs:
           if-no-files-found: error
           retention-days: 7
       - name: Syntax-check adapter and opt-in LA runtime verifier
-        run: python -m py_compile integrations/ecosystem_contract.py integrations/approval_scope.py integrations/la_bridge.py integrations/flowpilot_la_coordinator.py integrations/sovia_bridge.py tools/verify_la_runtime_bridge.py tools/flowpilot_ecosystem_showcase.py tools/verify_private_hae_chain.py
+        run: python -m py_compile integrations/ecosystem_contract.py integrations/approval_scope.py integrations/la_bridge.py integrations/flowpilot_la_coordinator.py integrations/sovia_bridge.py tools/verify_la_runtime_bridge.py tools/flowpilot_ecosystem_showcase.py tools/verify_private_hae_chain.py tools/verify_local_proof_receipt.py integrations/local_proof_receipt.py
       - name: Check no source secrets or private runtime assumptions
         run: |
           python - <<'PY'
