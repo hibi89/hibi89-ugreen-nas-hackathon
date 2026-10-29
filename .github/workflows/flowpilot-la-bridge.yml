@@ -17,6 +17,9 @@ on:
       - "tests/test_local_proof_receipt.py"
       - "tests/test_goal_la_sovia_runtime.py"
       - "tests/test_bounded_goal_runtime.py"
+      - "tests/test_local_metadata_la_chain.py"
+      - "integrations/local_metadata_la_chain.py"
+      - "tools/verify_local_metadata_la_chain.py"
       - "tools/verify_bounded_goal_chain.py"
       - "integrations/bounded_goal_compiler.py"
       - "integrations/bounded_goal_runtime.py"
@@ -77,6 +80,8 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_goal_la_sovia_runtime.py' -v
       - name: Verify 1-3 bounded FlowPilot intent compilation, SHA consent and synthetic receipts
         run: python -m unittest discover -s tests -p 'test_bounded_goal_runtime.py' -v
+      - name: Test consented actual disposable lstat observations to synthetic LA audit (NO HAE, NO NAS)
+        run: python -m unittest discover -s tests -p 'test_local_metadata_la_chain.py' -v
       - name: Verify LA read-only adapter contract
         run: python -m unittest discover -s tests -p 'test_la_bridge.py' -v
       - name: Verify real FlowPilot goal preview to injected LA preflight composition
@@ -197,6 +202,41 @@ jobs:
           assert passed['release_gate'] == 'HOLD'
           print('PASS: 2 real UGREEN goal intents + simulated LA SQLite + real pinned SOVIA assessor, NO HAE/NAS')
           PY
+      - name: Verify real pinned SOVIA reviews redacted actual disposable lstat states (fake LA)
+        run: |
+          PYTHONPATH=sovia-public:tests python - <<'PY'
+          from pathlib import Path
+          import tempfile
+          from sovia_la_plan_preflight import assess
+          from test_bounded_goal_runtime import FakeMultipleLA
+          from integrations.local_metadata_la_chain import run_local_observation_chain
+          with tempfile.TemporaryDirectory(prefix='ci-synthetic-lstat-') as tmp:
+              folder = Path(tmp)
+              (folder / 'README.md').write_bytes(b'disposable synthetic fixture only')
+              request = {
+                  'goal': '파일 누락 확인', 'root': folder, 'required': ['README.md'],
+                  'la_executor_type': FakeMultipleLA, 'sovia_assess': assess,
+              }
+              before = run_local_observation_chain(**request)
+              assert before['status'] == 'WAITING_LOCAL_METADATA_APPROVAL'
+              assert before['local_inspection_performed'] is False
+              inspected = run_local_observation_chain(**request, approve_local_metadata=True)
+              assert inspected['status'] == 'WAITING_EXACT_LOCAL_PLAN_APPROVAL'
+              assert inspected['local_state_counts']['PRESENT'] == 1
+              assert inspected['sovia_finding_count'] == 1
+              result = run_local_observation_chain(
+                  **request, approve_local_metadata=True,
+                  approve_plan_sha256=inspected['approve_plan_sha256']
+              )
+              assert result['status'] == 'PASS'
+              assert result['synthetic_write_rows'] == 1
+              assert result['approval_receipts'] == 1
+              assert result['replay_duplicate_writes'] == 0
+              assert result['file_contents_opened'] is False
+              assert result['actual_nas_verified'] is False
+              assert result['release_gate'] == 'HOLD'
+          print('PASS: actual OS lstat of disposable file + real pinned SOVIA + fake LA SQLite; HAE/NAS NOT RUN')
+          PY
       - name: Run synthetic reviewer demo with actual pinned SOVIA assessor
         run: |
           python tools/flowpilot_ecosystem_showcase.py --sovia-root sovia-public --scenario write_review > /tmp/ugreen-write.json
@@ -266,7 +306,7 @@ jobs:
           if-no-files-found: error
           retention-days: 7
       - name: Syntax-check adapter and opt-in LA runtime verifier
-        run: python -m py_compile integrations/ecosystem_contract.py integrations/approval_scope.py integrations/la_bridge.py integrations/flowpilot_la_coordinator.py integrations/sovia_bridge.py tools/verify_la_runtime_bridge.py tools/flowpilot_ecosystem_showcase.py tools/verify_private_hae_chain.py tools/verify_local_proof_receipt.py integrations/local_proof_receipt.py tools/verify_connected_goal_runtime.py integrations/goal_la_sovia_runtime.py tools/verify_bounded_goal_chain.py integrations/bounded_goal_compiler.py integrations/bounded_goal_runtime.py
+        run: python -m py_compile integrations/ecosystem_contract.py integrations/approval_scope.py integrations/la_bridge.py integrations/flowpilot_la_coordinator.py integrations/sovia_bridge.py tools/verify_la_runtime_bridge.py tools/flowpilot_ecosystem_showcase.py tools/verify_private_hae_chain.py tools/verify_local_proof_receipt.py integrations/local_proof_receipt.py tools/verify_connected_goal_runtime.py integrations/goal_la_sovia_runtime.py tools/verify_bounded_goal_chain.py integrations/bounded_goal_compiler.py integrations/bounded_goal_runtime.py integrations/local_metadata_la_chain.py tools/verify_local_metadata_la_chain.py
       - name: Check no source secrets or private runtime assumptions
         run: |
           python - <<'PY'
