@@ -18,6 +18,8 @@ on:
       - "tests/test_goal_la_sovia_runtime.py"
       - "tests/test_bounded_goal_runtime.py"
       - "tests/test_local_metadata_la_chain.py"
+      - "tests/test_verify_local_lstat_matrix.py"
+      - "tools/verify_local_lstat_matrix.py"
       - "integrations/local_metadata_la_chain.py"
       - "tools/verify_local_metadata_la_chain.py"
       - "tools/verify_bounded_goal_chain.py"
@@ -82,6 +84,8 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_bounded_goal_runtime.py' -v
       - name: Test consented actual disposable lstat observations to synthetic LA audit (NO HAE, NO NAS)
         run: python -m unittest discover -s tests -p 'test_local_metadata_la_chain.py' -v
+      - name: Verify six disposable real-lstat scenarios and synthetic write approval
+        run: python -m unittest discover -s tests -p 'test_verify_local_lstat_matrix.py' -v
       - name: Verify LA read-only adapter contract
         run: python -m unittest discover -s tests -p 'test_la_bridge.py' -v
       - name: Verify real FlowPilot goal preview to injected LA preflight composition
@@ -237,6 +241,26 @@ jobs:
               assert result['release_gate'] == 'HOLD'
           print('PASS: actual OS lstat of disposable file + real pinned SOVIA + fake LA SQLite; HAE/NAS NOT RUN')
           PY
+      - name: Run six disposable lstat scenarios against actual pinned SOVIA with fake LA
+        run: |
+          PYTHONPATH=sovia-public:tests python - <<'PY'
+          from sovia_la_plan_preflight import assess
+          from test_bounded_goal_runtime import FakeMultipleLA
+          from tools.verify_local_lstat_matrix import run_matrix
+          waiting = run_matrix(FakeMultipleLA, assess)
+          assert waiting['result'] == 'PASS'
+          assert waiting['scenario_count'] == 6
+          assert waiting['synthetic_sqlite_execution'] == 'NOT_RUN_NO_WRITE_APPROVAL'
+          assert FakeMultipleLA.constructed == 0
+          confirmed = run_matrix(FakeMultipleLA, assess, approve_synthetic_writes=True)
+          assert confirmed['result'] == 'PASS'
+          assert confirmed['synthetic_write_rows'] == 2
+          assert confirmed['approval_receipts'] == 1
+          assert confirmed['replay_duplicate_writes'] == 0
+          assert confirmed['actual_nas_verified'] is False
+          assert confirmed['release_gate'] == 'HOLD'
+          print('PASS: 6 real temporary lstat cases + real SOVIA assessor + synthetic fake LA; private HAE and NAS NOT RUN')
+          PY
       - name: Run synthetic reviewer demo with actual pinned SOVIA assessor
         run: |
           python tools/flowpilot_ecosystem_showcase.py --sovia-root sovia-public --scenario write_review > /tmp/ugreen-write.json
@@ -306,7 +330,7 @@ jobs:
           if-no-files-found: error
           retention-days: 7
       - name: Syntax-check adapter and opt-in LA runtime verifier
-        run: python -m py_compile integrations/ecosystem_contract.py integrations/approval_scope.py integrations/la_bridge.py integrations/flowpilot_la_coordinator.py integrations/sovia_bridge.py tools/verify_la_runtime_bridge.py tools/flowpilot_ecosystem_showcase.py tools/verify_private_hae_chain.py tools/verify_local_proof_receipt.py integrations/local_proof_receipt.py tools/verify_connected_goal_runtime.py integrations/goal_la_sovia_runtime.py tools/verify_bounded_goal_chain.py integrations/bounded_goal_compiler.py integrations/bounded_goal_runtime.py integrations/local_metadata_la_chain.py tools/verify_local_metadata_la_chain.py
+        run: python -m py_compile integrations/ecosystem_contract.py integrations/approval_scope.py integrations/la_bridge.py integrations/flowpilot_la_coordinator.py integrations/sovia_bridge.py tools/verify_la_runtime_bridge.py tools/flowpilot_ecosystem_showcase.py tools/verify_private_hae_chain.py tools/verify_local_proof_receipt.py integrations/local_proof_receipt.py tools/verify_connected_goal_runtime.py integrations/goal_la_sovia_runtime.py tools/verify_bounded_goal_chain.py integrations/bounded_goal_compiler.py integrations/bounded_goal_runtime.py integrations/local_metadata_la_chain.py tools/verify_local_metadata_la_chain.py tools/verify_local_lstat_matrix.py
       - name: Check no source secrets or private runtime assumptions
         run: |
           python - <<'PY'
