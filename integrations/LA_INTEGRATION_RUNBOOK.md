@@ -14,10 +14,12 @@ From the UGREEN repository root:
 ```powershell
 python -m unittest discover -s tests -p "test_la_bridge.py" -v
 python -m unittest discover -s tests -p "test_ecosystem_contract.py" -v
+python -m unittest discover -s tests -p "test_verify_la_runtime_bridge.py" -v
 python tools/verify_la_runtime_bridge.py --la-package-root "C:\path\to\HAE\packages\lightning-azent"
 ```
 
-The last command requires the owner to have independently checked out the actual LA package; no private code is fetched or copied by UGREEN. It exercises synthetic local plan preflight, a literal-only run, and read-only audit in a temporary directory. Runtime test PASS does **not** establish NAS access, Uliya Agent registration, document access, real customer safety, or external connector execution.
+The last command requires the owner to have independently checked out the actual LA package; no private code is fetched or copied by UGREEN. The optional smoke creates only disposable SQLite databases. It checks actual LA plan preflight and capability bounds, a literal read-only run, rejection of unapproved writes *before database creation*, one explicitly approved synthetic SQLite write, an approval-bound audit receipt without workflow values, independent SQLite row counting/integrity, and idempotent replay without duplicate business writes.
+A passing **fake-LA smoke-harness test** proves this verifier detects rejected/duplicated writes; it is **not** evidence that the owner-installed private HAE LA package passed. A passing real-package smoke requires its own exact-source execution record. Runtime test PASS does **not** establish NAS access, Uliya Agent registration, document access, real customer safety, or external connector execution.
 
 ## Separation and release gates
 - REA_APP is HAE's developer analysis workbench; **not** a runtime dependency.
@@ -27,3 +29,10 @@ The last command requires the owner to have independently checked out the actual
 - Until live registered Uliya Experts, effective permissions, processing location, and owner authorization are verified: `NOT_CHECKED`, not `READY`.
 - No customer information, credentials, access tokens, or private-source copies may be committed to this public repository.
 - The overall day-ledger metric 14/24 covers planned milestones, **not product or official submission completion**.
+
+
+## Evidence classification
+- `LOCAL_FAKE_HARNESS_PASS`: UGREEN tests against an explicitly simulated LA API and temporary SQLite; protects the *test harness*, not real HAE compatibility.
+- `HAE_LA_SYNTHETIC_PASS`: only after `verify_la_runtime_bridge.py` completes with the actual private HAE package installed by the owner. No NAS or Uliya Agent proof follows.
+- `NAS_ULIYA_NOT_TESTED`: remains the correct status until authorized official runtime evidence is obtained.
+- A previous private HAE Actions run #40906163642 failed with no runner and no executable steps; it must not be reported as a runtime test failure or PASS.
