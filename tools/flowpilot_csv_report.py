@@ -44,6 +44,7 @@ def _inside(root: Path, relative: str, *, existing: bool) -> Path:
     return target
 
 
+
 def _sha256_file(path: Path) -> str:
     """Bounded-memory digest for source and report evidence."""
     digest = hashlib.sha256()
