@@ -1,6 +1,6 @@
 import unittest
 
-from integrations.la_bridge import LABridgeUnavailable, preflight_la, read_la_audit
+from integrations.la_bridge import LABridgeUnavailable, preflight_la, read_la_audit, inspect_la_capabilities
 
 REQUEST = {
     "intent": "CHECK_REQUIRED",
@@ -76,6 +76,66 @@ class LABridgeTests(unittest.TestCase):
 
     def test_execution_flag_rejected(self):
         self.assertFalse(preflight_la({**REQUEST, "execute": True}, {}, FakeLA)["allowed"])
+
+
+
+class LocalOnlyLA:
+    calls = 0
+
+    @classmethod
+    def capabilities(cls):
+        cls.calls += 1
+        return {
+            "api_version": "azent.api.v0",
+            "scope": "synthetic-local-only",
+            "external_connectors": [],
+            "implemented_operations": ["literal", "csv_read", "sqlite_get"],
+        }
+
+
+class LACapabilityTests(unittest.TestCase):
+    def test_local_capabilities_never_imply_nas(self):
+        result = inspect_la_capabilities(REQUEST, LocalOnlyLA)
+        self.assertEqual(result["state"], "LOCAL_PLAN_ONLY")
+        self.assertFalse(result["can_read_nas"])
+        self.assertFalse(result["can_delegate_uliya_experts"])
+        self.assertEqual(result["nas_state"], "NOT_CHECKED")
+
+    def test_gate_before_capability_call(self):
+        LocalOnlyLA.calls = 0
+        result = inspect_la_capabilities(
+            {**REQUEST, "runtime_permissions_verified": False}, LocalOnlyLA
+        )
+        self.assertFalse(result["allowed"])
+        self.assertEqual(LocalOnlyLA.calls, 0)
+
+    def test_missing_capability_method(self):
+        with self.assertRaises(LABridgeUnavailable):
+            inspect_la_capabilities(REQUEST, object())
+
+    def test_unrecognized_api_version(self):
+        class FutureLA(LocalOnlyLA):
+            @staticmethod
+            def capabilities():
+                return {**LocalOnlyLA.capabilities(), "api_version": "azent.api.v99"}
+        with self.assertRaises(LABridgeUnavailable):
+            inspect_la_capabilities(REQUEST, FutureLA)
+
+    def test_external_connector_requires_review(self):
+        class ConnectorLA(LocalOnlyLA):
+            @staticmethod
+            def capabilities():
+                return {**LocalOnlyLA.capabilities(), "external_connectors": ["nas"]}
+        with self.assertRaises(LABridgeUnavailable):
+            inspect_la_capabilities(REQUEST, ConnectorLA)
+
+    def test_invalid_supported_operations(self):
+        class CorruptLA(LocalOnlyLA):
+            @staticmethod
+            def capabilities():
+                return {**LocalOnlyLA.capabilities(), "implemented_operations": [None]}
+        with self.assertRaises(LABridgeUnavailable):
+            inspect_la_capabilities(REQUEST, CorruptLA)
 
 
 if __name__ == "__main__":
