@@ -72,6 +72,24 @@ class SOVIABridgeTests(unittest.TestCase):
             assess_la_preview(REQUEST, {**PREVIEW, "scope": "real-nas"},
                               POLICY, FakeAdvisor.assess)
 
+    def test_negative_finding_count_rejected(self):
+        def negative(*args):
+            return {**FakeAdvisor.assess(*args), "finding_count": -1}
+        with self.assertRaises(AdvisoryUnavailable):
+            assess_la_preview(REQUEST, PREVIEW, POLICY, negative)
+
+    def test_boolean_finding_count_rejected(self):
+        def boolean(*args):
+            return {**FakeAdvisor.assess(*args), "finding_count": True}
+        with self.assertRaises(AdvisoryUnavailable):
+            assess_la_preview(REQUEST, PREVIEW, POLICY, boolean)
+
+    def test_excessive_finding_count_rejected(self):
+        def excessive(*args):
+            return {**FakeAdvisor.assess(*args), "finding_count": 1025}
+        with self.assertRaises(AdvisoryUnavailable):
+            assess_la_preview(REQUEST, PREVIEW, POLICY, excessive)
+
 
 if __name__ == "__main__":
     unittest.main()
