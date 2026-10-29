@@ -45,6 +45,16 @@ class DemoController:
         with self._lock:
             return dict(self._last)
 
+    def report_csv(self) -> bytes:
+        """Expose only the approved synthetic output, never arbitrary paths."""
+        with self._lock:
+            if not self._finished or self._last.get("status") != "LOCAL_REPORT_CREATED_NOT_NAS":
+                raise ValueError("No approved report available")
+            path = self.root / "summary.csv"
+            if path.is_symlink() or not path.is_file() or path.stat().st_size > 1_000_000:
+                raise ValueError("Report unavailable")
+            return path.read_bytes()
+
     def act(self, action: str) -> dict:
         with self._lock:
             if action == "preview":
@@ -100,7 +110,7 @@ pre{white-space:pre-wrap;word-break:break-word;max-height:290px;overflow:auto;ba
 <h2>Live workflow</h2><div class="content"><div class="card"><p>Dataset: jan.csv + feb.csv · customer / revenue</p>
 <button id="preview">Preview workflow</button><button class="approve" id="approve" disabled>Approve &amp; run</button>
 <button class="reject" id="reject" disabled>Reject</button><p id="status" role="status">Loading...</p><h3>Workflow graph</h3>
-<pre id="graph">No preview yet.</pre></div><div class="card"><h3>Output &amp; audit</h3><pre id="result">Awaiting preview.</pre></div></div>
+<pre id="graph">No preview yet.</pre></div><div class="card"><h3>Output &amp; audit</h3><pre id="result">Awaiting preview.</pre><button id="download" disabled>Download approved CSV</button><pre id="csv">Report not created.</pre></div></div>
 <h2>Submission package · target</h2><div class="artifacts"><div class="card"><b>Skill ZIP</b><p>Official compatibility pending</p></div>
 <div class="card"><b>English Summary PDF</b><p>500 words max · 1MB max</p></div>
 <div class="card"><b>Demo video</b><p>2–3 min proposal; mandatory status unverified</p></div>
@@ -114,9 +124,18 @@ function show(s){ const state=s.status || 'UNKNOWN'; el('status').textContent=st
 const graph=s.workflow_graph?.nodes || []; el('graph').textContent=JSON.stringify(graph,null,2);
 const audit=s.audit?.runs || []; el('result').textContent=JSON.stringify({execution:s.execution?.result || null,audit:audit,la_compatibility:s.la_compatibility?.status || 'NOT_CHECKED'},null,2);
 const ready=state==='WAITING_EXECUTION_APPROVAL'; el('approve').disabled=!ready;el('reject').disabled=!ready;
-el('preview').disabled=state==='LOCAL_REPORT_CREATED_NOT_NAS'; }
+el('preview').disabled=state==='LOCAL_REPORT_CREATED_NOT_NAS'; el('download').disabled=state!=='LOCAL_REPORT_CREATED_NOT_NAS'; }
 async function action(type){ try {const r=await fetch('/api/'+type,{method:'POST',headers:{'X-Flowpilot-Token':secret,'Content-Type':'application/json'},body:'{}'});
 const data=await r.json();if(!r.ok)throw Error(data.error || 'Request failed');show(data);}catch(e){el('status').textContent=e.message;}}
+async function downloadReport(){ try {
+const r=await fetch('/api/report',{headers:{'X-Flowpilot-Token':secret},cache:'no-store'});
+if(!r.ok)throw Error('Approved report unavailable');
+const csv=await r.text();el('csv').textContent=csv;
+const link=document.createElement('a');const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+link.href=url;link.download='flowpilot-summary.csv';document.body.appendChild(link);link.click();link.remove();
+setTimeout(()=>URL.revokeObjectURL(url),1000);
+}catch(e){el('status').textContent=e.message;}}
+el('download').addEventListener('click',downloadReport);
 for(const a of ['preview','approve','reject'])el(a).addEventListener('click',()=>action(a));update().catch(e=>el('status').textContent=e.message);
 </script></main></body></html>'''
 
@@ -153,6 +172,14 @@ def create_server(controller: DemoController, port: int = 0) -> ThreadingHTTPSer
                 self.send_payload(200, html.encode("utf-8"), "text/html; charset=utf-8")
             elif self.path == "/api/state":
                 self.send_json(200, controller.view())
+            elif self.path == "/api/report":
+                if self.headers.get("X-Flowpilot-Token") != controller.token:
+                    self.send_json(403, {"error": "Report authorization required"}); return
+                try:
+                    body = controller.report_csv()
+                except (ValueError, OSError):
+                    self.send_json(409, {"error": "No approved CSV report"}); return
+                self.send_payload(200, body, "text/csv; charset=utf-8")
             else:
                 self.send_json(404, {"error": "Not found"})
 
