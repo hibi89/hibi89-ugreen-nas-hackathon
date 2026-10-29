@@ -61,4 +61,14 @@ Successful result requires **all**:
 
 The script reports SHA-256 hashes of installed LA runtime and SOVIA assessor entry files, pinned Git commit IDs, proof classification and non-sensitive counters. It does not echo source file paths, business values or owner-specific data.
 
-An equivalent pinned-source **private HAE** workflow is in `hibi89/HAE` branch `verify/ugreen-la-bridge-20261030`; public GitHub Actions may not be used to retrieve private HAE source. No successful private HAE workflow execution had been confirmed when this runbook was updated. If the private runner is unavailable, the same local command provides an owner-controlled verification path.
+An equivalent pinned-source **private HAE** workflow is in `hibi89/HAE` branch `verify/ugreen-la-bridge-20261030`; public GitHub Actions may not be used to retrieve private HAE source. The private HAE Actions runner failed before producing executable-step evidence; therefore private GitHub Actions is still **NOT_RUN** for this E2E. On 2026-10-30 the owner separately executed the exact pinned command on a fresh Windows local clone of all three repositories and supplied its complete JSON stdout with `result=PASS`. This is **owner-reported actual local code execution**, not an independently witnessed GitHub CI success or a live NAS test.
+
+The sanitized transcript is at `integrations/evidence/owner_reported_local_e2e_20261030.json`. Its allowlisted consistency-checking logic is `integrations/local_proof_receipt.py` and the offline read-only verifier is `tools/verify_local_proof_receipt.py`. Run:
+
+```powershell
+python tools/verify_local_proof_receipt.py
+```
+
+Expected classification: `ACCEPTED_OWNER_REPORTED_SYNTHETIC_PROOF`; `independently_replayed_in_ugreen_ci=false`; `release_gate=HOLD`.
+
+The owner-reported stdout contains the exact HAE SHA `9cba6424dadf3fadb0ccd6ed10040e322c4a62fa` and SOVIA SHA `7418b23aff9b3abbd3faf5d1477e7244ec82b681`, one approved synthetic SQLite row, one approval receipt, zero duplicate writes, four scenarios and a passing SOVIA advisory. It also explicitly records `actual_nas_verified=false`. No private source code or Windows paths were included in the public report. **The next external gate remains authorized official UGOS/Uliya NAS runtime evidence**, not another local synthetic LA proof.
