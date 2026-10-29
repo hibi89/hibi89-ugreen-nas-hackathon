@@ -140,6 +140,55 @@ jobs:
           assert all(row['release_gate'] == 'HOLD' and row['actual_nas_verified'] is False and row['la_workflow_executed'] is False for row in results.values())
           print('SHOWCASE 4/4 PASS: real FlowPilot planner + simulated LA preflight + pinned SOVIA assessor; NAS NOT_TESTED')
           PY
+      - name: Build hash-labeled, synthetic-only reviewer evidence
+        env:
+          REVIEWED_UGREEN_COMMIT: ${{ github.sha }}
+        run: |
+          mkdir -p demo-evidence
+          cp /tmp/ugreen-write.json demo-evidence/write_review.json
+          cp /tmp/ugreen-read.json demo-evidence/read_only.json
+          cp /tmp/ugreen-missing.json demo-evidence/missing_input.json
+          cp /tmp/ugreen-declined.json demo-evidence/declined.json
+          python - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          root = Path('demo-evidence')
+          files = sorted(root.glob('*.json'))
+          assert len(files) == 4
+          reports = {}
+          for path in files:
+              raw = path.read_bytes()
+              record = json.loads(raw)
+              assert record['mode'] == 'SYNTHETIC_PLAN_PREVIEW_AND_ADVISORY_ONLY'
+              assert record['actual_nas_verified'] is False
+              assert record['la_workflow_executed'] is False
+              assert record['release_gate'] == 'HOLD'
+              assert record['la_preflight_source'] == 'SIMULATED_LA_PREFLIGHT'
+              reports[path.name] = {'sha256': hashlib.sha256(raw).hexdigest(), 'bytes': len(raw)}
+          manifest = {
+              'schema': 'ugreen-ecosystem-demo-evidence.v1',
+              'ugreen_commit': os.environ['REVIEWED_UGREEN_COMMIT'],
+              'sovia_source_commit': '7418b23aff9b3abbd3faf5d1477e7244ec82b681',
+              'flowpilot': 'REAL_BOUNDED_LOCAL_GOAL_PREVIEW',
+              'lightning_azent': 'SIMULATED_PREFLIGHT_NOT_REAL_HAE',
+              'sovia': 'PINNED_PUBLIC_SOURCE_ACTUAL_ASSESSOR',
+              'nas_and_uliya': 'NOT_TESTED',
+              'customer_data': 'NOT_USED',
+              'release_gate': 'HOLD',
+              'reports': reports,
+          }
+          (root / 'manifest.json').write_text(
+              json.dumps(manifest, sort_keys=True, indent=2) + '\\n', encoding='utf-8'
+          )
+          print('PASS: 4 redacted synthetic reviewer reports and SHA-256 manifest')
+          PY
+      - name: Publish CI evidence artifact (synthetic only)
+        uses: actions/upload-artifact@v4
+        with:
+          name: ugreen-ecosystem-synthetic-${{ github.sha }}
+          path: demo-evidence/
+          if-no-files-found: error
+          retention-days: 7
       - name: Syntax-check adapter and opt-in LA runtime verifier
         run: python -m py_compile integrations/ecosystem_contract.py integrations/approval_scope.py integrations/la_bridge.py integrations/flowpilot_la_coordinator.py integrations/sovia_bridge.py tools/verify_la_runtime_bridge.py tools/flowpilot_ecosystem_showcase.py
       - name: Check no source secrets or private runtime assumptions
