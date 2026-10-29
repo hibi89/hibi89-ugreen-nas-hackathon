@@ -16,7 +16,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from integrations.la_bridge import preflight_la, read_la_audit
+from integrations.la_bridge import preflight_la, read_la_audit, inspect_la_capabilities
 
 REQUEST = {
     "intent": "CHECK_REQUIRED", "folder": "synthetic-test-only",
@@ -43,6 +43,9 @@ def verify(package_root: Path) -> dict[str, object]:
         runtime = root / "runtime.sqlite"
         business = root / "business.sqlite"
         la = LAExecutor(runtime, business)
+        compatibility = inspect_la_capabilities(REQUEST, LAExecutor)
+        if compatibility.get("state") != "LOCAL_PLAN_ONLY" or compatibility.get("can_read_nas") is not False:
+            raise RuntimeError("LA falsely claims NAS capability")
         preview = preflight_la(REQUEST, PLAN, LAExecutor)
         if preview.get("state") != "PLAN_PREFLIGHT_ONLY" or preview["preview"]["step_count"] != 1:
             raise RuntimeError("LA plan preflight incompatible")
@@ -60,6 +63,7 @@ def verify(package_root: Path) -> dict[str, object]:
             "events": audit["audit"]["event_count"],
             "approval_receipts": audit["audit"]["approval_count"],
             "nas": "NOT_TESTED", "uliya_experts": "NOT_TESTED",
+            "la_capabilities": compatibility["state"],
         }
 
 
