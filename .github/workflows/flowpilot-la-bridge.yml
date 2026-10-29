@@ -7,6 +7,7 @@ on:
     paths:
       - "integrations/**"
       - "tests/test_la_bridge.py"
+      - "tests/test_sovia_bridge.py"
       - "tests/test_flowpilot_la_coordinator.py"
       - "tests/test_ecosystem_contract.py"
       - "tools/verify_la_runtime_bridge.py"
@@ -32,6 +33,8 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_la_bridge.py' -v
       - name: Verify real FlowPilot goal preview to injected LA preflight composition
         run: python -m unittest discover -s tests -p 'test_flowpilot_la_coordinator.py' -v
+      - name: Verify UGREEN SOVIA adapter contract
+        run: python -m unittest discover -s tests -p 'test_sovia_bridge.py' -v
       - name: Checkout pinned public SOVIA source for synthetic cross-repo contract test
         uses: actions/checkout@v4
         with:
@@ -58,10 +61,24 @@ jobs:
           assert result["execution_authorized"] is False
           assert result["real_la_integration_verified"] is False
           assert result["offline_only"] is True
+          from integrations.sovia_bridge import assess_la_preview
+          request = {"intent": "CHECK_REQUIRED", "folder": "/synthetic",
+                     "required_paths": ["README.md"], "owner_approved_metadata": True,
+                     "runtime_permissions_verified": True, "processing_location_accepted": True}
+          preview = {"source_version": "azent.ir.v0", "scope": "synthetic-local-only",
+                     "executes_workflow": False, "step_count": 1,
+                     "requires_write_approval": True,
+                     "steps": [{"id": "redacted_owner_step_id", "op": "sqlite_put"}]}
+          bridged = assess_la_preview(request, preview, policy, assess)
+          assert bridged["state"] == "ADVISORY_ONLY"
+          assert bridged["finding_count"] == 1
+          assert bridged["execution_authorized"] is False
+          assert bridged["nas_state"] == "NOT_CHECKED"
+          print("PASS: UGREEN sanitized adapter -> real SOVIA assessor with synthetic metadata")
           print("PASS: actual SOVIA source reviewed synthetic LA-shaped metadata; LA/NAS NOT_RUN")
           PY
       - name: Syntax-check adapter and opt-in LA runtime verifier
-        run: python -m py_compile integrations/ecosystem_contract.py integrations/la_bridge.py integrations/flowpilot_la_coordinator.py tools/verify_la_runtime_bridge.py
+        run: python -m py_compile integrations/ecosystem_contract.py integrations/la_bridge.py integrations/flowpilot_la_coordinator.py integrations/sovia_bridge.py tools/verify_la_runtime_bridge.py
       - name: Check no source secrets or private runtime assumptions
         run: |
           python - <<'PY'
