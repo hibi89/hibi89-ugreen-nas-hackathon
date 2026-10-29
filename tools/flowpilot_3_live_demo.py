@@ -45,12 +45,44 @@ class DemoController:
         with self._lock:
             return dict(self._last)
 
+    def configure(self, payload: dict) -> dict:
+        """One guided intake turn using ONLY synthetic, allowlisted CSV fixtures.
+
+        No caller-supplied filesystem roots or arbitrary paths are accepted.
+        Any new preview invalidates the previous approval state.
+        """
+        if not isinstance(payload, dict) or set(payload) != {"goal", "sources", "output"}:
+            raise ValueError("Invalid guided input")
+        goal, sources, output = payload["goal"], payload["sources"], payload["output"]
+        if not isinstance(goal, str) or len(goal) > 200:
+            raise ValueError("Invalid goal")
+        if (not isinstance(sources, list) or not 1 <= len(sources) <= 2
+                or len(sources) != len(set(sources))
+                or any(type(name) is not str or name not in ("jan.csv", "feb.csv")
+                       for name in sources)):
+            raise ValueError("Only explicit synthetic example files are supported")
+        if type(output) is not str or output not in ("summary.csv", "monthly-summary.csv"):
+            raise ValueError("Only bounded output paths are supported")
+        with self._lock:
+            if self._finished:
+                raise ValueError("Demo already executed; restart to reset")
+            args = dict(goal=goal, root=self.root, sources=sources,
+                        output=output, group="customer", amount="revenue")
+            # Validation and file preflight happen before mutating the pending plan.
+            candidate = run_session(**args)
+            if candidate["status"] != "WAITING_EXECUTION_APPROVAL":
+                raise ValueError("Missing or unsupported inputs")
+            self.args = args
+            self._last = candidate
+            self._pending = True
+            return dict(self._last)
+
     def report_csv(self) -> bytes:
         """Expose only the approved synthetic output, never arbitrary paths."""
         with self._lock:
             if not self._finished or self._last.get("status") != "LOCAL_REPORT_CREATED_NOT_NAS":
                 raise ValueError("No approved report available")
-            path = self.root / "summary.csv"
+            path = self.root / self.args["output"]
             if path.is_symlink() or not path.is_file() or path.stat().st_size > 1_000_000:
                 raise ValueError("Report unavailable")
             return path.read_bytes()
@@ -92,7 +124,7 @@ p{color:#afc3d4;line-height:1.5}.pill{border:1px solid #46718c;border-radius:50p
 .step,.card{background:#11263c;border:1px solid #2b4e68;border-radius:14px;padding:18px}
 .step small{color:#59d0ff}.step strong{display:block;margin-top:12px}h2{margin-top:30px;font-size:19px}
 .content{display:grid;grid-template-columns:1.2fr 1fr;gap:14px}.card{min-height:190px}.artifacts{grid-template-columns:repeat(4,1fr)}
-button{padding:12px 17px;background:#0e76b5;border:1px solid #42bfff;color:white;border-radius:9px;font-weight:700;cursor:pointer;margin:4px 6px 4px 0}
+input[type=text],input:not([type]),select{background:#071625;border:1px solid #41718c;border-radius:8px;color:#e6f6ff;padding:10px;max-width:100%;margin:9px 8px 9px 0}.choices{display:flex;gap:18px;flex-wrap:wrap;margin:8px 0}button{padding:12px 17px;background:#0e76b5;border:1px solid #42bfff;color:white;border-radius:9px;font-weight:700;cursor:pointer;margin:4px 6px 4px 0}
 button:disabled{opacity:.35;cursor:not-allowed}.reject{background:#512b3e;border-color:#c96073}.approve{background:#117b65;border-color:#4adbad}
 pre{white-space:pre-wrap;word-break:break-word;max-height:290px;overflow:auto;background:#071625;padding:14px;border-radius:9px;font-size:12px;color:#cce3f8}
 #status{color:#f4cb7b;font-weight:700}footer{margin-top:25px;color:#91a9bc;font-size:12px}
@@ -107,8 +139,16 @@ pre{white-space:pre-wrap;word-break:break-word;max-height:290px;overflow:auto;ba
 <div class="step"><small>03</small><strong>Workflow Preview</strong><p>Deterministic graph; LA not invoked</p></div>
 <div class="step"><small>04</small><strong>Approved Execute</strong><p>Local CSV grouping, new output</p></div>
 <div class="step"><small>05</small><strong>Audit Result</strong><p>SQLite record; not SOVIA</p></div></div>
-<h2>Live workflow</h2><div class="content"><div class="card"><p>Dataset: jan.csv + feb.csv · customer / revenue</p>
-<button id="preview">Preview workflow</button><button class="approve" id="approve" disabled>Approve &amp; run</button>
+<h2>Live workflow</h2><div class="content"><div class="card">
+<p>Step 1 · Give a supported natural-language goal and select synthetic NAS-like files.</p>
+<label for="goal">Natural language goal</label><input id="goal" value="고객별 매출 보고서 만들어줘" maxlength="200" aria-label="Natural language goal">
+<div class="choices"><label><input id="jan" type="checkbox" checked> jan.csv</label>
+<label><input id="feb" type="checkbox" checked> feb.csv</label></div>
+<label for="output">New output filename</label><select id="output"><option value="summary.csv">summary.csv</option>
+<option value="monthly-summary.csv">monthly-summary.csv</option></select>
+<p>Grouping: customer · Numeric field: revenue (fixed safe demo capabilities)</p>
+<p>Step 2 · Preview the workflow, then approve or reject it.</p>
+<button id="preview">Preview selected workflow</button><button class="approve" id="approve" disabled>Approve &amp; run</button>
 <button class="reject" id="reject" disabled>Reject</button><p id="status" role="status">Loading...</p><h3>Workflow graph</h3>
 <pre id="graph">No preview yet.</pre></div><div class="card"><h3>Output &amp; audit</h3><pre id="result">Awaiting preview.</pre><button id="download" disabled>Download approved CSV</button><pre id="csv">Report not created.</pre></div></div>
 <h2>Submission package · target</h2><div class="artifacts"><div class="card"><b>Skill ZIP</b><p>Official compatibility pending</p></div>
@@ -136,7 +176,13 @@ link.href=url;link.download='flowpilot-summary.csv';document.body.appendChild(li
 setTimeout(()=>URL.revokeObjectURL(url),1000);
 }catch(e){el('status').textContent=e.message;}}
 el('download').addEventListener('click',downloadReport);
-for(const a of ['preview','approve','reject'])el(a).addEventListener('click',()=>action(a));update().catch(e=>el('status').textContent=e.message);
+async function previewSelection(){
+const body={goal:el('goal').value,sources:['jan','feb'].filter(id=>el(id).checked).map(id=>id+'.csv'),output:el('output').value};
+try{const r=await fetch('/api/configure',{method:'POST',headers:{'X-Flowpilot-Token':secret,'Content-Type':'application/json'},body:JSON.stringify(body)});
+const data=await r.json();if(!r.ok)throw Error(data.error||'Configuration refused');show(data);
+}catch(e){el('approve').disabled=true;el('reject').disabled=true;el('status').textContent=e.message;}}
+el('preview').addEventListener('click',previewSelection);
+for(const a of ['approve','reject'])el(a).addEventListener('click',()=>action(a));update().catch(e=>el('status').textContent=e.message);
 </script></main></body></html>'''
 
 
@@ -188,10 +234,22 @@ def create_server(controller: DemoController, port: int = 0) -> ThreadingHTTPSer
             expected = f"http://127.0.0.1:{self.server.server_port}"
             if (not self.host_ok() or origin not in (None, expected)
                     or self.headers.get("X-Flowpilot-Token") != controller.token
-                    or self.headers.get("Content-Type") != "application/json"
-                    or self.headers.get("Content-Length") != "2"):
+                    or self.headers.get("Content-Type") != "application/json"):
                 self.send_json(403, {"error": "Request denied"}); return
-            if self.rfile.read(2) != b"{}":
+            try:
+                body_size = int(self.headers.get("Content-Length", "-1"))
+            except ValueError:
+                body_size = -1
+            if self.path == "/api/configure":
+                if not 2 <= body_size <= 512:
+                    self.send_json(413, {"error": "Invalid input size"}); return
+                try:
+                    payload = json.loads(self.rfile.read(body_size))
+                    value = controller.configure(payload)
+                except (ValueError, OSError, TypeError, UnicodeError):
+                    self.send_json(409, {"error": "Guided configuration refused"}); return
+                self.send_json(200, value); return
+            if body_size != 2 or self.rfile.read(2) != b"{}":
                 self.send_json(400, {"error": "Unexpected body"}); return
             if self.path not in ("/api/preview", "/api/approve", "/api/reject"):
                 self.send_json(404, {"error": "Unknown action"}); return
