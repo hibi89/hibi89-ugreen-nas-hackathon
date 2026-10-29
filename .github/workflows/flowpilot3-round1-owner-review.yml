@@ -1,0 +1,68 @@
+name: FlowPilot 3.0 Round 1 PDF ZIP owner review (NOT SUBMITTED)
+on:
+  push:
+    branches: ["lead/ugreen"]
+    paths:
+      - "docs/submission/flowpilot3_round1_qa_20261029.json"
+      - "tools/flowpilot3_round1_builder.py"
+      - "tests/test_flowpilot3_round1_builder.py"
+      - "skill/flowpilot-nas/SKILL.md"
+      - ".github/workflows/flowpilot3-round1-owner-review.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+
+jobs:
+  owner-review-artifacts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install offline PDF build dependencies
+        run: python -m pip install "reportlab>=4,<5" "pypdf>=6,<7"
+      - name: Verify exact canonical Skill and authored proposal
+        run: |
+          PYTHONPATH=tools python -m unittest discover -s tests -p "test_flowpilot3_round1_builder.py" -v
+      - name: Build owner-review PDF and Skill ZIP
+        run: |
+          python tools/flowpilot3_round1_builder.py \
+            --skill skill/flowpilot-nas/SKILL.md \
+            --qa docs/submission/flowpilot3_round1_qa_20261029.json \
+            --out "$RUNNER_TEMP/flowpilot3-owner-review"
+      - name: Verify produced artifact bytes and release hold
+        run: |
+          python - <<'PY'
+          import hashlib,json,os,pathlib,zipfile
+          from pypdf import PdfReader
+          root=pathlib.Path(os.environ["RUNNER_TEMP"])/"flowpilot3-owner-review"
+          m=json.loads((root/"NAS_FlowPilot_3_Round1_OWNER_REVIEW_manifest.json").read_text())
+          z=root/"NAS_FlowPilot_3_Round1_OWNER_REVIEW.zip"
+          p=root/"NAS_FlowPilot_3_Round1_OWNER_REVIEW.pdf"
+          src=pathlib.Path("skill/flowpilot-nas/SKILL.md").read_bytes()
+          assert m["status"]=="OWNER_REVIEW_NOT_SUBMITTED"
+          assert m["source_skill_sha256"]==hashlib.sha256(src).hexdigest()
+          assert m["zip_sha256"]==hashlib.sha256(z.read_bytes()).hexdigest()
+          assert m["pdf_sha256"]==hashlib.sha256(p.read_bytes()).hexdigest()
+          assert m["questions"]==10 and m["substantive_english_words"]<=500
+          assert m["official_creator"]=="NOT_RUN" and not m["devpost_submitted"]
+          assert not m["legal_rights_released"] and m["nas_runtime"]=="NOT_RUN"
+          assert m["local_prototype_excluded_from_zip"]
+          assert p.stat().st_size<=1_000_000
+          assert z.stat().st_size<=10_000_000
+          with zipfile.ZipFile(z) as archive:
+              assert archive.namelist()==["flowpilot-nas/SKILL.md"]
+              assert archive.read("flowpilot-nas/SKILL.md")==src
+          assert len(PdfReader(p).pages)<=2
+          print("FlowPilot 3.0 owner-review artifact check PASS; NOT official release")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FLOWPILOT3-R1-PDF-ZIP-OWNER-REVIEW-NOT-SUBMITTED
+          path: ${{ runner.temp }}/flowpilot3-owner-review/*
+          retention-days: 7
+          if-no-files-found: error
