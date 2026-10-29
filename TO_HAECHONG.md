@@ -64,3 +64,43 @@
 4. 시간·완성률: 개발 시간 미계측, 실제 NAS 접근 조건 미확정. **잔여 시간과 실작동 제품 완성률은 이 자료만으로 산정 불가**. 오프라인 기능/예선용 제출 초안의 완료와 대회 본선 실증은 별도 추적.
 
 **결론:** 문서·테스트 운영 절차 중 확인된 중복을 실제 코드에서 제거하고 G68의 동적 로컬 계획·실행 기능을 추가했습니다. 검증 가능한 성과는 486→496 **전체 실행된** 테스트와 새 동작·CI 4/4 성공이며, 시간 절약의 숫자와 NAS 동작 실증은 아직 없습니다. **해총의 코드·CI 독립 검수 요청.**
+
+---
+
+## 8. [해총 긴급 검수 요청] FlowPilot 3.0 전체 생태계 미통합 현황 — 2026-10-29
+
+> **상태: OPEN / 총괄 검수 필수.** 이 절은 위 2026-10-28 개발 가속 보고서를 대체하지 않고 최신 통합 결함을 추가 보고합니다. 사용자 요청: "유그린에 들어가는 깃헙 애들 다넣은거맞나 어케완성이되지" — 전체 설계 대비 미통합 사항을 해총이 직접 확인할 것.
+
+### 8-1. 목표 설계 vs 실제 확인
+
+원래 설계: **HAE(자연어·대화·계획) → Lightning Azent/LA(워크플로 생성·검증·실행) → FlowPilot + UGREEN NAS(승인된 데이터 접근·작업) → DBVORA(DB·리소스) 및 SOVIA(위험·행동 감사)**.
+
+| 대상 | 현재 UGREEN 저장소에서 확인한 증거 | 실제 연동 판정 | 해총 후속 검수 |
+|---|---|---|---|
+| **HAE** | `tools/flowpilot_goal_preview.py`, `tools/flowpilot_la_capabilities.py`; 제한된 표현·로컬 단계 처리, HAE 소스 blob 참조 | **미통합** — HAE 엔진 호출 실증 없음 | HAE 개발 브랜치의 실제 API/IR/테스트를 조회하고 연결 가능 여부 판정 |
+| **Lightning Azent (LA)** | `tools/flowpilot_la_capabilities.py`는 `actual_la_engine_invoked: false`, `actual_la_integration_verified: false`; `decimal_group_sum`, `csv_write_new`, `sqlite_audit` 등의 필요 노드가 기존 HAE 호환 IR에 없음 | **미통합/기능 차단** — 실제 LA 실행 대신 제한적 로컬 Python fallback | LA 저장소의 실제 코드·노드·실행 인터페이스 확인, 필요한 최소 노드와 승인 계약 정의 |
+| **FlowPilot 로컬 엔진** | `tools/flowpilot_csv_e2e.py`, `tools/flowpilot_3_live_demo.py`, `tools/flowpilot_handoff_live_demo.py`, `tools/flowpilot_owner_review_dashboard.py` | **로컬 합성 E2E 구현** — 공식 NAS 기능 아님 | 로컬 동작과 공식 Skill 동작을 혼동하지 않도록 분리 검수 |
+| **DBVORA** | SQLite 감사·조회 구현은 있으나 DBVORA 모듈 실제 import/API 호출·E2E 증거 없음 | **미통합** | DBVORA 저장소 계약·접근권한 확인 후 실제 어댑터 구현 및 호출 증거 요구 |
+| **SOVIA** | 로컬 감사·위험 관련 상태값은 있으나 SOVIA 독립 엔진 호출 증거 없음 | **미통합** | SOVIA 저장소 계약 확인 후 실제 위험 판정·감사 API 호출과 실패 차단 테스트 |
+| **Uliya / UGOS / 실제 NAS** | `skill/flowpilot-nas/SKILL.md` 및 로컬 시뮬레이터, 오프라인 테스트 | **실제 런타임 미검증** — 등록 Expert, 권한, NAS 접근·실행 증거 없음 | 공식 Creator·등록 Agent·NAS 테스트 접근 가능 시 검증, 불가 시 HOLD 유지 |
+| **예선 제출물** | `docs/submission/flowpilot3_round1_qa_20261029.json`, 기존 Skill·PDF/ZIP QA 기록 | **최종 확정/제출 아님** | 정확한 Skill ZIP·영문 PDF 바이트/해시/권리/Creator provenance 확인, 사용자 승인 후 제출 |
+
+**핵심:** `tools/flowpilot_3_smoke.py`는 테스트 설명과 반환값에서 HAE·LA·SOVIA·DBVORA·NAS 미호출을 명시합니다. 로컬 Python CSV 생성 성공, SQLite 로그, 관제 UI 및 많은 오프라인 테스트는 **GitHub 프로젝트 간 실제 연결이나 NAS 실동작을 입증하지 않습니다**.
+
+### 8-2. 완료율 및 제출 범위 정정
+
+- 이전 채팅에서 보고한 **79%는 로컬 시연 기능에 대한 주관적 추정**이며, **FlowPilot 3.0 전체 제품 통합 완료율로 사용 금지**.
+- 전체 제품 완성률·잔여 분은 **현재 증거만으로 산정 불가**. 실제 HAE→LA 호출, DBVORA/SOVIA 어댑터, NAS 런타임 성공을 별도 게이트로 계측할 것.
+- **예선 Skill ZIP은 공식 읽기 전용 Markdown Skill**로 제한. 임의 Python/JS/n8n 런타임, 독립 서비스, 임의 NAS 쓰기 작업을 Skill ZIP에 섞지 말 것. 로컬 CSV 자동화는 별도 제품/개념 증거로 표시.
+- **예선 제출 완성**과 **형이 설계한 전체 AX 제품 완성**은 별도 마일스톤. 본선 진출 후 실제 NAS에서 동일 Skill 검증이 필요.
+- 사용자 승인 없이 정본 Skill/기존 PDF·ZIP 변경, 권리 확정, NAS 접근, Devpost 업로드·제출 **금지**.
+
+### 8-3. 해총에게 요청하는 구체적 작업
+
+1. **GitHub 전수 대조:** HAE, Lightning Azent, DBVORA, SOVIA의 실제 저장소·개발 브랜치·HEAD와 공개/비공개 접근 여부를 확인. 이름만 적힌 모듈을 통합으로 판정하지 말 것.
+2. **연동 매트릭스 작성:** 각 프로젝트별 `actual_source_checked`, `actual_api_called`, `integration_test_passed`, `nas_runtime_verified`를 증거 SHA와 함께 PASS/BLOCKED/NOT_RUN으로 구분.
+3. **최소 실제 E2E 우선:** HAE 의도/승인 → LA 검증/실행 → 허용된 로컬 결과·감사까지 실제 호출 증거 확보. 이후 DBVORA/SOVIA는 실사용 어댑터 구현 및 별도 통합 테스트. 지원되지 않는 노드는 실패/차단 처리.
+4. **대회 트랙 별도 완결:** 공식 Uliya Creator provenance, Skill ZIP/PDF 정합성, 라이선스·권리, 실제 NAS 접근 가능 시 검증, Devpost 참가자 승인·접수증을 별도로 추적.
+5. **해총 최종 판단 요청:** 프로젝트별 KEEP/FIX/BLOCKED, 다음 우선순위, 실측 가능 일정과 완료 기준을 기록. 근거 없는 100%/남은 시간 단정 금지.
+
+**이번 확인 기준:** UGREEN `lead/ugreen` HEAD `6630ae08a0671133050c013b0d778a38970af6d2` (2026-10-29). 위 미통합 판정은 **UGREEN 저장소 내 호출 증거 기준**이며, 외부 HAE/LA/DBVORA/SOVIA 각 저장소의 최신 코드를 이번 검수에서 전부 조회했다는 뜻은 아닙니다. 해총의 독립 교차 검증이 필요합니다.
