@@ -140,3 +140,21 @@ py -3.11 tools\verify_local_metadata_la_chain.py --hae-root ..\HAE --sovia-root 
 A safe fixture can also test `--required missing.txt` (blocked) or `--goal "버전 비교" --candidate README.md=README_final.md` with a separately created synthetic `README_final.md` (review needed). Exact-source HAE and SOVIA must still be verified on the owner's PC; **public CI has real OS synthetic lstat, simulated LA SQLite and real pinned public SOVIA, not private HAE or NAS**. This module makes no official NAS readiness or Devpost claim.
 
 **Safety limitation:** the underlying local metadata inspector is not an atomic file snapshot; on an untrusted concurrently changing filesystem or Windows reparse points, only its conservative `NOT_CHECKED`/BLOCKED reporting is meaningful. Do not use it to claim production path security or privacy compliance.
+
+## Six-scenario owner-local HAE/SOVIA matrix (single opt-in command)
+
+The new `tools/verify_local_lstat_matrix.py` runs **six deterministic disposable-local cases** without any user-selected folder: unapproved preview, present file, missing file, conflicting version, stale approval after an observed state change and two-intent local metadata preflight. It constructs a fresh private temporary folder and non-sensitive synthetic files, calls the actual host OS's `lstat`, then invokes the pinned private HAE Lightning Azent and public SOVIA sources selected by the owner. It never uses an actual NAS or Uliya Agent, and never opens fixture file contents. Public CI uses fake LA plus the actual pinned public SOVIA assessor; **owner-local exact-H AE run is a separate gate**.
+
+From the verified UGREEN checkout beside the trusted pinned HAE and SOVIA clones:
+
+```powershell
+# No SQLite execution; default previews 6 disposable synthetic cases
+py -3.11 tools\verify_local_lstat_matrix.py --hae-root ..\HAE --sovia-root ..\SOVIA
+
+# Explicit consent ONLY for temporary synthetic SQLite writes (2 intent rows)
+py -3.11 tools\verify_local_lstat_matrix.py --hae-root ..\HAE --sovia-root ..\SOVIA --approve-synthetic-writes
+```
+
+The second command must report `result=PASS`, `scenario_count=6`, `synthetic_write_rows=2`, `approval_receipts=1`, `replay_duplicate_writes=0`, `actual_nas_verified=false`, `release_gate=HOLD`. A successful six-scenario result is not user-data readiness, cross-platform atomic path security, arbitrary goal execution, official Creator checker success, NAS permission evidence or a live registered Uliya file-agent invocation. The second command does not take any user folder path and creates only disposable local SQLite under its own temporary root.
+
+**As authored, this matrix has not yet received an owner-local private HAE execution report.** Do not claim actual private HAE PASS from public CI. GitHub source receipts must remain scoped to synthetic testing; no credentials, machine paths or customer files belong in public evidence.
