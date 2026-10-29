@@ -72,3 +72,21 @@ python tools/verify_local_proof_receipt.py
 Expected classification: `ACCEPTED_OWNER_REPORTED_SYNTHETIC_PROOF`; `independently_replayed_in_ugreen_ci=false`; `release_gate=HOLD`.
 
 The owner-reported stdout contains the exact HAE SHA `9cba6424dadf3fadb0ccd6ed10040e322c4a62fa` and SOVIA SHA `7418b23aff9b3abbd3faf5d1477e7244ec82b681`, one approved synthetic SQLite row, one approval receipt, zero duplicate writes, four scenarios and a passing SOVIA advisory. It also explicitly records `actual_nas_verified=false`. No private source code or Windows paths were included in the public report. **The next external gate remains authorized official UGOS/Uliya NAS runtime evidence**, not another local synthetic LA proof.
+
+## Continuous synthetic goal-to-SQLite path (new, owner-local proof pending)
+
+The earlier real pinned HAE/SOVIA report ran the actual LA database smoke and the FlowPilot/SOVIA preview as separate checks. The newer `integrations/goal_la_sovia_runtime.py` composes the *same synthetic write plan* through FlowPilot's bounded goal preview, real injected LA preflight, and actual SOVIA advisory, then — **only with a separate explicit synthetic-write approval** — executes that plan with LA and verifies its database write, approval audit and replay receipt integrity. This is a **fixed synthetic fixture for one supported goal**, not a general natural-language program compiler or NAS workflow engine.
+
+From a trusted local UGREEN checkout beside separately pinned HAE and SOVIA checkouts:
+
+```powershell
+# Default: prepare and review; executor is never instantiated.
+python tools/verify_connected_goal_runtime.py --hae-root ..\HAE --sovia-root ..\SOVIA
+
+# Explicit disposable synthetic SQLite write plus idempotent replay.
+python tools/verify_connected_goal_runtime.py --hae-root ..\HAE --sovia-root ..\SOVIA --approve-synthetic-write
+```
+
+The default must report `WAITING_EXPLICIT_SYNTHETIC_WRITE_APPROVAL` and zero executed writes. With explicit approval, a genuine pinned local HAE test can report `PASS` with one synthetic SQLite row, one approval receipt and zero replay duplicate rows. This newer command **has not yet been run on the owner's Windows checkout**; no new real-HAE claim follows from the public CI.
+
+Public CI uses a **fake LA executor**, the real UGREEN goal preview, actual pinned public SOVIA assessor and disposable synthetic SQLite, and tests missing approval, invalid goals, preflight failures, bad receipts and duplicate writes. This validates public integration behavior but does not import private HAE or touch NAS. The prior owner-reported real HAE/SOVIA PASS above remains a separate, narrower proof.
