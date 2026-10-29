@@ -95,10 +95,13 @@ def run_bounded_compiled_goal(
         if candidates is not None:
             request["version_candidates"] = candidates
 
-        compiled = compile_synthetic_goal_plan(
-            goal, preview, root=root, required=required, candidates=candidates,
-            owner_request=request,
-        )
+        try:
+            compiled = compile_synthetic_goal_plan(
+                goal, preview, root=root, required=required, candidates=candidates,
+                owner_request=request,
+            )
+        except (ValueError, TypeError) as exc:
+            raise BoundedGoalExecutionRefused("FLOWPILOT_APPROVAL_SCOPE_REFUSED") from exc
         plan = compiled["plan"]
         try:
             coordinated = compose_previews(
