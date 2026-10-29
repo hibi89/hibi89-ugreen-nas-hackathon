@@ -7,6 +7,7 @@ on:
     paths:
       - "integrations/**"
       - "tests/test_la_bridge.py"
+      - "tests/test_flowpilot_la_coordinator.py"
       - "tests/test_ecosystem_contract.py"
       - "tools/verify_la_runtime_bridge.py"
       - ".github/workflows/flowpilot-la-bridge.yml"
@@ -29,8 +30,10 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_ecosystem_contract.py' -v
       - name: Verify LA read-only adapter contract
         run: python -m unittest discover -s tests -p 'test_la_bridge.py' -v
+      - name: Verify real FlowPilot goal preview to injected LA preflight composition
+        run: python -m unittest discover -s tests -p 'test_flowpilot_la_coordinator.py' -v
       - name: Syntax-check adapter and opt-in LA runtime verifier
-        run: python -m py_compile integrations/ecosystem_contract.py integrations/la_bridge.py tools/verify_la_runtime_bridge.py
+        run: python -m py_compile integrations/ecosystem_contract.py integrations/la_bridge.py integrations/flowpilot_la_coordinator.py tools/verify_la_runtime_bridge.py
       - name: Check no source secrets or private runtime assumptions
         run: |
           python - <<'PY'
