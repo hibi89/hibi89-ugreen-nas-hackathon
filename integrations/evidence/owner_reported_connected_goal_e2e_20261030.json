@@ -1,0 +1,40 @@
+{
+  "schema": "ugreen-owner-reported-connected-synthetic-e2e.v1",
+  "captured_date_kst": "2026-10-30",
+  "evidence_source": "USER_SUPPLIED_WINDOWS_POWERSHELL_STDOUT",
+  "command": "py -3.11 tools/verify_connected_goal_runtime.py --hae-root ..\\HAE --sovia-root ..\\SOVIA --approve-synthetic-write",
+  "ugreen_checkout_after_pull": "f2fa9d48bcf655e431148f6b1583939879debbc6",
+  "git_pull_result": "FAST_FORWARD_3d19f45_TO_f2fa9d4_USER_REPORTED",
+  "observed_stdout": {
+    "actual_nas_verified": false,
+    "approval_receipts": 1,
+    "approval_scope": "EXPLICIT_SYNTHETIC_SQLITE_ONLY",
+    "chain": "REAL_UGREEN_GOAL_TO_INJECTED_LA_AND_SOVIA_SYNTHETIC_LOCAL",
+    "customer_data_used": false,
+    "devpost_submitted": false,
+    "ephemeral_sqlite_deleted_after_run": true,
+    "goal_to_plan": "ONE_HARDCODED_SYNTHETIC_FIXTURE_NOT_GENERAL_COMPILER",
+    "hae_la_commit": "9cba6424dadf3fadb0ccd6ed10040e322c4a62fa",
+    "independent_public_ci_real_hae_execution": false,
+    "la_execution_verified": true,
+    "owner_folder_metadata_accessed": false,
+    "pinned_source_check": "PASS",
+    "registered_uliya_expert_invoked": false,
+    "release_gate": "HOLD",
+    "replay_duplicate_writes": 0,
+    "sovia_advisory_reviewed": true,
+    "sovia_commit": "7418b23aff9b3abbd3faf5d1477e7244ec82b681",
+    "status": "PASS",
+    "synthetic_write_rows": 1
+  },
+  "independent_harness_execution_by_assistant": false,
+  "public_ci_actual_private_hae_invocation": false,
+  "vendor_nas_verified": false,
+  "official_uliya_expert_invoked": false,
+  "release_decision": "HOLD",
+  "evidence_limitations": [
+    "Provided by owner from Windows terminal; not independently attested or replayed by public CI",
+    "Only one fixed synthetic goal-to-plan fixture, not general natural-language workflow compilation",
+    "Synthetic local SQLite only; no official NAS or Uliya Expert evidence"
+  ]
+}
