@@ -1,0 +1,20 @@
+{
+  "actual_nas_verified": false,
+  "customer_data_used": false,
+  "devpost_submitted": false,
+  "hae_la_commit": "9cba6424dadf3fadb0ccd6ed10040e322c4a62fa",
+  "la_runtime_sha256": "1e36ae210881ae283bbea3a741570a39d2b259c835184fbf8af2e66febcb75d0",
+  "proof_type": "REAL_HAE_LA_AND_SOVIA_SYNTHETIC_LOCAL_ONLY",
+  "real_la_approval_receipts": 1,
+  "real_la_approved_write_rows": 1,
+  "real_la_replay_duplicate_writes": 0,
+  "real_la_synthetic_sqlite": "PASS",
+  "real_sovia_advisory": "PASS",
+  "registered_uliya_expert_invoked": false,
+  "release_gate": "HOLD",
+  "result": "PASS",
+  "scenario_count": 4,
+  "sovia_commit": "7418b23aff9b3abbd3faf5d1477e7244ec82b681",
+  "sovia_preflight_sha256": "f44d07b818bbdb04bfb97e73c15d901ff21e10838b2b4175b1e8bed686b1d12a",
+  "write_advisory_findings": 1
+}
