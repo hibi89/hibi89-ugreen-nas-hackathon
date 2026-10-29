@@ -55,7 +55,8 @@ def _base(status: str) -> dict[str, Any]:
         "raw_paths_or_names_returned": False,
         "actual_nas_verified": False,
         "registered_uliya_expert_invoked": False,
-        "customer_data_used": False,
+        "customer_file_contents_used": False,
+        "local_metadata_may_be_sensitive": True,
         "devpost_submitted": False,
         "release_gate": "HOLD",
     }
@@ -198,6 +199,7 @@ def run_local_observation_chain(
         raise LocalObservationRefused("CONSENTED_LOCAL_INSPECTION_REFUSED") from exc
     per_intent, total, ordered_states = _checked_observations(inspected, len(required))
     output["local_inspection_performed"] = True
+    output["inspected_intent_count"] = len(per_intent)
     output["local_state_counts"] = total
     if (inspected["status"] != "NEEDS_REVIEW"
             or len(per_intent) != len(intents)
