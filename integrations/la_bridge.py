@@ -24,8 +24,10 @@ def _block_if_unapproved(request: Mapping[str, Any]) -> dict[str, Any] | None:
     return None
 
 
-def preflight_la(request: Mapping[str, Any], plan: object, la_api: object | None) -> dict[str, Any]:
-    """Only side-effect-free plan metadata may cross this boundary."""
+def preflight_la(request: Mapping[str, Any], plan: object, la_api: object | None, *,
+                 sovia_assess: object | None = None,
+                 sovia_policy: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Run one LA preflight; optionally review its redacted metadata with SOVIA."""
     blocked = _block_if_unapproved(request)
     if blocked is not None:
         return blocked
@@ -45,7 +47,7 @@ def preflight_la(request: Mapping[str, Any], plan: object, la_api: object | None
     trigger = result.get("trigger_type")
     if trigger not in ("manual", "interval"):
         raise LABridgeUnavailable("unsupported LA trigger")
-    return {
+    response = {
         "allowed": True, "state": "PLAN_PREFLIGHT_ONLY",
         "preview": {
             "source_version": result["source_version"],
@@ -55,6 +57,12 @@ def preflight_la(request: Mapping[str, Any], plan: object, la_api: object | None
             "requires_input_root": result.get("requires_input_root") is True,
         },
     }
+    if sovia_assess is not None or sovia_policy is not None:
+        from .sovia_bridge import assess_la_preview
+        response["sovia"] = assess_la_preview(
+            request, result, sovia_policy, sovia_assess
+        )
+    return response
 
 
 def read_la_audit(request: Mapping[str, Any], run_id: str, la_api: object | None) -> dict[str, Any]:
