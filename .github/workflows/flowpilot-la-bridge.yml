@@ -11,9 +11,15 @@ on:
       - "tests/test_flowpilot_la_sovia_pipeline.py"
       - "tests/test_flowpilot_la_coordinator.py"
       - "tests/test_ecosystem_contract.py"
+      - "tests/test_approval_scope.py"
       - "tools/verify_la_runtime_bridge.py"
       - ".github/workflows/flowpilot-la-bridge.yml"
   workflow_dispatch:
+
+# Keep only the newest integration check for this feature branch.
+concurrency:
+  group: flowpilot-la-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -30,6 +36,8 @@ jobs:
           python-version: "3.11"
       - name: Verify UGREEN integration contract
         run: python -m unittest discover -s tests -p 'test_ecosystem_contract.py' -v
+      - name: Verify exact FlowPilot owner approval scope (offline)
+        run: python -m unittest discover -s tests -p 'test_approval_scope.py' -v
       - name: Verify LA read-only adapter contract
         run: python -m unittest discover -s tests -p 'test_la_bridge.py' -v
       - name: Verify real FlowPilot goal preview to injected LA preflight composition
@@ -65,7 +73,7 @@ jobs:
           assert result["real_la_integration_verified"] is False
           assert result["offline_only"] is True
           from integrations.sovia_bridge import assess_la_preview
-          request = {"intent": "CHECK_REQUIRED", "folder": "/synthetic",
+          request = {"intent": "CHECK_REQUIRED", "folder": "/synthetic-preview",
                      "required_paths": ["README.md"], "owner_approved_metadata": True,
                      "runtime_permissions_verified": True, "processing_location_accepted": True}
           preview = {"source_version": "azent.ir.v0", "scope": "synthetic-local-only",
@@ -107,7 +115,7 @@ jobs:
           print("PASS: actual SOVIA source reviewed synthetic LA-shaped metadata; LA/NAS NOT_RUN")
           PY
       - name: Syntax-check adapter and opt-in LA runtime verifier
-        run: python -m py_compile integrations/ecosystem_contract.py integrations/la_bridge.py integrations/flowpilot_la_coordinator.py integrations/sovia_bridge.py tools/verify_la_runtime_bridge.py
+        run: python -m py_compile integrations/ecosystem_contract.py integrations/approval_scope.py integrations/la_bridge.py integrations/flowpilot_la_coordinator.py integrations/sovia_bridge.py tools/verify_la_runtime_bridge.py
       - name: Check no source secrets or private runtime assumptions
         run: |
           python - <<'PY'
