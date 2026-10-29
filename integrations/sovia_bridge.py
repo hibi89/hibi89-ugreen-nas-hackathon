@@ -49,7 +49,8 @@ def assess_la_preview(request, preview, policy, assess):
             or reviewed.get("execution_authorized") is not False
             or reviewed.get("real_la_integration_verified") is not False
             or reviewed.get("offline_only") is not True
-            or type(reviewed.get("finding_count")) is not int):
+            or type(reviewed.get("finding_count")) is not int
+            or not 0 <= reviewed["finding_count"] <= 1024):
         raise AdvisoryUnavailable("unverified SOVIA response")
     return {"allowed": True, "state": "ADVISORY_ONLY",
             "finding_count": reviewed["finding_count"],
