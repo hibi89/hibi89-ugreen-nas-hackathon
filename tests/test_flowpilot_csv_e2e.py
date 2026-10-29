@@ -28,6 +28,8 @@ class EndToEndTests(unittest.TestCase):
     def test_preview_does_not_write(self):
         r = run_session(**self.args)
         self.assertEqual(r["status"], "WAITING_EXECUTION_APPROVAL")
+        self.assertEqual(r["la_compatibility"]["status"], "BLOCKED_MISSING_CAPABILITIES")
+        self.assertFalse(r["la_compatibility"]["execution_allowed"])
         self.assertFalse((self.root / "summary.csv").exists())
 
     def test_decline_does_not_write(self):
@@ -40,6 +42,7 @@ class EndToEndTests(unittest.TestCase):
         self.assertTrue(r["executed"])
         self.assertEqual(r["audit"]["count"], 1)
         self.assertFalse(r["nas_verified"])
+        self.assertFalse(r["la_compatibility"]["actual_la_engine_invoked"])
         with (self.root / "summary.csv").open(encoding="utf-8", newline="") as f:
             self.assertEqual(list(csv.reader(f))[1], ["alice", "4.00"])
 
