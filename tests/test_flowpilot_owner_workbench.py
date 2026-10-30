@@ -39,6 +39,7 @@ class OwnerWorkbenchTests(unittest.TestCase):
         self.assertEqual(result["stage_results"][0]["items"],
                          [{"item_index": 1, "state": "PRESENT"}])
         self.assertEqual(result["stage_results"][0]["step_index"], 1)
+        self.assertEqual(result["stage_results"][0]["action"], "check required files")
         self.assertFalse(result["actual_nas_verified"])
         raw = json.dumps(result)
         self.assertNotIn(str(self.root), raw)
@@ -65,6 +66,10 @@ class OwnerWorkbenchTests(unittest.TestCase):
         self.assertEqual(len(ticket["planned_actions"]), 3)
         row = self.controller.execute(ticket["approval_token"], CONSENT)
         self.assertEqual(len(row["stage_results"]), 3)
+        self.assertEqual(
+            [step["action"] for step in row["stage_results"]],
+            ["check required files", "check handoff deliverables", "compare versions"],
+        )
         self.assertEqual(row["stage_results"][2]["items"][0]["state"], "VERSION_REVIEW")
         serialized = json.dumps(row, ensure_ascii=False)
         for secret in (str(self.root), "README.md", "README_final.md", "test-only"):
@@ -82,6 +87,19 @@ class OwnerWorkbenchTests(unittest.TestCase):
         rows[0]["items"][0]["state"] = "FORGED_SUCCESS"
         with self.assertRaisesRegex(OwnerWorkbenchRefused, "INVALID_LOCAL_STAGE_EVIDENCE"):
             _safe_stage_results(rows, 1)
+
+    def test_approved_plan_actions_cannot_be_injected_from_fake_engine(self):
+        preview = self.controller.preview(self.request())
+        from tools.flowpilot_owner_workbench import SAFE_ACTIONS
+        self.assertNotIn("delete files", SAFE_ACTIONS)
+        # Only validated actions from preview may be attached to output.
+        actions = self.controller._pending[-1]
+        self.assertEqual(actions, ("check required files",))
+        self.assertEqual(
+            self.controller.execute(preview["approval_token"], CONSENT)[
+                "stage_results"][0]["action"],
+            "check required files",
+        )
 
     def test_missing_required_is_blocked_with_real_os_lstat(self):
         ticket = self.controller.preview(self.request(required=["absent.txt"]))

@@ -93,7 +93,7 @@ def _input_scope(data: object) -> tuple[str, Path, list[str], dict[str, list[str
 class OwnerWorkbench:
     def __init__(self):
         self._lock = Lock()
-        self._pending: tuple[str, Path, list[str], dict | None, str] | None = None
+        self._pending: tuple[str, Path, list[str], dict | None, str, tuple[str, ...]] | None = None
         self._reading = False
 
     def preview(self, request: object) -> dict:
@@ -126,7 +126,10 @@ class OwnerWorkbench:
                            for i, p in enumerate(planned, 1))):
                 raise OwnerWorkbenchRefused("UNVERIFIED_LOCAL_PLAN")
             token = secrets.token_hex(24)
-            self._pending = (goal, root, required, candidates, token)
+            self._pending = (
+                goal, root, required, candidates, token,
+                tuple(p["read_only_action"] for p in planned),
+            )
             return {
                 "status": "WAITING_EXPLICIT_LOCAL_METADATA_APPROVAL",
                 "approval_token": token,
@@ -145,7 +148,7 @@ class OwnerWorkbench:
         with self._lock:
             if self._reading or self._pending is None:
                 raise OwnerWorkbenchRefused("NO_PENDING_LOCAL_APPROVAL")
-            goal, root, required, candidates, expected = self._pending
+            goal, root, required, candidates, expected, actions = self._pending
             if (type(token) is not str or type(consent) is not str
                     or not secrets.compare_digest(token, expected)
                     or consent != CONSENT):
@@ -171,6 +174,11 @@ class OwnerWorkbench:
             stage_results = _safe_stage_results(
                 result.get("observed"), result["executed_steps"]
             )
+            if (len(actions) != result["planned_steps"]
+                    or any(action not in SAFE_ACTIONS for action in actions)):
+                raise OwnerWorkbenchRefused("INVALID_APPROVED_ACTIONS")
+            for i, stage in enumerate(stage_results):
+                stage["action"] = actions[i]
             if (type(result.get("review_item_count")) is not int
                     or not 0 <= result["review_item_count"] <= 300):
                 raise OwnerWorkbenchRefused("INVALID_LOCAL_REVIEW_EVIDENCE")

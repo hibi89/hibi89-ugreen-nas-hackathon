@@ -191,6 +191,7 @@ No contents, uploads, or raw filenames are included in results.</p>
 <div id="ownerSummary" hidden aria-live="polite"></div>
 <div id="ownerStages" aria-live="polite"></div>
 <button id="ownerExport" disabled>Download redacted JSON report</button>
+<button id="ownerPrint" disabled>Download printable HTML report</button>
 <pre id="ownerOutput" role="status" aria-live="polite">No local folder selected.</pre>
 </section><section><h2>Full pinned-source operator controls (optional)</h2>
 <button id="doctor">1 · Verify source SHAs</button>
@@ -235,6 +236,7 @@ function clearOwnerTicket(){
   document.getElementById("ownerSummary").hidden=true;
   document.getElementById("ownerStages").replaceChildren();
   document.getElementById("ownerExport").disabled=true;
+  document.getElementById("ownerPrint").disabled=true;
 }
 for(const id of ["ownerRoot","ownerGoal","ownerRequired","ownerCandidates","ownerLocalOnly"]){
   document.getElementById(id).addEventListener("input",clearOwnerTicket);
@@ -265,6 +267,7 @@ async function ownerRequest(path,body){
       summary.hidden=false;
       ownerReport=value;
       document.getElementById("ownerExport").disabled=false;
+      document.getElementById("ownerPrint").disabled=false;
       const stageRoot=document.getElementById("ownerStages");
       stageRoot.replaceChildren();
       for(const stage of (value.stage_results||[])){
@@ -273,7 +276,8 @@ async function ownerRequest(path,body){
         for(const item of stage.items||[]){
           if(Object.prototype.hasOwnProperty.call(counts,item.state))counts[item.state]++;
         }
-        line.textContent="Step "+stage.step_index+" · "+stage.status+" · "+
+        line.textContent="Step "+stage.step_index+" · "+stage.action+" · "+
+          stage.status+" · "+
           Object.entries(counts).map(([k,n])=>k+": "+n).join(" · ");
         stageRoot.append(line);
       }
@@ -281,15 +285,46 @@ async function ownerRequest(path,body){
   }catch(e){ownerTicket=null;ownerOut.textContent="LOCAL_CHECK_REFUSED"}
   ownerRun.disabled=!(ownerTicket&&ownerAgree.checked);
 }
+function downloadReport(content,mime,name){
+  const uri=URL.createObjectURL(new Blob([content],{type:mime}));
+  const link=document.createElement("a");
+  link.href=uri;link.download=name;
+  document.body.append(link);link.click();link.remove();
+  setTimeout(()=>URL.revokeObjectURL(uri),1000);
+}
 document.getElementById("ownerExport").onclick=()=>{
   if(!ownerReport)return;
-  const out=new Blob([JSON.stringify(ownerReport,null,2)+"\n"],
-    {type:"application/json"});
-  const link=document.createElement("a");
-  const uri=URL.createObjectURL(out);
-  link.href=uri;link.download="flowpilot-local-redacted-report.json";
-  document.body.append(link);link.click();link.remove();
-  URL.revokeObjectURL(uri);
+  downloadReport(JSON.stringify(ownerReport,null,2)+"\\n",
+    "application/json","flowpilot-local-redacted-report.json");
+};
+document.getElementById("ownerPrint").onclick=()=>{
+  if(!ownerReport)return;
+  const escapeHtml=v=>String(v).replace(/[&<>"']/g,c=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+  const keys=["PRESENT","MISSING","NOT_CHECKED","VERSION_REVIEW"];
+  const head="<html><head><meta charset='utf-8'><title>FlowPilot Local Report</title>"+
+    "<style>body{font:16px system-ui;max-width:900px;margin:48px auto;color:#17232f}"+
+    "table{border-collapse:collapse;width:100%;margin:24px 0}th,td{border:1px solid #bbc5ce;"+
+    "padding:10px;text-align:left}th{background:#eef3f6}"+
+    "footer{color:#526679;margin-top:32px}@media print{body{margin:20px}}</style></head><body>";
+  const intro="<h1>FlowPilot · Local file metadata report</h1><p>Status: "+
+    escapeHtml(ownerReport.status)+"</p><p>OS metadata only. No filenames or"+
+    " contents, no NAS/Uliya verification.</p>";
+  const rows=(ownerReport.stage_results||[]).map(stage=>{
+    const counts={PRESENT:0,MISSING:0,NOT_CHECKED:0,VERSION_REVIEW:0};
+    for(const item of stage.items||[]){
+      if(Object.prototype.hasOwnProperty.call(counts,item.state))counts[item.state]++;
+    }
+    return "<tr><td>"+Number(stage.step_index)+"</td><td>"+
+      escapeHtml(stage.action)+"</td><td>"+escapeHtml(stage.status)+"</td>"+
+      keys.map(k=>"<td>"+Number(counts[k])+"</td>").join("")+"</tr>";
+  }).join("");
+  const table="<table><thead><tr><th>#</th><th>Check</th><th>Status</th>"+
+    keys.map(k=>"<th>"+k+"</th>").join("")+"</tr></thead><tbody>"+rows+"</tbody></table>";
+  const html=head+intro+table+
+    "<footer>OWNER-CONSENTED LOCAL LSTAT ONLY · RELEASE HOLD · NOT NAS EVIDENCE</footer></body></html>";
+  downloadReport(html,"text/html","flowpilot-local-printable-report.html");
 };
 document.getElementById("ownerPreview").onclick=()=>{
   clearOwnerTicket();
