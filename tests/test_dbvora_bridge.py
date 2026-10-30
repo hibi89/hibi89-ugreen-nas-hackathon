@@ -6,6 +6,7 @@ import sqlite3
 import tempfile
 import unittest
 from pathlib import Path
+from contextlib import contextmanager
 
 from integrations.dbvora_bridge import (
     DBVORABridgeRefused, inspect_disposable_la_ledger,
@@ -14,6 +15,16 @@ from integrations.dbvora_bridge import (
 from integrations.local_metadata_la_chain import run_local_observation_chain
 from test_bounded_goal_runtime import FakeMultipleLA, fake_assess
 
+
+
+@contextmanager
+def committed_sqlite(path):
+    db = sqlite3.connect(path)
+    try:
+        yield db
+        db.commit()
+    finally:
+        db.close()
 
 def synthetic_inventory(path: Path) -> dict:
     # Simulated P0 response, not an invocation of the private DBVORA product.
@@ -149,12 +160,12 @@ class DBVORASyntheticBridgeTests(unittest.TestCase):
     def test_reader_mutation_of_disposable_sqlite_fails_closed(self):
         with tempfile.TemporaryDirectory(prefix="ugreen-dbvora-guard-") as tmp:
             path = Path(tmp) / "business.sqlite"
-            with sqlite3.connect(path) as db:
+            with committed_sqlite(path) as db:
                 db.execute("CREATE TABLE records (id INTEGER PRIMARY KEY, payload TEXT)")
                 db.execute("INSERT INTO records (payload) VALUES ('synthetic')")
             def mutating_reader(p):
                 result = synthetic_inventory(p)
-                with sqlite3.connect(p) as db:
+                with committed_sqlite(p) as db:
                     db.execute("UPDATE records SET payload = 'tampered' WHERE id = 1")
                 return result
             with self.assertRaisesRegex(
@@ -164,12 +175,12 @@ class DBVORASyntheticBridgeTests(unittest.TestCase):
     def test_reader_must_not_replace_disposable_sqlite(self):
         with tempfile.TemporaryDirectory(prefix="ugreen-dbvora-guard-") as tmp:
             path = Path(tmp) / "business.sqlite"
-            with sqlite3.connect(path) as db:
+            with committed_sqlite(path) as db:
                 db.execute("CREATE TABLE records (id INTEGER)")
             def replacing_reader(p):
                 result = synthetic_inventory(p)
                 other = p.parent / "replacement.sqlite"
-                with sqlite3.connect(other) as db:
+                with committed_sqlite(other) as db:
                     db.execute("CREATE TABLE records (id INTEGER)")
                 p.unlink()
                 other.rename(p)
