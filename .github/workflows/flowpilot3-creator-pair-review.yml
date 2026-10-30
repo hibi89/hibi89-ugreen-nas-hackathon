@@ -1,0 +1,42 @@
+name: FlowPilot 3.0 Creator candidate pairing (SYNTHETIC ONLY, HOLD)
+on:
+  push:
+    branches: ["lead/ugreen"]
+    paths:
+      - "tools/flowpilot3_creator_pair.py"
+      - "tests/test_flowpilot3_creator_pair.py"
+      - "docs/submission/flowpilot3_creator_round1_qa_20261031.json"
+      - ".github/workflows/flowpilot3-creator-pair-review.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  paired-review-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install isolated PDF test dependencies
+        run: python -m pip install "reportlab>=4,<5" "pypdf>=6,<7"
+      - name: Run 12 synthetic pairing / held-release tests
+        run: PYTHONPATH=tools python -m unittest discover -s tests -p "test_flowpilot3_creator_pair.py" -v
+      - name: Confirm no official-source or NAS execution claim
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          import sys
+          sys.path.insert(0, "tools")
+          from flowpilot3_creator_pair import PIN, validate_qa, CREATOR_EVIDENCE
+          qa=json.loads(Path("docs/submission/flowpilot3_creator_round1_qa_20261031.json").read_text())
+          assert qa["source_skill_sha256"] == PIN
+          assert qa["official_creator_evidence"] == CREATOR_EVIDENCE
+          assert len(qa["checker_evidence"]["warnings"]) == 1
+          assert validate_qa(qa) <= 500
+          print("12 synthetic tests only; original Creator tool and NAS NOT invoked. Release HOLD.")
+          PY
