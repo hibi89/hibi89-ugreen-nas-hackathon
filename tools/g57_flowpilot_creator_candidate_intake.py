@@ -30,6 +30,9 @@ SECRET = re.compile(
     r"xox[baprs]-[A-Za-z0-9-]{16,}"
 )
 UNFINISHED = re.compile(r"(?mi)^\s*(?:TODO|FIXME|TBD)\s*[:\-]")
+SUPPORTED_CANDIDATE_NAMES = frozenset(("flowpilot-nas", "flowpilot-3"))
+CANONICAL_NAME = "flowpilot-nas"
+
 FEATURE_SIGNALS = (
     "HANDOFF_AUDIT", "CHECK_REQUIRED", "REVIEW_VERSIONS", "SUMMARIZE_SELECTED",
     "file-agent", "document-agent", "NOT_CHECKED", "VERSION_REVIEW",
@@ -49,8 +52,8 @@ def inspect_candidate(
 ) -> dict:
     """Return a sanitized local structure/source-diff report, always HOLD."""
     folder = Path(directory)
-    if folder.name != "flowpilot-nas" or folder.is_symlink() or not folder.is_dir():
-        raise CandidateError("Use a real flowpilot-nas folder without symlinks")
+    if folder.name not in SUPPORTED_CANDIDATE_NAMES or folder.is_symlink() or not folder.is_dir():
+        raise CandidateError("Use a real, explicitly supported FlowPilot candidate folder without symlinks")
     if folder.parent.is_symlink():
         raise CandidateError("Parent path is a symlink")
     if not isinstance(baseline, bytes) or not baseline:
@@ -98,8 +101,8 @@ def inspect_candidate(
         if key in metadata:
             raise CandidateError("Duplicate frontmatter field")
         metadata[key] = value
-    if metadata.get("name") != "flowpilot-nas":
-        raise CandidateError("Generated Skill identity differs")
+    if metadata.get("name") != folder.name:
+        raise CandidateError("Generated Skill name must match its exact candidate directory")
     if not 1 <= len(metadata.get("description", "")) <= 1024:
         raise CandidateError("Invalid generated description length")
     references = LINK.findall(doc)
@@ -124,10 +127,17 @@ def inspect_candidate(
         and not any(x.casefold() in raw.decode("utf-8").casefold() for raw in payload.values())
     ]
     declaration = review_creator_evidence(skill, receipt)
+    canonical_identity = metadata["name"] == CANONICAL_NAME
     return {
-        "status": "SOURCE_MATCHED_HUMAN_PROVENANCE_REVIEW"
-        if digest(skill) == digest(baseline) else "SOURCE_DIFF_HUMAN_REVIEW_REQUIRED",
-        "candidate": "flowpilot-nas",
+        "status": ("SOURCE_DIFF_IDENTITY_REVIEW_REQUIRED" if not canonical_identity
+                   else "SOURCE_MATCHED_HUMAN_PROVENANCE_REVIEW"
+                   if digest(skill) == digest(baseline)
+                   else "SOURCE_DIFF_HUMAN_REVIEW_REQUIRED"),
+        "candidate": metadata["name"],
+        "canonical_candidate": CANONICAL_NAME,
+        "canonical_identity_matches": canonical_identity,
+        "candidate_adoption_approved": False,
+        "operator_receipt_gate_scope": "flowpilot-nas-only",
         "skill_sha256": digest(skill),
         "baseline_sha256": digest(baseline),
         "source_matches_baseline": skill == baseline,
