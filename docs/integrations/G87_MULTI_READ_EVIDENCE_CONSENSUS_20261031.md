@@ -1,3 +1,7 @@
+## CI update (2026-10-31 KST)
+
+The complete exact-code-SHA functional workflow [41104026399](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/41104026399) **succeeded** on `eb09099b57b8d914e3e9d46b539f7a08812c29b1`: **831 total / 826 PASS / 0 FAIL / 5 SKIP**, from the actual GitHub job log. Earlier `QUEUED` description below is a historical checkpoint only. These are local synthetic/contract tests and do not prove live NAS/Uliya or licensed official dispatch.
+
 # G87 — Multi-read file-agent evidence consensus (offline backend)
 
 **Source:** `tools/flowpilot_multi_read_intake.py`; tests: `tests/test_flowpilot_multi_read_intake.py`; branch `lead/ugreen`; latest code commit `eb09099b57b8d914e3e9d46b539f7a08812c29b1`. Python 3.11 stdlib, no third-party API, no NAS calls.

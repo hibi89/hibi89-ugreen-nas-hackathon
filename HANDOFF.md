@@ -1,3 +1,9 @@
+## G87 final exact-code-SHA CI result — 2026-10-31 KST
+
+- **Verified code and test:** `eb09099b57b8d914e3e9d46b539f7a08812c29b1` (G87 normalized multi-read backend, 19 focused tests).
+- **Actual public GitHub functional CI:** [run 41104026399](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/41104026399) SUCCESS: **831 total / 826 PASS / 0 FAIL / 5 SKIP**. This replaces old `QUEUED` status in prior G87 notes; other independent readiness/master/closeout checks are separate and must not be inferred green.
+- **Real-world boundaries:** Genuine HAE+LA+synthetic SQLite G86 local PASS from owner remains true, but G87 multi-read has only been run by offline public CI with normalized synthetic receipts, not an installed Uliya registered file-agent or NAS. No production/Devpost/release approval. Next prioritize official capabilities/permissions with owner-approved access; Python stays outside Markdown Skill ZIP.
+
 ## G87 — 2026-10-31 KST · bounded multi-read Uliya file-agent evidence integration (offline operator-normalized)
 
 1. **Product/stack/goal:** Continue NAS FlowPilot 3.0 backend-first. Bridge a concrete gap: multiple read-only Uliya file-agent observations need conservative cross-step reconciliation before reporting required-file presence, missing, or versions. Python 3.11 stdlib, existing G61 normalized contract and FlowPilot pipeline; no new paid services or NAS access.
