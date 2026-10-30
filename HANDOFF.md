@@ -1,3 +1,16 @@
+## UGREEN FlowPilot 2026-10-30 — Python import-origin provenance fix
+
+1. Main task: Continue feature branch work, CI nonblocking, and focus on actual multi-repo integration correctness rather than more synthetic UI.
+2. Source code verified: HAE private pinned `9cba6424dadf3fadb0ccd6ed10040e322c4a62fa` exposes `LAExecutor.preflight/execute/status/verify_receipts` via `packages/lightning-azent/lightning_azent/runtime.py`; SOVIA pinned `7418b23aff9b3abbd3faf5d1477e7244ec82b681` exposes `assess` in `sovia_la_plan_preflight.py`; DBVORA pinned `7f9a1c0d0f0e31f68fb600e47d04ccff1e22faaf` exposes `inspect_sqlite` in `dbvora/inventory.py` and already checks own import module path. Verified API definitions through GitHub connector, **did not execute private source**.
+3. Security correctness defect: Previous SHA/clean-tree check could be bypassed semantically by Python `sys.modules` returning already-imported HAE LA/SOVIA objects from another checkout. Added `require_pinned_import_origins` and use it both in `tools/verify_private_hae_chain.py` and `tools/verify_local_metadata_la_chain.py` before running private APIs.
+4. Code commit: `45fef5ec79bcf88bf0d0006da0fd452306b23e07` on `hibi89/hibi89-ugreen-nas-hackathon@feature/flowpilot-ecosystem-integration`, docs commit will advance head. Five synthetic unit tests in `tests/test_pinned_import_origins.py`, workflow check added. Reject cached unrelated module, absent entrypoint or unverifiable callable with safe non-path error; do not trust origins as cryptographic attestation or atomic filesystem lock.
+5. Latest CI `41010898843` for code SHA `45fef5ec` pending at last check; **no new test PASS observed**. Previous queued runs were cancelled by concurrency; this does not imply code failure. Previous independently verified CI success #41003986920 belongs to old SHA `cc8f4e8b`.
+6. Current execution path: Windows owner-local loopback UI checks SHA, preview 1/2/3 intents, separately requires explicit consent, runs temporary synthetic SQLite only with all pinned local source imports and optional redacted evidence bundle. No NAS/Uliya, no live customer data, no public Devpost activity. G49 Skill/G52 PDF+ZIP and lead/ugreen branch untouched.
+7. Permissions/risks: Real full 4-source owner-local invocation cannot be verified in GitHub-hosted CI without private checkouts; user-trusted local runtime and explicit disposable approval needed. Real NAS and Uliya Expert registration requires a later distinct owner-authorized vendor test. Release remains HOLD.
+8. Next: At next boundary check exact latest CI job once and repair demonstrable failure. Then owner-local synthetic 1–3 intent proof with trusted pinned HAE/SOVIA/DBVORA and inspect redacted manifest. No repeated CI waits or inflated progress percentages.
+9. Reported completion: ~60% remains previous informal estimate (not measured); adding security correctness does not prove that full NAS product is >60%.
+
+---
 # UGREEN 2026-10-30 KST independent continuation — reconciliation checkpoint
 
 1. Goal: Feature develop without CI waiting, but first reconcile HAE/SOVIA/DBVORA actual source contract and owner-local operator usability; never claim unrun private sources or real NAS.
