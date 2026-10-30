@@ -34,7 +34,10 @@ jobs:
           assert count>=505, f"Offline suite unexpectedly small ({count})"
           result=unittest.TextTestRunner(verbosity=1).run(suite)
           assert result.wasSuccessful(), f"Offline regressions failed ({count})"
-          print(f"UGREEN OFFLINE {count}/{count} PASS; NAS/ULIYA NOT_RUN")
+          skipped=len(result.skipped)
+          passed=result.testsRun-skipped
+          print(f"UGREEN OFFLINE {passed} PASS / 0 FAIL / {skipped} SKIP "
+                f"(total {result.testsRun}); real LA/NAS/ULIYA NOT_RUN when skipped")
           PY
       - name: Preserve canonical original and approval boundary
         run: |
