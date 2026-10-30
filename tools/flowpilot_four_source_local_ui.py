@@ -14,8 +14,18 @@ from threading import Lock
 PROJECT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT))
 
-from tools.flowpilot_source_doctor import inspect_sources
-from tools.flowpilot_four_source_suite import run_suite
+# Private-source integration is imported only when the optional panel is used.
+# The public offline CSV + lstat local pilot starts without any private modules.
+def inspect_sources(*args, **kwargs):
+    from tools.flowpilot_source_doctor import inspect_sources as implementation
+    return implementation(*args, **kwargs)
+
+
+def run_suite(*args, **kwargs):
+    from tools.flowpilot_four_source_suite import run_suite as implementation
+    return implementation(*args, **kwargs)
+
+
 from tools.flowpilot_real_os_demo import run_real_local_demo
 from tools.flowpilot_synthetic_csv_panel import CSVPanel, CSVPanelRefused
 from tools.flowpilot_owner_csv import OwnerCSV, OwnerCSVRefused, CONSENT as OWNER_CSV_CONSENT
