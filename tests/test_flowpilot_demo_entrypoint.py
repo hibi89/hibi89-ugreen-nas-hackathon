@@ -33,7 +33,7 @@ class OneClickDemoEntrypointTests(unittest.TestCase):
         self.assertIn(r"C:\Users", HTML)
         self.assertIn(r"value.split(/\r?\n/)", HTML)
         self.assertIn("ownerLocalOnly", HTML)
-        self.assertIn("LOCAL FILE METADATA ONLY", HTML)
+        self.assertIn("LOCAL CONSENTED WORKFLOWS", HTML)
 
     def test_owner_csv_ui_discloses_content_read_and_local_write_before_consent(self):
         from tools.flowpilot_four_source_local_ui import HTML
