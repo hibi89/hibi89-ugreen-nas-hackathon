@@ -191,10 +191,21 @@ class DBVORASyntheticBridgeTests(unittest.TestCase):
         self.assertEqual(len(called), 1)
         self.assertFalse(called[0].exists())
 
-    def test_injected_error_never_leaks_filename(self):
+    def test_invalid_empty_ledger_fails_before_reader_callback(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "business.sqlite"
             path.touch()
+            calls = []
+            with self.assertRaisesRegex(
+                    DBVORABridgeRefused, "^DBVORA_SYNTHETIC_LEDGER_SIZE_REFUSED$"):
+                inspect_disposable_la_ledger(path, lambda p: calls.append(p))
+            self.assertEqual(calls, [])
+
+    def test_injected_error_never_leaks_filename(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "business.sqlite"
+            with sqlite3.connect(path) as db:
+                db.execute("CREATE TABLE records (id INTEGER)")
             def broken_reader(_path):
                 raise RuntimeError("PRIVATE_USER_PATH_OR_SQL_SECRET")
             with self.assertRaisesRegex(
