@@ -90,6 +90,8 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_dbvora_bridge.py' -v
       - name: Verify DBVORA private-source opt-in refuses unapproved reads (no private checkout)
         run: python -m unittest discover -s tests -p 'test_verify_local_dbvora_optin.py' -v
+      - name: Test consented 4-source disposable synthetic owner proof (private sources simulated)
+        run: python -m unittest discover -s tests -p 'test_verify_four_source_synthetic.py' -v
       - name: Verify LA read-only adapter contract
         run: python -m unittest discover -s tests -p 'test_la_bridge.py' -v
       - name: Verify real FlowPilot goal preview to injected LA preflight composition
