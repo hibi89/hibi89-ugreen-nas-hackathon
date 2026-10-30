@@ -1,3 +1,15 @@
+## 2026-10-30 KST — Rapid local MVP acceptance handoff
+
+Goal: user says reach 90% today; do not wait on CI. Full NAS 90% not verifiable without vendor runtime.
+Delivered owner-selected local CSV processor (`tools/flowpilot_owner_csv.py`, commit cbf9a6a4): metadata-only preview, exact one-use separate content-reading consent, CSV aggregation on 1–5 actual local file basenames, exclusive creation of NEW CSV in selected folder and temporary SQLite audit, SHA-256 verified result. HTTP/UI integration (`tools/flowpilot_four_source_local_ui.py`, commit 83207d74). Input changes invalidate browser approval, no uploads/NAS or private modules. Result JSON returns counts/digest without customer paths/rows. Download CSV contains owner data after explicit approval.
+Delivered `tools/flowpilot_local_acceptance.py`, `tools/VERIFY_FLOWPILOT_LOCAL_MVP.cmd` (78d62124), browser Verify 4 local MVP capabilities button and route `/acceptance` (d5dd951c). It runs four genuinely executed local synthetic fixture functions, not mocked APIs: five-case OS-lstat goal checks, generated CSV with real SQLite audit, consented local folder lstat, consented owner-style CSV aggregation with real SQLite audit and SHA-256. NO owner files are used by the acceptance command.
+UI disclosure fix e2118893 clarifies owner CSV DOES open local CSV content after approval; metadata checklist does not. Test fix 126eb168 updates expected UI disclosure. README `OWNER_LOCAL_PILOT_QUICKSTART.md` updated.
+Validation: Github commits present, but new tests/acceptance result are not observed PASS. GitHub Actions queued/cancelled due concurrency. The assistant's container cannot fetch repo over network. Don't conflate code written with tested execution.
+Windows use: update `feature/flowpilot-ecosystem-integration`; double-click `tools/START_FLOWPILOT_DEMO.cmd` or `tools/VERIFY_FLOWPILOT_LOCAL_MVP.cmd` for generated-only acceptance. Python 3.11 required. Owner CSV form can process actual user-selected trusted LOCAL data only with explicit approval; never select NAS/mapped drive.
+Repo: hibi89/hibi89-ugreen-nas-hackathon, code SHA 126eb168fada615eaa749c70a73dcabf4fac8506; docs commit follows. `lead/ugreen@acc6d1fe94b908c5d449af15b297b4e62936d7f3` untouched; official submission artifacts unchanged. Release HOLD.
+Next: obtain executed four-capability acceptance output and exact-SHA CI result when it finishes; do not wait on it. Then trusted owner-local private HAE/SOVIA/DBVORA synthetic proof and separate real UGREEN NAS/Uliya/Creator verification. Whole NAS prior 60% is an unverified planning estimate.
+
+---
 ## 2026-10-30 KST — UGREEN owner-workbench action timeline, JSON+printable HTML exports
 
 1. **Task / purpose:** Finish real user-selected trusted LOCAL folder inspection UX, rather than more fake integration paths or CI waits. Existing `tools/START_FLOWPILOT_DEMO.cmd` launches loopback UI; user selects a trusted non-NAS folder and grants a separate one-time metadata-only approval.
