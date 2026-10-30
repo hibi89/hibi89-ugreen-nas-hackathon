@@ -1,3 +1,8 @@
+## G93 - 2026-10-31 KST - Windows + Linux offline full regressions PASS
+- G91's added test incorrectly parsed original Markdown as JSON; G92 fixed that test to read canonical JSON (2362a136). G92 four workflows SUCCESS; Linux 846 tests, 841 PASS, 0 FAIL, 5 SKIP.
+- G93 8f7c30c8 added native Windows regression to existing GitHub Actions (run 41116084733). Both Windows and Linux jobs SUCCESS: Windows master 12 PASS, SQLite 14 PASS, deterministic master 24-entry check PASS and PowerShell verify_local.ps1 -Mode full PASS at exact SHA; Linux 846/841 PASS/0 FAIL/5 SKIP.
+- Older G91/Windows failures superseded. No owner rerun needed. Original canonical Skill/master JSON/Markdown/PDF/ZIP unchanged; registered Expert/real NAS/official Creator/Devpost HOLD or NOT_RUN. See HANDOFF.md for 10-point evidence and next backend priority.
+
 ## G91 · 2026-10-31 KST — Windows-only MASTER_PROGRESS mismatch pinpointed and patched
 - Owner targeted 11 master tests: 1 FAIL at 3:47, lengths 67238/67238. Exact GitHub Markdown line 3 col 47 is `/` in `data/master_progress.json`; Windows `Path` string uses `\\`. Renderer now formats only the **display path** with `.as_posix()`, with full-render `PureWindowsPath` regression test. Neither `data/master_progress.json` nor `MASTER_PROGRESS.md` modified.
 - Last UGREEN full 844-case result remains FAIL (7 FAIL / 0 ERROR / 12 SKIP) at older `5b4e1f8`; G90 LA SQLite fix and G91 display correction still require independent execution evidence. Do not request repeated owner manual tests. HAE owner offline bundled 7/7 PASS preserved, NAS/Devpost/release HOLD.
