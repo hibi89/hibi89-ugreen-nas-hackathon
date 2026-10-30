@@ -147,8 +147,8 @@ class RealSQLiteAdapterBoundaryTests(unittest.TestCase):
         FakeLA.corrupted_source_sha = True
         result = run_demo(approval=APPROVAL, loader=loader)
         self.assertEqual(result["status"], "BLOCKED_RECEIPT_MISMATCH")
-        self.assertFalse(result["source_hash_preserved"] is False
-                         and result["la_execution_verified"])
+        self.assertFalse(result["la_execution_verified"])
+        self.assertEqual(result["persisted_rows"], 0)
 
     def test_failed_run_status_is_denied(self):
         FakeLA.corrupted_status = True
