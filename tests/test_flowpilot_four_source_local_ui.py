@@ -65,10 +65,43 @@ class OperatorUITests(unittest.TestCase):
                 self.operator.preview()
             called.assert_not_called()
 
+    def test_no_evidence_before_explicit_approval(self):
+        with self.assertRaisesRegex(OperatorRefused, "EVIDENCE_NOT_AVAILABLE"):
+            self.operator.evidence("index.html")
+
+    def test_only_whitelisted_evidence_and_verified_digest(self):
+        import hashlib
+        import json
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "proof"
+            root.mkdir()
+            content = b"<h1>STATIC SYNTHETIC REPORT</h1>"
+            (root / "index.html").write_bytes(content)
+            manifest = {
+                "kind": "ugreen-four-source-synthetic-bundle.v1",
+                "actual_nas_verified": False,
+                "registered_uliya_expert_invoked": False,
+                "release_gate": "HOLD",
+                "file_sha256": {"index.html": hashlib.sha256(content).hexdigest()},
+            }
+            (root / "manifest.json").write_text(json.dumps(manifest))
+            self.operator.output = root
+            self.operator.evidence_ready = True
+            self.assertEqual(self.operator.evidence("index.html"), content)
+            self.assertEqual(self.operator.evidence("manifest.json"),
+                             (root / "manifest.json").read_bytes())
+            with self.assertRaisesRegex(OperatorRefused, "EVIDENCE_NOT_AVAILABLE"):
+                self.operator.evidence("../secret.txt")
+            (root / "index.html").write_bytes(b"tampered")
+            with self.assertRaisesRegex(OperatorRefused, "EVIDENCE_DIGEST_MISMATCH"):
+                self.operator.evidence("index.html")
+
     def test_browser_has_separate_approval_checkbox_and_vendor_disclaimer(self):
         self.assertIn('type="checkbox"', HTML)
         self.assertIn("I_APPROVE_DISPOSABLE_SYNTHETIC_WRITES", HTML)
         self.assertIn("NAS/ULIYA NOT VERIFIED", HTML)
+        self.assertIn("/evidence/index.html", HTML)
         self.assertNotIn("<script src=", HTML)
 
 

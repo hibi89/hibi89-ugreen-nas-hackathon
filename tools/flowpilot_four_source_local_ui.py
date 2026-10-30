@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+import hashlib
 import json
 from pathlib import Path
 import secrets
@@ -16,6 +17,10 @@ from tools.flowpilot_source_doctor import inspect_sources
 from tools.flowpilot_four_source_suite import run_suite
 
 CONSENT = "I_APPROVE_DISPOSABLE_SYNTHETIC_WRITES"
+EVIDENCE_HTML = frozenset({"index.html", *(f"proof-{i}.html" for i in (1, 2, 3))})
+EVIDENCE_JSON = frozenset({"manifest.json", *(f"proof-{i}.json" for i in (1, 2, 3))})
+EVIDENCE_FILES = EVIDENCE_HTML | EVIDENCE_JSON
+MAX_EVIDENCE_BYTES = 256_000
 
 
 class OperatorRefused(ValueError):
@@ -29,6 +34,7 @@ class Operator:
         self.lock = Lock()
         self.challenge = None
         self.attempted = False
+        self.evidence_ready = False
 
     def sources(self) -> dict:
         return inspect_sources(*self.roots)
@@ -71,11 +77,47 @@ class Operator:
                 or result.get("registered_uliya_expert_invoked") is not False
                 or result.get("release_gate") != "HOLD"):
             raise OperatorRefused("SYNTHETIC_EVIDENCE_NOT_PROVEN")
+        with self.lock:
+            self.evidence_ready = result.get("evidence_bundle_created") is True
         return {"status": "OPERATOR_REPORTED_SYNTHETIC_PASS",
                 "intent_counts": [1, 2, 3],
-                "evidence_bundle_created": result["evidence_bundle_created"],
+                "evidence_bundle_created": self.evidence_ready,
                 "actual_nas_verified": False,
                 "registered_uliya_expert_invoked": False, "release_gate": "HOLD"}
+
+    def evidence(self, filename: str) -> bytes:
+        """Serve only digest-matched generated synthetic evidence after approval."""
+        with self.lock:
+            if (not self.evidence_ready or self.output is None
+                    or type(filename) is not str or filename not in EVIDENCE_FILES):
+                raise OperatorRefused("EVIDENCE_NOT_AVAILABLE")
+            folder = self.output
+            if (folder.is_symlink() or not folder.is_dir()
+                    or any(parent.is_symlink() for parent in folder.parents)):
+                raise OperatorRefused("UNSAFE_EVIDENCE_ROOT")
+            manifest = folder / "manifest.json"
+            if (manifest.is_symlink() or not manifest.is_file()
+                    or not 0 < manifest.stat().st_size <= MAX_EVIDENCE_BYTES):
+                raise OperatorRefused("EVIDENCE_MANIFEST_REFUSED")
+            claims = json.loads(manifest.read_text(encoding="utf-8"))
+            if (type(claims) is not dict
+                    or claims.get("kind") != "ugreen-four-source-synthetic-bundle.v1"
+                    or claims.get("actual_nas_verified") is not False
+                    or claims.get("registered_uliya_expert_invoked") is not False
+                    or claims.get("release_gate") != "HOLD"
+                    or type(claims.get("file_sha256")) is not dict):
+                raise OperatorRefused("EVIDENCE_MANIFEST_UNVERIFIED")
+            doc = folder / filename
+            if (doc.is_symlink() or not doc.is_file()
+                    or not 0 < doc.stat().st_size <= MAX_EVIDENCE_BYTES):
+                raise OperatorRefused("EVIDENCE_FILE_UNAVAILABLE")
+            data = doc.read_bytes()
+            if filename != "manifest.json":
+                expected = claims["file_sha256"].get(filename)
+                if (type(expected) is not str
+                        or hashlib.sha256(data).hexdigest() != expected):
+                    raise OperatorRefused("EVIDENCE_DIGEST_MISMATCH")
+            return data
 
 
 HTML = """<!doctype html><html lang="en"><head><meta charset="utf-8">
@@ -114,6 +156,8 @@ background:#081a2a;border-radius:9px;padding:16px;max-height:310px;overflow:auto
 <label><input id="agree" type="checkbox"> Approve disposable synthetic SQLite writes only</label>
 <button id="execute" class="execute" disabled>3 · Run approved synthetic E2E</button>
 <pre id="output" role="status" aria-live="polite">No operations performed.</pre>
+<p id="reports" hidden><a href="/evidence/index.html" target="_blank" rel="noopener">
+Open approved local JSON/HTML evidence dashboard</a></p>
 </section>
 <footer>Single-use execution. No owner file inputs, network calls, real NAS/Uliya,
 Creator invocation or Devpost submission. All PASS claims are operator-reported synthetic.</footer>
@@ -131,6 +175,9 @@ try{
  body:JSON.stringify(data)});
  const result=await response.json();
  out.textContent=JSON.stringify(result,null,2);
+ if(path==="/execute"&&response.ok&&result.evidence_bundle_created===true){
+   document.getElementById("reports").hidden=false;
+ }
  challenge=(path==="/preview"&&response.ok)?result.challenge:null;enable();
 }catch(e){challenge=null;enable();out.textContent="LOCAL_REQUEST_FAILED";}
 }
@@ -166,10 +213,23 @@ def handler_for(controller: Operator, session: str):
                 "127.0.0.1:" + str(self.server.server_port))
 
         def do_GET(self):
-            if self.path != "/" or not self.trusted_host():
+            if not self.trusted_host():
                 return self.send(404, b"NOT_FOUND", "text/plain")
-            self.send(200, HTML.replace("__SESSION__", session).encode("utf-8"),
-                      "text/html; charset=utf-8")
+            if self.path == "/":
+                return self.send(200, HTML.replace("__SESSION__", session).encode("utf-8"),
+                                 "text/html; charset=utf-8")
+            if self.path.startswith("/evidence/"):
+                name = self.path[len("/evidence/"):]
+                if name not in EVIDENCE_FILES:
+                    return self.send(404, b"NOT_FOUND", "text/plain")
+                try:
+                    payload = controller.evidence(name)
+                except (OSError, ValueError, TypeError, KeyError):
+                    return self.send(404, b"NOT_FOUND", "text/plain")
+                kind = ("text/html; charset=utf-8" if name in EVIDENCE_HTML
+                        else "application/json")
+                return self.send(200, payload, kind)
+            return self.send(404, b"NOT_FOUND", "text/plain")
 
         def do_POST(self):
             origin = self.headers.get("Origin")
