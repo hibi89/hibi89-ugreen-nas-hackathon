@@ -1,3 +1,11 @@
+## G88b corrective closeout — 2026-10-31 KST
+
+- **Actual improvement:** G88 review now distinctly reports owner-unapproved goal (`OWNER_APPROVAL_REQUIRED`), unrecognized owner input (`OWNER_INPUT_REQUIRED`), claimed missing file (`CLAIMED_REQUIRED_FILE_MISSING`), and blocked mutating request (`READ_ONLY_PLAN_BLOCKED`); it includes index-only `finding_counts` for PRESENT/MISSING/NOT_CHECKED/VERSION_REVIEW. No path, raw reference, content, independent registered Agent claim, release promotion, NAS access or external data transfer.
+- **Implementation SHA:** `eb5d141c5a8fd636aa11f3150247e88571702f42` on `hibi89/hibi89-ugreen-nas-hackathon@lead/ugreen`. `tools/flowpilot_multi_read_review.py`, `tests/test_flowpilot_multi_read_review.py`. 10 focused test FUNCTIONS DEFINED (prior 8 + 2 new). Independent *standalone decision-mapping* check 4/4 PASS in isolated Python 3.13; this is NOT the repository's G88 suite nor Python 3.11 CI.
+- **Validation boundary:** Repo-focused/full G88b tests and exact-SHA Actions **NOT VERIFIED**. GitHub connector `fetch_commit_workflow_runs` surfaces only PR-triggered workflows; the linked commit combined-status source returned no status entries. External GitHub HTTP unavailable to this runtime; don't infer green CI. Prior G87 exact-code `eb09099b` run 41104026399 SUCCESS (826 PASS/0 FAIL/5 SKIP), not evidence for G88b. G86 genuine owner local synthetic HAE+LA+SQLite PASS unchanged; real Uliya/NAS NOT_RUN.
+- **Next strict acceptance:** run `python -m unittest discover -s tests -p 'test_flowpilot_multi_read_review.py' -v` and repository-wide regression on exact G88b code SHA (or read verifiable exact-SHA Action job logs), repair failures before claiming G88 completion. No new NAS entitlement, license, external trial, Devpost or release approval. Parent G88 code `75d9869` and G88b parent docs `b0521c6` preserved; do not force-push.
+- **State:** CODE COMMITTED, REMOTE READBACK PENDING for doc commit; FUNCTIONAL CI UNVERIFIED; RELEASE HOLD; 2026-10-31 KST, next documentation commit follows.
+
 ## G88 — 2026-10-31 KST · post-G87 redacted multi-read owner review backend
 
 1. **Goal / stack:** Extend G87 already validated operator-normalized, bounded file-agent read reconciliation with a usable machine-readable, INDEX-ONLY owner review queue. Python 3.11 stdlib; zero new external API, runtime, hardware or spending.
