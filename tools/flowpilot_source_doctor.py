@@ -51,7 +51,7 @@ def inspect_sources(hae_root: Path, sovia_root: Path, dbvora_root: Path) -> dict
             status = "PYTHON_3_11_REQUIRED"
         elif not git_ok:
             status = "GIT_UNAVAILABLE"
-        elif type(root) is not Path or root.is_symlink():
+        elif not isinstance(root, Path) or root.is_symlink():
             status = "INVALID_SOURCE_ROOT"
         else:
             try:

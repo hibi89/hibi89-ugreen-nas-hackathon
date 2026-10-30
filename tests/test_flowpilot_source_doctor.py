@@ -48,6 +48,18 @@ class SourceDoctorTests(unittest.TestCase):
         self.assertFalse(row["owner_local_synthetic_source_readiness"])
         self.assertNotIn("/dbvora", str(row))
 
+    def test_path_concrete_subclasses_are_accepted_by_type_gate(self):
+        """Path(...) returns PosixPath/WindowsPath, never type Path itself."""
+        self.assertIsNot(type(self.roots[0]), Path)
+        with (patch("tools.flowpilot_source_doctor.verify_checkout",
+                    return_value=Path("/trusted")) as checked,
+              patch("tools.flowpilot_source_doctor.Path.is_file", return_value=True),
+              patch("tools.flowpilot_source_doctor.Path.is_symlink", return_value=False),
+              patch("tools.flowpilot_source_doctor.shutil.which", return_value="/bin/git")):
+            row = inspect_sources(*self.roots)
+        self.assertEqual(checked.call_count, 3)
+        self.assertTrue(row["owner_local_synthetic_source_readiness"])
+
     def test_missing_git_skips_all_checkout_invocations(self):
         with (patch("tools.flowpilot_source_doctor.shutil.which", return_value=None),
               patch("tools.flowpilot_source_doctor.verify_checkout",
