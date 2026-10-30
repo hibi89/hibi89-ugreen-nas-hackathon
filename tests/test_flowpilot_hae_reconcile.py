@@ -111,6 +111,8 @@ class Handler(BaseHTTPRequestHandler):
         self.server.runs += 1
         if body.get("preview_id") != TOKEN or body.get("approve_writes") is not True:
             return self.reply(403, {"error": "no approval"})
+        if body.get("pending_run_id") not in (None, RUN):
+            return self.reply(409, {"error": "pending run ID differs from approved preview"})
         if self.server.mode == "prewrite_409":
             return self.reply(409, {"error": "preview expired or no longer matches the request"})
         if self.server.mode == "postwrite_500":
@@ -295,6 +297,17 @@ class G82RecoveryContractTests(unittest.TestCase):
         self.assertEqual(report["status"], "BLOCKED_HAE_EXECUTION_REJECTED")
         self.assertFalse(report["executed"])
         self.assertEqual(self.server.runs, 1)
+
+    def test_pending_run_id_must_match_exact_server_preview_before_write(self):
+        preview = self.pending()
+        response = self.call(
+            approval=APPROVAL, preview_id=preview["preview_id"],
+            pending_run_id=OTHER)
+        self.assertEqual(response["status"], "BLOCKED_HAE_EXECUTION_REJECTED")
+        self.assertFalse(response["executed"])
+        self.assertEqual(self.server.status_reads, 0)
+        self.assertEqual(self.server.audit_reads, 0)
+        self.assertTrue(response["do_not_retry_automatically"])
 
     def test_mismatched_postwrite_run_id_reconciles_original_only(self):
         self.server.mode = "mismatch"
