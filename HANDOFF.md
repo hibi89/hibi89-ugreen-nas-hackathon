@@ -1,3 +1,14 @@
+## Latest UGREEN handoff — 2026-10-30 KST
+
+- HEAD code c9aba6074b28143b40b48df80fafccd6e9609882 on feature/flowpilot-ecosystem-integration. lead/ugreen remains acc6d1fe94b908c5d449af15b297b4e62936d7f3.
+- Real owner CSV report engine now cleans partial output on audit/write failure by checking exclusive-created inode identity (commit 1d09b267). Existing or competing replacement never removed. Regression tests for failing DB, partial writer, competing replacement; NOT observed PASS.
+- Offline local ZIP builder now tests its own staged extracted copy and headless UI demo in addition to source root's 4/4 acceptance BEFORE final ZIP creation (commit f26b0a20). Missing archive module triggers no final deliverable; two regression tests. Actual Windows ZIP artifact and extracted PASS still not independently observed.
+- Owner CSV workflow now supports explicit Start another report after prior execution without restarting app (commit b2c75f92). Previous output untouched, previous browser download revoked, fresh temp audit DB and separate new consent; HTTP and controller tests.
+- Official Devpost ZIP is Markdown Skill-only; local executable pilot ZIP is NOT valid submission. Commit c9aba607 adds manifest eligible_for_official_ugreen_submission=false and ensures prior tools/flowpilot_package_audit.py rejects local Python bundle. Official Skill G52 held as before. Source: https://ugreenhackathon.devpost.com/rules.
+- New Actions #41018497775 PENDING; prior feature pushes cancelled earlier pending jobs. CI nonblocking per user instruction. Do not report PASS or 90% overall completion.
+- Next P0: observe exact-code CI or execute on owner trusted Windows. Verify extracted ZIP acceptance, four local capabilities and browser UI. Then genuine first-party Uliya Creator run via supported environment and actual NAS tests if selected finalist. No NAS authorization or hardware currently.
+
+---
 ## UGREEN FlowPilot — 2026-10-30 KST OFFLINE PILOT / DASHBOARD HANDOFF
 
 Goal: fast functional shipping without waiting for CI. Whole NAS/Uliya product 90%-today target is NOT proven; user still wants maximum functional progress.
