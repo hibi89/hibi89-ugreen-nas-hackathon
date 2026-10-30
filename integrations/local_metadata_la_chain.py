@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import Any
 
 from .approval_scope import INTENT_LABELS
+from .dbvora_bridge import inspect_disposable_la_ledger
 from .bounded_goal_compiler import canonical_hash
 from .flowpilot_la_coordinator import compose_previews
 from .la_bridge import read_la_audit
@@ -48,6 +49,7 @@ def _base(status: str) -> dict[str, Any]:
         "local_state_counts": {state: 0 for state in STATES},
         "local_inspection_performed": False,
         "la_execution_verified": False,
+        "dbvora_metadata_inspected": False,
         "approval_receipts": 0,
         "synthetic_write_rows": 0,
         "replay_duplicate_writes": 0,
@@ -133,6 +135,7 @@ def run_local_observation_chain(
     candidates: dict[str, list[str]] | None = None,
     approve_local_metadata: bool = False,
     approve_plan_sha256: str | None = None,
+    dbvora_reader: object | None = None,
 ) -> dict[str, Any]:
     """Preview, inspect (with consent), then optionally persist redacted states.
 
@@ -148,6 +151,8 @@ def run_local_observation_chain(
         raise LocalObservationRefused("INVALID_PLAN_APPROVAL_HASH")
     if approve_plan_sha256 is not None and not approve_local_metadata:
         raise LocalObservationRefused("METADATA_CONSENT_REQUIRED_BEFORE_PLAN_APPROVAL")
+    if dbvora_reader is not None and not callable(dbvora_reader):
+        raise LocalObservationRefused("INVALID_DBVORA_READER")
     if not callable(la_executor_type) or not callable(sovia_assess):
         raise LocalObservationRefused("INJECTED_LOCAL_ENGINES_REQUIRED")
     if type(required) is not list or not 1 <= len(required) <= 12:
@@ -295,6 +300,11 @@ def run_local_observation_chain(
         for i, (step_id, payload) in enumerate(original, 1):
             if step_id != "store" + str(i) or json.loads(payload) != safe_values[i - 1]:
                 raise LocalObservationRefused("LOCAL_SYNTHETIC_PAYLOAD_MISMATCH")
+        # DBVORA is optional and only sees the already-created disposable LA ledger.
+        # This call is strictly after BOTH explicit consent and SHA approval.
+        if dbvora_reader is not None:
+            output["dbvora"] = inspect_disposable_la_ledger(business, dbvora_reader)
+            output["dbvora_metadata_inspected"] = True
         executor.execute(plan, RUN_ID, approve_writes=True)
         if (executor.status(RUN_ID).get("status") != "completed"
                 or _read_rows(business) != original
