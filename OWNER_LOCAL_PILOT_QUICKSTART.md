@@ -1,11 +1,30 @@
-# FlowPilot 3.0 — Windows local pilot
+# FlowPilot 3.0 — Owner-local functional MVP quickstart
 
-On Windows with Python 3.11 installed:
+On Windows with Python 3.11 installed and a fresh checkout of
+`feature/flowpilot-ecosystem-integration`:
 
-1. Check out `feature/flowpilot-ecosystem-integration`.
-2. Double-click `tools/START_FLOWPILOT_DEMO.cmd` (opens a local loopback browser).
-3. Click **Run 1–3 intent real OS demo** to try five automatically generated examples without any other repositories.
-4. For a practical file checklist, type an absolute **trusted LOCAL** folder path, an allowed bounded goal, and exact relative required names (one per line). Confirm this is not a NAS or mapped drive, choose **Preview local checklist**, then independently tick the metadata consent box and run. It reads only file metadata with `lstat`; it never opens file content or lists arbitrary directories.
-5. A separate optional panel handles private HAE/LA/SOVIA/DBVORA exact-source synthetic integrations, with its own approval. It requires separately installed pinned source checkouts. Nothing about local success claims vendor NAS or registered Uliya Expert execution.
+- Double-click `tools/START_FLOWPILOT_DEMO.cmd`. This opens the local
+  browser server (127.0.0.1 only; no external network).
+- Click **Verify 4 local MVP capabilities** for real automatically generated
+  test files, real OS lstat, actual generated CSV aggregation and SQLite
+  audit, approved local-folder metadata and separately consented content
+  aggregation. The four acceptance checks use only disposable fixtures,
+  never actual owner files.
+- To inspect your own trusted local folder, use the **read-only** checklist.
+  This never reads file contents.
+- To aggregate your own local CSV, enter a local absolute folder, 1–5
+  exact CSV base names, a new output filename, group and numeric amount
+  columns. Confirm metadata preview and then separately approve actual
+  contents being read and the creation of a new output file.
+  **This third workflow reads and writes your actual local data.**
+- Only the locally approved output may be downloaded. No public file names,
+  contents or paths are returned to the browser in JSON metadata results.
+- A distinct optional private 4-source verification panel still requires
+  pinned HAE/SOVIA/DBVORA checkouts. This is NOT yet live NAS/Uliya.
 
-No account, network upload or external service is necessary for the public local pilot. Local workbench results contain only counts and safe state labels. Approvals invalidate when input text changes; one approval token is consumed after use. Real NAS/UGOS/Uliya support is **not** implemented/verified in this local UI; official contest release remains HOLD.
+To check all four main LOCAL capabilities without opening the browser,
+double-click `tools/VERIFY_FLOWPILOT_LOCAL_MVP.cmd` or use
+`py -3.11 tools/flowpilot_local_acceptance.py`. The command runs temporary
+fixtures only, prints count/checksum receipts and exits. A PASS is local
+functionality evidence, **not** an official NAS, registered Uliya, Creator
+or Devpost acceptance. Release remains HOLD.

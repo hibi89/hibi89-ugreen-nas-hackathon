@@ -19,6 +19,7 @@ from tools.flowpilot_four_source_suite import run_suite
 from tools.flowpilot_real_os_demo import run_real_local_demo
 from tools.flowpilot_synthetic_csv_panel import CSVPanel, CSVPanelRefused
 from tools.flowpilot_owner_csv import OwnerCSV, OwnerCSVRefused, CONSENT as OWNER_CSV_CONSENT
+from tools.flowpilot_local_acceptance import run_acceptance
 from tools.flowpilot_owner_workbench import OwnerWorkbench, OwnerWorkbenchRefused, CONSENT as OWNER_CONSENT
 
 CONSENT = "I_APPROVE_DISPOSABLE_SYNTHETIC_WRITES"
@@ -55,6 +56,11 @@ class Operator:
     def real_os_demo() -> dict:
         # Independent of private source checkouts and without customer paths.
         return run_real_local_demo()
+
+    @staticmethod
+    def local_acceptance() -> dict:
+        # Real OS, CSV, SQLite checks on generated ephemeral data only.
+        return run_acceptance()
 
     def preview(self) -> dict:
         with self.lock:
@@ -184,6 +190,8 @@ background:#081a2a;border-radius:9px;padding:16px;max-height:310px;overflow:auto
 <p>Run the actual FlowPilot goal parser and OS metadata checks against five
 automatically generated, disposable folders. No LA, SOVIA, DBVORA or NAS calls.</p>
 <button id="demo">Run 1–3 intent real OS demo + missing-file cases</button>
+<button id="acceptance">Verify 4 local MVP capabilities</button>
+<pre id="acceptanceOutput" role="status">Acceptance has not run in this session.</pre>
 </section><section><h2>Real CSV automation on generated examples</h2>
 <p>Combine disposable monthly sales CSVs, inspect the plan, approve writes
 to generated data, and download the actual result with a SQLite audit receipt.
@@ -271,6 +279,17 @@ try{
 }catch(e){challenge=null;enable();out.textContent="LOCAL_REQUEST_FAILED";}
 }
 document.getElementById("demo").onclick=()=>request("/demo",{});
+document.getElementById("acceptance").onclick=async()=>{
+  const el=document.getElementById("acceptanceOutput");
+  el.textContent="Running four actual local fixture checks...";
+  try{
+    const response=await fetch("/acceptance",{method:"POST",cache:"no-store",
+      headers:{"Content-Type":"application/json","X-FlowPilot-Session":session},
+      body:"{}"});
+    const outcome=await response.json();
+    el.textContent=JSON.stringify(outcome,null,2);
+  }catch(e){el.textContent="LOCAL_ACCEPTANCE_REFUSED";}
+};
 const ownerOut=document.getElementById("ownerOutput");
 const ownerRun=document.getElementById("ownerRun");
 const ownerAgree=document.getElementById("ownerApprove");
@@ -642,6 +661,8 @@ def handler_for(controller: Operator, session: str):
                     )
                 elif self.path == "/demo" and not body:
                     result = controller.real_os_demo()
+                elif self.path == "/acceptance" and not body:
+                    result = controller.local_acceptance()
                 elif self.path == "/doctor" and not body:
                     result = controller.sources()
                 elif self.path == "/preview" and not body:

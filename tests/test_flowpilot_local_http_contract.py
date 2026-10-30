@@ -199,6 +199,18 @@ class LocalHTTPContractTests(unittest.TestCase):
                 "X-FlowPilot-Session":self.session
             })[0],404)
 
+    def test_real_four_capability_acceptance_from_local_browser_endpoint(self):
+        status, body, _ = self.authorized("/acceptance", {})
+        self.assertEqual(status, 200, body)
+        result = json.loads(body)
+        self.assertEqual(result["status"], "PASS_FOUR_LOCAL_CAPABILITY_CHECKS")
+        self.assertEqual(result["passed"], 4)
+        self.assertEqual(result["failed"], 0)
+        self.assertFalse(result["user_files_read"])
+        self.assertFalse(result["actual_nas_verified"])
+        self.assertEqual(len(result["checks"]), 4)
+        self.assertEqual(self.request("POST", "/acceptance", data={})[0], 403)
+
     def test_all_report_files_inaccessible_before_success(self):
         for name in ("index.html", "proof-1.html", "proof-1.json", "manifest.json"):
             with self.subTest(name=name):

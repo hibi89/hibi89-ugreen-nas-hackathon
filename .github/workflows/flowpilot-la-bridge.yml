@@ -47,6 +47,9 @@ on:
       - "tests/test_flowpilot_demo_entrypoint.py"
       - "tests/test_flowpilot_four_source_local_ui.py"
       - "tests/test_flowpilot_local_http_contract.py"
+      - "tools/flowpilot_local_acceptance.py"
+      - "tools/VERIFY_FLOWPILOT_LOCAL_MVP.cmd"
+      - "tests/test_flowpilot_local_acceptance.py"
       - "tools/flowpilot_four_source_dashboard.py"
       - "tests/test_public_sovia_dbvora_e2e.py"
       - "tools/verify_four_source_synthetic.py"
@@ -132,6 +135,11 @@ jobs:
           python -m unittest discover -s tests -p 'test_flowpilot_real_os_demo.py' -v
           python tools/flowpilot_real_os_demo.py > /tmp/ugreen-real-os-demo.json
           python -c "import json; d=json.load(open('/tmp/ugreen-real-os-demo.json')); assert d['status']=='PASS_REAL_OS_LSTAT_SYNTHETIC_DEMO'; assert d['scenario_count']==5; assert d['actual_nas_verified'] is False"
+      - name: Run four real local E2E capabilities and verify audit receipts
+        run: |
+          python -m unittest discover -s tests -p 'test_flowpilot_local_acceptance.py' -v
+          python tools/flowpilot_local_acceptance.py > /tmp/flowpilot-four-checks.json
+          python -c "import json;d=json.load(open('/tmp/flowpilot-four-checks.json'));assert d['status']=='PASS_FOUR_LOCAL_CAPABILITY_CHECKS' and d['passed']==4 and d['actual_nas_verified'] is False"
       - name: Run real owner-selected local CSV content aggregation and SQLite audit
         run: python -m unittest discover -s tests -p 'test_flowpilot_owner_csv.py' -v
       - name: Run real generated CSV aggregation and SQLite audit with no NAS
