@@ -1,3 +1,16 @@
+## G88d verification acceptance — 2026-10-31 03:43 KST
+
+1. **Goal/requirements/stack:** Validate offline multi-read review backend G88b and Windows runner G88d without NAS, mutations, cloud calls or private external transfer; PowerShell + Python unittest.
+2. **Completed change/outcome:** G88d `verify_local.ps1` corrected Windows native stderr processing (code commit `8f8f5215447f08b2c52905576ac1930fbb1a4c20`). User updated existing `_g84_local/UGREEN` via `git pull --ff-only` to exact `cd836ca6a456ecac5a748d00df7aefc4463afc70`, and confirmed successful `-Mode g88` run.
+3. **Executed tests/evidence:** User terminal explicitly displayed `UGREEN LOCAL VERIFY: PASS [g88]`, exact source SHA `cd836ca6a456ecac5a748d00df7aefc4463afc70`, and `G88 종료 코드: 0`. Generated summary `verify-20261031-034320-28644.json` and log `verify-20261031-034320-28644.log` under owner's `%LOCALAPPDATA%/Temp/ugreen-flowpilot-verify`; contents have NOT been read here. **Focused G88 verdict VERIFIED_BY_OWNER_TERMINAL; individual per-test count and full-suite CI still UNVERIFIED.** Distinct HAE run earlier 14 tests PASS, not UGREEN.
+4. **State / boundary:** G88 focused local test PASS; full UGREEN offline regression PENDING; actual registered Uliya Expert/NAS PENDING, no permission escalation or live claim; release/Devpost HOLD.
+5. **Incident/attempt/retry:** Pre-fix owner run at `c0386f4` exited wrapper 2; runner's global Stop + unittest verbose stderr hypothesized. After targeted `8f8f521` fix, owner reran and got PASS 0. Original error log unavailable, so underlying error diagnosis remains probable, not independently established. Do not repeat old broken runner or demand already completed G88 command.
+6. **Repo/branch/SHA/paths:** `hibi89/hibi89-ugreen-nas-hackathon@lead/ugreen` owner-tested SHA `cd836ca6a456ecac5a748d00df7aefc4463afc70`; implementation `tools/flowpilot_multi_read_review.py`, tests `tests/test_flowpilot_multi_read_review.py`, runner `verify_local.ps1`. Documentation checkpoint SHA follows.
+7. **Environment/production:** Existing user's Windows PowerShell checkout, Python unittest; `powershell -ExecutionPolicy Bypass -File .\\verify_local.ps1 -Mode g88` PASS 0. Vercel/production N/A; Actions exact-SHA output not retrieved.
+8. **Source/backup/security:** Git SHA is reproducibility anchor; original Skill/PDF/ZIP, HAE/LA files, tokens, customer data untouched; local log remains on user's computer, not uploaded.
+9. **Next priority/acceptance:** Run full UGREEN offline regression `powershell -ExecutionPolicy Bypass -File .\\verify_local.ps1 -Mode full` after updating docs (new SHA), record PASS 0 and suite counts if available; then backend official Uliya runtime metadata/permissions contract verification, without claiming real NAS access.
+10. **Checkpoint:** 2026-10-31 03:43 KST, as observed in user terminal against `cd836ca6`; this new docs-only commit does not modify the tested code. **G88 focused verified, backend/release not finished.**
+
 ## G88d — 2026-10-31 03:40 KST · Windows PowerShell runner correction
 
 1. **Goal/stack:** Verify G88 review functionality on owner's existing Windows PowerShell checkout using Python stdlib unittest, without NAS.
