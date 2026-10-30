@@ -119,6 +119,33 @@ class DBVORASyntheticBridgeTests(unittest.TestCase):
                 with self.assertRaises(DBVORABridgeRefused):
                     summarize_synthetic_dbvora_inventory(bad)
 
+    def test_symlink_ledger_refused_before_reader_invocation(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            actual = root / "target.sqlite"
+            actual.touch()
+            alias = root / "business.sqlite"
+            try:
+                alias.symlink_to(actual)
+            except (OSError, NotImplementedError):
+                self.skipTest("Host disallows synthetic symlink creation")
+            called = []
+            with self.assertRaisesRegex(
+                    DBVORABridgeRefused, "DBVORA_SYNTHETIC_READER_UNAVAILABLE"):
+                inspect_disposable_la_ledger(
+                    alias, lambda path: called.append(path))
+            self.assertEqual(called, [])
+
+    def test_unexpected_filename_refused_before_reader_invocation(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "private_customer.sqlite"
+            path.touch()
+            called = []
+            with self.assertRaises(DBVORABridgeRefused):
+                inspect_disposable_la_ledger(
+                    path, lambda p: called.append(p))
+            self.assertEqual(called, [])
+
     def test_injected_error_never_leaks_filename(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "business.sqlite"

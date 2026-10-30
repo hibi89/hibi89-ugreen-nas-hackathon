@@ -9,6 +9,7 @@ The injection being valid does not establish provenance of the private source.
 from __future__ import annotations
 
 from pathlib import Path
+import stat
 from typing import Callable, Any
 
 
@@ -80,8 +81,21 @@ def summarize_synthetic_dbvora_inventory(raw: object) -> dict[str, Any]:
 
 def inspect_disposable_la_ledger(path: Path, reader: Callable[[Path], dict]) -> dict:
     """Invoke supplied read-only metadata inspector ONLY on a temporary ledger."""
-    if not callable(reader) or not isinstance(path, Path) or not path.is_file():
+    if not callable(reader) or not isinstance(path, Path):
         raise DBVORABridgeRefused("DBVORA_SYNTHETIC_READER_UNAVAILABLE")
+    # The caller must pass its own disposable LA business.sqlite. Refuse
+    # symlink/reparse and multi-link paths before calling an injected reader.
+    # This is a local preflight, NOT atomic protection against concurrent
+    # replacement on an untrusted filesystem.
+    try:
+        info = path.lstat()
+        if (path.name != "business.sqlite"
+                or path.is_symlink() or path.parent.is_symlink()
+                or not stat.S_ISREG(info.st_mode)
+                or info.st_nlink != 1):
+            raise DBVORABridgeRefused("DBVORA_SYNTHETIC_READER_UNAVAILABLE")
+    except OSError:
+        raise DBVORABridgeRefused("DBVORA_SYNTHETIC_READER_UNAVAILABLE") from None
     try:
         inventory = reader(path)
     except Exception:
