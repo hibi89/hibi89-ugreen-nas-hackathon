@@ -96,7 +96,7 @@ def main(argv=None) -> int:
         row = {"status": "BLOCKED", "reason": "SOURCE_PROBE_REFUSED",
                "actual_nas_verified": False, "release_gate": "HOLD"}
     print(json.dumps(row, sort_keys=True))
-    return 0 if row.get("owner_local_synthetic_source_readiness") else 2
+    return 0 if row.get("owner_local_synthetic_preview_readiness") else 2
 
 
 if __name__ == "__main__":

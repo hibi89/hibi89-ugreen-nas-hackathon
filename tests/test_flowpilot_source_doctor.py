@@ -3,13 +3,15 @@ from __future__ import annotations
 
 import unittest
 import json
+from contextlib import redirect_stdout
+from io import StringIO
 import subprocess
 import sys
 import tempfile
 from pathlib import Path
 from unittest.mock import patch
 
-from tools.flowpilot_source_doctor import SOURCES, inspect_sources
+from tools.flowpilot_source_doctor import SOURCES, inspect_sources, main
 from tools.verify_private_hae_chain import ProofRefused
 
 
@@ -76,6 +78,24 @@ class SourceDoctorTests(unittest.TestCase):
         self.assertTrue(result["owner_local_synthetic_preview_readiness"])
         self.assertFalse(result["owner_local_synthetic_execution_readiness"])
         self.assertEqual(result["status"], "READY_FOR_LOCAL_SYNTHETIC_PREVIEW")
+
+    def test_cli_success_exit_means_preview_ready_not_private_execution(self):
+        evidence = {
+            "status": "READY_FOR_LOCAL_SYNTHETIC_PREVIEW",
+            "owner_local_synthetic_preview_readiness": True,
+            "owner_local_synthetic_execution_readiness": False,
+            "actual_nas_verified": False,
+            "release_gate": "HOLD",
+        }
+        output = StringIO()
+        with (patch("tools.flowpilot_source_doctor.inspect_sources",
+                    return_value=evidence),
+              redirect_stdout(output)):
+            rc = main(["--hae-root", "/hae", "--sovia-root", "/sovia",
+                       "--dbvora-root", "/dbvora"])
+        self.assertEqual(rc, 0)
+        row = json.loads(output.getvalue())
+        self.assertFalse(row["owner_local_synthetic_execution_readiness"])
 
     def test_missing_git_skips_all_checkout_invocations(self):
         with (patch("tools.flowpilot_source_doctor.shutil.which", return_value=None),
