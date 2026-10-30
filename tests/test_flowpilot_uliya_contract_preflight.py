@@ -106,8 +106,11 @@ class G95PinnedCatalogTests(unittest.TestCase):
     def test_reject_duplicate_official_parameter_names(self):
         def change(c):
             group = next(g for g in c["clis"] if g["name"] == "ug-filesystem")
-            group["actions"][0]["parameters"].append(
-                copy.deepcopy(group["actions"][0]["parameters"][0]))
+            # SELECTION stores names as a set: action[0] changes with hash seed.
+            # Exercise the supported read action explicitly, never arbitrary cat/hash.
+            ls_action = next(a for a in group["actions"] if a["name"] == "ls")
+            ls_action["parameters"].append(
+                copy.deepcopy(ls_action["parameters"][0]))
         blob, digest = fake(change)
         with self.assertRaises(TrialPreflightRefused):
             pinned_catalog_contract(blob, expected_sha=digest)
