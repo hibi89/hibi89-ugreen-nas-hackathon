@@ -9,11 +9,23 @@ from unittest.mock import patch
 from tools.verify_four_source_synthetic import (
     FourSourceProofRefused, run_matrix,
 )
+from tools.verify_private_hae_chain import EXPECTED_HAE_SHA, EXPECTED_SOVIA_SHA
+from tools.verify_local_metadata_la_chain import EXPECTED_DBVORA_SHA
 
 
 def fixture_response(*, approved=False):
     if not approved:
         return {
+            "pinned_sources": "PASS",
+            "hae_la_commit": EXPECTED_HAE_SHA,
+            "sovia_commit": EXPECTED_SOVIA_SHA,
+            "dbvora_commit": None,
+            "dbvora_private_checkout_pinned": False,
+            "dbvora_private_source_invoked_locally": False,
+            "independent_public_ci_private_hae_executed": False,
+            "local_inspection_performed": True,
+            "sovia_advisory": "REVIEW_ONLY",
+            "sovia_finding_count": 2,
             "status": "WAITING_EXACT_LOCAL_PLAN_APPROVAL",
             "approve_plan_sha256": "a" * 64,
             "la_execution_verified": False,
@@ -22,6 +34,18 @@ def fixture_response(*, approved=False):
             "actual_nas_verified": False, "release_gate": "HOLD",
         }
     return {
+        "pinned_sources": "PASS",
+        "hae_la_commit": EXPECTED_HAE_SHA,
+        "sovia_commit": EXPECTED_SOVIA_SHA,
+        "dbvora_commit": EXPECTED_DBVORA_SHA,
+        "dbvora_private_checkout_pinned": True,
+        "independent_public_ci_private_hae_executed": False,
+        "local_inspection_performed": True,
+        "sovia_advisory": "REVIEW_ONLY",
+        "sovia_finding_count": 2,
+        "file_contents_opened": False,
+        "raw_paths_or_names_returned": False,
+        "customer_file_contents_used": False,
         "status": "PASS",
         "la_execution_verified": True,
         "dbvora_metadata_inspected": True,
@@ -35,6 +59,10 @@ def fixture_response(*, approved=False):
         "release_gate": "HOLD",
         "dbvora": {
             "status": "SYNTHETIC_SCHEMA_METADATA_ONLY",
+            "contract": "ugreen-dbvora-p0-redacted.v1",
+            "scope": "DISPOSABLE_LOCAL_LA_SQLITE_NOT_NAS",
+            "source_implementation_independently_verified": False,
+            "main_database_file_bytes": 8192,
             "table_count": 1, "column_count": 3,
             "real_nas_or_customer_database_inspected": False,
         }
@@ -105,6 +133,49 @@ class FourSourceSyntheticMatrixTests(unittest.TestCase):
             with self.assertRaisesRegex(FourSourceProofRefused,
                                         "FOUR_SOURCE_SYNTHETIC_EVIDENCE_INCOMPLETE"):
                 run_matrix(*self.args, approve_disposable_synthetic=True)
+
+    def test_invalid_sha_preview_is_rejected_before_any_write(self):
+        for invalid in ("g" * 64, "A" * 64):
+            with self.subTest(invalid=invalid[0]):
+                bad = {**fixture_response(), "approve_plan_sha256": invalid}
+                with patch("tools.verify_four_source_synthetic.verify",
+                           side_effect=[bad, AssertionError("MUST_NOT_EXECUTE")]) as seen:
+                    with self.assertRaisesRegex(
+                            FourSourceProofRefused, "UNSAFE_SYNTHETIC_PREVIEW"):
+                        run_matrix(*self.args, approve_disposable_synthetic=True)
+                    self.assertEqual(seen.call_count, 1)
+
+    def test_wrong_hae_sha_preview_is_rejected_without_write(self):
+        bad = {**fixture_response(), "hae_la_commit": "0" * 40}
+        with patch("tools.verify_four_source_synthetic.verify",
+                   side_effect=[bad, AssertionError("MUST_NOT_EXECUTE")]) as seen:
+            with self.assertRaisesRegex(
+                    FourSourceProofRefused, "UNSAFE_SYNTHETIC_PREVIEW"):
+                run_matrix(*self.args, approve_disposable_synthetic=True)
+            self.assertEqual(seen.call_count, 1)
+
+    def test_wrong_dbvora_sha_approved_result_is_not_pass(self):
+        bad = {**fixture_response(approved=True), "dbvora_commit": "0" * 40}
+        with patch("tools.verify_four_source_synthetic.verify",
+                   side_effect=[fixture_response(), bad]):
+            with self.assertRaisesRegex(
+                    FourSourceProofRefused, "FOUR_SOURCE_SYNTHETIC_EVIDENCE_INCOMPLETE"):
+                run_matrix(*self.args, approve_disposable_synthetic=True)
+
+    def test_unverified_or_unredacted_dbvora_result_is_not_pass(self):
+        base = fixture_response(approved=True)
+        for field, value in (
+            ("source_implementation_independently_verified", True),
+            ("scope", "CUSTOMER_NAS"),
+            ("column_count", True),
+        ):
+            with self.subTest(field=field):
+                bad = {**base, "dbvora": {**base["dbvora"], field: value}}
+                with patch("tools.verify_four_source_synthetic.verify",
+                           side_effect=[fixture_response(), bad]):
+                    with self.assertRaisesRegex(
+                            FourSourceProofRefused, "FOUR_SOURCE_SYNTHETIC_EVIDENCE_INCOMPLETE"):
+                        run_matrix(*self.args, approve_disposable_synthetic=True)
 
     def test_bad_nas_claim_refused(self):
         bad = {**fixture_response(approved=True), "actual_nas_verified": True}

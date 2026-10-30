@@ -16,12 +16,31 @@ from pathlib import Path
 PROJECT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT))
 
-from tools.verify_private_hae_chain import ProofRefused
-from tools.verify_local_metadata_la_chain import verify
+from tools.verify_private_hae_chain import (
+    EXPECTED_HAE_SHA, EXPECTED_SOVIA_SHA, ProofRefused,
+)
+from tools.verify_local_metadata_la_chain import EXPECTED_DBVORA_SHA, verify
 
 GOAL = "파일 누락 확인 그리고 인계 확인"
 REQUIRED = ["README.md"]
 REQUIRED_STATUS = "WAITING_EXACT_LOCAL_PLAN_APPROVAL"
+
+
+def _pinned_source_claim_valid(row: dict, *, expect_dbvora: bool) -> bool:
+    """Fail closed on stale/missing provenance before reporting real integration."""
+    if type(row) is not dict:
+        return False
+    return (
+        row.get("pinned_sources") == "PASS"
+        and row.get("hae_la_commit") == EXPECTED_HAE_SHA
+        and row.get("sovia_commit") == EXPECTED_SOVIA_SHA
+        and row.get("dbvora_commit") == (
+            EXPECTED_DBVORA_SHA if expect_dbvora else None
+        )
+        and row.get("dbvora_private_checkout_pinned") is expect_dbvora
+        and row.get("dbvora_private_source_invoked_locally") is expect_dbvora
+        and row.get("independent_public_ci_private_hae_executed") is False
+    )
 
 
 class FourSourceProofRefused(ValueError):
@@ -44,6 +63,11 @@ def run_matrix(hae_root: Path, sovia_root: Path, dbvora_root: Path, *,
         if (preview.get("status") != REQUIRED_STATUS
                 or type(preview.get("approve_plan_sha256")) is not str
                 or len(preview["approve_plan_sha256"]) != 64
+                or any(c not in "0123456789abcdef" for c in preview["approve_plan_sha256"])
+                or not _pinned_source_claim_valid(preview, expect_dbvora=False)
+                or preview.get("local_inspection_performed") is not True
+                or preview.get("sovia_advisory") != "REVIEW_ONLY"
+                or preview.get("sovia_finding_count") != 2
                 or preview.get("la_execution_verified") is not False
                 or preview.get("dbvora_metadata_inspected") is not False
                 or preview.get("synthetic_write_rows") != 0
@@ -66,6 +90,13 @@ def run_matrix(hae_root: Path, sovia_root: Path, dbvora_root: Path, *,
         )
         summary = approved.get("dbvora", {})
         if (approved.get("status") != "PASS"
+                or not _pinned_source_claim_valid(approved, expect_dbvora=True)
+                or approved.get("local_inspection_performed") is not True
+                or approved.get("sovia_advisory") != "REVIEW_ONLY"
+                or approved.get("sovia_finding_count") != 2
+                or approved.get("file_contents_opened") is not False
+                or approved.get("raw_paths_or_names_returned") is not False
+                or approved.get("customer_file_contents_used") is not False
                 or approved.get("la_execution_verified") is not True
                 or approved.get("dbvora_metadata_inspected") is not True
                 or approved.get("dbvora_private_source_invoked_locally") is not True
@@ -75,6 +106,13 @@ def run_matrix(hae_root: Path, sovia_root: Path, dbvora_root: Path, *,
                 or approved.get("ephemeral_sqlite_deleted_after_run") is not True
                 or type(summary) is not dict
                 or summary.get("status") != "SYNTHETIC_SCHEMA_METADATA_ONLY"
+                or summary.get("contract") != "ugreen-dbvora-p0-redacted.v1"
+                or summary.get("scope") != "DISPOSABLE_LOCAL_LA_SQLITE_NOT_NAS"
+                or summary.get("source_implementation_independently_verified") is not False
+                or type(summary.get("column_count")) is not int
+                or summary["column_count"] < 1
+                or type(summary.get("main_database_file_bytes")) is not int
+                or summary["main_database_file_bytes"] < 100
                 or type(summary.get("table_count")) is not int
                 or summary.get("table_count") < 1
                 or summary.get("real_nas_or_customer_database_inspected") is not False
