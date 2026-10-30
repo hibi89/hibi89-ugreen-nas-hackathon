@@ -102,6 +102,43 @@ class LocalHTTPContractTests(unittest.TestCase):
                 "approval_token": ticket, "consent": "APPROVE_LOCAL_METADATA_LSTAT"
             })[0], 400)
 
+    def test_actual_csv_pipeline_via_local_http_approval_and_sha_download(self):
+        self.assertEqual(self.request("GET", "/csv/report.csv")[0], 403)
+        self.assertEqual(self.request("GET", "/csv/report.csv", headers={
+            "X-FlowPilot-Session": self.session,
+        })[0], 404)
+        preview_status, preview_data, _ = self.authorized("/csv/configure", {
+            "output": "summary.csv",
+        })
+        self.assertEqual(preview_status, 200)
+        preview = json.loads(preview_data)
+        self.assertTrue(preview["workflow_preview_ready"])
+        self.assertFalse(preview["csv_created"])
+        status, payload, _ = self.authorized("/csv/approve", {})
+        self.assertEqual(status, 200, payload)
+        result = json.loads(payload)
+        self.assertEqual(result["status"], "LOCAL_REPORT_CREATED_NOT_NAS")
+        self.assertTrue(result["audit_recorded"])
+        self.assertFalse(result["nas_verified"])
+        report_status, csv_bytes, _ = self.request("GET", "/csv/report.csv", headers={
+            "X-FlowPilot-Session": self.session,
+        })
+        self.assertEqual(report_status, 200)
+        self.assertIn(b"alice,5.00", csv_bytes)
+        self.assertIn(b"bob,6.00", csv_bytes)
+        self.assertEqual(hashlib.sha256(csv_bytes).hexdigest(),
+                         result["report_sha256"])
+        self.assertEqual(self.authorized("/csv/approve", {})[0], 400)
+
+    def test_generated_csv_rejects_unknown_output_before_write(self):
+        self.assertEqual(self.authorized("/csv/configure", {
+            "output": "../secret.csv",
+        })[0], 400)
+        self.assertEqual(self.authorized("/csv/approve", {})[0], 400)
+        self.assertEqual(self.request("GET", "/csv/report.csv", headers={
+            "X-FlowPilot-Session": self.session,
+        })[0], 404)
+
     def test_all_report_files_inaccessible_before_success(self):
         for name in ("index.html", "proof-1.html", "proof-1.json", "manifest.json"):
             with self.subTest(name=name):
