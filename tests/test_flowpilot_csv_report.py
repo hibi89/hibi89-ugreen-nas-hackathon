@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from flowpilot_csv_report import preview, execute, ReportRefused
+from tools.flowpilot_csv_report import preview, execute, ReportRefused
 
 
 class CsvReportTests(unittest.TestCase):
@@ -46,7 +46,7 @@ class CsvReportTests(unittest.TestCase):
     def test_audit_database_failure_rolls_back_newly_created_csv(self):
         from unittest.mock import patch
         p = preview(self.root, ["a.csv", "b.csv"], "summary.csv", **self.kw)
-        with patch("flowpilot_csv_report.sqlite3.connect",
+        with patch("tools.flowpilot_csv_report.sqlite3.connect",
                    side_effect=sqlite3.OperationalError("audit unavailable")):
             with self.assertRaisesRegex(ReportRefused, "LOCAL_CSV_OUTPUT_OR_AUDIT_FAILED"):
                 execute(self.root, p, approval="APPROVE_EXECUTION", audit_db=self.db)
@@ -65,7 +65,7 @@ class CsvReportTests(unittest.TestCase):
             os.replace(foreign, out)
             raise sqlite3.OperationalError("injected audit error")
         p = preview(self.root, ["a.csv", "b.csv"], "summary.csv", **self.kw)
-        with patch("flowpilot_csv_report.sqlite3.connect", side_effect=replace_and_fail):
+        with patch("tools.flowpilot_csv_report.sqlite3.connect", side_effect=replace_and_fail):
             with self.assertRaises(ReportRefused):
                 execute(self.root, p, approval="APPROVE_EXECUTION", audit_db=self.db)
         self.assertEqual(out.read_bytes(), b"OWNED-BY-ANOTHER-PROCESS")
@@ -76,7 +76,7 @@ class CsvReportTests(unittest.TestCase):
         class BrokenWriter:
             def writerow(self, row):
                 raise OSError("injected writing error")
-        with patch("flowpilot_csv_report.csv.writer", return_value=BrokenWriter()):
+        with patch("tools.flowpilot_csv_report.csv.writer", return_value=BrokenWriter()):
             with self.assertRaises(ReportRefused):
                 execute(self.root, p, approval="APPROVE_EXECUTION", audit_db=self.db)
         self.assertFalse((self.root / "summary.csv").exists())
