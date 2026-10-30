@@ -171,7 +171,9 @@ class HAELoopbackBridgeTests(unittest.TestCase):
         self.assertEqual(result["status"], "HAE_LA_SQLITE_AUDIT_CONFIRMED")
         self.assertEqual(result["run_id"], RUN_ID)
         self.assertTrue(result["executed"])
-        self.assertTrue(result["actual_la_execution_verified"])
+        self.assertTrue(result["hae_http_audit_verified"])
+        self.assertTrue(result["hae_reported_la_execution"])
+        self.assertFalse(result["actual_la_execution_verified"])
         self.assertFalse(result["real_nas_verified"])
         self.assertEqual(result["imported_rows"], 2)
         self.assertEqual(result["audit_events"], 5)
@@ -257,7 +259,8 @@ class HAELoopbackBridgeTests(unittest.TestCase):
                           hae_port=self.port, hae_csv=CSV, preview_id=pre["preview_id"],
                           approval=APPROVAL, confirm_synthetic=True)
         self.assertEqual(end["status"], "HAE_LA_SQLITE_AUDIT_CONFIRMED")
-        self.assertTrue(end["actual_la_execution_verified"])
+        self.assertTrue(end["hae_http_audit_verified"])
+        self.assertFalse(end["actual_la_execution_verified"])
 
     def test_hae_backend_cannot_mix_local_csv_or_metadata_options(self):
         with self.assertRaises(ReportRefused):
