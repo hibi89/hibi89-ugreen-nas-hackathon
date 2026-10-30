@@ -10,6 +10,12 @@ import shutil
 import sys
 from pathlib import Path
 
+# Direct execution (including PowerShell from any working directory) puts
+# tools/ rather than the repository root on sys.path. Fix before imports.
+PROJECT = Path(__file__).resolve().parents[1]
+if str(PROJECT) not in sys.path:
+    sys.path.insert(0, str(PROJECT))
+
 from tools.verify_private_hae_chain import (
     EXPECTED_HAE_SHA, EXPECTED_SOVIA_SHA, ProofRefused, verify_checkout,
 )

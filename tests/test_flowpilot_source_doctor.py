@@ -2,6 +2,10 @@
 from __future__ import annotations
 
 import unittest
+import json
+import subprocess
+import sys
+import tempfile
 from pathlib import Path
 from unittest.mock import patch
 
@@ -59,6 +63,23 @@ class SourceDoctorTests(unittest.TestCase):
             row = inspect_sources(*self.roots)
         self.assertEqual(row["sources"]["hae_la"]["status"], "LOCAL_SOURCE_UNVERIFIED")
         self.assertNotIn("PRIVATE_CUSTOMER", str(row))
+
+    def test_direct_launcher_from_unrelated_working_directory(self):
+        """Regression: script entrypoint must find tools even outside repo."""
+        script = Path(__file__).resolve().parents[1] / "tools" / "flowpilot_source_doctor.py"
+        with tempfile.TemporaryDirectory(prefix="ugreen-doctor-cwd-") as tmp:
+            proc = subprocess.run(
+                [sys.executable, str(script),
+                 "--hae-root", str(Path(tmp) / "no-hae"),
+                 "--sovia-root", str(Path(tmp) / "no-sovia"),
+                 "--dbvora-root", str(Path(tmp) / "no-dbvora")],
+                cwd=tmp, capture_output=True, text=True, timeout=15,
+            )
+        self.assertEqual(proc.returncode, 2, proc.stderr)
+        row = json.loads(proc.stdout)
+        self.assertEqual(row["status"], "BLOCKED")
+        self.assertFalse(row["actual_nas_verified"])
+        self.assertEqual(row["release_gate"], "HOLD")
 
     def test_missing_checkout_never_claims_real_execution(self):
         with patch("tools.flowpilot_source_doctor.verify_checkout",
