@@ -45,6 +45,30 @@ class OfflinePilotZIPTests(unittest.TestCase):
             self.assertEqual(check.returncode, 0, check.stderr)
             self.assertEqual(json.loads(check.stdout)["passed"], 4)
 
+    def test_final_delivery_blocked_when_extracted_bundle_has_missing_module(self):
+        from unittest.mock import patch
+        from tools import build_flowpilot_pilot_zip as bundler
+        original = bundler._collect
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "no-broken-pilot.zip"
+            def remove_required_module(root):
+                files = original(root)
+                self.assertIn("tools/flowpilot_owner_csv.py", files)
+                files.pop("tools/flowpilot_owner_csv.py")
+                return files
+            with patch.object(bundler, "_collect", side_effect=remove_required_module):
+                with self.assertRaises(PilotBundleRefused):
+                    bundler.build_offline_pilot(path)
+            self.assertFalse(path.exists())
+
+    def test_release_receipt_requires_extracted_four_check_and_ui_demo(self):
+        with tempfile.TemporaryDirectory() as temp:
+            target = Path(temp) / "verified.zip"
+            row = build_offline_pilot(target)
+            self.assertTrue(row["extracted_four_capability_acceptance_passed"])
+            self.assertTrue(row["extracted_ui_demo_check_passed"])
+            self.assertFalse(row["actual_nas_verified"])
+
     def test_existing_bundle_is_never_overwritten(self):
         with tempfile.TemporaryDirectory() as temp:
             out = Path(temp) / "existing.zip"

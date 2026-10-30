@@ -12,6 +12,7 @@ import ast
 import hashlib
 import json
 from pathlib import Path
+from tempfile import TemporaryDirectory
 import subprocess
 import sys
 import zipfile
@@ -203,9 +204,58 @@ def _write_zip(target: Path, files: dict[str, bytes]) -> dict:
     }
 
 
+def _accept_extracted_archive(stage: Path, manifest: dict) -> None:
+    """Install-test the exact contents intended for users before publication."""
+    with zipfile.ZipFile(stage, "r") as archive:
+        payload_names = set(archive.namelist())
+        expected_names = {f"{PREFIX}/{p}" for p in manifest["files"]}
+        expected_names.add(f"{PREFIX}/MANIFEST.json")
+        if payload_names != expected_names:
+            raise PilotBundleRefused("OFFLINE_ZIP_CONTENT_MISMATCH")
+        for filename, digest in manifest["files"].items():
+            data = archive.read(f"{PREFIX}/{filename}")
+            if hashlib.sha256(data).hexdigest() != digest:
+                raise PilotBundleRefused("OFFLINE_ZIP_DIGEST_MISMATCH")
+        # All archive paths are produced from the strict internal source
+        # manifest; ZIP entries are not caller-controlled.
+        extracted = stage.parent / "extracted"
+        archive.extractall(extracted)
+    pilot_root = extracted / PREFIX
+    _accept(pilot_root)
+    # The actual standalone browser entrypoint must also launch without
+    # external Git modules, vendor dependencies or the source repository.
+    run = subprocess.run(
+        [sys.executable, str(pilot_root / "tools" /
+                           "flowpilot_four_source_local_ui.py"), "--demo-check"],
+        cwd=stage.parent, capture_output=True, text=True, timeout=30,
+    )
+    try:
+        row = json.loads(run.stdout)
+    except ValueError:
+        raise PilotBundleRefused("EXTRACTED_UI_DEMO_NOT_READY") from None
+    if (run.returncode != 0 or
+            row.get("status") != "PASS_REAL_OS_LSTAT_SYNTHETIC_DEMO" or
+            row.get("scenario_count") != 5 or
+            row.get("actual_nas_verified") is not False):
+        raise PilotBundleRefused("EXTRACTED_UI_DEMO_NOT_READY")
+
+
 def build_offline_pilot(out: Path, *, root: Path = REPO) -> dict:
     _accept(root)
-    return _write_zip(out, _collect(root))
+    files = _collect(root)
+    # Build and execute a disposable ZIP copy before touching the requested
+    # destination. If an import or startup route is missing, no deliverable
+    # appears and no pre-existing user file can be changed.
+    with TemporaryDirectory(prefix="flowpilot-pilot-staging-") as tmp:
+        stage = Path(tmp) / "candidate.zip"
+        _write_zip(stage, files)
+        with zipfile.ZipFile(stage, "r") as archive:
+            manifest = json.loads(archive.read(f"{PREFIX}/MANIFEST.json"))
+        _accept_extracted_archive(stage, manifest)
+    result = _write_zip(out, files)
+    result["extracted_four_capability_acceptance_passed"] = True
+    result["extracted_ui_demo_check_passed"] = True
+    return result
 
 
 def main(argv=None) -> int:
