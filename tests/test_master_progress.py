@@ -11,6 +11,10 @@ class MasterTests(unittest.TestCase):
     def setUpClass(cls):
         cls.m=MASTER.read_text(encoding="utf-8")
         cls.p=SOURCE.read_text(encoding="utf-8")
+    def test_ugreen_master_source_is_pinned_not_opportunistic(self):
+        from render_master_progress import SOURCE as actual
+        self.assertEqual(actual,ROOT/"data/master_progress.json")
+
     def test_full_plan_matches_original(self):
         self.assertEqual([],integrity_errors(self.m,self.p))
     def test_missing_day_rejected(self):

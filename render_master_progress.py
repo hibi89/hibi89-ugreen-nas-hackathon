@@ -8,8 +8,8 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
-SOURCE = ROOT / ("data/paypal_daily_progress.json" if
-    (ROOT / "data/paypal_daily_progress.json").is_file() else "data/master_progress.json")
+# This repository must never auto-switch to another contest's progress file.
+SOURCE = ROOT / "data/master_progress.json"
 OUTPUT = ROOT / "MASTER_PROGRESS.md"
 STATES = {"DONE", "PARTIAL", "BLOCKED", "NOT_STARTED"}
 
