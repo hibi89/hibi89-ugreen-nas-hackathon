@@ -7,6 +7,8 @@ Missing/incompatible LA fails closed; never executes FlowPilot group-sum graph.
 """
 from __future__ import annotations
 
+from contextlib import closing
+
 import argparse
 import csv
 from hashlib import sha256
@@ -107,7 +109,12 @@ def run_demo(*, approval: str | None = None, loader=import_module,
             status = engine.status(RUN_ID)
             audit = engine.audit(RUN_ID)
             verified = engine.verify_receipts(LA_PLAN, RUN_ID)
-            with sqlite3.connect(f"file:{business.as_posix()}?mode=ro", uri=True) as connection:
+            # SQLite's connection context manager commits/rolls back but does NOT
+            # close the file handle. Release before the temporary root cleanup.
+            with closing(sqlite3.connect(
+                business.resolve(strict=True).as_uri() + "?mode=ro", uri=True,
+                timeout=2.0,
+            )) as connection:
                 persisted_rows = connection.execute(
                     "SELECT row_number, source_sha256, payload_json "
                     "FROM csv_records WHERE run_id=? AND import_step_id=? "

@@ -45,8 +45,17 @@ def integrity_errors(master,original):
             errors.append("Unverified official SDK gate should stay BLOCKED")
         if doc["days"][-1]["progress_state"]=="DONE":
             errors.append("No Devpost submission receipt on 11/16")
-        if master!=render(doc):
-            errors.append("MASTER_PROGRESS.md does not equal deterministic JSON rendering")
+        rendered = render(doc)
+        if master != rendered:
+            offset = next((i for i, (a, b) in enumerate(zip(master, rendered))
+                           if a != b), min(len(master), len(rendered)))
+            line = master.count("\n", 0, offset) + 1
+            errors.append(
+                "MASTER_PROGRESS.md does not equal deterministic JSON rendering"
+                " (first differing line " + str(line)
+                + ", local_chars=" + str(len(master))
+                + ", expected_chars=" + str(len(rendered)) + ")"
+            )
     except (ValueError,TypeError,KeyError,IndexError) as exc:
         errors.append("Invalid master JSON or content: "+str(exc))
     return errors

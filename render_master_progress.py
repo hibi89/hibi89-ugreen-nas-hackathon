@@ -123,8 +123,21 @@ def main():
         OUTPUT.write_text(rendered, encoding="utf-8")
         print("MASTER_PROGRESS generated")
         return 0
-    if not OUTPUT.is_file() or OUTPUT.read_text(encoding="utf-8") != rendered:
-        print("MASTER_PROGRESS OUT OF SYNC: run python render_master_progress.py --write")
+    if not OUTPUT.is_file():
+        print("MASTER_PROGRESS OUT OF SYNC: generated file missing")
+        return 1
+    actual = OUTPUT.read_text(encoding="utf-8")
+    if actual != rendered:
+        # Read-only, bounded location metadata; no document text is leaked.
+        offset = next((i for i, (a, b) in enumerate(zip(actual, rendered))
+                       if a != b), min(len(actual), len(rendered)))
+        line = actual.count("\n", 0, offset) + 1
+        column = offset - actual.rfind("\n", 0, offset)
+        print("MASTER_PROGRESS OUT OF SYNC: first differing line="
+              + str(line) + ", column=" + str(column)
+              + ", local_chars=" + str(len(actual))
+              + ", expected_chars=" + str(len(rendered))
+              + ". No files changed.")
         return 1
     print("MASTER_PROGRESS CHECK PASS", len(doc["days"]), "calendar entries")
     return 0

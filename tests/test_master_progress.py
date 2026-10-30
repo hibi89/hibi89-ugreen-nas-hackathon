@@ -17,6 +17,14 @@ class MasterTests(unittest.TestCase):
 
     def test_full_plan_matches_original(self):
         self.assertEqual([],integrity_errors(self.m,self.p))
+    def test_render_difference_reports_location_without_mutating_source(self):
+        changed = self.m + "\nextra-local-tail"
+        result = integrity_errors(changed, self.p)
+        self.assertEqual(len(result), 1)
+        self.assertIn("first differing line", result[0])
+        self.assertIn("local_chars=", result[0])
+        self.assertNotIn("extra-local-tail", result[0])
+
     def test_missing_day_rejected(self):
         bad="\n".join(line for line in self.m.splitlines() if not line.startswith("| UGR-D24 |"))
         self.assertTrue(integrity_errors(bad,self.p))
