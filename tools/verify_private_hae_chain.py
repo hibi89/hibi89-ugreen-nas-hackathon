@@ -70,6 +70,37 @@ def verify_checkout(
     return checked
 
 
+def require_pinned_import_origins(
+    hae_checkout: Path, sovia_checkout: Path,
+    la_executor_type: object, sovia_assess: object,
+) -> None:
+    """Ensure cached Python objects originated in the verified checkout.
+
+    A clean Git SHA alone is insufficient if sys.modules was previously
+    populated from another checkout. This protects import provenance, NOT
+    the runtime from malicious concurrent filesystem replacement.
+    """
+    expected_la = hae_checkout / "packages" / "lightning-azent" / "lightning_azent" / "runtime.py"
+    expected_sovia = sovia_checkout / "sovia_la_plan_preflight.py"
+    for path, function, reason in (
+        (expected_la, getattr(la_executor_type, "preflight", None),
+         "PINNED_LA_RUNTIME_IMPORT_MISMATCH"),
+        (expected_sovia, sovia_assess, "PINNED_SOVIA_IMPORT_MISMATCH"),
+    ):
+        if not path.is_file() or path.is_symlink():
+            raise ProofRefused(reason)
+        code = getattr(function, "__code__", None)
+        if code is None or type(code.co_filename) is not str:
+            raise ProofRefused(reason)
+        try:
+            actual = Path(code.co_filename).resolve(strict=True)
+            expected = path.resolve(strict=True)
+        except (OSError, RuntimeError):
+            raise ProofRefused(reason) from None
+        if actual != expected:
+            raise ProofRefused(reason)
+
+
 def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
@@ -96,6 +127,7 @@ def run(hae_root: Path, sovia_root: Path) -> dict:
     sys.path.insert(0, str(sovia))
     from lightning_azent import LAExecutor
     from sovia_la_plan_preflight import assess
+    require_pinned_import_origins(hae, sovia, LAExecutor, assess)
 
     # Real LA, disposable local SQLite, approved synthetic write and replay.
     la_proof = verify_la(la_package)

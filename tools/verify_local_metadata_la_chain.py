@@ -22,6 +22,7 @@ sys.path.insert(0, str(PROJECT))
 from integrations.local_metadata_la_chain import run_local_observation_chain
 from tools.verify_private_hae_chain import (
     EXPECTED_HAE_SHA, EXPECTED_SOVIA_SHA, ProofRefused, verify_checkout,
+    require_pinned_import_origins,
 )
 
 
@@ -88,6 +89,7 @@ def verify(
     sys.path.insert(0, str(sovia))
     from lightning_azent import LAExecutor
     from sovia_la_plan_preflight import assess
+    require_pinned_import_origins(hae, sovia, LAExecutor, assess)
 
     dbvora_reader = (load_pinned_dbvora_reader(dbvora_root)
                      if dbvora_root is not None else None)
