@@ -163,6 +163,8 @@ def _write_zip(target: Path, files: dict[str, bytes]) -> dict:
     manifest = {
         "schema": "flowpilot-offline-local-pilot-v1",
         "scope": "FOUR_REAL_LOCAL_CAPABILITIES_ONLY",
+        "artifact_type": "LOCAL_DEVELOPMENT_PILOT_NOT_UGREEN_SKILL",
+        "eligible_for_official_ugreen_submission": False,
         "files": {name: hashlib.sha256(data).hexdigest()
                   for name, data in files.items()},
         "source_file_count": len(files),
@@ -197,6 +199,7 @@ def _write_zip(target: Path, files: dict[str, bytes]) -> dict:
         "source_file_count": len(files),
         "zip_sha256": hashlib.sha256(target.read_bytes()).hexdigest(),
         "bundle_contains_owner_files": False,
+        "eligible_for_official_ugreen_submission": False,
         "four_capability_acceptance_passed_before_build": True,
         "actual_nas_verified": False,
         "registered_uliya_expert_invoked": False,

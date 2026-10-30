@@ -94,6 +94,23 @@ class OfflinePilotZIPTests(unittest.TestCase):
                     _write_zip(target, {"tools/sample.py": b"pass\\n"})
             self.assertEqual(target.read_bytes(), b"another-process-owned-file")
 
+    def test_official_ugreen_skill_auditor_refuses_offline_python_pilot(self):
+        from tools.flowpilot_package_audit import audit_zip_bytes
+        with tempfile.TemporaryDirectory() as temp:
+            local = Path(temp) / "FlowPilot_Local_Pilot.zip"
+            build_offline_pilot(local)
+            approved_skill_bytes = (
+                Path(__file__).resolve().parents[1] /
+                "skill" / "flowpilot-nas" / "SKILL.md"
+            ).read_bytes()
+            with self.assertRaises(ValueError):
+                audit_zip_bytes(local.read_bytes(), approved_skill_bytes)
+            with zipfile.ZipFile(local) as archive:
+                manifest = json.loads(archive.read(f"{PREFIX}/MANIFEST.json"))
+            self.assertFalse(manifest["eligible_for_official_ugreen_submission"])
+            self.assertEqual(manifest["artifact_type"],
+                             "LOCAL_DEVELOPMENT_PILOT_NOT_UGREEN_SKILL")
+
     def test_manifest_does_not_claim_vendor_execution(self):
         with tempfile.TemporaryDirectory() as temp:
             target = Path(temp) / "pilot.zip"
