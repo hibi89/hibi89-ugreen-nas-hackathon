@@ -139,7 +139,7 @@ class Operator:
             return data
 
 
-HTML = """<!doctype html><html lang="en"><head><meta charset="utf-8">
+HTML = r"""<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>NAS FlowPilot 3.0 — Local Integration</title><style>
 :root{font:15px system-ui,Segoe UI,sans-serif;background:#071522;color:#e8f5ff}

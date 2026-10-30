@@ -28,6 +28,13 @@ class OneClickDemoEntrypointTests(unittest.TestCase):
         self.assertFalse(row["actual_nas_verified"])
         self.assertNotIn("README.md", proc.stdout)
 
+    def test_template_keeps_windows_placeholders_and_js_newline_regex(self):
+        from tools.flowpilot_four_source_local_ui import HTML
+        self.assertIn(r"C:\Users", HTML)
+        self.assertIn(r"value.split(/\r?\n/)", HTML)
+        self.assertIn("ownerLocalOnly", HTML)
+        self.assertIn("LOCAL FILE METADATA ONLY", HTML)
+
     def test_browser_utility_startup_has_no_required_private_root_flags(self):
         script = ROOT / "tools" / "flowpilot_four_source_local_ui.py"
         with tempfile.TemporaryDirectory(prefix="ugreen-demo-help-") as tmp:
