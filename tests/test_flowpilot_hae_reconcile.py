@@ -163,10 +163,12 @@ class G82RecoveryContractTests(unittest.TestCase):
         return run_bridge(TASK, **request)
 
     def pending(self):
+        prior_writes = self.server.runs
         result = self.call()
         self.assertEqual(result["status"], "WAITING_HAE_WRITE_APPROVAL")
         self.assertEqual(result["pending_run_id"], RUN)
-        self.assertEqual(self.server.runs, 0)
+        self.assertEqual(self.server.runs, prior_writes,
+                         "Preview must never create a write")
         return result
 
     def approve(self, preview):
