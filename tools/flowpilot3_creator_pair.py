@@ -144,7 +144,7 @@ def build(skill_path: Path, qa_path: Path, out: Path, *, expected_sha: str = PIN
                        f'{words}/500 substantive English words  |  October 31, 2026', small),
              Spacer(1, 3)]
     for i, q in enumerate(qa['questions'], 1):
-        story.append(KeepTogether([Paragraph(f'{i:02d}  {escape(q["question"])}', question),
+        story.append(KeepTogether([Paragraph(f'Q{i}. {escape(q["question"])}', question),
                                   Paragraph(escape(q['answer']), answer)]))
     story.extend([Spacer(1, 4), Paragraph('AI assistance / Third-party components / Data flow', question),
                   Paragraph(escape(qa['disclosure']), small),
