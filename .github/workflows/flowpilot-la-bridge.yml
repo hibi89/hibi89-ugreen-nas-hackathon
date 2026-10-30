@@ -5,7 +5,9 @@ on:
     branches:
       - feature/flowpilot-ecosystem-integration
     paths:
-      - "integrations/**"
+      - "integrations/*.py"
+      - "integrations/**/*.py"
+      - "integrations/evidence/*.json"
       - "tests/test_la_bridge.py"
       - "tests/test_sovia_bridge.py"
       - "tests/test_flowpilot_la_sovia_pipeline.py"
@@ -44,10 +46,11 @@ on:
       - ".github/workflows/flowpilot-la-bridge.yml"
   workflow_dispatch:
 
-# Keep only the newest integration check for this feature branch.
+# Run CI asynchronously; never cancel a running job on a newer code commit.
+# The group still limits queue pressure, but new pushes cannot kill active tests.
 concurrency:
   group: flowpilot-la-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 permissions:
   contents: read
