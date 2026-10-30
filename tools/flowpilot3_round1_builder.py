@@ -126,13 +126,13 @@ def build(skill_path: Path, qa_path: Path, out: Path) -> dict:
     from reportlab.platypus import KeepTogether, Paragraph, SimpleDocTemplate, Spacer
     styles = getSampleStyleSheet()
     title = ParagraphStyle('Title3', parent=styles['Normal'], fontName='Helvetica-Bold',
-                           fontSize=15, leading=19, textColor=colors.HexColor('#193a5b'), spaceAfter=8)
+                           fontSize=17, leading=21, textColor=colors.HexColor('#193a5b'), spaceAfter=8)
     question = ParagraphStyle('Question3', parent=styles['Normal'], fontName='Helvetica-Bold',
-                              fontSize=8.3, leading=10.4, textColor=colors.HexColor('#153c60'), spaceAfter=1)
+                              fontSize=9.0, leading=11.5, textColor=colors.HexColor('#153c60'), spaceAfter=2)
     answer = ParagraphStyle('Answer3', parent=styles['Normal'], fontName='Helvetica',
-                            fontSize=8.35, leading=11.1, textColor=colors.HexColor('#182a39'), spaceAfter=5)
+                            fontSize=9.2, leading=12.4, textColor=colors.HexColor('#182a39'), spaceAfter=6)
     note = ParagraphStyle('Note3', parent=styles['Normal'], fontName='Helvetica',
-                          fontSize=7.3, leading=9.5, textColor=colors.HexColor('#3e5369'), spaceAfter=5)
+                          fontSize=8.0, leading=10.7, textColor=colors.HexColor('#3e5369'), spaceAfter=6)
     story = [Paragraph('NAS FlowPilot 3.0 | Round 1 Project Proposal', title),
              Paragraph('OWNER REVIEW ONLY &middot; NOT SUBMITTED &middot; Narrow Uliya Skill / separate local prototype', note),
              Paragraph(f'10 official questions &middot; {word_count}/500 substantive English words &middot; October 29, 2026', note),
