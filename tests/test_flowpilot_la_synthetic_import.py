@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import csv
+from hashlib import sha256
 import json
 import sqlite3
 import sys
@@ -19,6 +20,8 @@ class FakeLA:
     corrupted_status = False
     corrupted_receipt = False
     execute_fails = False
+    corrupted_payload = False
+    corrupted_source_sha = False
     @staticmethod
     def capabilities():
         return {
@@ -46,15 +49,24 @@ class FakeLA:
         with (self.root / "sales.csv").open(newline="", encoding="utf-8") as stream:
             rows = list(csv.reader(stream))
         assert rows == [["customer", "amount"], ["alice", "1.25"], ["bob", "2.00"]]
+        digest = sha256((self.root / "sales.csv").read_bytes()).hexdigest()
         with sqlite3.connect(self.business) as db:
             db.execute("CREATE TABLE IF NOT EXISTS csv_records("
-                       "run_id TEXT, import_step_id TEXT, rownum INTEGER, "
-                       "customer TEXT, amount TEXT, PRIMARY KEY(run_id,import_step_id,rownum))")
+                       "run_id TEXT, import_step_id TEXT, source_sha256 TEXT, "
+                       "row_number INTEGER, payload_json TEXT, "
+                       "PRIMARY KEY(run_id,import_step_id,row_number))")
             for i, (customer, amount) in enumerate(rows[1:], start=1):
+                payload = json.dumps({"customer": customer, "amount": amount}, sort_keys=True)
                 db.execute("INSERT OR IGNORE INTO csv_records VALUES (?,?,?,?,?)",
-                           (run_id, "imported", i, customer, amount))
+                           (run_id, "imported", digest, i, payload))
             if type(self).incorrect_rows:
-                db.execute("DELETE FROM csv_records WHERE rownum=2")
+                db.execute("DELETE FROM csv_records WHERE row_number=2")
+            if type(self).corrupted_payload:
+                db.execute("UPDATE csv_records SET payload_json=? WHERE row_number=1",
+                           ('{"customer":"charlie","amount":"1.25"}',))
+            if type(self).corrupted_source_sha:
+                db.execute("UPDATE csv_records SET source_sha256=? WHERE row_number=1",
+                           ("f" * 64,))
         return {"status": "completed"}
 
     def status(self, _run_id):
@@ -79,6 +91,7 @@ class RealSQLiteAdapterBoundaryTests(unittest.TestCase):
         FakeLA.calls = 0
         FakeLA.incorrect_rows = FakeLA.corrupted_status = False
         FakeLA.corrupted_receipt = FakeLA.execute_fails = False
+        FakeLA.corrupted_payload = FakeLA.corrupted_source_sha = False
 
     def test_preview_never_imports_or_creates_workspace(self):
         def unexpected(*_a, **_kw):
@@ -123,6 +136,19 @@ class RealSQLiteAdapterBoundaryTests(unittest.TestCase):
         result = run_demo(approval=APPROVAL, loader=loader)
         self.assertEqual(result["status"], "BLOCKED_RECEIPT_MISMATCH")
         self.assertFalse(result["la_execution_verified"])
+
+    def test_same_row_count_wrong_payload_is_rejected(self):
+        FakeLA.corrupted_payload = True
+        result = run_demo(approval=APPROVAL, loader=loader)
+        self.assertEqual(result["status"], "BLOCKED_RECEIPT_MISMATCH")
+        self.assertFalse(result["la_execution_verified"])
+
+    def test_source_sha_mismatch_is_rejected_even_if_rows_match(self):
+        FakeLA.corrupted_source_sha = True
+        result = run_demo(approval=APPROVAL, loader=loader)
+        self.assertEqual(result["status"], "BLOCKED_RECEIPT_MISMATCH")
+        self.assertFalse(result["source_hash_preserved"] is False
+                         and result["la_execution_verified"])
 
     def test_failed_run_status_is_denied(self):
         FakeLA.corrupted_status = True
