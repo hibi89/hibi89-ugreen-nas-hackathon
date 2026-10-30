@@ -1,6 +1,7 @@
 """UGREEN master-progress integrity tests, canonical JSON first."""
-import sys,unittest
-from pathlib import Path
+import sys,unittest,json
+from pathlib import Path, PureWindowsPath
+from unittest.mock import patch
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"tools"))
 from check_master_progress import MASTER,SOURCE,integrity_errors
@@ -14,6 +15,15 @@ class MasterTests(unittest.TestCase):
     def test_ugreen_master_source_is_pinned_not_opportunistic(self):
         from render_master_progress import SOURCE as actual
         self.assertEqual(actual,ROOT/"data/master_progress.json")
+
+    def test_windows_path_renders_identical_master_without_rewriting(self):
+        # Reproduce Windows PurePath backslashes on any test host; the exact
+        # generated Markdown must match the POSIX-normalized GitHub artifact.
+        from render_master_progress import render
+        with patch("render_master_progress.ROOT", PureWindowsPath("C:/checkout")), \
+             patch("render_master_progress.SOURCE",
+                   PureWindowsPath("C:/checkout/data/master_progress.json")):
+            self.assertEqual(self.m, render(json.loads(self.p)))
 
     def test_full_plan_matches_original(self):
         self.assertEqual([],integrity_errors(self.m,self.p))

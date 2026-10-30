@@ -1,3 +1,6 @@
+## G91 · 2026-10-31 KST — Windows-only MASTER_PROGRESS mismatch pinpointed and patched
+- Owner targeted 11 master tests: 1 FAIL at 3:47, lengths 67238/67238. Exact GitHub Markdown line 3 col 47 is `/` in `data/master_progress.json`; Windows `Path` string uses `\\`. Renderer now formats only the **display path** with `.as_posix()`, with full-render `PureWindowsPath` regression test. Neither `data/master_progress.json` nor `MASTER_PROGRESS.md` modified.
+- Last UGREEN full 844-case result remains FAIL (7 FAIL / 0 ERROR / 12 SKIP) at older `5b4e1f8`; G90 LA SQLite fix and G91 display correction still require independent execution evidence. Do not request repeated owner manual tests. HAE owner offline bundled 7/7 PASS preserved, NAS/Devpost/release HOLD.
 ## G90 2026-10-31 04:21 KST · HAE Windows 7/7 PASS, UGREEN full 844 tests still FAIL and G90 repair staged
 - Owner HAE Windows `--doctor` returned `OFFLINE_BUNDLE_STATIC_OK` and `--verify` genuine synthetic HAE-LA HTTP/SQLite **7/7 PASS**, release HOLD; exact HAE local SHA not printed.
 - Owner UGREEN full at 5b4e1f8: 844 tests, failures=7, errors=0, skipped=12, exit 1. Last-20 log proves master mismatch; prior log shows 6 LA synthetic runtime exceptions but current individual failure titles not provided.
