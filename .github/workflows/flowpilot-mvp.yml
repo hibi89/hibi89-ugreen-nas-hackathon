@@ -50,3 +50,27 @@ jobs:
           print("Canonical G49 Skill preserved; public artifacts/adoption NOT_CHANGED")
           print("UGREEN registered Expert and NAS NOT_RUN, Devpost NOT_SUBMITTED")
           PY
+
+  windows-local-regression:
+    name: Windows Python 3.11 local-only full regression
+    runs-on: windows-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: G90-G92 focused Windows master and synthetic SQLite regression
+        shell: pwsh
+        run: |
+          python -m unittest discover -s tests -p test_master_progress.py -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -m unittest discover -s tests -p test_flowpilot_la_synthetic_import.py -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python render_master_progress.py --check
+          exit $LASTEXITCODE
+      - name: Full Windows PowerShell 5.1 owner-equivalent offline verification
+        shell: pwsh
+        run: |
+          & powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\verify_local.ps1 -Mode full
+          exit $LASTEXITCODE
