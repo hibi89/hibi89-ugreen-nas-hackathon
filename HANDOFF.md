@@ -1,3 +1,17 @@
+# UGREEN 2026-10-30 latest integration work — real public SOVIA + fake LA/DBVORA combined CI
+
+1. Goal: raise credible readiness of FlowPilot 3.0 end-to-end while preserving a distinct official Markdown-only Round1 Skill, PDF and ZIP.
+2. Change: added `tests/test_public_sovia_dbvora_e2e.py` with four cases (positive two-intent E2E plus missing item, wrong approval SHA, forged DBVORA provenance). The CI uses real SOVIA checked out at fixed public SHA, fake HAE/LA and fake DBVORA only. Workflow `.github/workflows/flowpilot-la-bridge.yml` runs test after checkout and watches file changes.
+3. Earlier executed CI #41003986920 SUCCESS at `cc8f4e8b`. Most recent pre-change SHA `472ee736` CI #41005416151 was queued at last check; no new-sha assertion may be called PASS until exact CI finishes.
+4. Pending verification: latest exact-source CI, owner-local true pinned private HAE/LA/SOVIA/DBVORA four-source synthetic run with explicit approval, real NAS/Uliya Creator, owner editorial/IP and Devpost submission. All public CI evidence explicitly synthetic; NAS remains NOT_RUN.
+5. Prior defects: DBVORA empty-file negative test incorrectly bypassed reader exception (fixed `1a4874d2`); GitHub Actions test-only path filters missing (fixed `472ee736`); CI concurrency may cancel superseded source runs.
+6. Repo: `hibi89/hibi89-ugreen-nas-hackathon@feature/flowpilot-ecosystem-integration`; latest code SHA is the commit immediately preceding this documentation commit. Read current branch head for exact SHA. Stable `lead/ugreen@acc6d1fe` preserved.
+7. Test environment: Python 3.11 GitHub ubuntu-latest; public SOVIA `7418b23a`; no Vercel, no AWS, no live NAS.
+8. Security: no private HAE/DBVORA source copied; no real user files, network service, credentials, tokens or NAS permissions in fixtures. Temporary SQLite verified and deleted in context manager; simulated DBVORA result redacted. No automatic external submission.
+9. Next: verify new CI step logs for all four cases, fix only confirmed regressions. Then owner-authorized private-source local E2E and official creator/runtime confirmation. Do not claim 100% until both.
+10. As of 2026-10-30 KST new combined cases committed but not yet independently run in public CI. Completion approx 60% from prior heuristic, not an objective metric.
+---
+
 # Latest UGREEN flowpilot development handoff — 2026-10-30 KST
 
 1. **Goal and approach:** Continue bounded FlowPilot 3.0 HAE/LA/SOVIA/DBVORA local integration while keeping UGREEN Round1 Markdown Skill and checked PDF/ZIP separate. Avoid rerunning costly or unauthorized external/NAS actions; no source code from private HAE/DBVORA is copied into this public repository.

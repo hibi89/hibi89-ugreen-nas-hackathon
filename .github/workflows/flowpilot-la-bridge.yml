@@ -21,6 +21,7 @@ on:
       - "tests/test_dbvora_bridge.py"
       - "tests/test_verify_local_dbvora_optin.py"
       - "tests/test_verify_four_source_synthetic.py"
+      - "tests/test_public_sovia_dbvora_e2e.py"
       - "tools/verify_four_source_synthetic.py"
       - "tests/test_verify_local_lstat_matrix.py"
       - "tools/verify_local_lstat_matrix.py"
@@ -251,6 +252,8 @@ jobs:
               assert result['release_gate'] == 'HOLD'
           print('PASS: actual OS lstat of disposable file + real pinned SOVIA + fake LA SQLite; HAE/NAS NOT RUN')
           PY
+      - name: End-to-end real SOVIA assessor plus synthetic LA and DBVORA metadata
+        run: PYTHONPATH=sovia-public:tests python -m unittest discover -s tests -p 'test_public_sovia_dbvora_e2e.py' -v
       - name: Run six disposable lstat scenarios against actual pinned SOVIA with fake LA
         run: |
           PYTHONPATH=sovia-public:tests python - <<'PY'
