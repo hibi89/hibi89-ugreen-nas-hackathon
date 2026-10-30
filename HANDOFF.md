@@ -1,3 +1,17 @@
+## Latest 2026-10-30 KST — UGREEN FlowPilot browser handoff
+
+1. Goal: continue working autonomously, CI nonblocking. Do not modify official submission Skill/PDF/ZIP or claim real NAS proof.
+2. Code: 2a8101e8 source doctor checks exact HAE, SOVIA, DBVORA Git SHA, clean files and required entrypoints without importing private code; 5 mocked tests.
+3. Code: acc0581b provides localhost-only browser UI with source check, no-write preview, one-time explicit synthetic approval and optional JSON/HTML SHA evidence bundle; 5 mocked tests.
+4. Tests: latest Actions #41008126062 queued/pending as checked. Do not inherit older successful #41003986920 status. Actual 4-source owner-local execution unverified.
+5. Windows usage: py -3.11 tools/flowpilot_four_source_local_ui.py --hae-root ..\HAE --sovia-root ..\SOVIA_sovereign --dbvora-root ..\DBVORA --output-dir C:\temp\ugreen-proof-new ; output directory must not already exist. Printed 127.0.0.1 URL is local only.
+6. Security: HTTP POST requires session token and local Origin/Host; browser cannot supply source folders; browser approval is consumed even on failure. Temp synthetic only, no actual NAS/customer content.
+7. Repo: hibi89/hibi89-ugreen-nas-hackathon feature/flowpilot-ecosystem-integration source SHA acc0581b89490a721b5f6bd017fd7d566b462777; docs SHA follows. lead/ugreen acc6d1fe untouched.
+8. Blockers: private HAE/DBVORA actual synthetic source execution NOT_RUN; Uliya NAS, Creator and official Devpost release NOT_RUN. No Production/Vercel target for this local UI.
+9. Next: check exact latest CI once when ready, fix actual error, then improve browser result inspection and operator proof. Real NAS/Creator requires separate owner permission.
+10. Completion: ~60% full product remains subjective estimate; code and UI have advanced, vendor runtime unverified.
+
+---
 # 2026-10-30 KST UGREEN takeover — one-command suite and CI decoupling
 
 1. **Goal and boundaries:** User requested rapid autonomous feature development, **do not wait on CI**. FlowPilot 3.0 bounded 1–3 intent → local consent → exact SHA approval → disposable SQLite via pinned private HAE/LA → pinned public SOVIA advisory → optional pinned private DBVORA schema counts. No real NAS/Uliya or customer files. Keep official Round1 Markdown Skill/PDF/ZIP frozen.
