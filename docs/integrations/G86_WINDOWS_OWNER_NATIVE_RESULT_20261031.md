@@ -1,3 +1,9 @@
+## FINAL UPDATE — owner Windows G86 regressions now ALL PASS (2026-10-31 KST)
+
+User PowerShell after fast-forward of UGREEN from `21d34bf` to `832fd821` ran the corrected `tests/test_g86_native_backend_integrity.py`: **14 tests in 9.495 s, OK; process exit code 0**. This definitively resolves the previous 13/14 test failure caused by the double-escaped non-ASCII fixture. The previous owner Windows G86 native backend acceptance had already returned `G85_UGREEN_NATIVE_BACKEND_E2E_PASS`, `private_runner_integrity=G86_REVIEWED_GIT_BLOBS_MATCH`, exit 0. As no native production source was modified by this final test-only fix, G86 local acceptance gate is **PASS** on the verified pinned sources.
+
+Latest GitHub full regression workflow `41101831695` on test-fix code `e587665fceb6f2c996d58585f0c18251d77b0682` is QUEUED on the check and NOT certified green. Real NAS/Uliya/Devpost/production remain NOT_RUN. Evidence is the owner's Windows execution output and prior G86 owner record below, not CI-native HAE execution.
+
 # G86 Windows owner-native execution and regression fixture fix (2026-10-31 KST)
 
 Evidence: user-supplied Windows PowerShell console. G86 native E2E from updated UGREEN repository was successful; separate G86 unit regression suite was not fully successful.
