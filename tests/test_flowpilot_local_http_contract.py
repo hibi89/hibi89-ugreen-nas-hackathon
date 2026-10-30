@@ -31,6 +31,7 @@ class LocalHTTPContractTests(unittest.TestCase):
         self.server.shutdown()
         self.server.server_close()
         self.thread.join(timeout=2)
+        self.operator.close()
 
     def request(self, method: str, path: str, *, data=None, headers=None):
         connection = HTTPConnection("127.0.0.1", self.port, timeout=3)
@@ -138,6 +139,65 @@ class LocalHTTPContractTests(unittest.TestCase):
         self.assertEqual(self.request("GET", "/csv/report.csv", headers={
             "X-FlowPilot-Session": self.session,
         })[0], 404)
+
+    def test_consent_then_real_owner_csv_contents_download_via_local_http(self):
+        import hashlib
+        import csv
+        from io import StringIO
+        with tempfile.TemporaryDirectory(prefix="ugreen-own-csv-http-") as tmp:
+            root=Path(tmp)
+            (root / "a.csv").write_text("customer,revenue\nalice,2.50\n")
+            (root / "b.csv").write_text("customer,revenue\nalice,3.25\n")
+            self.assertEqual(self.authorized("/owner-csv/execute", {
+                "approval_token":"bad","consent":"APPROVE_LOCAL_CSV_CONTENT_READ_AND_NEW_OUTPUT_WRITE"
+            })[0],400)
+            pre,raw,_=self.authorized("/owner-csv/preview",{
+                "root":str(root),"sources":["a.csv","b.csv"],"output":"summary-new.csv",
+                "group":"customer","amount":"revenue","local_metadata_ack":True
+            })
+            self.assertEqual(pre,200,raw)
+            ticket=json.loads(raw)["approval_token"]
+            denied,_,_=self.authorized("/owner-csv/execute",{
+                "approval_token":ticket,"consent":"DECLINED"
+            })
+            self.assertEqual(denied,400)
+            ok,body,_=self.authorized("/owner-csv/execute",{
+                "approval_token":ticket,
+                "consent":"APPROVE_LOCAL_CSV_CONTENT_READ_AND_NEW_OUTPUT_WRITE"
+            })
+            self.assertEqual(ok,200,body)
+            result=json.loads(body)
+            self.assertEqual(result["status"],"LOCAL_CSV_CREATED_WITH_SQLITE_AUDIT")
+            self.assertEqual(result["rows_read"],2)
+            self.assertEqual(result["groups_written"],1)
+            self.assertNotIn(str(root),body.decode())
+            self.assertNotIn("alice",body.decode())
+            self.assertEqual(self.request("GET","/owner-csv/report.csv")[0],403)
+            status,csv_bytes,_=self.request("GET","/owner-csv/report.csv",headers={
+                "X-FlowPilot-Session":self.session
+            })
+            self.assertEqual(status,200)
+            self.assertEqual(hashlib.sha256(csv_bytes).hexdigest(),
+                             result["report_sha256"])
+            self.assertEqual(list(csv.DictReader(
+                StringIO(csv_bytes.decode()))),
+                [{"customer":"alice","total_revenue":"5.75"}])
+            self.assertEqual(self.authorized("/owner-csv/execute",{
+                "approval_token":ticket,
+                "consent":"APPROVE_LOCAL_CSV_CONTENT_READ_AND_NEW_OUTPUT_WRITE"
+            })[0],400)
+
+    def test_owner_csv_previews_refuse_external_paths_and_download_without_approval(self):
+        with tempfile.TemporaryDirectory(prefix="ugreen-own-csv-no-approval-") as tmp:
+            for files in (["../outside.csv"],["missing.csv"]):
+                status,_,_=self.authorized("/owner-csv/preview",{
+                    "root":tmp,"sources":files,"output":"report.csv",
+                    "group":"customer","amount":"revenue","local_metadata_ack":True
+                })
+                self.assertEqual(status,400)
+            self.assertEqual(self.request("GET","/owner-csv/report.csv",headers={
+                "X-FlowPilot-Session":self.session
+            })[0],404)
 
     def test_all_report_files_inaccessible_before_success(self):
         for name in ("index.html", "proof-1.html", "proof-1.json", "manifest.json"):

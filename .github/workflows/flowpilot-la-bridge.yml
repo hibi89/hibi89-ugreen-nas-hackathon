@@ -36,6 +36,8 @@ on:
       - "tools/flowpilot_four_source_local_ui.py"
       - "tools/flowpilot_synthetic_csv_panel.py"
       - "tests/test_flowpilot_synthetic_csv_panel.py"
+      - "tools/flowpilot_owner_csv.py"
+      - "tests/test_flowpilot_owner_csv.py"
       - "tools/flowpilot_real_os_demo.py"
       - "tests/test_flowpilot_real_os_demo.py"
       - "tools/flowpilot_owner_workbench.py"
@@ -130,6 +132,8 @@ jobs:
           python -m unittest discover -s tests -p 'test_flowpilot_real_os_demo.py' -v
           python tools/flowpilot_real_os_demo.py > /tmp/ugreen-real-os-demo.json
           python -c "import json; d=json.load(open('/tmp/ugreen-real-os-demo.json')); assert d['status']=='PASS_REAL_OS_LSTAT_SYNTHETIC_DEMO'; assert d['scenario_count']==5; assert d['actual_nas_verified'] is False"
+      - name: Run real owner-selected local CSV content aggregation and SQLite audit
+        run: python -m unittest discover -s tests -p 'test_flowpilot_owner_csv.py' -v
       - name: Run real generated CSV aggregation and SQLite audit with no NAS
         run: python -m unittest discover -s tests -p 'test_flowpilot_synthetic_csv_panel.py' -v
       - name: Test actual localhost HTTP headers consent and report route isolation

@@ -18,6 +18,7 @@ from tools.flowpilot_source_doctor import inspect_sources
 from tools.flowpilot_four_source_suite import run_suite
 from tools.flowpilot_real_os_demo import run_real_local_demo
 from tools.flowpilot_synthetic_csv_panel import CSVPanel, CSVPanelRefused
+from tools.flowpilot_owner_csv import OwnerCSV, OwnerCSVRefused, CONSENT as OWNER_CSV_CONSENT
 from tools.flowpilot_owner_workbench import OwnerWorkbench, OwnerWorkbenchRefused, CONSENT as OWNER_CONSENT
 
 CONSENT = "I_APPROVE_DISPOSABLE_SYNTHETIC_WRITES"
@@ -41,9 +42,11 @@ class Operator:
         self.evidence_ready = False
         self.owner_workbench = OwnerWorkbench()
         self.csv_panel = CSVPanel()
+        self.owner_csv = OwnerCSV()
 
     def close(self):
         self.csv_panel.close()
+        self.owner_csv.close()
 
     def sources(self) -> dict:
         return inspect_sources(*self.roots)
@@ -193,6 +196,31 @@ No customer/NAS files or private integrations are involved.</p>
 <button id="csvReject" disabled>Reject</button>
 <button id="csvDownload" disabled>Download verified generated CSV</button>
 <pre id="csvStatus" role="status">No CSV workflow previewed.</pre>
+</section><section><h2>Your own LOCAL sales CSV — read, aggregate and create new report</h2>
+<p>Real local CSV content is read ONLY after explicit approval. Preview checks
+filenames, size and output availability, without reading CSV contents.
+Output is created in your chosen local folder and never overwrites a file.
+No uploads, NAS access or external services.</p>
+<label>Trusted local folder (absolute path)
+<input type="text" id="ownCsvRoot" placeholder="C:\Users\...\Documents\sales"></label>
+<label>Source CSV basenames, one per line (1–5)
+<textarea id="ownCsvSources" rows="3">jan.csv
+feb.csv</textarea></label>
+<label>New output CSV basename
+<input type="text" id="ownCsvOutput" value="sales-summary-new.csv"></label>
+<label>Group column <input type="text" id="ownCsvGroup" value="customer"></label>
+<label>Numeric amount column <input type="text" id="ownCsvAmount" value="revenue"></label>
+<label><input type="checkbox" id="ownCsvMeta"> I confirm this is a trusted LOCAL
+folder (not NAS, mapped drive or remote mount). I permit source file metadata
+checks for a plan preview.</label>
+<button id="ownCsvPreview">Preview real CSV report without reading its contents</button>
+<label><input type="checkbox" id="ownCsvConsent"> I separately approve reading
+the selected local CSV contents and creating the named NEW output CSV. This
+may contain my own data; processing stays on this computer.</label>
+<button id="ownCsvRun" class="execute" disabled>Approve and aggregate local CSV</button>
+<button id="ownCsvCancel" disabled>Cancel plan</button>
+<button id="ownCsvDownload" disabled>Download verified local output</button>
+<pre id="ownCsvState" role="status" aria-live="polite">No owner CSV selected.</pre>
 </section><section><h2>Your local folder checklist (read-only)</h2>
 <p>For a local, trusted, non-NAS directory only. Enter exact file names.
 Preview does not inspect the directory; approval allows OS metadata lstat only.
@@ -420,6 +448,83 @@ csvDownload.onclick=async()=>{
   setTimeout(()=>URL.revokeObjectURL(uri),1000);
  }catch(e){csvStatus.textContent="CSV_REPORT_UNAVAILABLE";}
 };
+let ownCsvTicket=null,ownCsvReportReady=false,ownCsvRev=0;
+const ownCsvState=document.getElementById("ownCsvState"),
+ ownCsvRun=document.getElementById("ownCsvRun"),
+ ownCsvConsent=document.getElementById("ownCsvConsent"),
+ ownCsvCancel=document.getElementById("ownCsvCancel"),
+ ownCsvDownload=document.getElementById("ownCsvDownload");
+function ownCsvInvalidate(){
+  ownCsvRev++;ownCsvTicket=null;ownCsvReportReady=false;
+  ownCsvConsent.checked=false;ownCsvRun.disabled=true;
+  ownCsvCancel.disabled=true;ownCsvDownload.disabled=true;
+}
+for(const id of ["ownCsvRoot","ownCsvSources","ownCsvOutput","ownCsvGroup",
+  "ownCsvAmount","ownCsvMeta"]){
+  document.getElementById(id).addEventListener("input",ownCsvInvalidate);
+  document.getElementById(id).addEventListener("change",ownCsvInvalidate);
+}
+ownCsvConsent.onchange=()=>{
+  ownCsvRun.disabled=!(ownCsvTicket&&ownCsvConsent.checked);
+};
+async function ownCsvAction(path,data){
+  const rev=ownCsvRev;
+  ownCsvState.textContent="Processing approved local request...";
+  try{
+    const res=await fetch(path,{method:"POST",cache:"no-store",
+      headers:{"Content-Type":"application/json","X-FlowPilot-Session":session},
+      body:JSON.stringify(data)});
+    const row=await res.json();
+    if(rev!==ownCsvRev)return;
+    ownCsvState.textContent=JSON.stringify(row,null,2);
+    ownCsvTicket=(path==="/owner-csv/preview"&&res.ok)?
+      row.approval_token||null:null;
+    ownCsvReportReady=(path==="/owner-csv/execute"&&res.ok&&
+      row.local_csv_download_ready===true);
+    ownCsvRun.disabled=!(ownCsvTicket&&ownCsvConsent.checked);
+    ownCsvCancel.disabled=!ownCsvTicket;
+    ownCsvDownload.disabled=!ownCsvReportReady;
+  }catch(e){
+    ownCsvTicket=null;ownCsvRun.disabled=true;ownCsvCancel.disabled=true;
+    ownCsvState.textContent="LOCAL_CSV_ACTION_REFUSED";
+  }
+}
+document.getElementById("ownCsvPreview").onclick=()=>{
+  ownCsvInvalidate();
+  const names=document.getElementById("ownCsvSources").value
+    .split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+  ownCsvAction("/owner-csv/preview",{
+    root:document.getElementById("ownCsvRoot").value,
+    sources:names,output:document.getElementById("ownCsvOutput").value,
+    group:document.getElementById("ownCsvGroup").value,
+    amount:document.getElementById("ownCsvAmount").value,
+    local_metadata_ack:document.getElementById("ownCsvMeta").checked
+  });
+};
+ownCsvRun.onclick=()=>{
+  if(!ownCsvTicket||!ownCsvConsent.checked)return;
+  const token=ownCsvTicket;ownCsvTicket=null;ownCsvRun.disabled=true;
+  ownCsvAction("/owner-csv/execute",{approval_token:token,
+    consent:"APPROVE_LOCAL_CSV_CONTENT_READ_AND_NEW_OUTPUT_WRITE"});
+};
+ownCsvCancel.onclick=()=>{
+  if(!ownCsvTicket)return;
+  ownCsvTicket=null;ownCsvCancel.disabled=true;ownCsvRun.disabled=true;
+  ownCsvAction("/owner-csv/cancel",{});
+};
+ownCsvDownload.onclick=async()=>{
+  if(!ownCsvReportReady)return;
+  try{
+    const res=await fetch("/owner-csv/report.csv",{cache:"no-store",
+      headers:{"X-FlowPilot-Session":session}});
+    if(!res.ok)throw Error("refused");
+    const uri=URL.createObjectURL(await res.blob());
+    const a=document.createElement("a");
+    a.href=uri;a.download="flowpilot-owner-local-summary.csv";
+    document.body.append(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(uri),1000);
+  }catch(e){ownCsvState.textContent="LOCAL_CSV_REPORT_UNAVAILABLE";}
+};
 document.getElementById("doctor").onclick=()=>request("/doctor",{});
 document.getElementById("preview").onclick=()=>request("/preview",{});
 go.onclick=()=>{
@@ -459,6 +564,16 @@ def handler_for(controller: Operator, session: str):
             if self.path == "/":
                 return self.send(200, HTML.replace("__SESSION__", session).encode("utf-8"),
                                  "text/html; charset=utf-8")
+            if self.path == "/owner-csv/report.csv":
+                if not secrets.compare_digest(
+                    self.headers.get("X-FlowPilot-Session", ""), session
+                ):
+                    return self.send(403, b'{"status":"FORBIDDEN"}')
+                try:
+                    payload = controller.owner_csv.download()
+                except (OwnerCSVRefused, OSError, ValueError, RuntimeError):
+                    return self.send(404, b'{"status":"REPORT_UNAVAILABLE"}')
+                return self.send(200, payload, "text/csv; charset=utf-8")
             if self.path == "/csv/report.csv":
                 if not secrets.compare_digest(
                     self.headers.get("X-FlowPilot-Session", ""), session
@@ -494,13 +609,24 @@ def handler_for(controller: Operator, session: str):
                 if self.headers.get("Content-Type", "").split(";")[0] != "application/json":
                     raise OperatorRefused("JSON_REQUIRED")
                 length = int(self.headers.get("Content-Length", "-1"))
-                maximum = 8192 if self.path == "/owner/preview" else 512
+                maximum = (8192 if self.path in
+                           ("/owner/preview", "/owner-csv/preview") else 512)
                 if not 2 <= length <= maximum:
                     raise OperatorRefused("BODY_REFUSED")
                 body = json.loads(self.rfile.read(length))
                 if type(body) is not dict:
                     raise OperatorRefused("JSON_OBJECT_REQUIRED")
-                if self.path == "/csv/configure":
+                if self.path == "/owner-csv/preview":
+                    result = controller.owner_csv.preview(body)
+                elif self.path == "/owner-csv/execute" and set(body) == {
+                    "approval_token", "consent"
+                }:
+                    result = controller.owner_csv.execute(
+                        body["approval_token"], body["consent"]
+                    )
+                elif self.path == "/owner-csv/cancel" and not body:
+                    result = controller.owner_csv.cancel()
+                elif self.path == "/csv/configure":
                     result = controller.csv_panel.configure(body)
                 elif self.path in ("/csv/approve", "/csv/reject") and not body:
                     result = controller.csv_panel.action(
