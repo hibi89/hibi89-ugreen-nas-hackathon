@@ -124,7 +124,7 @@ class G86PrivateScriptTrustTests(unittest.TestCase):
     def test_non_ascii_git_gate_output_fails_closed(self):
         from types import SimpleNamespace
         with patch.object(entry.subprocess, "run", return_value=SimpleNamespace(
-            returncode=0, stdout=b"\\xed\\x95\\x9c")):
+            returncode=0, stdout=bytes([0xED, 0x95, 0x9C]))):
             with self.assertRaisesRegex(entry.IntegrityRefused, "ASCII gate value"):
                 entry._git(self.root, "rev-parse", "--show-prefix")
 
