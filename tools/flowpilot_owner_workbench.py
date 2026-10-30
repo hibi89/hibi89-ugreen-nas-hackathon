@@ -20,6 +20,41 @@ from flowpilot_local_workflow import WorkflowRefused
 
 CONSENT = "APPROVE_LOCAL_METADATA_LSTAT"
 COUNT_KEYS = ("PRESENT", "MISSING", "NOT_CHECKED", "VERSION_REVIEW")
+SAFE_ACTIONS = frozenset({
+    "check required files", "check handoff deliverables", "compare versions",
+})
+SAFE_STAGE_STATES = frozenset({"NEEDS_REVIEW", "BLOCKED", "NOT_CHECKED"})
+SAFE_ITEM_STATES = frozenset(COUNT_KEYS)
+
+
+def _safe_stage_results(raw: object, executed: int) -> list[dict]:
+    """Emit only bounded step/item indexes and states; no path-like strings."""
+    if type(raw) is not list or len(raw) != executed:
+        raise OwnerWorkbenchRefused("INVALID_LOCAL_STAGE_EVIDENCE")
+    stages = []
+    for i, row in enumerate(raw, 1):
+        if (type(row) is not dict or type(row.get("index")) is not int
+                or row["index"] != i
+                or row.get("status") not in SAFE_STAGE_STATES
+                or type(row.get("inspected_local_metadata")) is not bool
+                or type(row.get("items")) is not list
+                or len(row["items"]) > 30):
+            raise OwnerWorkbenchRefused("INVALID_LOCAL_STAGE_EVIDENCE")
+        items = []
+        for k, item in enumerate(row["items"], 1):
+            if (type(item) is not dict or type(item.get("index")) is not int
+                    or item["index"] != k or item.get("state") not in SAFE_ITEM_STATES
+                    or type(item.get("local_reference_count")) is not int
+                    or not 0 <= item["local_reference_count"] <= 100):
+                raise OwnerWorkbenchRefused("INVALID_LOCAL_STAGE_EVIDENCE")
+            items.append({"item_index": k, "state": item["state"]})
+        stages.append({
+            "step_index": i, "status": row["status"],
+            "metadata_inspected": row["inspected_local_metadata"],
+            "items": items,
+        })
+    return stages
+
 
 
 class OwnerWorkbenchRefused(ValueError):
@@ -82,12 +117,24 @@ class OwnerWorkbench:
                     or result.get("nas_verified") is not False
                     or result.get("release_gate") != "HOLD"):
                 raise OwnerWorkbenchRefused("UNSAFE_LOCAL_PREVIEW")
+            planned = result.get("plan")
+            if (type(planned) is not list or len(planned) != result["planned_steps"]
+                    or any(type(p) is not dict
+                           or type(p.get("index")) is not int
+                           or p["index"] != i
+                           or p.get("read_only_action") not in SAFE_ACTIONS
+                           for i, p in enumerate(planned, 1))):
+                raise OwnerWorkbenchRefused("UNVERIFIED_LOCAL_PLAN")
             token = secrets.token_hex(24)
             self._pending = (goal, root, required, candidates, token)
             return {
                 "status": "WAITING_EXPLICIT_LOCAL_METADATA_APPROVAL",
                 "approval_token": token,
                 "planned_steps": result["planned_steps"],
+                "planned_actions": [
+                    {"step_index": p["index"], "action": p["read_only_action"]}
+                    for p in planned
+                ],
                 "required_file_count": len(required),
                 "version_candidate_count": sum(len(v) for v in (candidates or {}).values()),
                 "metadata_accessed": False, "file_contents_opened": False,
@@ -121,13 +168,20 @@ class OwnerWorkbench:
                     or result.get("registered_uliya_expert_invoked") is not False
                     or result.get("release_gate") != "HOLD"):
                 raise OwnerWorkbenchRefused("LOCAL_METADATA_RESULT_UNVERIFIED")
+            stage_results = _safe_stage_results(
+                result.get("observed"), result["executed_steps"]
+            )
+            if (type(result.get("review_item_count")) is not int
+                    or not 0 <= result["review_item_count"] <= 300):
+                raise OwnerWorkbenchRefused("INVALID_LOCAL_REVIEW_EVIDENCE")
             return {
                 "status": result["status"],
                 "mode": "EXPLICITLY_CONSENTED_LOCAL_LSTAT_ONLY",
                 "planned_steps": result["planned_steps"],
                 "executed_steps": result["executed_steps"],
                 "finding_counts": {k: counts[k] for k in COUNT_KEYS},
-                "review_item_count": result.get("review_item_count", 0),
+                "stage_results": stage_results,
+                "review_item_count": result["review_item_count"],
                 "file_contents_opened": False, "raw_paths_returned": False,
                 "actual_nas_verified": False,
                 "registered_uliya_expert_invoked": False,

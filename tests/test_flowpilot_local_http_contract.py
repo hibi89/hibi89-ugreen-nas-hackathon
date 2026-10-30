@@ -94,6 +94,8 @@ class LocalHTTPContractTests(unittest.TestCase):
             self.assertEqual(good, 200)
             result = json.loads(body)
             self.assertEqual(result["finding_counts"]["PRESENT"], 1)
+            self.assertEqual(result["stage_results"][0]["items"][0],
+                             {"item_index": 1, "state": "PRESENT"})
             self.assertNotIn(str(root), body.decode("utf-8"))
             self.assertNotIn("README.md", body.decode("utf-8"))
             self.assertEqual(self.authorized("/owner/execute", {

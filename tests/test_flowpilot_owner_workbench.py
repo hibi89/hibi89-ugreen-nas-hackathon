@@ -30,10 +30,15 @@ class OwnerWorkbenchTests(unittest.TestCase):
                    side_effect=AssertionError("PREVIEW TOUCHED ROOT")):
             preview = self.controller.preview(req)
         self.assertFalse(preview["metadata_accessed"])
+        self.assertEqual(preview["planned_actions"],
+                         [{"step_index": 1, "action": "check required files"}])
         result = self.controller.execute(preview["approval_token"], CONSENT)
         self.assertEqual(result["status"], "NEEDS_REVIEW")
         self.assertEqual(result["finding_counts"]["PRESENT"], 1)
         self.assertEqual(result["executed_steps"], 1)
+        self.assertEqual(result["stage_results"][0]["items"],
+                         [{"item_index": 1, "state": "PRESENT"}])
+        self.assertEqual(result["stage_results"][0]["step_index"], 1)
         self.assertFalse(result["actual_nas_verified"])
         raw = json.dumps(result)
         self.assertNotIn(str(self.root), raw)
@@ -49,6 +54,34 @@ class OwnerWorkbenchTests(unittest.TestCase):
         self.assertEqual(result["status"], "BLOCKED")
         self.assertEqual(result["finding_counts"]["PRESENT"], 0)
         self.assertFalse(result["actual_nas_verified"])
+
+    def test_multi_stage_output_redacts_all_owner_paths_and_names(self):
+        (self.root / "README_final.md").write_text("test-only fixture")
+        req = self.request(
+            goal="파일 누락 확인 그리고 인계 확인 그리고 버전 비교",
+            candidates={"README.md": ["README_final.md"]},
+        )
+        ticket = self.controller.preview(req)
+        self.assertEqual(len(ticket["planned_actions"]), 3)
+        row = self.controller.execute(ticket["approval_token"], CONSENT)
+        self.assertEqual(len(row["stage_results"]), 3)
+        self.assertEqual(row["stage_results"][2]["items"][0]["state"], "VERSION_REVIEW")
+        serialized = json.dumps(row, ensure_ascii=False)
+        for secret in (str(self.root), "README.md", "README_final.md", "test-only"):
+            self.assertNotIn(secret, serialized)
+
+    def test_mutated_observed_item_with_raw_filename_is_never_forwarded(self):
+        from tools.flowpilot_owner_workbench import _safe_stage_results
+        rows = [{"index": 1, "status": "NEEDS_REVIEW",
+                 "inspected_local_metadata": True,
+                 "items": [{"index": 1, "state": "PRESENT",
+                            "local_reference_count": 1,
+                            "secret_filename": "sensitive-secret.txt"}]}]
+        safe = _safe_stage_results(rows, 1)
+        self.assertNotIn("sensitive-secret.txt", json.dumps(safe))
+        rows[0]["items"][0]["state"] = "FORGED_SUCCESS"
+        with self.assertRaisesRegex(OwnerWorkbenchRefused, "INVALID_LOCAL_STAGE_EVIDENCE"):
+            _safe_stage_results(rows, 1)
 
     def test_missing_required_is_blocked_with_real_os_lstat(self):
         ticket = self.controller.preview(self.request(required=["absent.txt"]))

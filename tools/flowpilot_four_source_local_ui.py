@@ -189,6 +189,8 @@ No contents, uploads, or raw filenames are included in results.</p>
 <label><input type="checkbox" id="ownerApprove"> I approve read-only lstat metadata for this exact checklist</label>
 <button id="ownerRun" class="execute" disabled>Inspect selected local metadata</button>
 <div id="ownerSummary" hidden aria-live="polite"></div>
+<div id="ownerStages" aria-live="polite"></div>
+<button id="ownerExport" disabled>Download redacted JSON report</button>
 <pre id="ownerOutput" role="status" aria-live="polite">No local folder selected.</pre>
 </section><section><h2>Full pinned-source operator controls (optional)</h2>
 <button id="doctor">1 · Verify source SHAs</button>
@@ -203,7 +205,7 @@ Open approved local JSON/HTML evidence dashboard</a></p>
 no file contents, uploads, external network requests, real NAS/Uliya, Creator or
 Devpost submission. Private-source synthetic PASS remains operator-reported.</footer>
 <script>
-const session="__SESSION__";let challenge=null, ownerTicket=null,ownerRevision=0;
+const session="__SESSION__";let challenge=null, ownerTicket=null,ownerRevision=0,ownerReport=null;
 const out=document.getElementById("output"),go=document.getElementById("execute"),
 checkbox=document.getElementById("agree");
 function enable(){go.disabled=!(challenge&&checkbox.checked)}
@@ -228,8 +230,11 @@ const ownerRun=document.getElementById("ownerRun");
 const ownerAgree=document.getElementById("ownerApprove");
 ownerAgree.onchange=()=>{ownerRun.disabled=!(ownerTicket&&ownerAgree.checked)};
 function clearOwnerTicket(){
-  ownerRevision++;ownerTicket=null;ownerAgree.checked=false;ownerRun.disabled=true;
+  ownerRevision++;ownerTicket=null;ownerReport=null;
+  ownerAgree.checked=false;ownerRun.disabled=true;
   document.getElementById("ownerSummary").hidden=true;
+  document.getElementById("ownerStages").replaceChildren();
+  document.getElementById("ownerExport").disabled=true;
 }
 for(const id of ["ownerRoot","ownerGoal","ownerRequired","ownerCandidates","ownerLocalOnly"]){
   document.getElementById(id).addEventListener("input",clearOwnerTicket);
@@ -246,6 +251,7 @@ async function ownerRequest(path,body){
       headers:{"Content-Type":"application/json","X-FlowPilot-Session":session},
       body:JSON.stringify(body)});
     const value=await response.json();
+    if(revision!==ownerRevision)return;
     ownerOut.textContent=JSON.stringify(value,null,2);
     if(path==="/owner/preview"&&response.ok&&revision===ownerRevision)
       ownerTicket=value.approval_token||null;
@@ -257,10 +263,34 @@ async function ownerRequest(path,body){
       summary.textContent="Inspection: "+value.status+" · "+
         labels.map(k=>k+" "+Number(counts[k]||0)).join(" · ");
       summary.hidden=false;
+      ownerReport=value;
+      document.getElementById("ownerExport").disabled=false;
+      const stageRoot=document.getElementById("ownerStages");
+      stageRoot.replaceChildren();
+      for(const stage of (value.stage_results||[])){
+        const line=document.createElement("p");
+        const counts={PRESENT:0,MISSING:0,NOT_CHECKED:0,VERSION_REVIEW:0};
+        for(const item of stage.items||[]){
+          if(Object.prototype.hasOwnProperty.call(counts,item.state))counts[item.state]++;
+        }
+        line.textContent="Step "+stage.step_index+" · "+stage.status+" · "+
+          Object.entries(counts).map(([k,n])=>k+": "+n).join(" · ");
+        stageRoot.append(line);
+      }
     }
   }catch(e){ownerTicket=null;ownerOut.textContent="LOCAL_CHECK_REFUSED"}
   ownerRun.disabled=!(ownerTicket&&ownerAgree.checked);
 }
+document.getElementById("ownerExport").onclick=()=>{
+  if(!ownerReport)return;
+  const out=new Blob([JSON.stringify(ownerReport,null,2)+"\n"],
+    {type:"application/json"});
+  const link=document.createElement("a");
+  const uri=URL.createObjectURL(out);
+  link.href=uri;link.download="flowpilot-local-redacted-report.json";
+  document.body.append(link);link.click();link.remove();
+  URL.revokeObjectURL(uri);
+};
 document.getElementById("ownerPreview").onclick=()=>{
   clearOwnerTicket();
   const versions=ownerLines(document.getElementById("ownerCandidates").value);
