@@ -104,7 +104,7 @@ class G88MultiReadReviewTests(unittest.TestCase):
         row["goal"] = "delete project files"
         review = build_review(bundle(row))
         self.assertEqual(review["source_status"], "BLOCKED")
-        self.assertIn("PLAN_BLOCKED_OR_CLAIMED_MISSING", review["blocking_reasons"])
+        self.assertIn("READ_ONLY_PLAN_BLOCKED", review["blocking_reasons"])
         self.assertEqual(review["decision"], "HOLD")
 
     def test_reject_untrusted_raw_api_and_scope_changes(self):
@@ -117,6 +117,25 @@ class G88MultiReadReviewTests(unittest.TestCase):
         b["file_agent_report"]["authorized_root"] = "/volume1/elsewhere"
         with self.assertRaises(IntakeRefused):
             build_review(bundle(a, b))
+
+    def test_g88b_missing_is_distinct_from_rejected_mutation(self):
+        missing = receipt()
+        missing["file_agent_report"]["observations"].pop()
+        result = build_review(bundle(missing))
+        self.assertIn("CLAIMED_REQUIRED_FILE_MISSING", result["blocking_reasons"])
+        self.assertNotIn("READ_ONLY_PLAN_BLOCKED", result["blocking_reasons"])
+        self.assertEqual(result["finding_counts"]["MISSING"], 1)
+        self.assertEqual(sum(result["finding_counts"].values()), len(missing["required_paths"]))
+
+    def test_g88b_unknown_request_requires_owner_input_not_fake_check(self):
+        row = receipt()
+        row["goal"] = "something unrelated"
+        result = build_review(bundle(row))
+        self.assertEqual(result["source_status"], "WAITING_USER")
+        self.assertIn("OWNER_INPUT_REQUIRED", result["blocking_reasons"])
+        self.assertEqual(result["finding_counts"]["PRESENT"], 0)
+        self.assertEqual(result["review_queue"], [])
+        self.assertEqual(result["decision"], "HOLD")
 
     def test_cli_good_input_contains_no_names_references_or_paths(self):
         row = receipt()

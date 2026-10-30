@@ -34,8 +34,15 @@ def build_review(bundle: Any) -> dict:
     blockers: list[str] = []
     if status == "WAITING_APPROVAL":
         blockers.append("OWNER_APPROVAL_REQUIRED")
+    if status == "WAITING_USER":
+        blockers.append("OWNER_INPUT_REQUIRED")
     if status == "BLOCKED":
-        blockers.append("PLAN_BLOCKED_OR_CLAIMED_MISSING")
+        blockers.append(
+            "CLAIMED_REQUIRED_FILE_MISSING"
+            if any(item["state"] == "MISSING"
+                   for item in assessment["item_results"])
+            else "READ_ONLY_PLAN_BLOCKED"
+        )
     if consistency == "CONFLICT":
         blockers.append("CONTRADICTORY_EVIDENCE")
     elif consistency == "INCOMPLETE":
@@ -66,6 +73,10 @@ def build_review(bundle: Any) -> dict:
         "source_status": status,
         "consistency": consistency,
         "receipt_count": assessment["receipts_reviewed"],
+        "finding_counts": {
+            state: sum(row["claimed_state"] == state for row in queue)
+            for state in ISSUE_CODES
+        },
         "review_queue": queue,
         "review_item_count": len(queue),
         "review_required": True,
