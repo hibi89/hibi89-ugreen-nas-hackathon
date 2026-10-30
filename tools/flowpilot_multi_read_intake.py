@@ -149,11 +149,14 @@ def evaluate_multi_read(bundle: Any) -> dict:
         version_candidates=first.get("version_candidates", {}),
     )
     findings = result.report.items if result.report else ()
+    # Never weaken a blocked or non-consented plan just because reports conflict.
+    final_status = ("NEEDS_REVIEW" if conflict and result.report is not None
+                    else result.status)
     # Even a matching self-attested scan is not a proof of a registered agent.
     return {
         "schema": OUTPUT_SCHEMA,
         "mode": "OFFLINE_OPERATOR_NORMALIZED_EVIDENCE_CONSENSUS_ONLY",
-        "status": "NEEDS_REVIEW" if conflict else result.status,
+        "status": final_status,
         "receipts_reviewed": len(receipts),
         "operation_claims": operations,
         "full_enumeration_claims": complete_scan_claims,
@@ -166,7 +169,7 @@ def evaluate_multi_read(bundle: Any) -> dict:
         ] if not conflict else [
             {"requirement_index": i, "state": "NOT_CHECKED", "reference_count": 0}
             for i in range(1, len(first["required_paths"]) + 1)
-        ],
+        ] if result.report is not None else [],
         "raw_paths_references_and_contents_returned": False,
         "operator_claims_independently_verified": False,
         "registered_expert_invocation_verified": False,

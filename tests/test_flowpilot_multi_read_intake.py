@@ -171,6 +171,24 @@ class G87MultiReadIntakeTests(unittest.TestCase):
             with self.subTest(mutation=mutation), self.assertRaises(IntakeRefused):
                 evaluate_multi_read(bundle(first))
 
+    def test_conflict_never_overrides_write_block_or_owner_consent(self):
+        first = receipt()
+        second = receipt()
+        second["file_agent_report"]["observations"].pop()
+        first["goal"] = "delete project files"
+        second["goal"] = first["goal"]
+        result = evaluate_multi_read(bundle(first, second))
+        self.assertEqual(result["consistency"], "CONFLICT")
+        self.assertEqual(result["status"], "BLOCKED")
+        self.assertEqual(result["item_results"], [])
+        first["goal"] = "check required files"
+        second["goal"] = first["goal"]
+        first["metadata_approved"] = False
+        second["metadata_approved"] = False
+        result = evaluate_multi_read(bundle(first, second))
+        self.assertEqual(result["status"], "WAITING_APPROVAL")
+        self.assertEqual(result["item_results"], [])
+
     def test_bounded_input_and_wrong_schema_are_refused(self):
         with self.assertRaises(IntakeRefused):
             evaluate_multi_read(bundle())
