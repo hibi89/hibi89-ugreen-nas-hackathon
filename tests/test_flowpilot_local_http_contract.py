@@ -69,6 +69,37 @@ class LocalHTTPContractTests(unittest.TestCase):
         self.assertEqual(row["scenario_count"], 5)
         self.assertFalse(row["actual_nas_verified"])
 
+    def test_selected_local_folder_requires_preview_and_explicit_approval(self):
+        with tempfile.TemporaryDirectory(prefix="ugreen-http-owner-") as tmp:
+            root = Path(tmp)
+            (root / "README.md").write_text("synthetic generated file")
+            preview_req = {
+                "goal": "파일 누락 확인", "root": str(root),
+                "required": ["README.md"], "candidates": None,
+                "confirm_local_only": True,
+            }
+            self.assertEqual(self.authorized("/owner/execute", {
+                "approval_token": "none", "consent": "APPROVE_LOCAL_METADATA_LSTAT"
+            })[0], 400)
+            status, payload, _ = self.authorized("/owner/preview", preview_req)
+            self.assertEqual(status, 200)
+            ticket = json.loads(payload)["approval_token"]
+            bad, _, _ = self.authorized("/owner/execute", {
+                "approval_token": ticket, "consent": "NOT_APPROVED"
+            })
+            self.assertEqual(bad, 400)
+            good, body, _ = self.authorized("/owner/execute", {
+                "approval_token": ticket, "consent": "APPROVE_LOCAL_METADATA_LSTAT"
+            })
+            self.assertEqual(good, 200)
+            result = json.loads(body)
+            self.assertEqual(result["finding_counts"]["PRESENT"], 1)
+            self.assertNotIn(str(root), body.decode("utf-8"))
+            self.assertNotIn("README.md", body.decode("utf-8"))
+            self.assertEqual(self.authorized("/owner/execute", {
+                "approval_token": ticket, "consent": "APPROVE_LOCAL_METADATA_LSTAT"
+            })[0], 400)
+
     def test_all_report_files_inaccessible_before_success(self):
         for name in ("index.html", "proof-1.html", "proof-1.json", "manifest.json"):
             with self.subTest(name=name):

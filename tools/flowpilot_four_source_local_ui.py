@@ -17,6 +17,7 @@ sys.path.insert(0, str(PROJECT))
 from tools.flowpilot_source_doctor import inspect_sources
 from tools.flowpilot_four_source_suite import run_suite
 from tools.flowpilot_real_os_demo import run_real_local_demo
+from tools.flowpilot_owner_workbench import OwnerWorkbench, OwnerWorkbenchRefused, CONSENT as OWNER_CONSENT
 
 CONSENT = "I_APPROVE_DISPOSABLE_SYNTHETIC_WRITES"
 EVIDENCE_HTML = frozenset({"index.html", *(f"proof-{i}.html" for i in (1, 2, 3))})
@@ -37,6 +38,7 @@ class Operator:
         self.challenge = None
         self.attempted = False
         self.evidence_ready = False
+        self.owner_workbench = OwnerWorkbench()
 
     def sources(self) -> dict:
         return inspect_sources(*self.roots)
@@ -148,7 +150,10 @@ h1{font-size:clamp(30px,4vw,48px)}p{color:#adc4d6;line-height:1.65}
 .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:11px;margin:30px 0}
 article,section{background:#142a40;border:1px solid #315775;border-radius:13px;padding:18px}
 article b{display:block;margin:10px 0}article small{color:#80c6df}
-section{margin-top:22px}button{padding:12px 18px;background:#135f90;color:white;
+section{margin-top:22px}
+input[type=text],textarea{background:#071b2b;color:#e8f5ff;border:1px solid #527b99;
+border-radius:8px;padding:10px;width:100%;margin:7px 0;font:inherit}
+button{padding:12px 18px;background:#135f90;color:white;
 border:1px solid #6cbad8;border-radius:9px;margin:8px 5px;cursor:pointer}
 button:disabled{opacity:.4;cursor:not-allowed}
 button.execute{background:#156e56;border-color:#6cdbac}
@@ -171,6 +176,19 @@ background:#081a2a;border-radius:9px;padding:16px;max-height:310px;overflow:auto
 <p>Run the actual FlowPilot goal parser and OS metadata checks against five
 automatically generated, disposable folders. No LA, SOVIA, DBVORA or NAS calls.</p>
 <button id="demo">Run 1–3 intent real OS demo + missing-file cases</button>
+</section><section><h2>Your local folder checklist (read-only)</h2>
+<p>For a local, trusted, non-NAS directory only. Enter exact file names.
+Preview does not inspect the directory; approval allows OS metadata lstat only.
+No contents, uploads, or raw filenames are included in results.</p>
+<label>Local absolute folder path<input type="text" id="ownerRoot" placeholder="C:\Users\...\Documents\sample"></label>
+<label>Bounded goal<input type="text" id="ownerGoal" value="파일 누락 확인"></label>
+<label>Required relative paths, one per line<textarea id="ownerRequired" rows="3">README.md</textarea></label>
+<label>Optional versions, one required=candidate per line<textarea id="ownerCandidates" rows="2"></textarea></label>
+<label><input type="checkbox" id="ownerLocalOnly"> I confirm this is a trusted LOCAL folder, not a NAS or mapped remote drive</label>
+<button id="ownerPreview">Preview local checklist (no folder access)</button>
+<label><input type="checkbox" id="ownerApprove"> I approve read-only lstat metadata for this exact checklist</label>
+<button id="ownerRun" class="execute" disabled>Inspect selected local metadata</button>
+<pre id="ownerOutput" role="status" aria-live="polite">No local folder selected.</pre>
 </section><section><h2>Full pinned-source operator controls (optional)</h2>
 <button id="doctor">1 · Verify source SHAs</button>
 <button id="preview">2 · Preview 3 test scenarios</button>
@@ -183,7 +201,7 @@ Open approved local JSON/HTML evidence dashboard</a></p>
 <footer>Single-use execution. No owner file inputs, network calls, real NAS/Uliya,
 Creator invocation or Devpost submission. All PASS claims are operator-reported synthetic.</footer>
 <script>
-const session="__SESSION__";let challenge=null;
+const session="__SESSION__";let challenge=null, ownerTicket=null;
 const out=document.getElementById("output"),go=document.getElementById("execute"),
 checkbox=document.getElementById("agree");
 function enable(){go.disabled=!(challenge&&checkbox.checked)}
@@ -203,6 +221,53 @@ try{
 }catch(e){challenge=null;enable();out.textContent="LOCAL_REQUEST_FAILED";}
 }
 document.getElementById("demo").onclick=()=>request("/demo",{});
+const ownerOut=document.getElementById("ownerOutput");
+const ownerRun=document.getElementById("ownerRun");
+const ownerAgree=document.getElementById("ownerApprove");
+ownerAgree.onchange=()=>{ownerRun.disabled=!(ownerTicket&&ownerAgree.checked)};
+function ownerLines(value){
+  return value.split(/\r?\n/).map(v=>v.trim()).filter(Boolean);
+}
+async function ownerRequest(path,body){
+  ownerOut.textContent="Checking bounded local request...";
+  try {
+    const response=await fetch(path,{method:"POST",cache:"no-store",
+      headers:{"Content-Type":"application/json","X-FlowPilot-Session":session},
+      body:JSON.stringify(body)});
+    const value=await response.json();
+    ownerOut.textContent=JSON.stringify(value,null,2);
+    if(path==="/owner/preview"&&response.ok) ownerTicket=value.approval_token||null;
+    else ownerTicket=null;
+  }catch(e){ownerTicket=null;ownerOut.textContent="LOCAL_CHECK_REFUSED"}
+  ownerRun.disabled=!(ownerTicket&&ownerAgree.checked);
+}
+document.getElementById("ownerPreview").onclick=()=>{
+  ownerTicket=null;ownerAgree.checked=false;ownerRun.disabled=true;
+  const versions=ownerLines(document.getElementById("ownerCandidates").value);
+  const mapping={};
+  for(const value of versions){
+    const pos=value.indexOf("=");
+    if(pos<=0||pos===value.length-1||value.indexOf("=",pos+1)!==-1){
+      ownerOut.textContent="INVALID_VERSION_MAPPING";return;
+    }
+    const key=value.slice(0,pos).trim(),alternative=value.slice(pos+1).trim();
+    (mapping[key]??=[]).push(alternative);
+  }
+  ownerRequest("/owner/preview",{
+    goal:document.getElementById("ownerGoal").value,
+    root:document.getElementById("ownerRoot").value,
+    required:ownerLines(document.getElementById("ownerRequired").value),
+    candidates:versions.length?mapping:null,
+    confirm_local_only:document.getElementById("ownerLocalOnly").checked
+  });
+};
+ownerRun.onclick=()=>{
+  if(!ownerTicket||!ownerAgree.checked)return;
+  const ticket=ownerTicket;ownerTicket=null;ownerRun.disabled=true;
+  ownerRequest("/owner/execute",{
+    approval_token:ticket,consent:"APPROVE_LOCAL_METADATA_LSTAT"
+  });
+};
 document.getElementById("doctor").onclick=()=>request("/doctor",{});
 document.getElementById("preview").onclick=()=>request("/preview",{});
 go.onclick=()=>{
@@ -267,12 +332,21 @@ def handler_for(controller: Operator, session: str):
                 if self.headers.get("Content-Type", "").split(";")[0] != "application/json":
                     raise OperatorRefused("JSON_REQUIRED")
                 length = int(self.headers.get("Content-Length", "-1"))
-                if not 2 <= length <= 512:
+                maximum = 8192 if self.path == "/owner/preview" else 512
+                if not 2 <= length <= maximum:
                     raise OperatorRefused("BODY_REFUSED")
                 body = json.loads(self.rfile.read(length))
                 if type(body) is not dict:
                     raise OperatorRefused("JSON_OBJECT_REQUIRED")
-                if self.path == "/demo" and not body:
+                if self.path == "/owner/preview":
+                    result = controller.owner_workbench.preview(body)
+                elif self.path == "/owner/execute" and set(body) == {
+                    "approval_token", "consent"
+                }:
+                    result = controller.owner_workbench.execute(
+                        body["approval_token"], body["consent"]
+                    )
+                elif self.path == "/demo" and not body:
                     result = controller.real_os_demo()
                 elif self.path == "/doctor" and not body:
                     result = controller.sources()
