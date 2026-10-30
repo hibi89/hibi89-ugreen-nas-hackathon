@@ -146,6 +146,51 @@ class DBVORASyntheticBridgeTests(unittest.TestCase):
                     path, lambda p: called.append(p))
             self.assertEqual(called, [])
 
+    def test_reader_mutation_of_disposable_sqlite_fails_closed(self):
+        with tempfile.TemporaryDirectory(prefix="ugreen-dbvora-guard-") as tmp:
+            path = Path(tmp) / "business.sqlite"
+            with sqlite3.connect(path) as db:
+                db.execute("CREATE TABLE records (id INTEGER PRIMARY KEY, payload TEXT)")
+                db.execute("INSERT INTO records (payload) VALUES ('synthetic')")
+            def mutating_reader(p):
+                result = synthetic_inventory(p)
+                with sqlite3.connect(p) as db:
+                    db.execute("UPDATE records SET payload = 'tampered' WHERE id = 1")
+                return result
+            with self.assertRaisesRegex(
+                    DBVORABridgeRefused, "DBVORA_SYNTHETIC_LEDGER_CHANGED"):
+                inspect_disposable_la_ledger(path, mutating_reader)
+
+    def test_reader_must_not_replace_disposable_sqlite(self):
+        with tempfile.TemporaryDirectory(prefix="ugreen-dbvora-guard-") as tmp:
+            path = Path(tmp) / "business.sqlite"
+            with sqlite3.connect(path) as db:
+                db.execute("CREATE TABLE records (id INTEGER)")
+            def replacing_reader(p):
+                result = synthetic_inventory(p)
+                other = p.parent / "replacement.sqlite"
+                with sqlite3.connect(other) as db:
+                    db.execute("CREATE TABLE records (id INTEGER)")
+                p.unlink()
+                other.rename(p)
+                return result
+            with self.assertRaisesRegex(
+                    DBVORABridgeRefused, "DBVORA_SYNTHETIC_LEDGER_CHANGED"):
+                inspect_disposable_la_ledger(path, replacing_reader)
+
+    def test_invalid_reader_failure_does_not_claim_integration_pass(self):
+        called = []
+        def failing_reader(p):
+            called.append(p)
+            raise RuntimeError("FORBIDDEN_PRIVATE_PATH")
+        preview = self.chain(metadata=True)
+        with self.assertRaisesRegex(
+                DBVORABridgeRefused, "DBVORA_SYNTHETIC_INSPECTION_FAILED"):
+            self.chain(metadata=True, approval=preview["approve_plan_sha256"],
+                       reader=failing_reader)
+        self.assertEqual(len(called), 1)
+        self.assertFalse(called[0].exists())
+
     def test_injected_error_never_leaks_filename(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "business.sqlite"

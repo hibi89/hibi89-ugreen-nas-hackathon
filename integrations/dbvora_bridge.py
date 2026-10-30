@@ -9,12 +9,25 @@ The injection being valid does not establish provenance of the private source.
 from __future__ import annotations
 
 from pathlib import Path
+import hashlib
 import stat
 from typing import Callable, Any
 
 
 class DBVORABridgeRefused(ValueError):
     """Fail-closed error without source paths or raw database metadata."""
+
+
+MAX_SYNTHETIC_LEDGER_BYTES = 2 * 1024 * 1024
+
+
+def _synthetic_ledger_digest(path: Path) -> str:
+    """Hash only the disposable LA SQLite file, never user-selected files."""
+    with path.open("rb") as stream:
+        content = stream.read(MAX_SYNTHETIC_LEDGER_BYTES + 1)
+    if not 100 <= len(content) <= MAX_SYNTHETIC_LEDGER_BYTES:
+        raise DBVORABridgeRefused("DBVORA_SYNTHETIC_LEDGER_SIZE_REFUSED")
+    return hashlib.sha256(content).hexdigest()
 
 
 def summarize_synthetic_dbvora_inventory(raw: object) -> dict[str, Any]:
@@ -97,7 +110,18 @@ def inspect_disposable_la_ledger(path: Path, reader: Callable[[Path], dict]) -> 
     except OSError:
         raise DBVORABridgeRefused("DBVORA_SYNTHETIC_READER_UNAVAILABLE") from None
     try:
+        # Detection, not a transactional filesystem lock: the optional reader
+        # must not alter bytes, file identity or mtime of synthetic LA SQLite.
+        before = (info.st_dev, info.st_ino, info.st_size, info.st_mtime_ns,
+                  _synthetic_ledger_digest(path))
         inventory = reader(path)
+        after_info = path.lstat()
+        after = (after_info.st_dev, after_info.st_ino, after_info.st_size,
+                 after_info.st_mtime_ns, _synthetic_ledger_digest(path))
+        if before != after or path.is_symlink() or after_info.st_nlink != 1:
+            raise DBVORABridgeRefused("DBVORA_SYNTHETIC_LEDGER_CHANGED")
+    except DBVORABridgeRefused:
+        raise
     except Exception:
         # Never propagate private source paths, SQL fragments or library errors.
         raise DBVORABridgeRefused("DBVORA_SYNTHETIC_INSPECTION_FAILED") from None
