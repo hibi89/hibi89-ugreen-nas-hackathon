@@ -68,7 +68,7 @@ class Handler(BaseHTTPRequestHandler):
             })
         if self.path.startswith("/api/status?run_id="):
             self.server.readbacks += 1
-            return self.send_data(200, {"status": "completed"})
+            return self.send_data(200, {"run_id": RUN_ID, "status": "completed"})
         if self.path.startswith("/api/la-audit?run_id="):
             self.server.audits += 1
             if self.server.mode == "audit_absent":

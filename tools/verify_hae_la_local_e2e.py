@@ -21,16 +21,58 @@ import sqlite3
 import sys
 from tempfile import TemporaryDirectory
 import threading
+from urllib.parse import quote
 
 from flowpilot_hae_bridge import APPROVAL, run_bridge, _request, reconcile_run
 
 SHA = re.compile(r"^[a-f0-9]{64}$")
+PENDING = re.compile(r"^Gui[a-fA-F0-9]{12}$")
 FIXTURE = b"id,name\n11,SyntheticAlice\n12,SyntheticBob\n"
 TASK = "Import this CSV into local SQLite"
 
 
 class AcceptanceRefused(ValueError):
     """Local acceptance requirements not satisfied."""
+
+
+def validate_pending_identity(preview: dict, *, require_g82: bool) -> str | None:
+    """Old G81 archives may run, but must never be certified as G82."""
+    pending = preview.get("pending_run_id")
+    if pending is None:
+        if require_g82:
+            raise AcceptanceRefused("G82 pending run ID absent from genuine HAE preview")
+        return None
+    if not isinstance(pending, str) or not PENDING.fullmatch(pending):
+        raise AcceptanceRefused("G82 preview returned an invalid pending run ID")
+    return pending
+
+
+def verify_business_receipts(business: Path, run_id: str) -> bool:
+    """Independently inspect LA's exact synthetic SQLite payloads and source digest."""
+    if not business.is_file() or not isinstance(run_id, str) or not PENDING.fullmatch(run_id):
+        return False
+    digest = sha256(FIXTURE).hexdigest()
+    expected = [
+        (1, digest, {"id": "11", "name": "SyntheticAlice"}),
+        (2, digest, {"id": "12", "name": "SyntheticBob"}),
+    ]
+    uri = "file:" + quote(business.resolve().as_posix(), safe="/:") + "?mode=ro"
+    try:
+        with closing(sqlite3.connect(uri, uri=True, timeout=2)) as connection:
+            records = connection.execute(
+                "SELECT row_number, source_sha256, payload_json "
+                "FROM csv_records WHERE run_id=? ORDER BY row_number", (run_id,)
+            ).fetchall()
+        return len(records) == len(expected) and all(
+            type(row_number) is int and row_number == expected_number
+            and source_digest == expected_digest
+            and isinstance(payload, str) and json.loads(payload) == expected_data
+            for (row_number, source_digest, payload),
+                (expected_number, expected_digest, expected_data)
+            in zip(records, expected)
+        )
+    except (sqlite3.DatabaseError, OSError, ValueError, TypeError):
+        return False
 
 
 def validate_binary(path: Path, expected: str, confirmed: bool) -> tuple[Path, str]:
@@ -50,7 +92,8 @@ def validate_binary(path: Path, expected: str, confirmed: bool) -> tuple[Path, s
 
 
 def run_acceptance(hae_zipapp: Path, expected_sha: str, *,
-                   execute_synthetic_only: bool = False) -> dict:
+                   execute_synthetic_only: bool = False,
+                   require_g82_pending_id: bool = False) -> dict:
     binary, digest = validate_binary(
         hae_zipapp, expected_sha, execute_synthetic_only)
     sys.path.insert(0, str(binary))
@@ -85,14 +128,26 @@ def run_acceptance(hae_zipapp: Path, expected_sha: str, *,
                 first = run_bridge(TASK, **opts)
                 if first["status"] != "WAITING_HAE_WRITE_APPROVAL":
                     raise AcceptanceRefused("Real HAE preview did not validate")
+                pending = validate_pending_identity(first, require_g82=require_g82_pending_id)
                 if state.exists() or business.exists():
                     raise AcceptanceRefused("Preview unexpectedly wrote SQLite")
                 declined = run_bridge(
                     TASK, approval="DECLINED", preview_id=first["preview_id"], **opts)
                 if declined["status"] != "DECLINED" or business.exists():
                     raise AcceptanceRefused("Declined execution changed SQLite")
+                if pending is not None:
+                    # Real G82 HAE must reject a wrong preview-bound ID before writing.
+                    wrong = "Gui" + ("f" * 12 if pending != "Gui" + "f" * 12 else "e" * 12)
+                    rejected = run_bridge(
+                        TASK, approval=APPROVAL, preview_id=first["preview_id"],
+                        pending_run_id=wrong, **opts)
+                    if rejected["status"] != "BLOCKED_HAE_EXECUTION_REJECTED":
+                        raise AcceptanceRefused("G82 wrong pending ID not rejected pre-write")
+                    if business.exists():
+                        raise AcceptanceRefused("G82 wrong pending ID wrote SQLite")
                 executed = run_bridge(
-                    TASK, approval=APPROVAL, preview_id=first["preview_id"], **opts)
+                    TASK, approval=APPROVAL, preview_id=first["preview_id"],
+                    pending_run_id=pending, **opts)
                 if (executed["status"] != "HAE_LA_SQLITE_AUDIT_CONFIRMED"
                         or executed["imported_rows"] != 2):
                     raise AcceptanceRefused("HAE/LA exact runtime audit not confirmed")
@@ -101,9 +156,14 @@ def run_acceptance(hae_zipapp: Path, expected_sha: str, *,
                 if count != 2:
                     raise AcceptanceRefused("HAE LA business SQLite row count differs")
                 run_id = executed["run_id"]
+                if pending is not None and run_id != pending:
+                    raise AcceptanceRefused("G82 approved pending ID differs from actual run")
+                if not verify_business_receipts(business, run_id):
+                    raise AcceptanceRefused("Independent LA SQLite payload/provenance mismatch")
                 code, status = _request(port, "GET", f"/api/status?run_id={run_id}")
-                if code != 200 or status.get("status") != "completed":
-                    raise AcceptanceRefused("HAE persistent run status mismatch")
+                if (code != 200 or status.get("run_id") != run_id
+                        or status.get("status") != "completed"):
+                    raise AcceptanceRefused("HAE persistent run identity/status mismatch")
             finally:
                 server.shutdown()
                 worker.join(timeout=5)
@@ -123,7 +183,8 @@ def run_acceptance(hae_zipapp: Path, expected_sha: str, *,
                 port = server.server_port
                 code, status = _request(port, "GET", f"/api/status?run_id={run_id}")
                 code2, audit = _request(port, "GET", f"/api/la-audit?run_id={run_id}")
-                if (code != 200 or status.get("status") != "completed"
+                if (code != 200 or status.get("run_id") != run_id
+                        or status.get("status") != "completed"
                         or code2 != 200 or audit.get("run_id") != run_id
                         or type(audit.get("total_events")) is not int
                         or audit["total_events"] < 2):
@@ -144,6 +205,8 @@ def run_acceptance(hae_zipapp: Path, expected_sha: str, *,
                         "SELECT COUNT(*) FROM csv_records").fetchone()[0]
                 if after_read_only != 2:
                     raise AcceptanceRefused("Read-only recovery changed SQLite")
+                if not verify_business_receipts(business, run_id):
+                    raise AcceptanceRefused("Recovered LA SQLite row payloads changed")
             finally:
                 server.shutdown()
                 worker.join(timeout=5)
@@ -152,7 +215,10 @@ def run_acceptance(hae_zipapp: Path, expected_sha: str, *,
             raise AcceptanceRefused("Zipapp changed during isolated test")
         return {
             "status": "REAL_HAE_LA_LOCAL_SYNTHETIC_E2E_PASS",
-            "steps_passed": 5, "steps_failed": 0,
+            "steps_passed": 6 if require_g82_pending_id else 5,
+            "steps_failed": 0,
+            "g82_pending_identity_verified": require_g82_pending_id,
+            "independent_sqlite_payload_verified": True,
             "hae_binary_sha256": digest, "live_hae_http": True,
             "real_la_engine": True, "sqlite_business_rows": 2,
             "la_audit_persisted_after_restart": True,
@@ -171,11 +237,14 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--hae-zipapp", type=Path, required=True)
     parser.add_argument("--sha256", required=True)
     parser.add_argument("--execute-synthetic-only", action="store_true")
+    parser.add_argument("--require-g82-pending-id", action="store_true",
+                        help="Require new HAE G82 bound preview identity")
     args = parser.parse_args(argv)
     try:
         result = run_acceptance(
             args.hae_zipapp, args.sha256,
             execute_synthetic_only=args.execute_synthetic_only,
+            require_g82_pending_id=args.require_g82_pending_id,
         )
     except (AcceptanceRefused, OSError, ValueError, ImportError, AttributeError):
         result = {"status": "REAL_HAE_LA_ACCEPTANCE_BLOCKED",

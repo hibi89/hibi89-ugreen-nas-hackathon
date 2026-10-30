@@ -315,7 +315,8 @@ def run_bridge(task: str, *, csv_path: str, port: int,
                 "executed": True, "do_not_retry_automatically": True,
                 "actual_la_execution_verified": False, "real_nas_verified": False,
             }
-        if (status_code != 200 or saved.get("status") != "completed"
+        if (status_code != 200 or saved.get("run_id") != run_id
+                or saved.get("status") != "completed"
                 or audit_code != 200 or audit.get("run_id") != run_id
                 or type(audit.get("approval_count")) is not int
                 or audit["approval_count"] < 1
