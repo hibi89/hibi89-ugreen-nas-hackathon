@@ -174,9 +174,12 @@ def _write_zip(target: Path, files: dict[str, bytes]) -> dict:
     payloads["MANIFEST.json"] = (
         json.dumps(manifest, ensure_ascii=False, sort_keys=True, indent=2) + "\n"
     ).encode("utf-8")
+    created = False
     try:
-        # Exclusive creation prevents clobbering existing release bundles.
+        # Exclusive creation: only clean up a file THIS process created.
+        # A racing external creator's file must never be deleted.
         with target.open("xb") as handle:
+            created = True
             with zipfile.ZipFile(handle, "w", compression=zipfile.ZIP_DEFLATED,
                                  compresslevel=9) as archive:
                 for name, data in sorted(payloads.items()):
@@ -185,7 +188,7 @@ def _write_zip(target: Path, files: dict[str, bytes]) -> dict:
                     entry.external_attr = 0o644 << 16
                     archive.writestr(entry, data, compress_type=zipfile.ZIP_DEFLATED)
     except Exception:
-        if target.is_file():
+        if created and target.is_file():
             target.unlink()
         raise PilotBundleRefused("ZIP_BUILD_FAILED") from None
     return {

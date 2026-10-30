@@ -53,6 +53,23 @@ class OfflinePilotZIPTests(unittest.TestCase):
                 build_offline_pilot(out)
             self.assertEqual(out.read_bytes(), b"never overwrite")
 
+    def test_racing_destination_creator_cannot_be_deleted_by_zip_failure(self):
+        from tools.build_flowpilot_pilot_zip import _write_zip
+        from unittest.mock import patch
+        real_open = Path.open
+        with tempfile.TemporaryDirectory() as folder:
+            target = Path(folder) / "racing.zip"
+            def racing_open(instance, mode="r", *args, **kwargs):
+                if instance == target and mode == "xb":
+                    with real_open(target, "wb") as foreign:
+                        foreign.write(b"another-process-owned-file")
+                    raise FileExistsError("race")
+                return real_open(instance, mode, *args, **kwargs)
+            with patch.object(Path, "open", racing_open):
+                with self.assertRaisesRegex(PilotBundleRefused, "ZIP_BUILD_FAILED"):
+                    _write_zip(target, {"tools/sample.py": b"pass\\n"})
+            self.assertEqual(target.read_bytes(), b"another-process-owned-file")
+
     def test_manifest_does_not_claim_vendor_execution(self):
         with tempfile.TemporaryDirectory() as temp:
             target = Path(temp) / "pilot.zip"
