@@ -39,6 +39,47 @@ class Round1BuilderTests(unittest.TestCase):
             self.assertTrue(result['local_prototype_excluded_from_zip'])
             self.assertEqual(verify_pdf(Path(d) / 'NAS_FlowPilot_3_Round1_OWNER_REVIEW.pdf', self.qa), 1)
 
+    def test_wrong_edition_projectready_or_old_flowpilot_refused(self):
+        for changes in ({'project': 'ProjectReady NAS'},
+                        {'date_kst': '2026-10-27'},
+                        {'project': None}, {'date_kst': None}):
+            with self.subTest(changes=changes):
+                bad=copy.deepcopy(self.qa)
+                bad.update(changes)
+                with self.assertRaisesRegex(ValueError,'Wrong FlowPilot 3.0 proposal edition'):
+                    validate(self.skill,bad)
+
+    @unittest.skipUnless(importlib.util.find_spec('reportlab') and importlib.util.find_spec('pypdf'),
+                         'PDF build dependencies not installed in general regression job')
+    def test_existing_owner_review_files_never_overwritten(self):
+        from hashlib import sha256
+        with TemporaryDirectory() as d:
+            out=Path(d)
+            skill_path=ROOT / 'skill/flowpilot-nas/SKILL.md'
+            qa_path=ROOT / 'docs/submission/flowpilot3_round1_qa_20261029.json'
+            first=build(skill_path,qa_path,out)
+            expected={p.name:sha256(p.read_bytes()).hexdigest() for p in out.iterdir()}
+            with self.assertRaisesRegex(ValueError,'Existing owner-review artifact'):
+                build(skill_path,qa_path,out)
+            actual={p.name:sha256(p.read_bytes()).hexdigest() for p in out.iterdir()}
+            self.assertEqual(first['status'],'OWNER_REVIEW_NOT_SUBMITTED')
+            self.assertEqual(actual,expected)
+
+    @unittest.skipUnless(importlib.util.find_spec('reportlab') and importlib.util.find_spec('pypdf'),
+                         'PDF build dependencies not installed in general regression job')
+    def test_preexisting_manifest_refuses_before_any_zip_or_pdf_write(self):
+        with TemporaryDirectory() as d:
+            out=Path(d)
+            (out/'NAS_FlowPilot_3_Round1_OWNER_REVIEW_manifest.json').write_text(
+                'OWNER-LOCK: keep unchanged',encoding='utf-8')
+            with self.assertRaisesRegex(ValueError,'Existing owner-review artifact'):
+                build(ROOT/'skill/flowpilot-nas/SKILL.md',
+                      ROOT/'docs/submission/flowpilot3_round1_qa_20261029.json',out)
+            self.assertEqual(list(p.name for p in out.iterdir()),
+                ['NAS_FlowPilot_3_Round1_OWNER_REVIEW_manifest.json'])
+            self.assertEqual((out/'NAS_FlowPilot_3_Round1_OWNER_REVIEW_manifest.json').read_text(),
+                'OWNER-LOCK: keep unchanged')
+
     def test_modified_skill_refused(self):
         with self.assertRaises(ValueError):
             validate(self.skill+b'\n# Modified', self.qa)
