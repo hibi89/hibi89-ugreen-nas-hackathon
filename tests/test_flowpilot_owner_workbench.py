@@ -44,8 +44,11 @@ class OwnerWorkbenchTests(unittest.TestCase):
         request["root"] = str(self.root / "nonexistent-child")
         ticket = self.controller.preview(request)
         self.assertFalse(ticket["metadata_accessed"])
-        with self.assertRaises(OwnerWorkbenchRefused):
-            self.controller.execute(ticket["approval_token"], CONSENT)
+        # Missing roots fail closed as BLOCKED, not as a successful inspection.
+        result = self.controller.execute(ticket["approval_token"], CONSENT)
+        self.assertEqual(result["status"], "BLOCKED")
+        self.assertEqual(result["finding_counts"]["PRESENT"], 0)
+        self.assertFalse(result["actual_nas_verified"])
 
     def test_missing_required_is_blocked_with_real_os_lstat(self):
         ticket = self.controller.preview(self.request(required=["absent.txt"]))
