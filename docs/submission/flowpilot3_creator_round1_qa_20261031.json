@@ -1,0 +1,59 @@
+{
+  "status": "OWNER_REVIEW_NOT_SUBMITTED",
+  "date_kst": "2026-10-31",
+  "project": "NAS FlowPilot 3.0",
+  "candidate_name": "flowpilot-3",
+  "source_skill_sha256": "2ac1b6c656c57443c63ee71b0d03b81a286845da230e9bdf068066d08f16dac7",
+  "official_creator_evidence": "OWNER_REPORTED_NOT_INDEPENDENTLY_VERIFIED",
+  "checker_evidence": {
+    "source": "owner_report",
+    "status": "static-pass-needs-target-validation",
+    "errors": 0,
+    "warnings": [
+      "DELEGATION_WORKFLOW_STATIC_VALIDATION_INCOMPLETE"
+    ]
+  },
+  "questions": [
+    {
+      "question": "One sentence: What does the Skill do?",
+      "answer": "FlowPilot 3.0 turns an owner-approved UGREEN NAS project-folder request into a bounded, read-only file-evidence review or a separately authorized document summary."
+    },
+    {
+      "question": "Who is the target user and problem?",
+      "answer": "Solo creators and small project teams need to check delivery files, competing versions and handoff readiness. Manual searches can miss files; incomplete scans can be mistaken for confirmed absence."
+    },
+    {
+      "question": "What is your proposed solution?",
+      "answer": "A Markdown Uliya Skill selects CHECK_REQUIRED, REVIEW_VERSIONS, HANDOFF_AUDIT or SUMMARIZE_SELECTED, delegates only to registered experts within an approved scope, and reports attributable results without claiming unsupported completeness."
+    },
+    {
+      "question": "What is the Core User Flow?",
+      "answer": "The owner selects an exact folder, task mode, depth and checklist. FlowPilot verifies consent and bounds before file-agent delegation. Summaries additionally require real file references, document-by-document consent and an accepted processing destination before document-agent access. Gaps stop with NOT_CHECKED or CONTENT_NOT_CHECKED."
+    },
+    {
+      "question": "What substantive difference does your idea offer compared with existing tools or conventional AI solutions?",
+      "answer": "Unlike an unscoped chatbot or simple file search, FlowPilot binds each expert instruction to the owner's exact scope and consent, distinguishes partial evidence from verified missing files, and never silently chooses a final version."
+    },
+    {
+      "question": "Which UGREEN AI NAS capabilities will be used, and at which step in the workflow?",
+      "answer": "The candidate maps ug-filesystem ls/find/stat through file-agent for scoped metadata and optionally sha256sum after file-specific consent. For owner-selected documents, document-agent may use ug-document metadata/qa/extract/reconcile on validated references. Runtime registration and permissions remain unverified."
+    },
+    {
+      "question": "What was your technical approach? Describe the planned Skill workflow, supported NAS CLI capabilities, expert agent orchestration, required inputs, permissions, AI model choices, and data handling, as applicable;",
+      "answer": "An instruction-only SKILL.md defines exact-scope input checks, conditional delegation, redaction, read-only boundaries, evidence states and failure stops. The official Uliya catalog informs candidate CLI mappings. No Python scripts, third-party model integration or external data transfer are included in the Skill ZIP."
+    },
+    {
+      "question": "What is the current development status? Identify what was implemented already, not yet implemented, or is pending NAS validation if selected to be a Finalist.",
+      "answer": "The owner reports using the installed official Uliya Creator to generate a new flowpilot-3 Skill and its Checker returning zero errors and one static delegation warning. The received source hash was independently matched; Creator execution, registered expert calls and real NAS operation were not independently verified."
+    },
+    {
+      "question": "What is your final validation plan? Name two core test cases and one edge case to validate if selected as a Finalist.",
+      "answer": "Core: an approved complete handoff checklist returns traceable file references; conflicting version candidates return VERSION_REVIEW without automatic choice. Edge: a denied, restricted, truncated or scope-escaping listing returns NOT_CHECKED without document reads or folder expansion."
+    },
+    {
+      "question": "Are there any known limitations of your Project? Describe current known limitations, technical risks, and any external dependencies.",
+      "answer": "Effective Uliya expert permissions, inventory completeness, result schema and document-processing location are unknown. The static warning remains unresolved until target testing. Finalist NAS access, rights review and final submission are pending."
+    }
+  ],
+  "disclosure": "AI assistance: OpenAI ChatGPT (GPT-6) assisted design, review and proposal preparation; the entrant reports using OpenAI Codex with the official Uliya Skill Creation Tool to generate the new Skill. Third-party components: official UGREEN capability documentation informed the CLI names, but no vendor SDK code, binary, custom runtime, bundled model or external API component is included in the ZIP. Data flow: proposed metadata reads stay within an authorized NAS folder; document content reads require separate per-file approval and a known, acceptable processing destination. No external content transmission is authorized by this Skill. The Creator/Checker activity is owner-reported, not independently replayed; the static Checker reported zero errors and one delegation-workflow warning. Actual NAS operation, rights, licensing decision and Devpost release are pending."
+}
