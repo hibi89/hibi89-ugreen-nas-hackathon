@@ -38,22 +38,28 @@ class IntegrityRefused(ValueError):
 
 
 def _git(root: Path, *args: str) -> str:
+    """Read ASCII-only Git gate values without Windows cp949 path decoding."""
     try:
         proc = subprocess.run(
             ["git", "-C", str(root), *args],
-            capture_output=True, text=True, timeout=10, check=False,
+            capture_output=True, timeout=10, check=False,
             stdin=subprocess.DEVNULL,
         )
     except (OSError, subprocess.TimeoutExpired) as exc:
         raise IntegrityRefused("Private Git source unavailable") from exc
-    if proc.returncode:
+    if proc.returncode or not isinstance(proc.stdout, bytes):
         raise IntegrityRefused("Private Git source unavailable")
-    return proc.stdout.strip()
+    try:
+        return proc.stdout.decode("ascii").strip()
+    except UnicodeError as exc:
+        raise IntegrityRefused("Private Git output is not an ASCII gate value") from exc
 
 
 def _verify_private_source(hae_root: Path) -> None:
     """Before executing any private helper, match exact reviewed Git blobs."""
-    if Path(_git(hae_root, "rev-parse", "--show-toplevel")).resolve() != hae_root:
+    # --show-toplevel prints the Korean absolute path as UTF-8 on Windows.
+    # --show-prefix is empty only for the repository root and stays ASCII.
+    if _git(hae_root, "rev-parse", "--show-prefix") != "":
         raise IntegrityRefused("HAE source root mismatch")
     for rel, expected in PINNED_PRIVATE_BLOBS.items():
         source = hae_root / rel
