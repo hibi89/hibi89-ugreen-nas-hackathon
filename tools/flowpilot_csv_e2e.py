@@ -3,6 +3,8 @@
 This module composes bounded goal/slot filling, preview, separate approval,
 CSV report execution and read-only SQLite audit view. A separate opt-in
 synthetic-only LA v0 import may call an installed private package, never HAE.
+A separate ProjectReady local metadata mode reuses the bounded, consent-gated
+owner folder inspector: not a NAS drive or a registered Uliya Expert.
 NOT a NAS/Uliya/SOVIA/DBVORA integration or complete LA CSV reporting graph.
 """
 from __future__ import annotations
@@ -27,9 +29,36 @@ def run_session(goal: str, *, root: Path | None = None,
                 sources: list[str] | None = None, output: str | None = None,
                 group: str | None = None, amount: str | None = None,
                 approval: str | None = None, audit_db: Path | None = None,
-                backend: str = "local-csv-report") -> dict:
-    if backend not in {"local-csv-report", "la-synthetic-import"}:
+                backend: str = "local-csv-report",
+                required: list[str] | None = None,
+                candidates: dict[str, list[str]] | None = None) -> dict:
+    if backend not in {"local-csv-report", "la-synthetic-import",
+                       "projectready-local-metadata"}:
         raise ReportRefused("Unsupported backend")
+    if backend == "projectready-local-metadata":
+        # Deliberately distinct from local CSV writes or real NAS access.
+        if any(value is not None for value in (sources, output, group, amount, audit_db)):
+            raise ReportRefused("Metadata backend rejects CSV and database options")
+        from flowpilot_goal_preview import process_goal
+        from flowpilot_local_workflow import WorkflowRefused
+        preview = process_goal(goal, root=root, required=required,
+                               candidates=candidates, metadata_consent=False)
+        if approval is None or preview["status"] != "WAITING_APPROVAL":
+            result = preview
+        elif approval != "APPROVE_LOCAL_METADATA":
+            result = dict(preview, status="DECLINED", next_action="NO_ACTION")
+        else:
+            result = process_goal(goal, root=root, required=required,
+                                  candidates=candidates, metadata_consent=True)
+        return {
+            **result,
+            "backend": "projectready-local-metadata",
+            "executed": result["owner_folder_metadata_accessed"] is True,
+            "actual_la_integrated": False,
+            "actual_uliya_nas_integrated": False,
+        }
+    if required is not None or candidates is not None:
+        raise ReportRefused("Metadata checklist options require ProjectReady backend")
     if backend == "la-synthetic-import":
         # This backend is fixed to code-owned test data, not owner/customer files.
         # Refuse caller paths rather than silently ignoring them.
@@ -75,25 +104,41 @@ def run_session(goal: str, *, root: Path | None = None,
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="FlowPilot local CSV E2E demo, NOT NAS")
     parser.add_argument("--goal", required=True)
-    parser.add_argument("--backend", choices=("local-csv-report", "la-synthetic-import"),
+    parser.add_argument("--backend", choices=("local-csv-report", "la-synthetic-import",
+                                               "projectready-local-metadata"),
                         default="local-csv-report",
-                        help="Separate opt-in synthetic LA import; default stays local report")
+                        help="ProjectReady read-only local metadata or synthetic LA; default CSV")
     parser.add_argument("--root", type=Path)
     parser.add_argument("--source", action="append", dest="sources")
     parser.add_argument("--output")
     parser.add_argument("--group")
     parser.add_argument("--amount")
-    parser.add_argument("--approval", help="APPROVE_EXECUTION (local report) or APPROVE_SYNTHETIC_SQLITE_IMPORT (LA)")
+    parser.add_argument("--required", action="append",
+                        help="ProjectReady: exact relative checklist file; repeatable")
+    parser.add_argument("--candidate", action="append",
+                        help="ProjectReady: required=candidate; repeatable")
+    parser.add_argument("--approval", help="APPROVE_EXECUTION (CSV), APPROVE_SYNTHETIC_SQLITE_IMPORT (LA) or APPROVE_LOCAL_METADATA (ProjectReady)")
     parser.add_argument("--audit-db", type=Path)
     args = parser.parse_args(argv)
     try:
+        candidates = None
+        if args.candidate:
+            candidates = {}
+            for pair in args.candidate:
+                if pair.count("=") != 1:
+                    raise ReportRefused("Invalid candidate assignment")
+                name, variant = pair.split("=", 1)
+                candidates.setdefault(name, []).append(variant)
         result = run_session(args.goal, root=args.root, sources=args.sources,
                              output=args.output, group=args.group,
                              amount=args.amount, approval=args.approval,
-                             audit_db=args.audit_db, backend=args.backend)
+                             audit_db=args.audit_db, backend=args.backend,
+                             required=args.required, candidates=candidates)
         print(json.dumps(result, ensure_ascii=False, indent=2))
         if args.backend == "la-synthetic-import":
             return 2 if result["status"].startswith(("BLOCKED_", "REFUSED_")) else 0
+        if args.backend == "projectready-local-metadata":
+            return 1 if result["status"] == "BLOCKED" else 0
         return 0
     except (ReportRefused, OSError, ValueError, TypeError):
         print(json.dumps({"status": "REFUSED", "executed": False,
