@@ -48,9 +48,9 @@ class G85PublicEntryTests(unittest.TestCase):
             "devpost_submitted": False,
         }
         self.runner.write_text(
-            "import json, sys\\n"
-            f"print(json.dumps({receipt!r}))\\n"
-            f"sys.exit({code})\\n", encoding="utf-8"
+            "import json, sys\n"
+            f"print(json.dumps({receipt!r}))\n"
+            f"sys.exit({code})\n", encoding="utf-8"
         )
 
     def test_unapproved_does_not_run_private_script(self):
