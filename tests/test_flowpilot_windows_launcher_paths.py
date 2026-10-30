@@ -28,7 +28,7 @@ class LocalWindowsLauncherPathTests(unittest.TestCase):
             with self.subTest(name=name):
                 text = (ROOT / "tools" / name).read_text(encoding="utf-8")
                 for directory in ("HAE", "SOVIA_sovereign", "DBVORA"):
-                    self.assertIn("..\\\\" + directory, text)
+                    self.assertIn("..\\" + directory, text)
                 self.assertNotIn("Invoke-WebRequest", text)
                 self.assertNotIn("git clone", text)
 
