@@ -8,6 +8,7 @@ import json
 from pathlib import Path
 import secrets
 import sys
+import webbrowser
 from threading import Lock
 
 PROJECT = Path(__file__).resolve().parents[1]
@@ -292,18 +293,39 @@ def handler_for(controller: Operator, session: str):
 
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(description="Loopback synthetic FlowPilot UI, no NAS")
-    for root in ("hae", "sovia", "dbvora"):
-        p.add_argument("--" + root + "-root", type=Path, required=True)
+    for root, folder in (("hae", "HAE"), ("sovia", "SOVIA_sovereign"),
+                         ("dbvora", "DBVORA")):
+        p.add_argument("--" + root + "-root", type=Path,
+                       default=PROJECT.parent / folder,
+                       help="Optional private source root (not needed for real OS demo)")
+    p.add_argument("--open-browser", action="store_true",
+                   help="Open the loopback UI locally after server startup")
+    p.add_argument("--demo-check", action="store_true",
+                   help="Run actual local OS demo without browser or private repositories")
     p.add_argument("--output-dir", type=Path)
     p.add_argument("--port", type=int, default=0)
     a = p.parse_args(argv)
     if not 0 <= a.port <= 65535:
         p.error("Invalid port")
+    if a.demo_check:
+        try:
+            report = run_real_local_demo()
+        except (OSError, ValueError, TypeError, RuntimeError):
+            print(json.dumps({"status": "REAL_OS_DEMO_REFUSED", "release_gate": "HOLD"}))
+            return 2
+        print(json.dumps(report, ensure_ascii=False, sort_keys=True))
+        return 0
     controller = Operator(a.hae_root, a.sovia_root, a.dbvora_root, a.output_dir)
     server = ThreadingHTTPServer(
         ("127.0.0.1", a.port), handler_for(controller, secrets.token_hex(32)))
-    print("OPEN_LOCAL_UI http://127.0.0.1:" + str(server.server_port) + "/",
-          flush=True)
+    url = "http://127.0.0.1:" + str(server.server_port) + "/"
+    print("OPEN_LOCAL_UI " + url, flush=True)
+    if a.open_browser:
+        try:
+            webbrowser.open(url)
+        except (OSError, RuntimeError):
+            # Browser availability does not change local server safety.
+            print("OPEN_BROWSER_MANUALLY " + url, flush=True)
     try:
         server.serve_forever(poll_interval=0.2)
     except KeyboardInterrupt:
