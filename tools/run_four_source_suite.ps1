@@ -11,8 +11,18 @@ param(
     [string]$OutputDir = ""
 )
 $ErrorActionPreference = "Stop"
-$root = Split-Path -Parent $PSScriptRoot
-$script = Join-Path $root "tools\flowpilot_four_source_suite.py"
+$repo = Split-Path -Parent $PSScriptRoot
+function Resolve-SourceRoot([string]$Value) {
+    if ([string]::IsNullOrWhiteSpace($Value)) { throw "Empty source root" }
+    if ([System.IO.Path]::IsPathRooted($Value)) {
+        return [System.IO.Path]::GetFullPath($Value)
+    }
+    return [System.IO.Path]::GetFullPath((Join-Path $repo $Value))
+}
+$HaeRoot = Resolve-SourceRoot $HaeRoot
+$SoviaRoot = Resolve-SourceRoot $SoviaRoot
+$DbvoraRoot = Resolve-SourceRoot $DbvoraRoot
+$script = Join-Path $repo "tools\flowpilot_four_source_suite.py"
 if (-not (Test-Path -LiteralPath $script -PathType Leaf)) {
     throw "Local synthetic verification suite unavailable"
 }
@@ -21,7 +31,12 @@ $arglist = @("-3.11", $script,
     "--dbvora-root", $DbvoraRoot)
 if ($ApproveDisposableSynthetic) { $arglist += "--approve-disposable-synthetic" }
 if ($OutputDir) {
-    $arglist += @("--output-dir", [System.IO.Path]::GetFullPath($OutputDir))
+    $resolved = if ([System.IO.Path]::IsPathRooted($OutputDir)) {
+        [System.IO.Path]::GetFullPath($OutputDir)
+    } else {
+        [System.IO.Path]::GetFullPath((Join-Path $repo $OutputDir))
+    }
+    $arglist += @("--output-dir", $resolved)
 }
 & py @arglist
 exit $LASTEXITCODE

@@ -28,6 +28,10 @@ on:
       - "tools/flowpilot_four_source_suite.py"
       - "tools/flowpilot_source_doctor.py"
       - "tests/test_flowpilot_source_doctor.py"
+      - "tests/test_flowpilot_windows_launcher_paths.py"
+      - "tools/run_four_source_doctor.ps1"
+      - "tools/run_four_source_synthetic.ps1"
+      - "tools/run_four_source_suite.ps1"
       - "tools/flowpilot_four_source_local_ui.py"
       - "tests/test_flowpilot_four_source_local_ui.py"
       - "tests/test_flowpilot_local_http_contract.py"
@@ -107,6 +111,8 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_flowpilot_local_http_contract.py' -v
       - name: Check explicit synthetic consent in loopback-only UI
         run: python -m unittest discover -s tests -p 'test_flowpilot_four_source_local_ui.py' -v
+      - name: Validate Windows launcher source paths and explicit synthetic opt-in
+        run: python -m unittest discover -s tests -p 'test_flowpilot_windows_launcher_paths.py' -v
       - name: Validate exact local Git source readiness (no private imports)
         run: python -m unittest discover -s tests -p 'test_flowpilot_source_doctor.py' -v
       - name: Verify 1-3 intent offline proof bundle and file SHA-256 manifest
