@@ -10,6 +10,8 @@ from contextlib import closing
 import csv
 import hashlib
 import json
+import os
+import stat
 import sqlite3
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
@@ -126,36 +128,54 @@ def execute(root: Path, plan: dict, *, approval: str, audit_db: Path) -> dict:
         raise ReportRefused("No data rows")
     if any(_sha256_file(src) != digest for src, digest in zip(sources, source_hashes)):
         raise ReportRefused("Source changed during report computation")
-    # Exclusive creation avoids overwriting any pre-existing output.
-    with output.open("x", encoding="utf-8", newline="") as handle:
-        writer = csv.writer(handle)
-        writer.writerow([plan["group"], "total_" + plan["amount"]])
-        for key in sorted(totals):
-            writer.writerow([key, str(totals[key])])
-    report_sha256 = _sha256_file(output)
-    # Exact node IDs match the deterministic FlowPilot preview graph. This is
-    # local evidence, NOT a SOVIA risk rating or an LA execution trace.
-    node_trace = [
-        {"node_id": f"read_{index}", "action": "csv_read", "status": "COMPLETED",
-         "source_sha256": digest}
-        for index, digest in enumerate(source_hashes, 1)
-    ]
-    node_trace.extend([
-        {"node_id": "aggregate", "action": "decimal_group_sum", "status": "COMPLETED",
-         "rows": rows, "groups": len(totals)},
-        {"node_id": "write", "action": "csv_write_new", "status": "COMPLETED",
-         "report_sha256": report_sha256},
-        {"node_id": "audit", "action": "sqlite_audit", "status": "COMPLETED"},
-    ])
-    record = {"timestamp": datetime.now(timezone.utc).isoformat(), "output": plan["output"],
-              "source_count": len(plan["sources"]), "rows": rows, "groups": len(totals),
-              "report_sha256": report_sha256,
-              "node_trace": node_trace,
-              "audit_kind": "FLOWPILOT_LOCAL_EVIDENCE_NOT_SOVIA",
-              "status": "LOCAL_REPORT_CREATED_NOT_NAS"}
-    # This is a generic local SQLite trace, NOT a SOVIA/DBVORA integration.
-    with closing(sqlite3.connect(audit_db)) as db, db:
-        db.execute("CREATE TABLE IF NOT EXISTS flowpilot_runs (id INTEGER PRIMARY KEY, timestamp TEXT NOT NULL, record_json TEXT NOT NULL)")
-        db.execute("INSERT INTO flowpilot_runs(timestamp, record_json) VALUES (?,?)",
-                   (record["timestamp"], json.dumps(record, sort_keys=True)))
-    return record
+    created_identity = None
+    try:
+        # Exclusive creation avoids overwriting any pre-existing output.
+        with output.open("x", encoding="utf-8", newline="") as handle:
+            created_identity = os.fstat(handle.fileno())
+            writer = csv.writer(handle)
+            writer.writerow([plan["group"], "total_" + plan["amount"]])
+            for key in sorted(totals):
+                writer.writerow([key, str(totals[key])])
+        report_sha256 = _sha256_file(output)
+        # Exact node IDs match the deterministic FlowPilot preview graph. This is
+        # local evidence, NOT a SOVIA risk rating or an LA execution trace.
+        node_trace = [
+            {"node_id": f"read_{index}", "action": "csv_read", "status": "COMPLETED",
+             "source_sha256": digest}
+            for index, digest in enumerate(source_hashes, 1)
+        ]
+        node_trace.extend([
+            {"node_id": "aggregate", "action": "decimal_group_sum", "status": "COMPLETED",
+             "rows": rows, "groups": len(totals)},
+            {"node_id": "write", "action": "csv_write_new", "status": "COMPLETED",
+             "report_sha256": report_sha256},
+            {"node_id": "audit", "action": "sqlite_audit", "status": "COMPLETED"},
+        ])
+        record = {"timestamp": datetime.now(timezone.utc).isoformat(), "output": plan["output"],
+                  "source_count": len(plan["sources"]), "rows": rows, "groups": len(totals),
+                  "report_sha256": report_sha256,
+                  "node_trace": node_trace,
+                  "audit_kind": "FLOWPILOT_LOCAL_EVIDENCE_NOT_SOVIA",
+                  "status": "LOCAL_REPORT_CREATED_NOT_NAS"}
+        # This is a generic local SQLite trace, NOT a SOVIA/DBVORA integration.
+        with closing(sqlite3.connect(audit_db)) as db, db:
+            db.execute("CREATE TABLE IF NOT EXISTS flowpilot_runs (id INTEGER PRIMARY KEY, timestamp TEXT NOT NULL, record_json TEXT NOT NULL)")
+            db.execute("INSERT INTO flowpilot_runs(timestamp, record_json) VALUES (?,?)",
+                       (record["timestamp"], json.dumps(record, sort_keys=True)))
+        return record
+    except Exception as failure:
+        # Only unlink the inode exclusively created by THIS execution.
+        # Never remove a competing replacement, symlink or owner-owned file.
+        if created_identity is not None:
+            try:
+                current = output.lstat()
+                if (stat.S_ISREG(current.st_mode)
+                        and (current.st_dev, current.st_ino) ==
+                            (created_identity.st_dev, created_identity.st_ino)):
+                    output.unlink()
+            except OSError:
+                pass
+        if isinstance(failure, ReportRefused):
+            raise
+        raise ReportRefused('LOCAL_CSV_OUTPUT_OR_AUDIT_FAILED') from None

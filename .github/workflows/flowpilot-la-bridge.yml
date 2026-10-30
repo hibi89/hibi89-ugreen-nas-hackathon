@@ -150,6 +150,8 @@ jobs:
           python -c "import json;d=json.load(open('/tmp/flowpilot-four-checks.json'));assert d['status']=='PASS_FOUR_LOCAL_CAPABILITY_CHECKS' and d['passed']==4 and d['actual_nas_verified'] is False"
       - name: Run real owner-selected local CSV content aggregation and SQLite audit
         run: python -m unittest discover -s tests -p 'test_flowpilot_owner_csv.py' -v
+      - name: Verify failure-atomic owner CSV output and audit
+        run: python -m unittest discover -s tests -p 'test_flowpilot_csv_report.py' -v
       - name: Run real generated CSV aggregation and SQLite audit with no NAS
         run: python -m unittest discover -s tests -p 'test_flowpilot_synthetic_csv_panel.py' -v
       - name: Test actual localhost HTTP headers consent and report route isolation
