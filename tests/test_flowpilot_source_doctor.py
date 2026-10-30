@@ -45,6 +45,9 @@ class SourceDoctorTests(unittest.TestCase):
               patch("tools.flowpilot_source_doctor.shutil.which", return_value="/bin/git")):
             row = inspect_sources(*self.roots)
         self.assertEqual(row["sources"]["dbvora"]["status"], "SOURCE_SHA_MISMATCH")
+        self.assertEqual(row["status"], "READY_FOR_LOCAL_SYNTHETIC_PREVIEW")
+        self.assertTrue(row["owner_local_synthetic_preview_readiness"])
+        self.assertFalse(row["owner_local_synthetic_execution_readiness"])
         self.assertFalse(row["owner_local_synthetic_source_readiness"])
         self.assertNotIn("/dbvora", str(row))
 
@@ -59,6 +62,20 @@ class SourceDoctorTests(unittest.TestCase):
             row = inspect_sources(*self.roots)
         self.assertEqual(checked.call_count, 3)
         self.assertTrue(row["owner_local_synthetic_source_readiness"])
+
+    def test_absent_dbvora_allows_preview_but_not_execution(self):
+        def fake(root, sha, paths):
+            if sha == SOURCES[2][1]:
+                raise ProofRefused("SOURCE_ROOT_MISSING")
+            return Path("/trusted")
+        with (patch("tools.flowpilot_source_doctor.verify_checkout", side_effect=fake),
+              patch("tools.flowpilot_source_doctor.Path.is_file", return_value=True),
+              patch("tools.flowpilot_source_doctor.Path.is_symlink", return_value=False),
+              patch("tools.flowpilot_source_doctor.shutil.which", return_value="/bin/git")):
+            result = inspect_sources(*self.roots)
+        self.assertTrue(result["owner_local_synthetic_preview_readiness"])
+        self.assertFalse(result["owner_local_synthetic_execution_readiness"])
+        self.assertEqual(result["status"], "READY_FOR_LOCAL_SYNTHETIC_PREVIEW")
 
     def test_missing_git_skips_all_checkout_invocations(self):
         with (patch("tools.flowpilot_source_doctor.shutil.which", return_value=None),

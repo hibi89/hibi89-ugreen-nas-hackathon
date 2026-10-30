@@ -44,8 +44,11 @@ class Operator:
             if self.attempted:
                 raise OperatorRefused("SYNTHETIC_EXECUTION_ALREADY_ATTEMPTED")
             self.challenge = None
-            if self.sources().get("owner_local_synthetic_source_readiness") is not True:
-                raise OperatorRefused("EXACT_GIT_CHECKOUTS_NOT_READY")
+            readiness = self.sources()
+            if (readiness.get("owner_local_synthetic_preview_readiness",
+                              readiness.get("owner_local_synthetic_source_readiness"))
+                    is not True):
+                raise OperatorRefused("HAE_SOVIA_SOURCES_NOT_READY")
             row = run_suite(*self.roots, approve_disposable_synthetic=False)
             if (row.get("status") != "WAITING_DISPOSABLE_SYNTHETIC_WRITE_APPROVAL"
                     or row.get("scenario_count") != 3
@@ -69,6 +72,13 @@ class Operator:
                 raise OperatorRefused("EXACT_DISPOSABLE_APPROVAL_REQUIRED")
             self.challenge = None
             self.attempted = True
+        # Before any approved temp SQLite write, separately require DBVORA
+        # as well as the two sources already checked for read-only preview.
+        readiness = self.sources()
+        if (readiness.get("owner_local_synthetic_execution_readiness",
+                          readiness.get("owner_local_synthetic_source_readiness"))
+                is not True):
+            raise OperatorRefused("THREE_PINNED_SOURCES_NOT_READY_FOR_EXECUTION")
         result = run_suite(*self.roots, approve_disposable_synthetic=True,
                            output_dir=self.output)
         if (result.get("status") != "PASS_SYNTHETIC_LOCAL_ONLY"

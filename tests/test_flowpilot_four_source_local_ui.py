@@ -61,9 +61,32 @@ class OperatorUITests(unittest.TestCase):
                            return_value={"owner_local_synthetic_source_readiness": False}),
               patch("tools.flowpilot_four_source_local_ui.run_suite",
                     side_effect=AssertionError("MUST_NOT_RUN")) as called):
-            with self.assertRaisesRegex(OperatorRefused, "EXACT_GIT_CHECKOUTS_NOT_READY"):
+            with self.assertRaisesRegex(OperatorRefused, "HAE_SOVIA_SOURCES_NOT_READY"):
                 self.operator.preview()
             called.assert_not_called()
+
+    def test_missing_dbvora_permits_preview_but_refuses_approved_execution(self):
+        calls = []
+        def fake(*args, **kwargs):
+            calls.append(kwargs["approve_disposable_synthetic"])
+            return {"status": "WAITING_DISPOSABLE_SYNTHETIC_WRITE_APPROVAL",
+                    "scenario_count": 3, "actual_nas_verified": False,
+                    "release_gate": "HOLD"}
+        with (patch.object(self.operator, "sources",
+                           return_value={
+                               "owner_local_synthetic_preview_readiness": True,
+                               "owner_local_synthetic_execution_readiness": False,
+                           }),
+              patch("tools.flowpilot_four_source_local_ui.run_suite",
+                    side_effect=fake) as recorded):
+            challenge = self.operator.preview()["challenge"]
+            with self.assertRaisesRegex(
+                    OperatorRefused, "THREE_PINNED_SOURCES_NOT_READY_FOR_EXECUTION"):
+                self.operator.execute(challenge, CONSENT)
+        self.assertEqual(calls, [False])
+        self.assertEqual(recorded.call_count, 1)
+        with self.assertRaisesRegex(OperatorRefused, "NO_PENDING_APPROVAL"):
+            self.operator.execute(challenge, CONSENT)
 
     def test_no_evidence_before_explicit_approval(self):
         with self.assertRaisesRegex(OperatorRefused, "EVIDENCE_NOT_AVAILABLE"):

@@ -65,13 +65,17 @@ def inspect_sources(hae_root: Path, sovia_root: Path, dbvora_root: Path) -> dict
             except (OSError, ValueError, RuntimeError):
                 status = "LOCAL_SOURCE_UNVERIFIED"
         statuses[key] = {"status": status, "expected_sha": sha}
-    ready = all(item["status"] == "EXACT_SOURCE_READY"
-                for item in statuses.values())
+    preview_ready = all(statuses[key]["status"] == "EXACT_SOURCE_READY"
+                        for key in ("hae_la", "sovia"))
+    ready = preview_ready and statuses["dbvora"]["status"] == "EXACT_SOURCE_READY"
     return {
-        "status": "READY_FOR_LOCAL_SYNTHETIC_PREVIEW" if ready else "BLOCKED",
+        "status": ("READY_FOR_LOCAL_SYNTHETIC_PREVIEW"
+                   if preview_ready else "BLOCKED"),
         "python_3_11_or_newer": python_ok,
         "git_available": git_ok,
         "sources": statuses,
+        "owner_local_synthetic_preview_readiness": preview_ready,
+        "owner_local_synthetic_execution_readiness": ready,
         "owner_local_synthetic_source_readiness": ready,
         "private_source_executed": False,
         "actual_nas_verified": False,
