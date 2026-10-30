@@ -17,6 +17,7 @@ sys.path.insert(0, str(PROJECT))
 from tools.flowpilot_source_doctor import inspect_sources
 from tools.flowpilot_four_source_suite import run_suite
 from tools.flowpilot_real_os_demo import run_real_local_demo
+from tools.flowpilot_synthetic_csv_panel import CSVPanel, CSVPanelRefused
 from tools.flowpilot_owner_workbench import OwnerWorkbench, OwnerWorkbenchRefused, CONSENT as OWNER_CONSENT
 
 CONSENT = "I_APPROVE_DISPOSABLE_SYNTHETIC_WRITES"
@@ -39,6 +40,10 @@ class Operator:
         self.attempted = False
         self.evidence_ready = False
         self.owner_workbench = OwnerWorkbench()
+        self.csv_panel = CSVPanel()
+
+    def close(self):
+        self.csv_panel.close()
 
     def sources(self) -> dict:
         return inspect_sources(*self.roots)
@@ -176,6 +181,18 @@ background:#081a2a;border-radius:9px;padding:16px;max-height:310px;overflow:auto
 <p>Run the actual FlowPilot goal parser and OS metadata checks against five
 automatically generated, disposable folders. No LA, SOVIA, DBVORA or NAS calls.</p>
 <button id="demo">Run 1–3 intent real OS demo + missing-file cases</button>
+</section><section><h2>Real CSV automation on generated examples</h2>
+<p>Combine disposable monthly sales CSVs, inspect the plan, approve writes
+to generated data, and download the actual result with a SQLite audit receipt.
+No customer/NAS files or private integrations are involved.</p>
+<label>Output name<select id="csvOutput">
+<option value="summary.csv">summary.csv</option>
+<option value="monthly-summary.csv">monthly-summary.csv</option></select></label>
+<button id="csvPreview">Preview sales CSV automation</button>
+<button id="csvApprove" class="execute" disabled>Approve synthetic CSV write</button>
+<button id="csvReject" disabled>Reject</button>
+<button id="csvDownload" disabled>Download verified generated CSV</button>
+<pre id="csvStatus" role="status">No CSV workflow previewed.</pre>
 </section><section><h2>Your local folder checklist (read-only)</h2>
 <p>For a local, trusted, non-NAS directory only. Enter exact file names.
 Preview does not inspect the directory; approval allows OS metadata lstat only.
@@ -353,6 +370,56 @@ ownerRun.onclick=()=>{
     approval_token:ticket,consent:"APPROVE_LOCAL_METADATA_LSTAT"
   });
 };
+let csvReady=false,csvDone=false;
+const csvStatus=document.getElementById("csvStatus"),
+ csvApprove=document.getElementById("csvApprove"),
+ csvReject=document.getElementById("csvReject"),
+ csvDownload=document.getElementById("csvDownload"),
+ csvPreview=document.getElementById("csvPreview");
+document.getElementById("csvOutput").onchange=()=>{
+ csvReady=false;csvDone=false;csvApprove.disabled=true;
+ csvReject.disabled=true;csvDownload.disabled=true;
+ csvStatus.textContent="Output changed; preview again.";
+};
+async function runCSV(path,data){
+ csvStatus.textContent="Executing generated-only CSV step...";
+ try{
+  const response=await fetch(path,{method:"POST",cache:"no-store",
+   headers:{"Content-Type":"application/json","X-FlowPilot-Session":session},
+   body:JSON.stringify(data)});
+  const row=await response.json();
+  csvStatus.textContent=JSON.stringify(row,null,2);
+  csvReady=response.ok&&row.workflow_preview_ready===true;
+  csvDone=response.ok&&row.csv_created===true&&row.audit_recorded===true;
+  csvApprove.disabled=!csvReady;csvReject.disabled=!csvReady;
+  csvDownload.disabled=!csvDone;
+  csvPreview.disabled=csvDone;
+ }catch(e){csvReady=false;csvApprove.disabled=true;csvReject.disabled=true;
+  csvStatus.textContent="SYNTHETIC_CSV_REFUSED";}
+}
+csvPreview.onclick=()=>runCSV("/csv/configure",
+ {output:document.getElementById("csvOutput").value});
+csvApprove.onclick=()=>{
+ if(!csvReady)return;csvReady=false;csvApprove.disabled=true;
+ csvReject.disabled=true;runCSV("/csv/approve",{});
+};
+csvReject.onclick=()=>{
+ if(!csvReady)return;csvReady=false;csvApprove.disabled=true;
+ csvReject.disabled=true;runCSV("/csv/reject",{});
+};
+csvDownload.onclick=async()=>{
+ if(!csvDone)return;
+ try{
+  const r=await fetch("/csv/report.csv",{cache:"no-store",
+   headers:{"X-FlowPilot-Session":session}});
+  if(!r.ok)throw Error("unavailable");
+  const uri=URL.createObjectURL(await r.blob());
+  const link=document.createElement("a");link.href=uri;
+  link.download="flowpilot-synthetic-customer-summary.csv";
+  document.body.append(link);link.click();link.remove();
+  setTimeout(()=>URL.revokeObjectURL(uri),1000);
+ }catch(e){csvStatus.textContent="CSV_REPORT_UNAVAILABLE";}
+};
 document.getElementById("doctor").onclick=()=>request("/doctor",{});
 document.getElementById("preview").onclick=()=>request("/preview",{});
 go.onclick=()=>{
@@ -392,6 +459,16 @@ def handler_for(controller: Operator, session: str):
             if self.path == "/":
                 return self.send(200, HTML.replace("__SESSION__", session).encode("utf-8"),
                                  "text/html; charset=utf-8")
+            if self.path == "/csv/report.csv":
+                if not secrets.compare_digest(
+                    self.headers.get("X-FlowPilot-Session", ""), session
+                ):
+                    return self.send(403, b'{"status":"FORBIDDEN"}')
+                try:
+                    data = controller.csv_panel.report()
+                except (CSVPanelRefused, OSError, ValueError, RuntimeError):
+                    return self.send(404, b'{"status":"REPORT_UNAVAILABLE"}')
+                return self.send(200, data, "text/csv; charset=utf-8")
             if self.path.startswith("/evidence/"):
                 name = self.path[len("/evidence/"):]
                 if name not in EVIDENCE_FILES:
@@ -423,7 +500,13 @@ def handler_for(controller: Operator, session: str):
                 body = json.loads(self.rfile.read(length))
                 if type(body) is not dict:
                     raise OperatorRefused("JSON_OBJECT_REQUIRED")
-                if self.path == "/owner/preview":
+                if self.path == "/csv/configure":
+                    result = controller.csv_panel.configure(body)
+                elif self.path in ("/csv/approve", "/csv/reject") and not body:
+                    result = controller.csv_panel.action(
+                        "approve" if self.path == "/csv/approve" else "reject"
+                    )
+                elif self.path == "/owner/preview":
                     result = controller.owner_workbench.preview(body)
                 elif self.path == "/owner/execute" and set(body) == {
                     "approval_token", "consent"
@@ -493,6 +576,7 @@ def main(argv=None) -> int:
         pass
     finally:
         server.server_close()
+        controller.close()
     return 0
 
 
