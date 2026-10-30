@@ -1,6 +1,6 @@
 # UGREEN FlowPilot safe one-command LOCAL verification. No NAS, customer DB, API or upload.
 param(
-  [ValidateSet("smoke", "full")][string]$Mode = "smoke",
+  [ValidateSet("smoke", "g88", "full")][string]$Mode = "smoke",
   [string]$Python = "python"
 )
 $ErrorActionPreference = "Stop"
@@ -24,7 +24,11 @@ try {
     }
     $pythonVersion = (& $Python --version 2>&1 | Out-String).Trim()
     if ($LASTEXITCODE -ne 0) { throw "Python not available" }
-    $testPattern = if ($Mode -eq "smoke") { "test_flowpilot_goal_preview.py" } else { "test_*.py" }
+    $testPattern = switch ($Mode) {
+      "smoke" { "test_flowpilot_goal_preview.py" }
+      "g88" { "test_flowpilot_multi_read_review.py" }
+      "full" { "test_*.py" }
+    }
     & $Python -m unittest discover -s tests -p $testPattern -v 2>&1 |
       Tee-Object -FilePath $log | Out-Null
     $exitCode = $LASTEXITCODE
