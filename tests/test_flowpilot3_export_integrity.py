@@ -20,7 +20,7 @@ from contextlib import redirect_stdout
 TOOLS = Path(__file__).resolve().parents[1] / "tools"
 sys.path.insert(0, str(TOOLS))
 from flowpilot3_export_integrity import (
-    PDF, ZIP, MANIFEST, PREVIEW, AUDIT, SOURCE_MEMBER,
+    PDF, ZIP, MANIFEST, PREVIEW, AUDIT, SOURCE_MEMBER, G76_PROVENANCE,
     IntegrityError, main, verify_archive,
 )
 
@@ -158,6 +158,55 @@ class G76ExportIntegrityTests(unittest.TestCase):
             z.writestr(PDF, self.files[PDF])
         with self.assertRaises(IntegrityError):
             verify_archive(buff.getvalue(), **self.pins)
+
+    def make_synthetic_g76_wrapped(self):
+        proof = {
+            "status": "G76_HASH_CHECKED_OWNER_REVIEW_NOT_SUBMITTED",
+            "source": "GitHub Actions run 41073132653 artifact ID 12985507108",
+            "pdf_sha256": self.pins["expected_pdf"],
+            "zip_sha256": self.pins["expected_zip"],
+            "skill_sha256": self.pins["expected_skill"],
+            "creator": "NOT_EVIDENCED", "release": "HOLD",
+        }
+        files = dict(self.files, **{G76_PROVENANCE: json.dumps(proof).encode()})
+        return archive(files), files[G76_PROVENANCE]
+
+    def test_synthetic_g76_owner_wrapper_exactly_matches_all_claims(self):
+        wrapped, proof = self.make_synthetic_g76_wrapped()
+        with patch("flowpilot3_export_integrity.G76_WRAPPER_SHA", hash_of(wrapped)), \
+             patch("flowpilot3_export_integrity.G76_PROVENANCE_SHA", hash_of(proof)):
+            result = verify_archive(wrapped, **self.pins)
+        self.assertEqual(result["archive_format"], "G76_PINNED_OWNER_WRAPPER")
+        self.assertTrue(result["g76_wrapper_byte_verified"])
+        self.assertEqual(result["release_gate"], "HOLD")
+
+    def test_mutated_g76_wrapper_rejected_even_if_inner_files_unchanged(self):
+        wrapped, proof = self.make_synthetic_g76_wrapped()
+        with patch("flowpilot3_export_integrity.G76_WRAPPER_SHA", hash_of(wrapped)), \
+             patch("flowpilot3_export_integrity.G76_PROVENANCE_SHA", hash_of(proof)):
+            forged = wrapped + b"trailing bytes"
+            with self.assertRaises(IntegrityError):
+                verify_archive(forged, **self.pins)
+
+    def test_forged_g76_provenance_detected_with_wrapper_hash_matching(self):
+        wrapped, _ = self.make_synthetic_g76_wrapped()
+        with patch("flowpilot3_export_integrity.G76_WRAPPER_SHA", hash_of(wrapped)), \
+             patch("flowpilot3_export_integrity.G76_PROVENANCE_SHA", "0" * 64):
+            with self.assertRaisesRegex(IntegrityError, "G76 provenance changed"):
+                verify_archive(wrapped, **self.pins)
+
+    def test_g76_wrapped_detached_pdf_mismatch_still_rejected(self):
+        wrapped, proof = self.make_synthetic_g76_wrapped()
+        with patch("flowpilot3_export_integrity.G76_WRAPPER_SHA", hash_of(wrapped)), \
+             patch("flowpilot3_export_integrity.G76_PROVENANCE_SHA", hash_of(proof)):
+            with self.assertRaisesRegex(IntegrityError, "Detached PDF"):
+                verify_archive(wrapped, exported_pdf=self.files[PDF] + b"altered",
+                               **self.pins)
+
+    def test_original_g75_archive_still_accepted_unchanged(self):
+        result = verify_archive(archive(self.files), **self.pins)
+        self.assertEqual(result["archive_format"], "G75_ORIGINAL_CI")
+        self.assertFalse(result["g76_wrapper_byte_verified"])
 
     def test_cli_returns_blocked_without_raw_path_echo(self):
         with TemporaryDirectory(prefix="flowpilot-g76-private-") as d:
