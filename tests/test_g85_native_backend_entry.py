@@ -22,15 +22,35 @@ class G85PublicEntryTests(unittest.TestCase):
         (self.la / "lightning_azent").mkdir(parents=True)
         (self.la / "lightning_azent" / "__init__.py").write_text("", encoding="utf-8")
         self.runner = self.hae / "tools" / "g84_verify_ugreen_native.py"
+        self.source_patcher = patch.object(entry, "_verify_private_source", return_value=None)
+        self.source_patcher.start()
+        self.addCleanup(self.source_patcher.stop)
         self.patcher = patch.object(entry, "UGREEN_ROOT", self.ugreen)
         self.patcher.start()
         self.addCleanup(self.patcher.stop)
 
     def write_runner(self, status: str, code: int = 0):
+        # A synthetic, fully shaped child receipt; the G86 private Git
+        # authentication is exercised by its own isolated fixture tests.
+        receipt = {
+            "status": status,
+            "verification": "G82_PRIVATE_RUNTIME_G83_PUBLIC_ACCEPTANCE",
+            "hae_web_git_blob": entry.G82_WEB_BLOB,
+            "la_source_commit": entry.LA_COMMIT,
+            "ugreen_verifier_commit": entry.G83_PUBLIC_VERIFIER,
+            "temporary_zipapp_sha256": "b" * 64,
+            "independent_sqlite_payload_verified": True,
+            "pending_run_id_bound_to_approval": True,
+            "sqlite_business_rows": 2,
+            "read_only_recovery_without_duplicate_write": True,
+            "original_binary_replaced": False,
+            "real_nas_verified": False,
+            "devpost_submitted": False,
+        }
         self.runner.write_text(
-            "import json, sys\n"
-            f"print(json.dumps({{'status': {status!r}, 'sqlite_business_rows': 2}}))\n"
-            f"sys.exit({code})\n", encoding="utf-8"
+            "import json, sys\\n"
+            f"print(json.dumps({receipt!r}))\\n"
+            f"sys.exit({code})\\n", encoding="utf-8"
         )
 
     def test_unapproved_does_not_run_private_script(self):
