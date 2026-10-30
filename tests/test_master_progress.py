@@ -4,7 +4,7 @@ from pathlib import Path, PureWindowsPath
 from unittest.mock import patch
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"tools"))
-from check_master_progress import MASTER,SOURCE,integrity_errors
+from check_master_progress import MASTER,SOURCE,DATA,integrity_errors
 from check_handoff_sync import closeout_errors,REQUIRED
 
 class MasterTests(unittest.TestCase):
@@ -23,7 +23,7 @@ class MasterTests(unittest.TestCase):
         with patch("render_master_progress.ROOT", PureWindowsPath("C:/checkout")), \
              patch("render_master_progress.SOURCE",
                    PureWindowsPath("C:/checkout/data/master_progress.json")):
-            self.assertEqual(self.m, render(json.loads(self.p)))
+            self.assertEqual(self.m, render(json.loads(DATA.read_text(encoding="utf-8"))))
 
     def test_full_plan_matches_original(self):
         self.assertEqual([],integrity_errors(self.m,self.p))
