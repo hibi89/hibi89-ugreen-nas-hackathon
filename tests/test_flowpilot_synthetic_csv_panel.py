@@ -26,8 +26,9 @@ class RealGeneratedCSVTests(unittest.TestCase):
         self.assertEqual(hashlib.sha256(content).hexdigest(),
                          result["report_sha256"])
         rows = list(csv.DictReader(StringIO(content.decode("utf-8"))))
+        self.assertEqual(list(rows[0]), ["customer", "total_revenue"])
         self.assertEqual(
-            {(r["customer"], r["revenue"]) for r in rows},
+            {(r["customer"], r["total_revenue"]) for r in rows},
             {("alice", "5.00"), ("bob", "6.00")},
         )
         with self.assertRaises(ValueError):
