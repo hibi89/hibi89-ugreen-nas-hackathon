@@ -1,3 +1,16 @@
+## G85 actual owner-local acceptance — 2026-10-31 KST (supersedes pending status in previous G85 handoff)
+
+1. **Goal/stack:** Validate genuine HAE→LA→SQLite owner-local native backend on pinned Python 3.11+ source with zero paid calls; no NAS or submission.
+2. **Completed:** Five private integrity regression cases pass; updated UGREEN-main command runs actual private engine and LA, enforces approval, writes two exact synthetic SQLite rows, reloads audit across restart, checks no duplicate on read-only recovery. G85 descendant doc commit false-block eliminated without relaxing Git blob parity.
+3. **Executed:** User PowerShell reported `Ran 5 tests in 5.513s OK`; UGREEN output status `G85_UGREEN_NATIVE_BACKEND_E2E_PASS` and exit `0`; nested `G84_GENUINE_HAE_LA_SQLITE_E2E_PASS`. Disposable zipapp SHA256 `2697c20cfebdcb52ae660e534b0a644b0e3ec47c3947cb77bce720eecb9d3fcb`. Public offline CI 41097309612 SUCCESS, readiness 41097309367 SUCCESS (not private engine runs).
+4. **State:** Genuine synthetic local backend PASS; real NAS/Uliya NOT_RUN, production NOT_APPLICABLE, user delivery/deployment and official submission NOT_DONE.
+5. **Failure/root:** Initial G84 checkout SHA pin falsely rejected later docs-only commit; G85 exact Git blob + descendant check solved it; current run passed without losing security checks. Do not repeat POST on unknown writes.
+6. **Repo/branch/SHA:** UGREEN `hibi89/hibi89-ugreen-nas-hackathon@lead/ugreen` G85 functional SHA `7e0f48b278ef559e52960e1c50e8a3429db94a0e`; HAE private `hibi89/HAE@feature/axflow-mvp` code SHA `c482e57587ce5d0f619997b6e5c7d160d0d3d400`; LA `feature/lightning-azent` SHA `9cba6424dadf3fadb0ccd6ed10040e322c4a62fa`. See `tools/run_g85_native_backend.py`, private `tools/g84_verify_ugreen_native.py`.
+7. **Runtime:** Owner Windows PowerShell local clones, no public service or Vercel. Commands at `docs/integrations/G85_OWNER_LOCAL_NATIVE_PASS_20261031.md`.
+8. **Originals/security:** Real customer DBs, original HAE distribution zipapp, NAS data and credentials unaffected. Temporary synthetic Python archive+SQLite only; no external write or new payment. Git parent history is rollback.
+9. **Next priority:** Actual NAS/Uliya interface contract and permission/hardware feasibility; keep these external execution gates unverified until approved. Avoid needless repetition of already passed local G85 tests unless source changes. Backend first, design/submission deferred.
+10. **Checkpoint:** 2026-10-31 KST, evidence is owner console output; public CI verified at G85 code SHA; document baseline before this record `17da324daba01e94a1e241e8b321c45981b9d6f8`. Final documentation commit to be verified after push.
+
 ## G85 — 2026-10-31 KST · native backend entrypoint and immutable-source verification
 1. Goal/stack: UGREEN FlowPilot 3.0 backend first, genuine HAE → Lightning Azent → synthetic SQLite, Python 3.11 stdlib, zero new paid APIs; no design, submission or external NAS.
 2. Changes/decision: prefer G83 descendant ancestry + exact G83 verifier/bridge blob parity over full HEAD equality (blocks code tampering while allowing docs commits). HAE private runner fixed; public UGREEN owner-local native entrypoint added with explicit consent, no private-source copying.
