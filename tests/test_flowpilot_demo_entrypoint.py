@@ -35,6 +35,15 @@ class OneClickDemoEntrypointTests(unittest.TestCase):
         self.assertIn("ownerLocalOnly", HTML)
         self.assertIn("LOCAL FILE METADATA ONLY", HTML)
 
+    def test_owner_csv_ui_discloses_content_read_and_local_write_before_consent(self):
+        from tools.flowpilot_four_source_local_ui import HTML
+        self.assertIn("owner CSV aggregation DOES read selected CSV content", HTML)
+        self.assertIn("writes a", HTML)
+        self.assertIn("NEW local CSV", HTML)
+        self.assertIn('id="ownCsvConsent"', HTML)
+        self.assertIn('id="ownCsvDownload" disabled', HTML)
+        self.assertIn("NAS/ULIYA NOT VERIFIED", HTML)
+
     def test_browser_utility_startup_has_no_required_private_root_flags(self):
         script = ROOT / "tools" / "flowpilot_four_source_local_ui.py"
         with tempfile.TemporaryDirectory(prefix="ugreen-demo-help-") as tmp:

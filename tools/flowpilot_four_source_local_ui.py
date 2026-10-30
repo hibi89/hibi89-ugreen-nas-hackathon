@@ -179,7 +179,7 @@ background:#081a2a;border-radius:9px;padding:16px;max-height:310px;overflow:auto
 </style></head><body><main>
 <small>UGREEN · OWNER LOCAL DEVELOPMENT</small><h1>NAS FlowPilot 3.0</h1>
 <p>Natural-language intent → source validation → explicit approval → disposable SQLite audit.</p>
-<p class="notice">LOCAL FILE METADATA ONLY · NAS/ULIYA NOT VERIFIED · RELEASE HOLD</p>
+<p class="notice">LOCAL CONSENTED WORKFLOWS · NAS/ULIYA NOT VERIFIED · RELEASE HOLD</p>
 <div class="grid">
 <article><small>01</small><b>FlowPilot</b><p>1–3 bounded intents</p></article>
 <article><small>02</small><b>HAE / LA</b><p>Exact Git source and isolated SQLite</p></article>
@@ -255,9 +255,11 @@ No contents, uploads, or raw filenames are included in results.</p>
 <p id="reports" hidden><a href="/evidence/index.html" target="_blank" rel="noopener">
 Open approved local JSON/HTML evidence dashboard</a></p>
 </section>
-<footer>Optional owner-selected trusted LOCAL folder metadata requires separate consent;
-no file contents, uploads, external network requests, real NAS/Uliya, Creator or
-Devpost submission. Private-source synthetic PASS remains operator-reported.</footer>
+<footer>LOCAL capability distinctions: metadata checklist does NOT open file
+contents; owner CSV aggregation DOES read selected CSV content and writes a
+NEW local CSV only after explicit separate approval. Nothing is uploaded.
+No real NAS/Uliya/Creator/Devpost invocation or external network services.
+Private-source synthetic PASS remains operator-reported.</footer>
 <script>
 const session="__SESSION__";let challenge=null, ownerTicket=null,ownerRevision=0,ownerReport=null;
 const out=document.getElementById("output"),go=document.getElementById("execute"),
@@ -674,7 +676,7 @@ def handler_for(controller: Operator, session: str):
                 status = 200
             except Exception:
                 result = {"status": ("LOCAL_ACTION_REFUSED" if
-                            self.path.startswith("/owner/") else
+                            self.path.startswith(("/owner/", "/owner-csv/")) else
                             "SYNTHETIC_ACTION_REFUSED"),
                           "actual_nas_verified": False, "release_gate": "HOLD"}
                 status = 400
