@@ -1,0 +1,49 @@
+{
+  "schema": "ugreen-owner-reported-six-scenario-local-lstat-hae-sovia.v1",
+  "reported_on_kst": "2026-10-30",
+  "evidence_origin": "USER_SUPPLIED_WINDOWS_POWERSHELL_STDOUT",
+  "independently_observed_or_replayed_in_public_ci": false,
+  "verified_branch_prior_to_owner_run": "feature/flowpilot-ecosystem-integration",
+  "ugreen_commit_claimed_by_user_git_pull": "a5ac6013a3ec849100951d0d8ccc43d41fdfcf90",
+  "tool": "tools/verify_local_lstat_matrix.py",
+  "flags": [
+    "--hae-root",
+    "--sovia-root",
+    "--approve-synthetic-writes"
+  ],
+  "output": {
+    "actual_local_missing": "BLOCKED_AS_EXPECTED",
+    "actual_local_present": "PASS",
+    "actual_local_version_conflict": "REVIEW_REQUIRED",
+    "actual_nas_verified": false,
+    "actual_private_hae_executed": true,
+    "actual_public_sovia_assessor_invoked": true,
+    "approval_receipts": 1,
+    "changed_observation_reused_approval": "REFUSED_AS_EXPECTED",
+    "customer_data_used": false,
+    "devpost_submitted": false,
+    "disposable_fixture_deleted_after_run": true,
+    "file_contents_opened": false,
+    "hae_la_commit": "9cba6424dadf3fadb0ccd6ed10040e322c4a62fa",
+    "independent_public_ci_real_hae_executed": false,
+    "pinned_source_check": "PASS",
+    "proof_type": "REAL_LOCAL_LSTAT_WITH_INJECTED_LA_SOVIA_SYNTHETIC_ONLY",
+    "registered_uliya_expert_invoked": false,
+    "release_gate": "HOLD",
+    "replay_duplicate_writes": 0,
+    "result": "PASS",
+    "scenario_count": 6,
+    "sovia_commit": "7418b23aff9b3abbd3faf5d1477e7244ec82b681",
+    "synthetic_sqlite_execution": "PASS",
+    "synthetic_write_rows": 2,
+    "two_intent_local_preflight": "PASS",
+    "unapproved_preview": "PASS_NO_LOCAL_METADATA_ACCESS",
+    "user_project_folders_accessed": false
+  },
+  "verification_limits": [
+    "Report transcribed from owner's local terminal stdout, not an independently captured command execution by GitHub CI.",
+    "Actual OS lstat touched only disposable synthetic fixtures; no owner project folders, real NAS or official registered Uliya Expert was accessed.",
+    "Actual pinned private HAE LA runtime and pinned public SOVIA assessor were invoked on owner PC according to tool output; public CI did not invoke private HAE.",
+    "No evidence of production NAS readiness, installed Uliya agents, official Creator approval or Devpost submission."
+  ]
+}
