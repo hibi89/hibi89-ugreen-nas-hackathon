@@ -1,0 +1,31 @@
+name: G95 pinned Uliya file-agent read-action catalog preflight (NO NAS)
+on:
+  push:
+    branches: ["lead/ugreen"]
+    paths:
+      - "tools/flowpilot_uliya_contract_preflight.py"
+      - "tools/sdk_parameter_matrix.py"
+      - "tools/sdk_action_contract_digest.py"
+      - "tools/inspect_official_sdk.py"
+      - "tests/test_flowpilot_uliya_contract_preflight.py"
+      - ".github/workflows/g95-pinned-uliya-preflight.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  pinned-official-readonly:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    env:
+      KIT_URL: https://cdn.shopify.com/s/files/1/0630/9416/1602/files/uliya-skill-kit-0.7.3-en.zip?v=1790578898
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Check G95 synthetic denial and untrusted input tests
+        run: python -m unittest discover -s tests -p test_flowpilot_uliya_contract_preflight.py -v
+      - name: Independently confirm exact pinned public first-party action identifiers only
+        run: python tools/flowpilot_uliya_contract_preflight.py --official-url "$KIT_URL"
