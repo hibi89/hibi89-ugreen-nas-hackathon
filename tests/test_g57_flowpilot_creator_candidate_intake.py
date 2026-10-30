@@ -103,6 +103,47 @@ class CreatorCandidateIntakeTests(unittest.TestCase):
         with self.assertRaises(CandidateError):
             self.check()
 
+    def test_official_creator_alternate_identity_is_review_only(self):
+        alternate = self.root / "flowpilot-3"
+        alternate.mkdir()
+        (alternate / "SKILL.md").write_text(
+            GOOD.replace("name: flowpilot-nas", "name: flowpilot-3"),
+            encoding="utf-8",
+        )
+        result = inspect_candidate(alternate, BASE)
+        self.assertEqual(result["candidate"], "flowpilot-3")
+        self.assertEqual(result["canonical_candidate"], "flowpilot-nas")
+        self.assertFalse(result["canonical_identity_matches"])
+        self.assertFalse(result["candidate_adoption_approved"])
+        self.assertEqual(result["status"], "SOURCE_DIFF_IDENTITY_REVIEW_REQUIRED")
+        self.assertEqual(result["operator_receipt_status"], "CREATOR_NOT_EVIDENCED")
+        self.assertEqual(result["operator_receipt_gate_scope"], "flowpilot-nas-only")
+        self.assertEqual(result["release_gate"], "HOLD")
+
+    def test_alt_identity_directory_mismatch_rejected(self):
+        alternate = self.root / "flowpilot-3"
+        alternate.mkdir()
+        (alternate / "SKILL.md").write_text(GOOD, encoding="utf-8")
+        with self.assertRaises(CandidateError):
+            inspect_candidate(alternate, BASE)
+
+    def test_unapproved_candidate_directory_rejected(self):
+        unexpected = self.root / "flowpilot-other"
+        unexpected.mkdir()
+        (unexpected / "SKILL.md").write_text(
+            GOOD.replace("name: flowpilot-nas", "name: flowpilot-other"),
+            encoding="utf-8",
+        )
+        with self.assertRaises(CandidateError):
+            inspect_candidate(unexpected, BASE)
+
+    def test_canonical_identity_remains_canonical(self):
+        result = self.check()
+        self.assertEqual(result["candidate"], "flowpilot-nas")
+        self.assertTrue(result["canonical_identity_matches"])
+        self.assertFalse(result["candidate_adoption_approved"])
+        self.assertEqual(result["status"], "SOURCE_DIFF_HUMAN_REVIEW_REQUIRED")
+
     def test_symlink_to_external_file_rejected(self):
         outside = self.root / "outside"
         outside.write_text("private", encoding="utf-8")
