@@ -29,9 +29,19 @@ try {
       "g88" { "test_flowpilot_multi_read_review.py" }
       "full" { "test_*.py" }
     }
-    & $Python -m unittest discover -s tests -p $testPattern -v 2>&1 |
-      Tee-Object -FilePath $log | Out-Null
-    $exitCode = $LASTEXITCODE
+    # Windows PowerShell 5.1 turns native stderr into error records.
+    # unittest -v writes normal progress on stderr; Stop would misclassify it
+    # as a runner exception with exit code 2, even when all tests pass.
+    # Scope this to the Python process and preserve its actual exit code.
+    $previousErrorActionPreference = $ErrorActionPreference
+    try {
+      $ErrorActionPreference = "Continue"
+      & $Python -m unittest discover -s tests -p $testPattern -v 2>&1 |
+        Tee-Object -FilePath $log | Out-Null
+      $exitCode = $LASTEXITCODE
+    } finally {
+      $ErrorActionPreference = $previousErrorActionPreference
+    }
     if ($exitCode -eq 0) { $status = "PASS" }
   } finally {
     Pop-Location
@@ -59,5 +69,9 @@ try {
   Write-Host ("SHA: " + $sha)
   Write-Host ("Summary: " + $summary)
   Write-Host ("Log: " + $log)
+  if ($exitCode -ne 0 -and (Test-Path -LiteralPath $log)) {
+    Write-Host "Failure log (last 20 lines):"
+    Get-Content -LiteralPath $log -Tail 20 | ForEach-Object { Write-Host $_ }
+  }
 }
 exit $exitCode
