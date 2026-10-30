@@ -1,3 +1,8 @@
+## G96 · 2026-10-31 KST · backend integration pushed, exact-SHA CI QUEUED
+- Code SHA `2061bb51d761d5606471297ae5aa75fc5cd2a42a` on lead/ugreen: added offline G95→G87→G88 integration module, 15 test methods and companion integration doc. Confirmed GitHub fast-forward via Git Data API. No live NAS/Expert, customer data, creator or submission.
+- GitHub Actions started but jobs were QUEUED (NOT_PASS/NOT_FAIL) at this checkpoint: [functional Windows/Linux 41121270138](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/41121270138), readiness 41121269917, master 41121269904, closeout 41121269989. Exact SHA full-test counts and completion NOT_VERIFIED; previous G95 result does not apply to G96.
+- Next: inspect THESE runs before new tests/commits; fix evidenced failure only, then record results. Canonical Skill, master data and G52 PDF/ZIP unchanged. Real NAS and Devpost HOLD.
+
 ## G95 — 2026-10-31 KST — pinned official file-agent catalog verification PASS, runtime still HOLD
 - New G95 no-execute trial preflight binds owner-scoped read-only request to official 0.7.3 SHA-pinned public catalog identifiers without generating actual SDK command/payload; no owner path/data exposed. Exact source SHA 811392b402e66840763ee509f2bd6b9226442772.
 - [Official public pinned kit CI 41117968076](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/41117968076) SUCCESS, 13 focused tests PASS. File-agent catalog `ug-filesystem ls/find/stat`, required `path:string`; permissions `knowledgeStatus=unknown`. No registered Expert/permission/return shape proof.
