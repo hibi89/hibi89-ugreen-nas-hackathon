@@ -300,8 +300,8 @@ def run_local_observation_chain(
         for i, (step_id, payload) in enumerate(original, 1):
             if step_id != "store" + str(i) or json.loads(payload) != safe_values[i - 1]:
                 raise LocalObservationRefused("LOCAL_SYNTHETIC_PAYLOAD_MISMATCH")
-        # DBVORA is optional and only sees the already-created disposable LA ledger.
-        # This call is strictly after BOTH explicit consent and SHA approval.
+        # Optional DBVORA inspection runs only on the approved, already-created
+        # disposable LA ledger after exact row/payload validation, not earlier.
         if dbvora_reader is not None:
             output["dbvora"] = inspect_disposable_la_ledger(business, dbvora_reader)
             output["dbvora_metadata_inspected"] = True
