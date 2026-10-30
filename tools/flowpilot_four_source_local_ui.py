@@ -165,7 +165,7 @@ background:#081a2a;border-radius:9px;padding:16px;max-height:310px;overflow:auto
 </style></head><body><main>
 <small>UGREEN · OWNER LOCAL DEVELOPMENT</small><h1>NAS FlowPilot 3.0</h1>
 <p>Natural-language intent → source validation → explicit approval → disposable SQLite audit.</p>
-<p class="notice">LOCAL SYNTHETIC ONLY · NAS/ULIYA NOT VERIFIED · RELEASE HOLD</p>
+<p class="notice">LOCAL FILE METADATA ONLY · NAS/ULIYA NOT VERIFIED · RELEASE HOLD</p>
 <div class="grid">
 <article><small>01</small><b>FlowPilot</b><p>1–3 bounded intents</p></article>
 <article><small>02</small><b>HAE / LA</b><p>Exact Git source and isolated SQLite</p></article>
@@ -188,6 +188,7 @@ No contents, uploads, or raw filenames are included in results.</p>
 <button id="ownerPreview">Preview local checklist (no folder access)</button>
 <label><input type="checkbox" id="ownerApprove"> I approve read-only lstat metadata for this exact checklist</label>
 <button id="ownerRun" class="execute" disabled>Inspect selected local metadata</button>
+<div id="ownerSummary" hidden aria-live="polite"></div>
 <pre id="ownerOutput" role="status" aria-live="polite">No local folder selected.</pre>
 </section><section><h2>Full pinned-source operator controls (optional)</h2>
 <button id="doctor">1 · Verify source SHAs</button>
@@ -198,10 +199,11 @@ No contents, uploads, or raw filenames are included in results.</p>
 <p id="reports" hidden><a href="/evidence/index.html" target="_blank" rel="noopener">
 Open approved local JSON/HTML evidence dashboard</a></p>
 </section>
-<footer>Single-use execution. No owner file inputs, network calls, real NAS/Uliya,
-Creator invocation or Devpost submission. All PASS claims are operator-reported synthetic.</footer>
+<footer>Optional owner-selected trusted LOCAL folder metadata requires separate consent;
+no file contents, uploads, external network requests, real NAS/Uliya, Creator or
+Devpost submission. Private-source synthetic PASS remains operator-reported.</footer>
 <script>
-const session="__SESSION__";let challenge=null, ownerTicket=null;
+const session="__SESSION__";let challenge=null, ownerTicket=null,ownerRevision=0;
 const out=document.getElementById("output"),go=document.getElementById("execute"),
 checkbox=document.getElementById("agree");
 function enable(){go.disabled=!(challenge&&checkbox.checked)}
@@ -225,10 +227,19 @@ const ownerOut=document.getElementById("ownerOutput");
 const ownerRun=document.getElementById("ownerRun");
 const ownerAgree=document.getElementById("ownerApprove");
 ownerAgree.onchange=()=>{ownerRun.disabled=!(ownerTicket&&ownerAgree.checked)};
+function clearOwnerTicket(){
+  ownerRevision++;ownerTicket=null;ownerAgree.checked=false;ownerRun.disabled=true;
+  document.getElementById("ownerSummary").hidden=true;
+}
+for(const id of ["ownerRoot","ownerGoal","ownerRequired","ownerCandidates","ownerLocalOnly"]){
+  document.getElementById(id).addEventListener("input",clearOwnerTicket);
+  document.getElementById(id).addEventListener("change",clearOwnerTicket);
+}
 function ownerLines(value){
   return value.split(/\r?\n/).map(v=>v.trim()).filter(Boolean);
 }
 async function ownerRequest(path,body){
+  const revision=ownerRevision;
   ownerOut.textContent="Checking bounded local request...";
   try {
     const response=await fetch(path,{method:"POST",cache:"no-store",
@@ -236,13 +247,22 @@ async function ownerRequest(path,body){
       body:JSON.stringify(body)});
     const value=await response.json();
     ownerOut.textContent=JSON.stringify(value,null,2);
-    if(path==="/owner/preview"&&response.ok) ownerTicket=value.approval_token||null;
+    if(path==="/owner/preview"&&response.ok&&revision===ownerRevision)
+      ownerTicket=value.approval_token||null;
     else ownerTicket=null;
+    const summary=document.getElementById("ownerSummary");
+    if(path==="/owner/execute"&&response.ok&&value.finding_counts){
+      const counts=value.finding_counts;
+      const labels=["PRESENT","MISSING","NOT_CHECKED","VERSION_REVIEW"];
+      summary.textContent="Inspection: "+value.status+" · "+
+        labels.map(k=>k+" "+Number(counts[k]||0)).join(" · ");
+      summary.hidden=false;
+    }
   }catch(e){ownerTicket=null;ownerOut.textContent="LOCAL_CHECK_REFUSED"}
   ownerRun.disabled=!(ownerTicket&&ownerAgree.checked);
 }
 document.getElementById("ownerPreview").onclick=()=>{
-  ownerTicket=null;ownerAgree.checked=false;ownerRun.disabled=true;
+  clearOwnerTicket();
   const versions=ownerLines(document.getElementById("ownerCandidates").value);
   const mapping={};
   for(const value of versions){
@@ -358,7 +378,9 @@ def handler_for(controller: Operator, session: str):
                     raise OperatorRefused("UNKNOWN_ACTION")
                 status = 200
             except Exception:
-                result = {"status": "SYNTHETIC_ACTION_REFUSED",
+                result = {"status": ("LOCAL_ACTION_REFUSED" if
+                            self.path.startswith("/owner/") else
+                            "SYNTHETIC_ACTION_REFUSED"),
                           "actual_nas_verified": False, "release_gate": "HOLD"}
                 status = 400
             self.send(status, json.dumps(result, sort_keys=True).encode("utf-8"))

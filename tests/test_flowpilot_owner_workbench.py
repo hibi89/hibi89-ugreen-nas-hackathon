@@ -39,6 +39,14 @@ class OwnerWorkbenchTests(unittest.TestCase):
         self.assertNotIn(str(self.root), raw)
         self.assertNotIn("README.md", raw)
 
+    def test_preview_is_not_a_metadata_read_even_if_root_does_not_exist(self):
+        request = self.request()
+        request["root"] = str(self.root / "nonexistent-child")
+        ticket = self.controller.preview(request)
+        self.assertFalse(ticket["metadata_accessed"])
+        with self.assertRaises(OwnerWorkbenchRefused):
+            self.controller.execute(ticket["approval_token"], CONSENT)
+
     def test_missing_required_is_blocked_with_real_os_lstat(self):
         ticket = self.controller.preview(self.request(required=["absent.txt"]))
         result = self.controller.execute(ticket["approval_token"], CONSENT)
