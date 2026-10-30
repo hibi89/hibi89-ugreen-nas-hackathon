@@ -46,6 +46,10 @@ def validate(skill: bytes, qa: dict) -> int:
         raise ValueError('Missing owner-review hold')
     if qa.get('source_skill_sha256') != PIN:
         raise ValueError('Skill SHA does not match proposal')
+    # Do not accidentally package the superseded Oct-27 ProjectReady/FlowPilot
+    # editorial draft via the newer FlowPilot 3.0 submission builder.
+    if qa.get('project') != 'NAS FlowPilot 3.0' or qa.get('date_kst') != '2026-10-29':
+        raise ValueError('Wrong FlowPilot 3.0 proposal edition')
     rows = qa.get('questions')
     if not isinstance(rows, list) or len(rows) != 10:
         raise ValueError('Exactly ten official questions required')
@@ -91,13 +95,19 @@ def build(skill_path: Path, qa_path: Path, out: Path) -> dict:
     qa_bytes = qa_path.read_bytes()
     qa = json.loads(qa_bytes.decode('utf-8'))
     word_count = validate(skill, qa)
+    if out.is_symlink():
+        raise ValueError('Output directory symlink refused')
     out.mkdir(parents=True, exist_ok=True)
     pdf = out / 'NAS_FlowPilot_3_Round1_OWNER_REVIEW.pdf'
     zip_path = out / 'NAS_FlowPilot_3_Round1_OWNER_REVIEW.zip'
+    manifest = out / 'NAS_FlowPilot_3_Round1_OWNER_REVIEW_manifest.json'
+    # Create-only owner review: never overwrite reviewed PDF/ZIP/manifest bytes.
+    if any(p.exists() or p.is_symlink() for p in (pdf, zip_path, manifest)):
+        raise ValueError('Existing owner-review artifact: create a fresh output directory')
 
     # Only one official package member. Local Python, workflows and the PDF
     # live outside the ZIP and are not interpreted by Uliya.
-    with ZipFile(zip_path, 'w', compression=ZIP_DEFLATED, compresslevel=9) as z:
+    with ZipFile(zip_path, 'x', compression=ZIP_DEFLATED, compresslevel=9) as z:
         meta = ZipInfo(MEMBER, (2026, 10, 29, 0, 0, 0))
         meta.compress_type = ZIP_DEFLATED
         meta.external_attr = 0o644 << 16
@@ -164,7 +174,7 @@ def build(skill_path: Path, qa_path: Path, out: Path) -> dict:
         'devpost_submitted': False,
         'local_prototype_excluded_from_zip': True,
     }
-    (out / 'NAS_FlowPilot_3_Round1_OWNER_REVIEW_manifest.json').write_text(
+    manifest.write_text(
         json.dumps(report, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     return report
 
