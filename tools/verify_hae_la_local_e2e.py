@@ -22,7 +22,7 @@ import sys
 from tempfile import TemporaryDirectory
 import threading
 
-from flowpilot_hae_bridge import APPROVAL, run_bridge, _request
+from flowpilot_hae_bridge import APPROVAL, run_bridge, _request, reconcile_run
 
 SHA = re.compile(r"^[a-f0-9]{64}$")
 FIXTURE = b"id,name\n11,SyntheticAlice\n12,SyntheticBob\n"
@@ -133,6 +133,17 @@ def run_acceptance(hae_zipapp: Path, expected_sha: str, *,
                         "SELECT COUNT(*) FROM csv_records").fetchone()[0]
                 if count_after != 2:
                     raise AcceptanceRefused("Restart changed business SQLite")
+                read_only = reconcile_run(
+                    port, run_id, confirm_synthetic=True)
+                if (read_only["status"] != "HAE_LA_AUDIT_RECONCILED"
+                        or not read_only["do_not_retry_automatically"]
+                        or read_only["actual_la_execution_verified"] is not False):
+                    raise AcceptanceRefused("Read-only audit recovery did not validate")
+                with closing(sqlite3.connect(business)) as connection:
+                    after_read_only = connection.execute(
+                        "SELECT COUNT(*) FROM csv_records").fetchone()[0]
+                if after_read_only != 2:
+                    raise AcceptanceRefused("Read-only recovery changed SQLite")
             finally:
                 server.shutdown()
                 worker.join(timeout=5)
@@ -145,6 +156,7 @@ def run_acceptance(hae_zipapp: Path, expected_sha: str, *,
             "hae_binary_sha256": digest, "live_hae_http": True,
             "real_la_engine": True, "sqlite_business_rows": 2,
             "la_audit_persisted_after_restart": True,
+            "read_only_recovery_no_duplicate_write": True,
             "source_originals_modified": False,
             "nas_verified": False, "uliya_verified": False,
             "devpost_submitted": False, "release_gate": "HOLD",
