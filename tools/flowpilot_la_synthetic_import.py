@@ -108,10 +108,16 @@ def run_demo(*, approval: str | None = None, loader=import_module,
             audit = engine.audit(RUN_ID)
             verified = engine.verify_receipts(LA_PLAN, RUN_ID)
             with sqlite3.connect(f"file:{business.as_posix()}?mode=ro", uri=True) as connection:
-                count = connection.execute("SELECT COUNT(*) FROM csv_records").fetchone()[0]
+                count = connection.execute(
+                    "SELECT COUNT(*) FROM csv_records WHERE run_id=? AND import_step_id=?",
+                    (RUN_ID, "imported"),
+                ).fetchone()[0]
             preserved = sha256(source.read_bytes()).hexdigest() == before
             if (not isinstance(status, dict) or status.get("status") != "completed"
-                    or not isinstance(audit, dict)
+                    or not isinstance(audit, dict) or audit.get("run_id") != RUN_ID
+                    or not isinstance(audit.get("events"), list) or not audit["events"]
+                    or not isinstance(audit.get("approval_receipts"), list)
+                    or not audit["approval_receipts"]
                     or not isinstance(verified, dict) or verified.get("verified") is not True
                     or type(count) is not int or count != len(TEST_ROWS) - 1
                     or not preserved):
