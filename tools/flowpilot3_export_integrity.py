@@ -1,10 +1,10 @@
-"""G76: byte-verify exported G75 Round 1 owner-review archive and detached files.
+"""G77: byte-verify G75 CI archive or exact G76 owner download ZIP.
 
 G75's GitHub Actions uploaded a ZIP containing PDF, Skill ZIP, JSON
 manifest, PNG visual preview and JSON visual audit. The archive, not an
 unverified re-rendered detached PDF, is the provenance root.
 
-Default policy pins exact G75 CI bytes; test overrides are injectable ONLY
+Default policy pins G75 CI bytes plus exact G76 six-member outer ZIP; overrides are injectable ONLY
 into verify_archive(), never exposed by CLI. This does not prove official
 Creator invocation, copyright clearance, NAS integration, or submission.
 No file writes, network, credential access, or external uploads.
@@ -30,6 +30,10 @@ MANIFEST = "NAS_FlowPilot_3_Round1_OWNER_REVIEW_manifest.json"
 PREVIEW = "NAS_FlowPilot_3_Round1_PREVIEW.png"
 AUDIT = "NAS_FlowPilot_3_Round1_visual_audit.json"
 MEMBERS = {PDF, ZIP, MANIFEST, PREVIEW, AUDIT}
+G76_PROVENANCE = "G76_EXACT_CI_BYTE_PROVENANCE.json"
+G76_MEMBERS = MEMBERS | {G76_PROVENANCE}
+G76_WRAPPER_SHA = "b36d172707e1f8278063fd6ce4f3439ae63be10b3534b361a6f3dbff5db12409"
+G76_PROVENANCE_SHA = "e6d7e32d91f657215a2f73769717bdf6595f4baf94ca0f34f458102d9ea99215"
 SOURCE_MEMBER = "flowpilot-nas/SKILL.md"
 MAX_ARCHIVE_BYTES = 10_000_000
 
@@ -76,7 +80,31 @@ def verify_archive(archive: bytes, *, exported_pdf: bytes | None = None,
     Parameterized hashes enable only the unit-test's synthetic fixture; the
     command-line interface does not expose any hash override or release action.
     """
-    members = _bounded_zip(archive, MEMBERS, uncompressed_limit=4_000_000)
+    # G75 is the original five-member CI artifact. G76 is a strictly pinned
+    # six-member *owner download* wrapper containing one extra provenance JSON.
+    # A changed wrapper cannot masquerade as either format.
+    wrapped = _sha(archive) == G76_WRAPPER_SHA
+    members = _bounded_zip(
+        archive, G76_MEMBERS if wrapped else MEMBERS,
+        uncompressed_limit=4_000_000,
+    )
+    if wrapped:
+        proof_raw = members[G76_PROVENANCE]
+        if _sha(proof_raw) != G76_PROVENANCE_SHA:
+            raise IntegrityError("G76 provenance changed")
+        try:
+            proof = json.loads(proof_raw)
+        except (ValueError, UnicodeDecodeError) as exc:
+            raise IntegrityError("G76 provenance unreadable") from exc
+        if (not isinstance(proof, dict)
+                or proof.get("status") != "G76_HASH_CHECKED_OWNER_REVIEW_NOT_SUBMITTED"
+                or proof.get("source") != "GitHub Actions run 41073132653 artifact ID 12985507108"
+                or proof.get("pdf_sha256") != expected_pdf
+                or proof.get("zip_sha256") != expected_zip
+                or proof.get("skill_sha256") != expected_skill
+                or proof.get("creator") != "NOT_EVIDENCED"
+                or proof.get("release") != "HOLD"):
+            raise IntegrityError("G76 provenance claims differ from exact CI evidence")
     pdf, skill_zip, png = members[PDF], members[ZIP], members[PREVIEW]
     try:
         manifest = json.loads(members[MANIFEST])
@@ -134,6 +162,8 @@ def verify_archive(archive: bytes, *, exported_pdf: bytes | None = None,
         "pdf_sha256": expected_pdf, "pdf_bytes": len(pdf),
         "skill_zip_sha256": expected_zip, "skill_zip_bytes": len(skill_zip),
         "skill_sha256": expected_skill,
+        "archive_format": "G76_PINNED_OWNER_WRAPPER" if wrapped else "G75_ORIGINAL_CI",
+        "g76_wrapper_byte_verified": wrapped,
         "pdf_copy_verified": exported_pdf is not None,
         "skill_zip_copy_verified": exported_skill_zip is not None,
         "official_creator_execution_verified": False,
@@ -149,7 +179,7 @@ def _read(path: Path) -> bytes:
 
 
 def main(argv: list[str] | None = None) -> int:
-    p = argparse.ArgumentParser(description="Verify G75 owner-review CI archive; NO release")
+    p = argparse.ArgumentParser(description="Verify original G75 CI or exact G76 owner wrapper; NO release")
     p.add_argument("--archive", required=True, type=Path)
     p.add_argument("--pdf-copy", type=Path)
     p.add_argument("--skill-zip-copy", type=Path)
