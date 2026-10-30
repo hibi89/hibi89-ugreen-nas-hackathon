@@ -47,10 +47,12 @@ class FakeLA:
             rows = list(csv.reader(stream))
         assert rows == [["customer", "amount"], ["alice", "1.25"], ["bob", "2.00"]]
         with sqlite3.connect(self.business) as db:
-            db.execute("CREATE TABLE IF NOT EXISTS csv_records(rownum INTEGER PRIMARY KEY, customer TEXT, amount TEXT)")
+            db.execute("CREATE TABLE IF NOT EXISTS csv_records("
+                       "run_id TEXT, import_step_id TEXT, rownum INTEGER, "
+                       "customer TEXT, amount TEXT, PRIMARY KEY(run_id,import_step_id,rownum))")
             for i, (customer, amount) in enumerate(rows[1:], start=1):
-                db.execute("INSERT OR IGNORE INTO csv_records VALUES (?,?,?)",
-                           (i, customer, amount))
+                db.execute("INSERT OR IGNORE INTO csv_records VALUES (?,?,?,?,?)",
+                           (run_id, "imported", i, customer, amount))
             if type(self).incorrect_rows:
                 db.execute("DELETE FROM csv_records WHERE rownum=2")
         return {"status": "completed"}
@@ -59,7 +61,9 @@ class FakeLA:
         return {"status": "failed" if type(self).corrupted_status else "completed"}
 
     def audit(self, _run_id):
-        return {"events": [{"type": "synthetic"}]}
+        return {"run_id": "FlowPilotSyntheticImport",
+                "events": [{"type": "synthetic"}],
+                "approval_receipts": [{"scope": "synthetic-write"}]}
 
     def verify_receipts(self, _plan, _run_id):
         return {"verified": not type(self).corrupted_receipt}
