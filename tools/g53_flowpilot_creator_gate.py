@@ -39,7 +39,7 @@ def review_creator_evidence(source: bytes | None, declaration: Mapping[str, Any]
         decoded = source.decode("utf-8")
     except UnicodeDecodeError:
         return {**result, "status": "INVALID_SOURCE"}
-    if not decoded.startswith("---\nname: flowpilot-nas\n"):
+    if re.match(r"\A---\r?\nname: flowpilot-nas\r?\n", decoded) is None:
         return {**result, "status": "WRONG_SKILL_ID"}
     actual_hash = hashlib.sha256(source).hexdigest()
     result["actual_generated_sha256"] = actual_hash

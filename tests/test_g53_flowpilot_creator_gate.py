@@ -41,6 +41,20 @@ class CreatorGate(unittest.TestCase):
         r=review_creator_evidence(forged,declared(generated_skill_sha256=h,checker_skill_sha256=h))
         self.assertEqual(r["status"],"GENERATED_SOURCE_DIFFERS_REVIEW_REQUIRED")
 
+    def test_windows_crlf_source_is_valid_identity_but_not_pinned_proof(self):
+        # Windows-generated Skill bytes may use CRLF. Identity is semantic,
+        # yet SHA256 receipts must remain bound to exact byte content.
+        crlf = SKILL.replace(b"\r\n", b"\n").replace(b"\n", b"\r\n")
+        self.assertTrue(crlf.startswith(b"---\r\nname: flowpilot-nas\r\n"))
+        digest = hashlib.sha256(crlf).hexdigest()
+        approved = declared(generated_skill_sha256=digest,
+                            checker_skill_sha256=digest)
+        report = review_creator_evidence(crlf, approved)
+        self.assertEqual(report["status"], "GENERATED_SOURCE_DIFFERS_REVIEW_REQUIRED")
+        self.assertEqual(report["release_gate"], "HOLD")
+        denied = review_creator_evidence(crlf, declared())
+        self.assertEqual(denied["status"], "GENERATED_SOURCE_SHA_MISMATCH")
+
     def test_stale_checker_cannot_certify_new_source(self):
         forged=SKILL+b"\n"
         h=hashlib.sha256(forged).hexdigest()

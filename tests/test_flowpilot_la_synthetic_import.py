@@ -5,6 +5,7 @@ import csv
 from hashlib import sha256
 import json
 import sqlite3
+from contextlib import closing
 import sys
 from pathlib import Path
 from types import SimpleNamespace
@@ -50,7 +51,7 @@ class FakeLA:
             rows = list(csv.reader(stream))
         assert rows == [["customer", "amount"], ["alice", "1.25"], ["bob", "2.00"]]
         digest = sha256((self.root / "sales.csv").read_bytes()).hexdigest()
-        with sqlite3.connect(self.business) as db:
+        with closing(sqlite3.connect(self.business)) as db, db:
             db.execute("CREATE TABLE IF NOT EXISTS csv_records("
                        "run_id TEXT, import_step_id TEXT, source_sha256 TEXT, "
                        "row_number INTEGER, payload_json TEXT, "

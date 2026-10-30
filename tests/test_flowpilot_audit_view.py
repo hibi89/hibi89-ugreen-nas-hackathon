@@ -1,5 +1,6 @@
 """Offline tests for local audit history view."""
 import sqlite3
+from contextlib import closing
 import tempfile
 import unittest
 from pathlib import Path
@@ -12,7 +13,7 @@ class AuditViewTests(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
         self.db = Path(self.tmp.name) / "audit.sqlite"
-        with sqlite3.connect(self.db) as conn:
+        with closing(sqlite3.connect(self.db)) as conn, conn:
             conn.execute("CREATE TABLE flowpilot_runs (id INTEGER PRIMARY KEY, timestamp TEXT, record_json TEXT)")
             conn.execute("INSERT INTO flowpilot_runs(timestamp,record_json) VALUES (?,?)",
                          ("2026-10-29T00:00:00Z", '{"status":"LOCAL_REPORT_CREATED_NOT_NAS"}'))

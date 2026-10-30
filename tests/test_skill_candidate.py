@@ -66,7 +66,7 @@ class SkillDraftTests(unittest.TestCase):
 
     def test_no_placeholders(self):
         for p in DIR.rglob("*.md"):
-            self.assertIsNone(re.search(r"\b(?:TODO|TBD|FIXME|PLACEHOLDER)\b", p.read_text(), re.I))
+            self.assertIsNone(re.search(r"\b(?:TODO|TBD|FIXME|PLACEHOLDER)\b", p.read_text(encoding="utf-8"), re.I))
 
     def test_read_only_and_no_invented_commands(self):
         text = SKILL.read_text(encoding="utf-8")

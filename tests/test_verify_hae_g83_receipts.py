@@ -3,6 +3,7 @@ from hashlib import sha256
 import json
 from pathlib import Path
 import sqlite3
+from contextlib import closing
 import sys
 from tempfile import TemporaryDirectory
 import unittest
@@ -30,7 +31,7 @@ class G83AcceptanceEvidenceTests(unittest.TestCase):
     def test_independent_sqlite_receipts_values_and_digest(self):
         with TemporaryDirectory() as d:
             path = Path(d) / "business.sqlite"
-            with sqlite3.connect(path) as db:
+            with closing(sqlite3.connect(path)) as db, db:
                 db.execute("CREATE TABLE csv_records (run_id TEXT, row_number INT,"
                            " source_sha256 TEXT, payload_json TEXT)")
                 for row_num, name in ((1, "SyntheticAlice"), (2, "SyntheticBob")):
@@ -39,7 +40,7 @@ class G83AcceptanceEvidenceTests(unittest.TestCase):
                                 json.dumps({"id": str(row_num + 10), "name": name})))
             self.assertTrue(verify_business_receipts(path, RUN))
             self.assertFalse(verify_business_receipts(path, "Gui" + "c" * 12))
-            with sqlite3.connect(path) as db:
+            with closing(sqlite3.connect(path)) as db, db:
                 db.execute("UPDATE csv_records SET source_sha256=? WHERE row_number=2",
                            ("0" * 64,))
             self.assertFalse(verify_business_receipts(path, RUN))
@@ -49,7 +50,7 @@ class G83AcceptanceEvidenceTests(unittest.TestCase):
             path = Path(d) / "missing.sqlite"
             self.assertFalse(verify_business_receipts(path, RUN))
             self.assertFalse(path.exists(), "Read-only verifier must not create database")
-            with sqlite3.connect(path) as db:
+            with closing(sqlite3.connect(path)) as db, db:
                 db.execute("CREATE TABLE not_csv_records (unused INT)")
             self.assertFalse(verify_business_receipts(path, RUN))
 

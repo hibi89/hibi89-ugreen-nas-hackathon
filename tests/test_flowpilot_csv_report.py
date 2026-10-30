@@ -1,6 +1,7 @@
 """Focused offline tests for FlowPilot CSV report prototype."""
 import csv
 import sqlite3
+from contextlib import closing
 import tempfile
 import unittest
 from pathlib import Path
@@ -40,7 +41,7 @@ class CsvReportTests(unittest.TestCase):
         with (self.root / "summary.csv").open(newline="", encoding="utf-8") as f:
             rows = list(csv.reader(f))
         self.assertEqual(rows, [["customer", "total_revenue"], ["alice", "5.00"], ["bob", "2"]])
-        with sqlite3.connect(self.db) as conn:
+        with closing(sqlite3.connect(self.db)) as conn, conn:
             self.assertEqual(conn.execute("SELECT COUNT(*) FROM flowpilot_runs").fetchone()[0], 1)
 
     def test_no_traversal_or_overwrite(self):
