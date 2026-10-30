@@ -20,6 +20,12 @@ class RedactedLocalReportViewTests(unittest.TestCase):
         self.assertNotIn("ownerRoot.value+", HTML)
         self.assertNotIn("ownerRequired.value+", HTML)
 
+    def test_json_export_has_one_js_escape_for_valid_newline(self):
+        line = next(line for line in HTML.splitlines()
+                    if "downloadReport(JSON.stringify(ownerReport" in line)
+        self.assertIn(r'"\\n"', line)
+        self.assertNotIn(r'"\\\\n"', line)
+
     def test_change_invalidates_both_download_buttons(self):
         self.assertIn('document.getElementById("ownerPrint").disabled=true', HTML)
         self.assertIn('document.getElementById("ownerExport").disabled=true', HTML)

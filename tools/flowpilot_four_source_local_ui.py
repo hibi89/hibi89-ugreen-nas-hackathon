@@ -294,7 +294,7 @@ function downloadReport(content,mime,name){
 }
 document.getElementById("ownerExport").onclick=()=>{
   if(!ownerReport)return;
-  downloadReport(JSON.stringify(ownerReport,null,2)+"\\n",
+  downloadReport(JSON.stringify(ownerReport,null,2)+"\n",
     "application/json","flowpilot-local-redacted-report.json");
 };
 document.getElementById("ownerPrint").onclick=()=>{
