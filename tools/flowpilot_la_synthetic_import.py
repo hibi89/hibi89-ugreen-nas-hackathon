@@ -108,10 +108,28 @@ def run_demo(*, approval: str | None = None, loader=import_module,
             audit = engine.audit(RUN_ID)
             verified = engine.verify_receipts(LA_PLAN, RUN_ID)
             with sqlite3.connect(f"file:{business.as_posix()}?mode=ro", uri=True) as connection:
-                count = connection.execute(
-                    "SELECT COUNT(*) FROM csv_records WHERE run_id=? AND import_step_id=?",
+                persisted_rows = connection.execute(
+                    "SELECT row_number, source_sha256, payload_json "
+                    "FROM csv_records WHERE run_id=? AND import_step_id=? "
+                    "ORDER BY row_number",
                     (RUN_ID, "imported"),
-                ).fetchone()[0]
+                ).fetchall()
+            expected_rows = [
+                (index, before, dict(zip(TEST_ROWS[0], cells)))
+                for index, cells in enumerate(TEST_ROWS[1:], start=1)
+            ]
+            provenance_matches = (
+                len(persisted_rows) == len(expected_rows)
+                and all(
+                    type(row_number) is int and row_number == expected_number
+                    and digest == expected_digest
+                    and isinstance(payload, str)
+                    and json.loads(payload) == expected_data
+                    for (row_number, digest, payload),
+                        (expected_number, expected_digest, expected_data)
+                    in zip(persisted_rows, expected_rows)
+                )
+            )
             preserved = sha256(source.read_bytes()).hexdigest() == before
             if (not isinstance(status, dict) or status.get("status") != "completed"
                     or not isinstance(audit, dict) or audit.get("run_id") != RUN_ID
@@ -119,11 +137,10 @@ def run_demo(*, approval: str | None = None, loader=import_module,
                     or not isinstance(audit.get("approval_receipts"), list)
                     or not audit["approval_receipts"]
                     or not isinstance(verified, dict) or verified.get("verified") is not True
-                    or type(count) is not int or count != len(TEST_ROWS) - 1
-                    or not preserved):
+                    or not provenance_matches or not preserved):
                 return _answer("BLOCKED_RECEIPT_MISMATCH", attempted=attempted)
             return _answer("SYNTHETIC_LA_SQLITE_VERIFIED", attempted=True, executed=True,
-                           persisted=count, replay=True, audited=True, source_preserved=True)
+                           persisted=len(persisted_rows), replay=True, audited=True, source_preserved=True)
     except Exception:
         # Never echo exception strings, filesystem paths, database values or CSV cells.
         return _answer("BLOCKED_LA_EXECUTION_OR_AUDIT", attempted=attempted)
