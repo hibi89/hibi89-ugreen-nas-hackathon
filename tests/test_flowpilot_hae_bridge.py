@@ -99,7 +99,7 @@ class Handler(BaseHTTPRequestHandler):
             self.server.runs += 1
             self.server.last_approval = body.get("approve_writes")
             if self.server.mode == "run_rejected" or body.get("preview_id") != TOKEN:
-                return self.send_data(409, {"error": "preview expired"})
+                return self.send_data(409, {"error": "preview expired or no longer matches the request"})
             if self.server.mode == "drop_after_write":
                 self.close_connection = True
                 return
