@@ -267,14 +267,17 @@ def run_bridge(task: str, *, csv_path: str, port: int,
         code, data = _request(
             port, "POST", "/api/run",
             {"task": task, "csv_path": csv_path, "preview_id": preview_id,
-             "approve_writes": True},
+             "approve_writes": True,
+             **({"pending_run_id": pending_run_id} if pending_run_id is not None else {})},
             may_write=True,
         )
         if code != 200:
             # Only a specific, known HAE rejection happens before any write.
             # Other HTTP 4xx/5xx can follow a committed business SQLite write.
-            if (code == 409 and data.get("error") ==
-                    "preview expired or no longer matches the request"):
+            if (code == 409 and data.get("error") in {
+                    "preview expired or no longer matches the request",
+                    "pending run ID differs from approved preview",
+            }):
                 return {
                     "status": "BLOCKED_HAE_EXECUTION_REJECTED", "executed": False,
                     "hae_http_connected": True, "http_status": code,
