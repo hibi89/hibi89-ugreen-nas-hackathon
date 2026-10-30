@@ -83,7 +83,8 @@ class G86PrivateScriptTrustTests(unittest.TestCase):
     def setUp(self):
         self.tmp = TemporaryDirectory(prefix="g86-private-git-")
         self.addCleanup(self.tmp.cleanup)
-        self.root = Path(self.tmp.name) / "private-hae"
+        # Exercise the Windows failure case: non-ASCII checkout ancestors.
+        self.root = Path(self.tmp.name) / "유그린 해커톤" / "HAE"
         (self.root / "tools").mkdir(parents=True)
         self.git("init", "--quiet")
         self.runner = self.root / "tools" / "g84_verify_ugreen_native.py"
@@ -113,6 +114,19 @@ class G86PrivateScriptTrustTests(unittest.TestCase):
 
     def test_pinned_clean_private_code_passes(self):
         self.check()
+
+    def test_korean_checkout_root_uses_ascii_only_git_values(self):
+        self.assertIn("유그린 해커톤", str(self.root))
+        self.assertEqual(entry._git(self.root, "rev-parse", "--show-prefix"), "")
+        self.assertEqual(entry._git(self.root, "rev-parse", "--is-inside-work-tree"), "true")
+        self.check()
+
+    def test_non_ascii_git_gate_output_fails_closed(self):
+        from types import SimpleNamespace
+        with patch.object(entry.subprocess, "run", return_value=SimpleNamespace(
+            returncode=0, stdout=b"\\xed\\x95\\x9c")):
+            with self.assertRaisesRegex(entry.IntegrityRefused, "ASCII gate value"):
+                entry._git(self.root, "rev-parse", "--show-prefix")
 
     def test_docs_only_descendant_keeps_pinned_binary_source(self):
         (self.root / "HANDOFF.md").write_text("documentation\n", encoding="utf-8")
