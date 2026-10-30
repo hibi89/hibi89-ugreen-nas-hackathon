@@ -10,6 +10,7 @@ import argparse
 import hashlib
 import io
 import json
+import struct
 import stat
 import sys
 import urllib.parse
@@ -35,6 +36,39 @@ def _safe_path(name: str) -> None:
     if any(ord(c) < 32 or ord(c) == 127 for c in name):
         raise UnsafePackage("control character in member path")
 
+def _validate_raw_member_names(binary: bytes, archive: zipfile.ZipFile) -> None:
+    """Reject raw ZIP backslashes before ZipInfo normalizes them on Windows.
+
+    Validate central and local filename metadata only; never extract contents.
+    """
+    cursor = archive.start_dir
+    for member in archive.infolist():
+        if (cursor < 0 or cursor + 46 > len(binary)
+                or binary[cursor:cursor + 4] != b"PK\x01\x02"):
+            raise UnsafePackage("invalid ZIP central directory entry")
+        name_len, extra_len, comment_len = struct.unpack_from(
+            "<HHH", binary, cursor + 28
+        )
+        end = cursor + 46 + name_len + extra_len + comment_len
+        if end > len(binary):
+            raise UnsafePackage("truncated ZIP central directory metadata")
+        name = binary[cursor + 46:cursor + 46 + name_len]
+        if not name or b"\\" in name or b"\x00" in name:
+            raise UnsafePackage("unsafe raw ZIP member name")
+
+        local = member.header_offset
+        if (local < 0 or local + 30 > len(binary)
+                or binary[local:local + 4] != b"PK\x03\x04"):
+            raise UnsafePackage("invalid ZIP local header")
+        local_name_len, local_extra_len = struct.unpack_from(
+            "<HH", binary, local + 26
+        )
+        if (local + 30 + local_name_len + local_extra_len > len(binary)
+                or binary[local + 30:local + 30 + local_name_len] != name):
+            raise UnsafePackage("ZIP local and central filenames differ")
+        cursor = end
+
+
 def inspect_zip_bytes(binary: bytes) -> dict:
     if not binary or len(binary) > MAX_DOWNLOAD:
         raise UnsafePackage("download empty/too large")
@@ -46,6 +80,7 @@ def inspect_zip_bytes(binary: bytes) -> dict:
         members = archive.infolist()
         if len(members) > MAX_MEMBERS:
             raise UnsafePackage("too many archive entries")
+        _validate_raw_member_names(binary, archive)
         total = 0
         docs = 0
         caps = {word: False for word in DOC_KEYWORDS}

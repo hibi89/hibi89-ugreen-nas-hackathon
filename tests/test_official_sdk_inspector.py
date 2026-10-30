@@ -32,8 +32,22 @@ class SDKInspectTests(unittest.TestCase):
         with self.assertRaises(module.UnsafePackage):
             module.inspect_zip_bytes(make_zip({"../secret.txt":"x"}))
     def test_rejects_backslash(self):
+        # ZipFile.writestr() normalizes backslashes on Windows. Replace the
+        # two raw ZIP filename occurrences to preserve an unsafe fixture.
+        raw = make_zip({"a/b": "x"})
+        self.assertEqual(raw.count(b"a/b"), 2)
         with self.assertRaises(module.UnsafePackage):
-            module.inspect_zip_bytes(make_zip({"a\\b":"x"}))
+            module.inspect_zip_bytes(raw.replace(b"a/b", b"a\\b"))
+
+    def test_rejects_central_local_name_mismatch(self):
+        raw = make_zip({"a/b": "x"})
+        central = raw.index(b"PK\x01\x02")
+        tampered = raw[:central] + raw[central:].replace(
+            b"a/b", b"a\\b", 1
+        )
+        with self.assertRaises(module.UnsafePackage):
+            module.inspect_zip_bytes(tampered)
+
     def test_rejects_absolute(self):
         with self.assertRaises(module.UnsafePackage):
             module.inspect_zip_bytes(make_zip({"/etc/key":"x"}))
