@@ -1,0 +1,73 @@
+"""Source doctor regressions, using mock Git checks rather than private source."""
+from __future__ import annotations
+
+import unittest
+from pathlib import Path
+from unittest.mock import patch
+
+from tools.flowpilot_source_doctor import SOURCES, inspect_sources
+from tools.verify_private_hae_chain import ProofRefused
+
+
+class SourceDoctorTests(unittest.TestCase):
+    def setUp(self):
+        self.roots = (Path("/hae"), Path("/sovia"), Path("/dbvora"))
+
+    def test_three_clean_checkouts_are_preview_ready_but_not_executed(self):
+        calls = []
+        def fake_verify(root, sha, paths):
+            calls.append((root, sha, paths))
+            return Path("/trusted")
+        with (patch("tools.flowpilot_source_doctor.verify_checkout",
+                    side_effect=fake_verify),
+              patch("tools.flowpilot_source_doctor.Path.is_file", return_value=True),
+              patch("tools.flowpilot_source_doctor.Path.is_symlink", return_value=False),
+              patch("tools.flowpilot_source_doctor.shutil.which", return_value="/bin/git")):
+            row = inspect_sources(*self.roots)
+        self.assertEqual(row["status"], "READY_FOR_LOCAL_SYNTHETIC_PREVIEW")
+        self.assertEqual(len(calls), 3)
+        self.assertFalse(row["private_source_executed"])
+        self.assertFalse(row["actual_nas_verified"])
+        self.assertEqual(row["release_gate"], "HOLD")
+
+    def test_bad_dbvora_revision_refused_without_source_paths(self):
+        def fake(root, sha, paths):
+            if sha == SOURCES[2][1]:
+                raise ProofRefused("SOURCE_SHA_MISMATCH")
+            return Path("/trusted")
+        with (patch("tools.flowpilot_source_doctor.verify_checkout", side_effect=fake),
+              patch("tools.flowpilot_source_doctor.Path.is_file", return_value=True),
+              patch("tools.flowpilot_source_doctor.Path.is_symlink", return_value=False),
+              patch("tools.flowpilot_source_doctor.shutil.which", return_value="/bin/git")):
+            row = inspect_sources(*self.roots)
+        self.assertEqual(row["sources"]["dbvora"]["status"], "SOURCE_SHA_MISMATCH")
+        self.assertFalse(row["owner_local_synthetic_source_readiness"])
+        self.assertNotIn("/dbvora", str(row))
+
+    def test_missing_git_skips_all_checkout_invocations(self):
+        with (patch("tools.flowpilot_source_doctor.shutil.which", return_value=None),
+              patch("tools.flowpilot_source_doctor.verify_checkout",
+                    side_effect=AssertionError("GIT CALLED")) as checked):
+            row = inspect_sources(*self.roots)
+        checked.assert_not_called()
+        self.assertEqual(row["status"], "BLOCKED")
+
+    def test_untrusted_exception_text_never_reaches_status(self):
+        with (patch("tools.flowpilot_source_doctor.verify_checkout",
+                    side_effect=ProofRefused("PRIVATE_CUSTOMER_C_PATH")),
+              patch("tools.flowpilot_source_doctor.shutil.which", return_value="/bin/git")):
+            row = inspect_sources(*self.roots)
+        self.assertEqual(row["sources"]["hae_la"]["status"], "LOCAL_SOURCE_UNVERIFIED")
+        self.assertNotIn("PRIVATE_CUSTOMER", str(row))
+
+    def test_missing_checkout_never_claims_real_execution(self):
+        with patch("tools.flowpilot_source_doctor.verify_checkout",
+                   side_effect=ProofRefused("SOURCE_ROOT_MISSING")):
+            row = inspect_sources(*self.roots)
+        self.assertEqual(row["status"], "BLOCKED")
+        self.assertFalse(row["private_source_executed"])
+        self.assertFalse(row["registered_uliya_expert_invoked"])
+
+
+if __name__ == "__main__":
+    unittest.main()
