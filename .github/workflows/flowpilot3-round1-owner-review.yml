@@ -5,6 +5,7 @@ on:
     paths:
       - "docs/submission/flowpilot3_round1_qa_20261029.json"
       - "tools/flowpilot3_round1_builder.py"
+      - "tools/flowpilot3_round1_visual_qa.py"
       - "tests/test_flowpilot3_round1_builder.py"
       - "skill/flowpilot-nas/SKILL.md"
       - ".github/workflows/flowpilot3-round1-owner-review.yml"
@@ -24,7 +25,7 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install offline PDF build dependencies
-        run: python -m pip install "reportlab>=4,<5" "pypdf>=6,<7"
+        run: python -m pip install "reportlab>=4,<5" "pypdf>=6,<7" "pymupdf>=1.24,<2"
       - name: Verify exact canonical Skill and authored proposal
         run: |
           PYTHONPATH=tools python -m unittest discover -s tests -p "test_flowpilot3_round1_builder.py" -v
@@ -59,6 +60,25 @@ jobs:
               assert archive.read("flowpilot-nas/SKILL.md")==src
           assert len(PdfReader(p).pages)<=2
           print("FlowPilot 3.0 owner-review artifact check PASS; NOT official release")
+          PY
+      - name: Render exact PDF image and verify content geometry
+        run: |
+          python tools/flowpilot3_round1_visual_qa.py \
+            --pdf "$RUNNER_TEMP/flowpilot3-owner-review/NAS_FlowPilot_3_Round1_OWNER_REVIEW.pdf" \
+            --manifest "$RUNNER_TEMP/flowpilot3-owner-review/NAS_FlowPilot_3_Round1_OWNER_REVIEW_manifest.json" \
+            --preview "$RUNNER_TEMP/flowpilot3-owner-review/NAS_FlowPilot_3_Round1_PREVIEW.png" \
+            > "$RUNNER_TEMP/flowpilot3-owner-review/NAS_FlowPilot_3_Round1_visual_audit.json"
+          python - <<'PY'
+          import json,os,pathlib,hashlib
+          root=pathlib.Path(os.environ["RUNNER_TEMP"])/"flowpilot3-owner-review"
+          proof=json.loads((root/"NAS_FlowPilot_3_Round1_visual_audit.json").read_text())
+          image=root/"NAS_FlowPilot_3_Round1_PREVIEW.png"
+          assert proof["status"]=="OWNER_REVIEW_PDF_GEOMETRY_PASS_NOT_RELEASE"
+          assert proof["preview_png_sha256"]==hashlib.sha256(image.read_bytes()).hexdigest()
+          assert proof["pages"]==1 and proof["clipped_text_blocks_found"]==0
+          assert proof["manual_visual_editorial_review"]=="PENDING"
+          assert proof["release_gate"]=="HOLD" and not proof["devpost_submitted"]
+          print("G75 PDF REAL RENDER/GEOMETRY PASS; OWNER VISUAL SIGNOFF PENDING")
           PY
       - uses: actions/upload-artifact@v4
         with:
