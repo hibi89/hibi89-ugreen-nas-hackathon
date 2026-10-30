@@ -1,3 +1,8 @@
+## G94 — 2026-10-31 KST — LOCAL metadata→redacted review backend, hosted Windows/Linux PASS
+- New G94 tool tools/flowpilot_local_review.py bridges real consented G62 owner-local lstat to indexed redacted review and HOLD, without forging official Uliya Expert G61/G87 receipts. Separate from official Markdown-only Skill ZIP; no network, content reads or source writes. New tests tests/test_flowpilot_local_review.py (13).
+- Exact feature SHA 05760ecee8b9c894700c6654883ee5442a2ac314. [GitHub Actions 41117060190](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/41117060190) Windows and Linux both SUCCESS. Linux 859 total / 854 PASS / 0 FAIL / 5 SKIP; Windows 12 master + 14 SQLite focus PASS, master --check PASS and PowerShell -Mode full PASS at exact SHA. Owner manual regression NOT_REQUIRED. Original Skill, master JSON/Markdown, PDFs/ZIP untouched; no actual NAS/registered Expert/Creator or Devpost submission.
+- Next G95: verified official Expert operation signature/result contract and owner permission evidence are mandatory before real Uliya adapter. Release HOLD; no unapproved external calls.
+
 ## G93 - 2026-10-31 KST - Windows + Linux offline full regressions PASS
 - G91's added test incorrectly parsed original Markdown as JSON; G92 fixed that test to read canonical JSON (2362a136). G92 four workflows SUCCESS; Linux 846 tests, 841 PASS, 0 FAIL, 5 SKIP.
 - G93 8f7c30c8 added native Windows regression to existing GitHub Actions (run 41116084733). Both Windows and Linux jobs SUCCESS: Windows master 12 PASS, SQLite 14 PASS, deterministic master 24-entry check PASS and PowerShell verify_local.ps1 -Mode full PASS at exact SHA; Linux 846/841 PASS/0 FAIL/5 SKIP.
