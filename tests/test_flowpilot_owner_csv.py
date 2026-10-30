@@ -96,6 +96,28 @@ class LocalOwnerCSVTests(unittest.TestCase):
             with self.subTest(request=list(req)), self.assertRaises(OwnerCSVRefused):
                 self.owner.preview(req)
 
+    def test_explicit_start_another_preserves_old_output_and_rechecks_new_scope(self):
+        first = self.owner.preview(self.scope())
+        output = self.owner.execute(first["approval_token"], CONSENT)
+        file_one = self.root / "new-report.csv"
+        old = file_one.read_bytes()
+        again = self.owner.start_new_report()
+        self.assertEqual(again["status"], "READY_FOR_NEW_LOCAL_CSV_PREVIEW")
+        self.assertTrue(again["previous_owner_output_preserved"])
+        with self.assertRaisesRegex(OwnerCSVRefused, "NO_APPROVED_CSV_OUTPUT"):
+            self.owner.download()
+        scope = {**self.scope(), "output": "second-new-report.csv"}
+        next_token = self.owner.preview(scope)["approval_token"]
+        next_result = self.owner.execute(next_token, CONSENT)
+        self.assertNotEqual(self.owner._audit_db.name, "audit.sqlite")
+        self.assertEqual(next_result["rows_read"], 2)
+        self.assertEqual(file_one.read_bytes(), old)
+        self.assertTrue((self.root / "second-new-report.csv").exists())
+
+    def test_rearm_requires_previous_attempt(self):
+        with self.assertRaisesRegex(OwnerCSVRefused, "NO_PREVIOUS_CSV_EXECUTION"):
+            self.owner.start_new_report()
+
     def test_unapproved_download_refused(self):
         self.owner.preview(self.scope())
         with self.assertRaisesRegex(OwnerCSVRefused, "NO_APPROVED_CSV_OUTPUT"):

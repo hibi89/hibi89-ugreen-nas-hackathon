@@ -211,6 +211,37 @@ class LocalHTTPContractTests(unittest.TestCase):
         self.assertEqual(len(result["checks"]), 4)
         self.assertEqual(self.request("POST", "/acceptance", data={})[0], 403)
 
+    def test_owner_csv_start_new_requires_previous_execution_and_new_consent(self):
+        with tempfile.TemporaryDirectory(prefix="flowpilot-rearm-http-") as temp:
+            root=Path(temp)
+            (root / "a.csv").write_text("customer,revenue\nalice,1.00\n")
+            self.assertEqual(self.authorized("/owner-csv/reset",{})[0],400)
+            scope={"root":str(root),"sources":["a.csv"],"output":"one.csv",
+                   "group":"customer","amount":"revenue","local_metadata_ack":True}
+            st,raw,_=self.authorized("/owner-csv/preview",scope)
+            self.assertEqual(st,200,raw)
+            token=json.loads(raw)["approval_token"]
+            st,_,_=self.authorized("/owner-csv/execute",{
+                "approval_token":token,
+                "consent":"APPROVE_LOCAL_CSV_CONTENT_READ_AND_NEW_OUTPUT_WRITE"
+            })
+            self.assertEqual(st,200)
+            st,raw,_=self.authorized("/owner-csv/reset",{})
+            self.assertEqual(st,200,raw)
+            self.assertTrue(json.loads(raw)["approval_required_again"])
+            self.assertTrue((root/"one.csv").is_file())
+            self.assertEqual(self.request("GET","/owner-csv/report.csv",headers={
+                "X-FlowPilot-Session":self.session
+            })[0],404)
+            new_scope={**scope,"output":"two.csv"}
+            st,raw,_=self.authorized("/owner-csv/preview",new_scope)
+            self.assertEqual(st,200,raw)
+            self.assertEqual(self.authorized("/owner-csv/execute",{
+                "approval_token":token,
+                "consent":"APPROVE_LOCAL_CSV_CONTENT_READ_AND_NEW_OUTPUT_WRITE"
+            })[0],400)
+            self.assertFalse((root/"two.csv").exists())
+
     def test_all_report_files_inaccessible_before_success(self):
         for name in ("index.html", "proof-1.html", "proof-1.json", "manifest.json"):
             with self.subTest(name=name):

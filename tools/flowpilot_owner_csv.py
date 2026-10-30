@@ -198,6 +198,32 @@ class OwnerCSV:
                 "actual_nas_verified": False, "release_gate": "HOLD",
             }
 
+    def start_new_report(self) -> dict:
+        """Explicitly re-arm a new approval after a completed/failed run.
+
+        Keep previous owner output untouched. Previous report download
+        becomes unavailable; a fresh isolated audit database is used.
+        """
+        with self._lock:
+            if self._closed:
+                raise OwnerCSVRefused("CLOSED_LOCAL_CSV_SESSION")
+            if not self._executed:
+                raise OwnerCSVRefused("NO_PREVIOUS_CSV_EXECUTION")
+            self._pending = None
+            self._complete = None
+            self._audit_db = Path(self._temp.name) / (
+                "audit-" + secrets.token_hex(12) + ".sqlite"
+            )
+            self._executed = False
+            return {
+                "status": "READY_FOR_NEW_LOCAL_CSV_PREVIEW",
+                "approval_required_again": True,
+                "previous_owner_output_preserved": True,
+                "previous_download_revoked": True,
+                "actual_nas_verified": False,
+                "release_gate": "HOLD",
+            }
+
     def download(self) -> bytes:
         with self._lock:
             if self._closed or self._complete is None:

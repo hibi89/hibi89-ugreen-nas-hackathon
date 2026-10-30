@@ -255,6 +255,7 @@ may contain my own data; processing stays on this computer.</label>
 <button id="ownCsvRun" class="execute" disabled>Approve and aggregate local CSV</button>
 <button id="ownCsvCancel" disabled>Cancel plan</button>
 <button id="ownCsvDownload" disabled>Download verified local output</button>
+<button id="ownCsvReset" disabled>Start another CSV report</button>
 <pre id="ownCsvState" role="status" aria-live="polite">No owner CSV selected.</pre>
 </section><section><h2>Your local folder checklist (read-only)</h2>
 <p>For a local, trusted, non-NAS directory only. Enter exact file names.
@@ -545,7 +546,8 @@ const ownCsvState=document.getElementById("ownCsvState"),
  ownCsvRun=document.getElementById("ownCsvRun"),
  ownCsvConsent=document.getElementById("ownCsvConsent"),
  ownCsvCancel=document.getElementById("ownCsvCancel"),
- ownCsvDownload=document.getElementById("ownCsvDownload");
+ ownCsvDownload=document.getElementById("ownCsvDownload"),
+ ownCsvReset=document.getElementById("ownCsvReset");
 function ownCsvInvalidate(){
   ownCsvRev++;ownCsvTicket=null;ownCsvReportReady=false;
   ownCsvConsent.checked=false;ownCsvRun.disabled=true;
@@ -576,6 +578,8 @@ async function ownCsvAction(path,data){
     ownCsvRun.disabled=!(ownCsvTicket&&ownCsvConsent.checked);
     ownCsvCancel.disabled=!ownCsvTicket;
     ownCsvDownload.disabled=!ownCsvReportReady;
+    if(path==="/owner-csv/execute")ownCsvReset.disabled=false;
+    if(path==="/owner-csv/reset"&&res.ok)ownCsvReset.disabled=true;
   }catch(e){
     ownCsvTicket=null;ownCsvRun.disabled=true;ownCsvCancel.disabled=true;
     ownCsvState.textContent="LOCAL_CSV_ACTION_REFUSED";
@@ -603,6 +607,11 @@ ownCsvCancel.onclick=()=>{
   if(!ownCsvTicket)return;
   ownCsvTicket=null;ownCsvCancel.disabled=true;ownCsvRun.disabled=true;
   ownCsvAction("/owner-csv/cancel",{});
+};
+ownCsvReset.onclick=()=>{
+  ownCsvInvalidate();
+  ownCsvReset.disabled=true;
+  ownCsvAction("/owner-csv/reset",{});
 };
 ownCsvDownload.onclick=async()=>{
   if(!ownCsvReportReady)return;
@@ -718,6 +727,8 @@ def handler_for(controller: Operator, session: str):
                     )
                 elif self.path == "/owner-csv/cancel" and not body:
                     result = controller.owner_csv.cancel()
+                elif self.path == "/owner-csv/reset" and not body:
+                    result = controller.owner_csv.start_new_report()
                 elif self.path == "/csv/configure":
                     result = controller.csv_panel.configure(body)
                 elif self.path in ("/csv/approve", "/csv/reject") and not body:
