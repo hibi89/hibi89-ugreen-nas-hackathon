@@ -59,6 +59,16 @@ class LocalHTTPContractTests(unittest.TestCase):
         self.assertEqual(headers["X-Frame-Options"], "DENY")
         self.assertEqual(headers["Cache-Control"], "no-store")
 
+    def test_real_os_demo_endpoint_works_without_private_checkouts(self):
+        with patch.object(self.operator, "sources",
+                          side_effect=AssertionError("PRIVATE_CHECKOUT_ACCESSED")):
+            status, body, _ = self.authorized("/demo", {})
+        self.assertEqual(status, 200)
+        row = json.loads(body)
+        self.assertEqual(row["status"], "PASS_REAL_OS_LSTAT_SYNTHETIC_DEMO")
+        self.assertEqual(row["scenario_count"], 5)
+        self.assertFalse(row["actual_nas_verified"])
+
     def test_all_report_files_inaccessible_before_success(self):
         for name in ("index.html", "proof-1.html", "proof-1.json", "manifest.json"):
             with self.subTest(name=name):

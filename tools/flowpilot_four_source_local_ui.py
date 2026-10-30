@@ -15,6 +15,7 @@ sys.path.insert(0, str(PROJECT))
 
 from tools.flowpilot_source_doctor import inspect_sources
 from tools.flowpilot_four_source_suite import run_suite
+from tools.flowpilot_real_os_demo import run_real_local_demo
 
 CONSENT = "I_APPROVE_DISPOSABLE_SYNTHETIC_WRITES"
 EVIDENCE_HTML = frozenset({"index.html", *(f"proof-{i}.html" for i in (1, 2, 3))})
@@ -38,6 +39,11 @@ class Operator:
 
     def sources(self) -> dict:
         return inspect_sources(*self.roots)
+
+    @staticmethod
+    def real_os_demo() -> dict:
+        # Independent of private source checkouts and without customer paths.
+        return run_real_local_demo()
 
     def preview(self) -> dict:
         with self.lock:
@@ -160,7 +166,11 @@ background:#081a2a;border-radius:9px;padding:16px;max-height:310px;overflow:auto
 <article><small>03</small><b>SOVIA</b><p>Advisory risk review</p></article>
 <article><small>04</small><b>DBVORA</b><p>Read-only synthetic schema</p></article>
 <article><small>05</small><b>NAS / Uliya</b><p>NOT RUN</p></article>
-</div><section><h2>Operator controls</h2>
+</div><section><h2>Real local filesystem demo — no private checkouts needed</h2>
+<p>Run the actual FlowPilot goal parser and OS metadata checks against five
+automatically generated, disposable folders. No LA, SOVIA, DBVORA or NAS calls.</p>
+<button id="demo">Run 1–3 intent real OS demo + missing-file cases</button>
+</section><section><h2>Full pinned-source operator controls (optional)</h2>
 <button id="doctor">1 · Verify source SHAs</button>
 <button id="preview">2 · Preview 3 test scenarios</button>
 <label><input id="agree" type="checkbox"> Approve disposable synthetic SQLite writes only</label>
@@ -191,6 +201,7 @@ try{
  challenge=(path==="/preview"&&response.ok)?result.challenge:null;enable();
 }catch(e){challenge=null;enable();out.textContent="LOCAL_REQUEST_FAILED";}
 }
+document.getElementById("demo").onclick=()=>request("/demo",{});
 document.getElementById("doctor").onclick=()=>request("/doctor",{});
 document.getElementById("preview").onclick=()=>request("/preview",{});
 go.onclick=()=>{
@@ -260,7 +271,9 @@ def handler_for(controller: Operator, session: str):
                 body = json.loads(self.rfile.read(length))
                 if type(body) is not dict:
                     raise OperatorRefused("JSON_OBJECT_REQUIRED")
-                if self.path == "/doctor" and not body:
+                if self.path == "/demo" and not body:
+                    result = controller.real_os_demo()
+                elif self.path == "/doctor" and not body:
                     result = controller.sources()
                 elif self.path == "/preview" and not body:
                     result = controller.preview()
