@@ -35,6 +35,7 @@ def run_session(goal: str, *, root: Path | None = None,
                 hae_port: int | None = None,
                 hae_csv: str | None = None,
                 preview_id: str | None = None,
+                hae_pending_run_id: str | None = None,
                 confirm_synthetic: bool = False) -> dict:
     if backend not in {"local-csv-report", "la-synthetic-import",
                        "projectready-local-metadata", "hae-la-loopback"}:
@@ -55,13 +56,15 @@ def run_session(goal: str, *, root: Path | None = None,
             result = run_bridge(
                 goal, csv_path=hae_csv, port=hae_port,
                 approval=approval, preview_id=preview_id,
+                pending_run_id=hae_pending_run_id,
                 confirm_synthetic=confirm_synthetic,
             )
         except BridgeRefused as exc:
             raise ReportRefused("HAE loopback request refused") from exc
         return {**result, "backend": "hae-la-loopback",
                 "actual_nas_integrated": False}
-    if any(value is not None for value in (hae_port, hae_csv, preview_id)) or confirm_synthetic:
+    if any(value is not None for value in (hae_port, hae_csv, preview_id,
+                                           hae_pending_run_id)) or confirm_synthetic:
         raise ReportRefused("HAE-only flags cannot be used with other backends")
     if backend == "projectready-local-metadata":
         # Deliberately distinct from local CSV writes or real NAS access.
@@ -150,6 +153,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--hae-port", type=int, help="Existing HAE loopback port, 1024..65535")
     parser.add_argument("--hae-csv", help="HAE server synthetic input-root CSV basename")
     parser.add_argument("--preview-id", help="Token returned by a separate HAE preview")
+    parser.add_argument("--hae-pending-run-id",
+                        help="Optional run ID from newer HAE preview, for read-only error recovery")
     parser.add_argument("--confirm-synthetic", action="store_true",
                         help="Confirm that the HAE server holds synthetic test data ONLY")
     args = parser.parse_args(argv)
@@ -169,6 +174,7 @@ def main(argv: list[str] | None = None) -> int:
                              required=args.required, candidates=candidates,
                              hae_port=args.hae_port, hae_csv=args.hae_csv,
                              preview_id=args.preview_id,
+                             hae_pending_run_id=args.hae_pending_run_id,
                              confirm_synthetic=args.confirm_synthetic)
         print(json.dumps(result, ensure_ascii=False, indent=2))
         if args.backend == "hae-la-loopback":
