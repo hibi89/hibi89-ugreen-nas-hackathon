@@ -120,6 +120,13 @@ def inspect_disposable_la_ledger(path: Path, reader: Callable[[Path], dict]) -> 
                  after_info.st_mtime_ns, _synthetic_ledger_digest(path))
         if before != after or path.is_symlink() or after_info.st_nlink != 1:
             raise DBVORABridgeRefused("DBVORA_SYNTHETIC_LEDGER_CHANGED")
+        # The injected metadata report must describe THIS exact disposable
+        # SQLite file, not another database of the reader's choosing.
+        # Do not trust the reader's size observation without local comparison.
+        if (type(inventory) is not dict
+                or type(inventory.get("size_bytes")) is not int
+                or inventory["size_bytes"] != after_info.st_size):
+            raise DBVORABridgeRefused("DBVORA_SYNTHETIC_SIZE_CLAIM_MISMATCH")
     except DBVORABridgeRefused:
         raise
     except Exception:

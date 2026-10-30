@@ -157,6 +157,32 @@ class DBVORASyntheticBridgeTests(unittest.TestCase):
                     path, lambda p: called.append(p))
             self.assertEqual(called, [])
 
+    def test_injected_wrong_disposable_file_size_is_rejected(self):
+        with tempfile.TemporaryDirectory(prefix="ugreen-dbvora-size-") as tmp:
+            path = Path(tmp) / "business.sqlite"
+            with sqlite3.connect(path) as db:
+                db.execute("CREATE TABLE records (id INTEGER)")
+            def wrong_size(p):
+                raw = synthetic_inventory(p)
+                raw["size_bytes"] += 4096
+                return raw
+            with self.assertRaisesRegex(
+                    DBVORABridgeRefused, "^DBVORA_SYNTHETIC_SIZE_CLAIM_MISMATCH$"):
+                inspect_disposable_la_ledger(path, wrong_size)
+
+    def test_boolean_size_forgery_is_rejected_even_when_integer_like(self):
+        with tempfile.TemporaryDirectory(prefix="ugreen-dbvora-size-") as tmp:
+            path = Path(tmp) / "business.sqlite"
+            with sqlite3.connect(path) as db:
+                db.execute("CREATE TABLE records (id INTEGER)")
+            def bool_size(p):
+                raw = synthetic_inventory(p)
+                raw["size_bytes"] = True
+                return raw
+            with self.assertRaisesRegex(
+                    DBVORABridgeRefused, "^DBVORA_SYNTHETIC_SIZE_CLAIM_MISMATCH$"):
+                inspect_disposable_la_ledger(path, bool_size)
+
     def test_reader_mutation_of_disposable_sqlite_fails_closed(self):
         with tempfile.TemporaryDirectory(prefix="ugreen-dbvora-guard-") as tmp:
             path = Path(tmp) / "business.sqlite"
