@@ -21,7 +21,11 @@ from tools.verify_private_hae_chain import (
 )
 from tools.verify_local_metadata_la_chain import EXPECTED_DBVORA_SHA, verify
 
-GOAL = "파일 누락 확인 그리고 인계 확인"
+GOALS = {
+    1: "파일 누락 확인",
+    2: "파일 누락 확인 그리고 인계 확인",
+    3: "파일 누락 확인 그리고 인계 확인 그리고 버전 비교",
+}
 REQUIRED = ["README.md"]
 REQUIRED_STATUS = "WAITING_EXACT_LOCAL_PLAN_APPROVAL"
 
@@ -48,17 +52,26 @@ class FourSourceProofRefused(ValueError):
 
 
 def run_matrix(hae_root: Path, sovia_root: Path, dbvora_root: Path, *,
-               approve_disposable_synthetic: bool = False) -> dict:
+               approve_disposable_synthetic: bool = False,
+               intent_count: int = 2) -> dict:
     if type(approve_disposable_synthetic) is not bool:
         raise FourSourceProofRefused("INVALID_SYNTHETIC_APPROVAL")
+    if type(intent_count) is not int or intent_count not in GOALS:
+        raise FourSourceProofRefused("INVALID_INTENT_COUNT")
+    goal = GOALS[intent_count]
+    candidates = {"README.md": ["README_final.md"]} if intent_count == 3 else None
     # No caller-selected source folder, no NAS path or customer content.
     with tempfile.TemporaryDirectory(prefix="ugreen-4source-disposable-") as d:
         root = Path(d) / "input"
         root.mkdir(mode=0o700)
         (root / "README.md").write_text("synthetic fixture only\n", encoding="utf-8")
+        if candidates:
+            (root / "README_final.md").write_text(
+                "synthetic competing version only\n", encoding="utf-8",
+            )
         preview = verify(
-            hae_root, sovia_root, GOAL, root, REQUIRED,
-            metadata_consent=True,
+            hae_root, sovia_root, goal, root, REQUIRED,
+            candidates=candidates, metadata_consent=True,
         )
         if (preview.get("status") != REQUIRED_STATUS
                 or type(preview.get("approve_plan_sha256")) is not str
@@ -67,7 +80,8 @@ def run_matrix(hae_root: Path, sovia_root: Path, dbvora_root: Path, *,
                 or not _pinned_source_claim_valid(preview, expect_dbvora=False)
                 or preview.get("local_inspection_performed") is not True
                 or preview.get("sovia_advisory") != "REVIEW_ONLY"
-                or preview.get("sovia_finding_count") != 2
+                or preview.get("sovia_finding_count") != intent_count
+                or preview.get("intent_count") != intent_count
                 or preview.get("la_execution_verified") is not False
                 or preview.get("dbvora_metadata_inspected") is not False
                 or preview.get("synthetic_write_rows") != 0
@@ -77,14 +91,14 @@ def run_matrix(hae_root: Path, sovia_root: Path, dbvora_root: Path, *,
         if not approve_disposable_synthetic:
             return {
                 "status": "WAITING_DISPOSABLE_SYNTHETIC_WRITE_APPROVAL",
-                "scenario_count": 2,
+                "scenario_count": intent_count,
                 "synthetic_write_rows": 0,
                 "dbvora_private_source_invoked_locally": False,
                 "nas_verified": False, "release_gate": "HOLD",
             }
         approved = verify(
-            hae_root, sovia_root, GOAL, root, REQUIRED,
-            metadata_consent=True,
+            hae_root, sovia_root, goal, root, REQUIRED,
+            candidates=candidates, metadata_consent=True,
             approved_sha256=preview["approve_plan_sha256"],
             dbvora_root=dbvora_root,
         )
@@ -93,14 +107,15 @@ def run_matrix(hae_root: Path, sovia_root: Path, dbvora_root: Path, *,
                 or not _pinned_source_claim_valid(approved, expect_dbvora=True)
                 or approved.get("local_inspection_performed") is not True
                 or approved.get("sovia_advisory") != "REVIEW_ONLY"
-                or approved.get("sovia_finding_count") != 2
+                or approved.get("sovia_finding_count") != intent_count
+                or approved.get("intent_count") != intent_count
                 or approved.get("file_contents_opened") is not False
                 or approved.get("raw_paths_or_names_returned") is not False
                 or approved.get("customer_file_contents_used") is not False
                 or approved.get("la_execution_verified") is not True
                 or approved.get("dbvora_metadata_inspected") is not True
                 or approved.get("dbvora_private_source_invoked_locally") is not True
-                or approved.get("synthetic_write_rows") != 2
+                or approved.get("synthetic_write_rows") != intent_count
                 or approved.get("approval_receipts") != 1
                 or approved.get("replay_duplicate_writes") != 0
                 or approved.get("ephemeral_sqlite_deleted_after_run") is not True
@@ -126,7 +141,8 @@ def run_matrix(hae_root: Path, sovia_root: Path, dbvora_root: Path, *,
             "actual_private_hae_la_invoked": True,
             "actual_public_sovia_invoked": True,
             "actual_private_dbvora_invoked": True,
-            "la_write_rows": 2,
+            "intent_count": intent_count,
+            "la_write_rows": intent_count,
             "la_replay_duplicates": 0,
             "approval_receipts": 1,
             "dbvora_table_count": summary["table_count"],
@@ -146,11 +162,13 @@ def main(argv=None) -> int:
     p.add_argument("--sovia-root", required=True, type=Path)
     p.add_argument("--dbvora-root", required=True, type=Path)
     p.add_argument("--approve-disposable-synthetic", action="store_true")
+    p.add_argument("--intent-count", type=int, choices=(1, 2, 3), default=2)
     options = p.parse_args(argv)
     try:
         result = run_matrix(
             options.hae_root, options.sovia_root, options.dbvora_root,
             approve_disposable_synthetic=options.approve_disposable_synthetic,
+            intent_count=options.intent_count,
         )
     except (FourSourceProofRefused, ProofRefused, OSError, ValueError,
             TypeError, ImportError, RuntimeError, KeyError, sqlite3.Error):

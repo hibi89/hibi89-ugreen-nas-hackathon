@@ -13,7 +13,7 @@ from tools.verify_private_hae_chain import EXPECTED_HAE_SHA, EXPECTED_SOVIA_SHA
 from tools.verify_local_metadata_la_chain import EXPECTED_DBVORA_SHA
 
 
-def fixture_response(*, approved=False):
+def fixture_response(*, approved=False, intent_count=2):
     if not approved:
         return {
             "pinned_sources": "PASS",
@@ -25,7 +25,8 @@ def fixture_response(*, approved=False):
             "independent_public_ci_private_hae_executed": False,
             "local_inspection_performed": True,
             "sovia_advisory": "REVIEW_ONLY",
-            "sovia_finding_count": 2,
+            "sovia_finding_count": intent_count,
+            "intent_count": intent_count,
             "status": "WAITING_EXACT_LOCAL_PLAN_APPROVAL",
             "approve_plan_sha256": "a" * 64,
             "la_execution_verified": False,
@@ -42,7 +43,8 @@ def fixture_response(*, approved=False):
         "independent_public_ci_private_hae_executed": False,
         "local_inspection_performed": True,
         "sovia_advisory": "REVIEW_ONLY",
-        "sovia_finding_count": 2,
+        "sovia_finding_count": intent_count,
+        "intent_count": intent_count,
         "file_contents_opened": False,
         "raw_paths_or_names_returned": False,
         "customer_file_contents_used": False,
@@ -50,7 +52,7 @@ def fixture_response(*, approved=False):
         "la_execution_verified": True,
         "dbvora_metadata_inspected": True,
         "dbvora_private_source_invoked_locally": True,
-        "synthetic_write_rows": 2,
+        "synthetic_write_rows": intent_count,
         "approval_receipts": 1,
         "replay_duplicate_writes": 0,
         "ephemeral_sqlite_deleted_after_run": True,
@@ -176,6 +178,62 @@ class FourSourceSyntheticMatrixTests(unittest.TestCase):
                     with self.assertRaisesRegex(
                             FourSourceProofRefused, "FOUR_SOURCE_SYNTHETIC_EVIDENCE_INCOMPLETE"):
                         run_matrix(*self.args, approve_disposable_synthetic=True)
+
+    def test_three_intent_version_review_executes_three_synthetic_writes(self):
+        calls = []
+        def fake(*args, **kwargs):
+            calls.append(dict(kwargs))
+            self.assertEqual(kwargs["candidates"],
+                             {"README.md": ["README_final.md"]})
+            self.assertTrue((args[3] / "README_final.md").is_file())
+            return fixture_response(
+                approved=kwargs.get("dbvora_root") is not None,
+                intent_count=3,
+            )
+        with patch("tools.verify_four_source_synthetic.verify", side_effect=fake):
+            row = run_matrix(*self.args, intent_count=3,
+                             approve_disposable_synthetic=True)
+        self.assertEqual(row["la_write_rows"], 3)
+        self.assertEqual(row["intent_count"], 3)
+        self.assertEqual(len(calls), 2)
+
+    def test_single_intent_executes_one_synthetic_write(self):
+        def fake(*args, **kwargs):
+            self.assertIsNone(kwargs.get("candidates"))
+            return fixture_response(
+                approved=kwargs.get("dbvora_root") is not None,
+                intent_count=1,
+            )
+        with patch("tools.verify_four_source_synthetic.verify", side_effect=fake):
+            row = run_matrix(*self.args, intent_count=1,
+                             approve_disposable_synthetic=True)
+        self.assertEqual(row["la_write_rows"], 1)
+        self.assertEqual(row["intent_count"], 1)
+
+    def test_bad_intent_count_refused_before_any_source_access(self):
+        with patch("tools.verify_four_source_synthetic.verify",
+                   side_effect=AssertionError("MUST_NOT_RUN")) as mocked:
+            for item in (0, 4, True, "3"):
+                with self.subTest(item=item):
+                    with self.assertRaisesRegex(
+                            FourSourceProofRefused, "INVALID_INTENT_COUNT"):
+                        run_matrix(*self.args, intent_count=item)
+            self.assertEqual(mocked.call_count, 0)
+
+    def test_three_intents_refuse_only_two_write_receipts(self):
+        def fake(*args, **kwargs):
+            row = fixture_response(
+                approved=kwargs.get("dbvora_root") is not None,
+                intent_count=3,
+            )
+            if kwargs.get("dbvora_root") is not None:
+                row["synthetic_write_rows"] = 2
+            return row
+        with patch("tools.verify_four_source_synthetic.verify", side_effect=fake):
+            with self.assertRaisesRegex(
+                    FourSourceProofRefused, "FOUR_SOURCE_SYNTHETIC_EVIDENCE_INCOMPLETE"):
+                run_matrix(*self.args, intent_count=3,
+                           approve_disposable_synthetic=True)
 
     def test_bad_nas_claim_refused(self):
         bad = {**fixture_response(approved=True), "actual_nas_verified": True}

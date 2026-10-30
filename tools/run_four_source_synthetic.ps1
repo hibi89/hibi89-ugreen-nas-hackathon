@@ -7,7 +7,8 @@ param(
     [switch]$ApproveDisposableSynthetic,
     [string]$HaeRoot = "..\HAE",
     [string]$SoviaRoot = "..\SOVIA_sovereign",
-    [string]$DbvoraRoot = "..\DBVORA"
+    [string]$DbvoraRoot = "..\DBVORA",
+    [ValidateSet(1, 2, 3)][int]$IntentCount = 2
 )
 $ErrorActionPreference = "Stop"
 $repo = Split-Path -Parent $PSScriptRoot
@@ -18,7 +19,8 @@ if (-not (Test-Path -LiteralPath $script -PathType Leaf)) {
 $args = @("-3.11", $script,
           "--hae-root", $HaeRoot,
           "--sovia-root", $SoviaRoot,
-          "--dbvora-root", $DbvoraRoot)
+          "--dbvora-root", $DbvoraRoot,
+          "--intent-count", [string]$IntentCount)
 if ($ApproveDisposableSynthetic) { $args += "--approve-disposable-synthetic" }
 & py @args
 exit $LASTEXITCODE
