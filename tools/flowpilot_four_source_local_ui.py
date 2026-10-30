@@ -175,6 +175,16 @@ h1{font-size:clamp(30px,4vw,48px)}p{color:#adc4d6;line-height:1.65}
 article,section{background:#142a40;border:1px solid #315775;border-radius:13px;padding:18px}
 article b{display:block;margin:10px 0}article small{color:#80c6df}
 section{margin-top:22px}
+.acceptance-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:17px 0}
+.acceptance-card{padding:16px;background:#0a1f31;border:1px solid #426885;border-radius:12px}
+.acceptance-card b{display:block;font-size:15px;margin-bottom:7px}
+.acceptance-card small{font-size:11px;letter-spacing:0;color:#98bdd3}
+.acceptance-card[data-state=passed]{border-color:#358e78}
+.acceptance-card[data-state=failed]{border-color:#af5d69}
+.acceptance-summary{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:14px;
+margin-top:13px;border:1px solid #426885;border-radius:12px;background:#0a2033}
+.acceptance-summary strong{color:#80edbe}
+@media(max-width:650px){.acceptance-grid{grid-template-columns:1fr}}
 input[type=text],textarea{background:#071b2b;color:#e8f5ff;border:1px solid #527b99;
 border-radius:8px;padding:10px;width:100%;margin:7px 0;font:inherit}
 button{padding:12px 18px;background:#135f90;color:white;
@@ -201,7 +211,14 @@ background:#081a2a;border-radius:9px;padding:16px;max-height:310px;overflow:auto
 automatically generated, disposable folders. No LA, SOVIA, DBVORA or NAS calls.</p>
 <button id="demo">Run 1–3 intent real OS demo + missing-file cases</button>
 <button id="acceptance">Verify 4 local MVP capabilities</button>
+<div id="acceptanceSummary" class="acceptance-summary" role="status" aria-live="polite">
+<strong id="acceptancePassCount">Not verified</strong>
+<span id="acceptanceScope">Four disposable LOCAL checks; NOT NAS or Uliya proof</span>
+</div>
+<div id="acceptanceCards" class="acceptance-grid" aria-live="polite"></div>
+<details><summary>Show redacted machine evidence</summary>
 <pre id="acceptanceOutput" role="status">Acceptance has not run in this session.</pre>
+</details>
 </section><section><h2>Real CSV automation on generated examples</h2>
 <p>Combine disposable monthly sales CSVs, inspect the plan, approve writes
 to generated data, and download the actual result with a SQLite audit receipt.
@@ -291,16 +308,60 @@ try{
 }catch(e){challenge=null;enable();out.textContent="LOCAL_REQUEST_FAILED";}
 }
 document.getElementById("demo").onclick=()=>request("/demo",{});
+const acceptedStages=[
+ ["REAL_OS_LSTAT_1_TO_3_INTENTS","Real OS metadata · 1–3 intents"],
+ ["GENERATED_CSV_AGGREGATION_AND_SQLITE","Generated CSV + SQLite audit"],
+ ["OWNER_METADATA_CONSENT_AND_LSTAT","Consent-bound local folder check"],
+ ["OWNER_CSV_CONTENT_CONSENT_SQLITE_REPORT","Consented real CSV + audit"]
+];
+function showAcceptance(outcome,ok){
+  const cards=document.getElementById("acceptanceCards");
+  const count=document.getElementById("acceptancePassCount");
+  const rows=Array.isArray(outcome.checks)?outcome.checks:[];
+  const verified=ok&&outcome.status==="PASS_FOUR_LOCAL_CAPABILITY_CHECKS"&&
+    outcome.passed===4&&outcome.failed===0&&
+    outcome.generated_disposable_test_data_only===true&&
+    outcome.actual_nas_verified===false&&rows.length===4&&
+    rows.every((r,i)=>r.stage===acceptedStages[i][0]&&r.status==="PASS_SYNTHETIC");
+  count.textContent=verified?"4 / 4 LOCAL checks PASSED":
+    "NOT VERIFIED — local checks failed or incomplete";
+  count.style.color=verified?"#80edbe":"#ffadb5";
+  cards.replaceChildren();
+  acceptedStages.forEach(([key,label],index)=>{
+    const row=rows[index];
+    const passed=verified&&row&&row.stage===key;
+    const card=document.createElement("div");
+    card.className="acceptance-card";
+    card.dataset.state=passed?"passed":"failed";
+    const title=document.createElement("b");
+    title.textContent=String(index+1)+". "+label;
+    const result=document.createElement("small");
+    const digest=(passed&&typeof row.output_sha256==="string"&&
+      /^[a-f0-9]{64}$/.test(row.output_sha256))?
+      " · digest "+row.output_sha256.slice(0,12):"";
+    result.textContent=(passed?"PASS · generated local fixtures":
+      "NOT VERIFIED")+digest;
+    card.append(title,result);cards.append(card);
+  });
+}
 document.getElementById("acceptance").onclick=async()=>{
-  const el=document.getElementById("acceptanceOutput");
-  el.textContent="Running four actual local fixture checks...";
+  const el=document.getElementById("acceptanceOutput"),
+   button=document.getElementById("acceptance");
+  button.disabled=true;
+  el.textContent="Running real disposable OS, CSV and SQLite checks...";
+  document.getElementById("acceptancePassCount").textContent="Checking...";
+  document.getElementById("acceptanceCards").replaceChildren();
   try{
     const response=await fetch("/acceptance",{method:"POST",cache:"no-store",
       headers:{"Content-Type":"application/json","X-FlowPilot-Session":session},
       body:"{}"});
     const outcome=await response.json();
     el.textContent=JSON.stringify(outcome,null,2);
-  }catch(e){el.textContent="LOCAL_ACCEPTANCE_REFUSED";}
+    showAcceptance(outcome,response.ok);
+  }catch(e){
+    el.textContent="LOCAL_ACCEPTANCE_REFUSED";
+    showAcceptance({},false);
+  }finally{button.disabled=false;}
 };
 const ownerOut=document.getElementById("ownerOutput");
 const ownerRun=document.getElementById("ownerRun");

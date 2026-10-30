@@ -51,6 +51,7 @@ on:
       - "tools/build_flowpilot_pilot_zip.py"
       - "tools/BUILD_FLOWPILOT_PILOT.cmd"
       - "tests/test_build_flowpilot_pilot_zip.py"
+      - "tests/test_flowpilot_acceptance_dashboard.py"
       - "tools/VERIFY_FLOWPILOT_LOCAL_MVP.cmd"
       - "tests/test_flowpilot_local_acceptance.py"
       - "tools/flowpilot_four_source_dashboard.py"
@@ -138,6 +139,8 @@ jobs:
           python -m unittest discover -s tests -p 'test_flowpilot_real_os_demo.py' -v
           python tools/flowpilot_real_os_demo.py > /tmp/ugreen-real-os-demo.json
           python -c "import json; d=json.load(open('/tmp/ugreen-real-os-demo.json')); assert d['status']=='PASS_REAL_OS_LSTAT_SYNTHETIC_DEMO'; assert d['scenario_count']==5; assert d['actual_nas_verified'] is False"
+      - name: Verify acceptance dashboard only shows validated local PASS
+        run: python -m unittest discover -s tests -p 'test_flowpilot_acceptance_dashboard.py' -v
       - name: Build source-only offline local ZIP and run extracted acceptance
         run: python -m unittest discover -s tests -p 'test_build_flowpilot_pilot_zip.py' -v
       - name: Run four real local E2E capabilities and verify audit receipts
