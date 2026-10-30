@@ -31,10 +31,38 @@ def run_session(goal: str, *, root: Path | None = None,
                 approval: str | None = None, audit_db: Path | None = None,
                 backend: str = "local-csv-report",
                 required: list[str] | None = None,
-                candidates: dict[str, list[str]] | None = None) -> dict:
+                candidates: dict[str, list[str]] | None = None,
+                hae_port: int | None = None,
+                hae_csv: str | None = None,
+                preview_id: str | None = None,
+                confirm_synthetic: bool = False) -> dict:
     if backend not in {"local-csv-report", "la-synthetic-import",
-                       "projectready-local-metadata"}:
+                       "projectready-local-metadata", "hae-la-loopback"}:
         raise ReportRefused("Unsupported backend")
+    if backend == "hae-la-loopback":
+        # This is the actual existing HAE localhost HTTP service contract, not
+        # an in-process fake LA import. HAE decides CSV scope at server startup.
+        # No NAS data, external URL, remote service, or caller filesystem path.
+        if any(value is not None for value in (
+            root, sources, output, group, amount, audit_db, required, candidates,
+        )):
+            raise ReportRefused("HAE loopback rejects local report or metadata options")
+        if hae_port is None or hae_csv is None:
+            raise ReportRefused("HAE loopback requires explicit port and synthetic CSV")
+        from flowpilot_hae_bridge import run_bridge
+        from flowpilot_hae_bridge import BridgeRefused
+        try:
+            result = run_bridge(
+                goal, csv_path=hae_csv, port=hae_port,
+                approval=approval, preview_id=preview_id,
+                confirm_synthetic=confirm_synthetic,
+            )
+        except BridgeRefused as exc:
+            raise ReportRefused("HAE loopback request refused") from exc
+        return {**result, "backend": "hae-la-loopback",
+                "actual_nas_integrated": False}
+    if any(value is not None for value in (hae_port, hae_csv, preview_id)) or confirm_synthetic:
+        raise ReportRefused("HAE-only flags cannot be used with other backends")
     if backend == "projectready-local-metadata":
         # Deliberately distinct from local CSV writes or real NAS access.
         if any(value is not None for value in (sources, output, group, amount, audit_db)):
@@ -105,7 +133,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="FlowPilot local CSV E2E demo, NOT NAS")
     parser.add_argument("--goal", required=True)
     parser.add_argument("--backend", choices=("local-csv-report", "la-synthetic-import",
-                                               "projectready-local-metadata"),
+                                               "projectready-local-metadata", "hae-la-loopback"),
                         default="local-csv-report",
                         help="ProjectReady read-only local metadata or synthetic LA; default CSV")
     parser.add_argument("--root", type=Path)
@@ -119,6 +147,11 @@ def main(argv: list[str] | None = None) -> int:
                         help="ProjectReady: required=candidate; repeatable")
     parser.add_argument("--approval", help="APPROVE_EXECUTION (CSV), APPROVE_SYNTHETIC_SQLITE_IMPORT (LA) or APPROVE_LOCAL_METADATA (ProjectReady)")
     parser.add_argument("--audit-db", type=Path)
+    parser.add_argument("--hae-port", type=int, help="Existing HAE loopback port, 1024..65535")
+    parser.add_argument("--hae-csv", help="HAE server synthetic input-root CSV basename")
+    parser.add_argument("--preview-id", help="Token returned by a separate HAE preview")
+    parser.add_argument("--confirm-synthetic", action="store_true",
+                        help="Confirm that the HAE server holds synthetic test data ONLY")
     args = parser.parse_args(argv)
     try:
         candidates = None
@@ -133,8 +166,13 @@ def main(argv: list[str] | None = None) -> int:
                              output=args.output, group=args.group,
                              amount=args.amount, approval=args.approval,
                              audit_db=args.audit_db, backend=args.backend,
-                             required=args.required, candidates=candidates)
+                             required=args.required, candidates=candidates,
+                             hae_port=args.hae_port, hae_csv=args.hae_csv,
+                             preview_id=args.preview_id,
+                             confirm_synthetic=args.confirm_synthetic)
         print(json.dumps(result, ensure_ascii=False, indent=2))
+        if args.backend == "hae-la-loopback":
+            return 2 if result["status"].startswith(("BLOCKED_", "EXECUTION_", "BRIDGE_")) else 0
         if args.backend == "la-synthetic-import":
             return 2 if result["status"].startswith(("BLOCKED_", "REFUSED_")) else 0
         if args.backend == "projectready-local-metadata":
