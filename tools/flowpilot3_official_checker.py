@@ -124,40 +124,78 @@ def _prepare_toolkit(vendor_zip: bytes, extracted: Path, root: str) -> Path:
     return vendor
 
 
+def _local_docker_socket_ready() -> bool:
+    """Refuse Docker Desktop, named remote contexts, symlinks and non-sockets.
+
+    This is only an endpoint safeguard, not independent Docker host attestation.
+    Native checker mode remains the separately approved non-Docker alternative.
+    """
+    sock = Path("/var/run/docker.sock")
+    try:
+        return (os.name == "posix" and not sock.is_symlink()
+                and stat.S_ISSOCK(sock.stat().st_mode))
+    except (OSError, ValueError):
+        return False
+
+
+def _read_checker_output(result: subprocess.CompletedProcess) -> tuple[int, str, str]:
+    if len(result.stdout) > 100_000 or len(result.stderr) > 100_000:
+        raise VerificationRefused("Official checker output limit exceeded")
+    return (result.returncode, result.stdout.decode("utf-8", "replace"),
+            result.stderr.decode("utf-8", "replace"))
+
+
 def _execute(vendor: Path, candidate: Path, *, mode: str) -> tuple[int, str, str]:
     if mode == "docker":
-        if not shutil.which("docker"):
-            raise VerificationRefused("Docker not installed; no fallback")
+        # NEVER inherit owner DOCKER_HOST/CONTEXT/TLS credentials or default
+        # configuration: a remote daemon would receive private candidate mounts.
+        docker = shutil.which("docker")
+        if not docker or not _local_docker_socket_ready():
+            raise VerificationRefused("Verified local Unix Docker daemon unavailable; no remote fallback")
         image = "node:22-alpine"
-        inspect = subprocess.run(["docker", "image", "inspect", image], capture_output=True,
-                                 timeout=20, check=False)
-        if inspect.returncode != 0:
-            raise VerificationRefused("Pinned Docker image not present; no automatic download")
-        cmd = ["docker", "run", "--rm", "--network", "none", "--read-only",
-               "--cap-drop", "ALL", "--security-opt", "no-new-privileges",
-               "--pids-limit", "96", "--memory", "384m", "--cpus", "1",
-               "--user", "65534:65534", "-v", str(vendor) + ":/vendor:ro",
-               "-v", str(candidate) + ":/candidate/flowpilot-3:ro",
-               "--workdir", "/candidate", image, "node",
-               "/vendor/scripts/check-skill.mjs", "/candidate/flowpilot-3"]
-    elif mode == "native":
+        try:
+            with tempfile.TemporaryDirectory(prefix="ugreen-official-docker-config-") as config:
+                env = {"PATH": os.environ.get("PATH", "/usr/bin:/bin"),
+                       "HOME": config, "DOCKER_CONFIG": config,
+                       "DOCKER_HOST": "unix:///var/run/docker.sock"}
+                base = [docker, "--host=unix:///var/run/docker.sock",
+                        "--config", config]
+                inspect = subprocess.run(base + ["image", "inspect", image],
+                                         cwd=vendor.parent, env=env,
+                                         capture_output=True, timeout=20, check=False)
+                if inspect.returncode != 0:
+                    raise VerificationRefused("Locally installed Node image unavailable; no pull")
+                cmd = base + [
+                    "run", "--rm", "--pull=never",
+                    "--network=none", "--read-only", "--cap-drop=ALL",
+                    "--security-opt=no-new-privileges", "--pids-limit=96",
+                    "--memory=384m", "--cpus=1", "--user=65534:65534",
+                    "--tmpfs=/tmp:rw,noexec,nosuid,size=16m",
+                    "-v", str(vendor) + ":/vendor:ro",
+                    "-v", str(candidate) + ":/candidate/flowpilot-3:ro",
+                    "--workdir=/candidate", "--entrypoint=node", image,
+                    "/vendor/scripts/check-skill.mjs", "/candidate/flowpilot-3",
+                ]
+                result = subprocess.run(cmd, cwd=vendor.parent, env=env,
+                                        capture_output=True, timeout=90, check=False)
+        except (OSError, subprocess.TimeoutExpired) as exc:
+            raise VerificationRefused("Local Docker Checker failed or timed out") from exc
+        return _read_checker_output(result)
+    if mode == "native":
         node = shutil.which("node")
         if not node:
             raise VerificationRefused("Node 22+ is not installed; no fallback")
         cmd = [node, str(vendor / "scripts/check-skill.mjs"), str(candidate)]
-    else:
-        raise VerificationRefused("Unknown checker execution mode")
-    env = {"PATH": os.environ.get("PATH", ""), "HOME": str(vendor.parent),
-           "TEMP": str(vendor.parent), "TMP": str(vendor.parent),
-           "NODE_ENV": "production"}
-    try:
-        result = subprocess.run(cmd, cwd=vendor.parent, env=env, capture_output=True,
-                                timeout=90, check=False)
-    except (OSError, subprocess.TimeoutExpired) as exc:
-        raise VerificationRefused("Official checker failed or timed out") from exc
-    if len(result.stdout) > 100_000 or len(result.stderr) > 100_000:
-        raise VerificationRefused("Official checker output limit exceeded")
-    return result.returncode, result.stdout.decode("utf-8", "replace"), result.stderr.decode("utf-8", "replace")
+        env = {"PATH": os.environ.get("PATH", ""), "HOME": str(vendor.parent),
+               "TEMP": str(vendor.parent), "TMP": str(vendor.parent),
+               "NODE_ENV": "production"}
+        try:
+            result = subprocess.run(cmd, cwd=vendor.parent, env=env,
+                                    capture_output=True, timeout=90, check=False)
+        except (OSError, subprocess.TimeoutExpired) as exc:
+            raise VerificationRefused("Official checker failed or timed out") from exc
+        return _read_checker_output(result)
+    raise VerificationRefused("Unknown checker execution mode")
 
 
 def _sanitized_checker_result(code: int, stdout: str, stderr: str, *, mode: str) -> dict:

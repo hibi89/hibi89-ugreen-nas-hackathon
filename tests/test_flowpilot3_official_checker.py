@@ -383,5 +383,101 @@ class G100OfficialKitBoundary(unittest.TestCase):
 
 
 
+    def test_g149_docker_refuses_remote_context_when_local_socket_unavailable(self):
+        # Explicit approval of docker mode does NOT approve shipping G147 to a
+        # caller-configured remote daemon, even if the Docker binary is present.
+        with patch.object(gate.shutil, "which", return_value="/usr/bin/docker"), \
+             patch.object(gate, "_local_docker_socket_ready", return_value=False), \
+             patch.object(gate.subprocess, "run",
+                          side_effect=AssertionError("Private mounts must not be sent")):
+            with self.assertRaisesRegex(gate.VerificationRefused, "local Unix Docker"):
+                gate._execute(self.path.parent, self.path.parent, mode="docker")
+
+    def test_g149_docker_uses_pinned_local_endpoint_without_inherited_credentials(self):
+        from subprocess import CompletedProcess
+        import os
+        outputs = [
+            CompletedProcess([], 0, stdout=b"image-present", stderr=b""),
+            CompletedProcess([], 0, stdout=b'{"status":"static-pass"}', stderr=b""),
+        ]
+        with patch.object(gate.shutil, "which", return_value="/usr/bin/docker"), \
+             patch.object(gate, "_local_docker_socket_ready", return_value=True), \
+             patch.dict(os.environ, {
+                 "DOCKER_HOST": "tcp://malicious.example:2375",
+                 "DOCKER_CONTEXT": "remote-work",
+                 "DOCKER_TLS_VERIFY": "1",
+                 "DOCKER_CERT_PATH": "/private/key",
+             }), patch.object(gate.subprocess, "run", side_effect=outputs) as run:
+            exit_code, stdout, stderr = gate._execute(
+                self.path.parent, self.path.parent, mode="docker")
+        self.assertEqual((exit_code, stdout, stderr),
+                         (0, '{"status":"static-pass"}', ""))
+        self.assertEqual(run.call_count, 2)
+        inspect_call, execute_call = run.call_args_list
+        for call in (inspect_call, execute_call):
+            command = call.args[0]
+            self.assertEqual(command[0], "/usr/bin/docker")
+            self.assertIn("--host=unix:///var/run/docker.sock", command)
+            self.assertIn("--config", command)
+            env = call.kwargs["env"]
+            self.assertEqual(env["DOCKER_HOST"], "unix:///var/run/docker.sock")
+            self.assertEqual(env["DOCKER_CONFIG"], env["HOME"])
+            self.assertNotIn("DOCKER_CONTEXT", env)
+            self.assertNotIn("DOCKER_TLS_VERIFY", env)
+            self.assertNotIn("DOCKER_CERT_PATH", env)
+            self.assertFalse(call.kwargs["check"])
+            self.assertEqual(call.kwargs["cwd"], self.path.parent)
+        argv = execute_call.args[0]
+        for flag in ("--pull=never", "--network=none", "--read-only",
+                     "--cap-drop=ALL", "--security-opt=no-new-privileges",
+                     "--user=65534:65534", "--entrypoint=node"):
+            self.assertIn(flag, argv)
+        self.assertNotIn("--privileged", argv)
+        self.assertNotIn("--network=host", argv)
+        self.assertEqual(argv[-3:],
+                         ["node:22-alpine", "/vendor/scripts/check-skill.mjs",
+                          "/candidate/flowpilot-3"])
+
+    def test_g149_missing_local_image_does_not_run_or_pull(self):
+        from subprocess import CompletedProcess
+        with patch.object(gate.shutil, "which", return_value="/usr/bin/docker"), \
+             patch.object(gate, "_local_docker_socket_ready", return_value=True), \
+             patch.object(gate.subprocess, "run",
+                          return_value=CompletedProcess([], 1, b"", b"")) as run:
+            with self.assertRaisesRegex(gate.VerificationRefused, "no pull"):
+                gate._execute(self.path.parent, self.path.parent, mode="docker")
+        self.assertEqual(run.call_count, 1)
+        self.assertEqual(run.call_args.args[0][-3:],
+                         ["image", "inspect", "node:22-alpine"])
+
+    def test_g149_docker_never_emits_untrusted_stderr_from_bad_vendor(self):
+        from subprocess import CompletedProcess
+        stderr = b"PRIVATE_OWNER_FILE_PATH"
+        with patch.object(gate.shutil, "which", return_value="/usr/bin/docker"), \
+             patch.object(gate, "_local_docker_socket_ready", return_value=True), \
+             patch.object(gate.subprocess, "run", side_effect=[
+                 CompletedProcess([], 0, b"", b""),
+                 CompletedProcess([], 2, b'{"status":"fail"}', stderr)]):
+            code, stdout, err = gate._execute(self.path.parent, self.path.parent,
+                                              mode="docker")
+        self.assertEqual(code, 2)
+        self.assertEqual(err, stderr.decode())
+        sanitized = gate._sanitized_checker_result(code, stdout, err, mode="docker")
+        self.assertNotIn("PRIVATE_OWNER", json.dumps(sanitized))
+        self.assertEqual(sanitized["release_gate"], "HOLD")
+
+    def test_g149_explicit_native_still_uses_node_not_docker(self):
+        from subprocess import CompletedProcess
+        with patch.object(gate.shutil, "which", return_value="/usr/bin/node"), \
+             patch.object(gate, "_local_docker_socket_ready",
+                          side_effect=AssertionError("native uses Docker")), \
+             patch.object(gate.subprocess, "run",
+                          return_value=CompletedProcess([], 0, b"{}", b"")) as invoke:
+            result = gate._execute(self.path.parent, self.path.parent, mode="native")
+        self.assertEqual(result, (0, "{}", ""))
+        self.assertEqual(invoke.call_args.args[0][0], "/usr/bin/node")
+
+
+
 if __name__ == "__main__":
     unittest.main()
