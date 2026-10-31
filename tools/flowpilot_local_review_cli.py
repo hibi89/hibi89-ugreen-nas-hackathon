@@ -264,7 +264,7 @@ def main(argv: list[str] | None = None) -> int:
             current_id=args.current_id, mode=args.mode,
             approve_local_metadata=args.approve_local_metadata,
             approve_local_db_write=args.approve_local_db_write)
-        if args.action in ("compare", "review") and args.html_out is not None and result["status"] in _ALLOWED_RESULTS:
+        if args.action in ("compare", "review") and args.html_out is not None and result["status"] in (_ALLOWED_RESULTS | {"LOCAL_SNAPSHOT_REVIEW_REQUIRED"}):
             try:
                 write_new_report_html(args.html_out, result)
                 result = {**result, "local_html_created": True}
