@@ -5,6 +5,7 @@ No private user files, NAS mount, network, Uliya expert or Docker runtime.
 from __future__ import annotations
 
 import json
+from contextlib import closing
 from pathlib import Path
 import sqlite3
 import subprocess
@@ -140,9 +141,12 @@ class G137ReviewTests(unittest.TestCase):
         self.assertEqual(result["status"], "SNAPSHOT_SCOPE_MISMATCH")
 
     def test_untrusted_database_refused_no_mutation(self):
-        with sqlite3.connect(self.db) as db:
+        # sqlite3.Connection.__exit__ does NOT close the handle on Windows.
+        # Close explicitly before TemporaryDirectory cleanup (WinError 32).
+        with closing(sqlite3.connect(self.db)) as db:
             db.execute("CREATE TABLE private_table(value TEXT)")
             db.execute("INSERT INTO private_table VALUES('OWNER_KEEP')")
+            db.commit()
         before = self.db.read_bytes()
         result = self.comparison()
         self.assertEqual(result["status"], "LOCAL_SNAPSHOT_COMPARISON_REFUSED")
