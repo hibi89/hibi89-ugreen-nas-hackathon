@@ -81,5 +81,61 @@ class G63SequentialLocalWorkflow(unittest.TestCase):
         self.assertEqual(result.returncode, 0)
         self.assertEqual(json.loads(result.stdout)["status"], "WAITING_APPROVAL")
 
+    def test_unresolved_version_first_stage_stops_later_local_file_access(self):
+        from flowpilot_local_workflow import run_workflow
+        (self.root / "review_final.pdf").write_bytes(b"candidate")
+        recipe = self.recipe(
+            {"goal": "compare versions", "required": ["review.pdf"],
+             "candidates": {"review.pdf": ["review_final.pdf"]}},
+            self.step(required=["README.md"]),
+        )
+        # Real OS lstat for the first stage, no lstat on the next stage.
+        from flowpilot_local_workflow import inspect_owner_folder as real_inspector
+        accessed = []
+        def record(*args, **kwargs):
+            if kwargs.get("metadata_consent"):
+                accessed.extend(kwargs.get("required", []))
+            return real_inspector(*args, **kwargs)
+        with patch("flowpilot_local_workflow.inspect_owner_folder", side_effect=record):
+            report = run_workflow(self.root, recipe, metadata_consent=True)
+        self.assertEqual(report["executed_steps"], 1)
+        self.assertEqual(report["steps"][0]["items"][0]["state"], "VERSION_REVIEW")
+        self.assertEqual(report["status"], "NEEDS_REVIEW")
+        self.assertEqual(accessed, ["review.pdf"])
+        self.assertFalse(report["nas_verified"])
+        self.assertNotIn("review_final.pdf", json.dumps(report))
+
+    def test_not_checked_item_stops_dependent_steps_without_false_missing(self):
+        calls = []
+        def fake(root, required, *, metadata_consent=False, **kwargs):
+            if not metadata_consent:
+                return {"status": "WAITING_APPROVAL"}
+            calls.append(tuple(required))
+            if len(calls) != 1:
+                raise AssertionError("Unexpected dependent owner metadata read")
+            return {"status": "NEEDS_REVIEW", "items": [
+                {"index": 1, "state": "NOT_CHECKED", "local_reference_count": 0}],
+                "inspected_local_metadata": True}
+        with patch("flowpilot_local_workflow.inspect_owner_folder", side_effect=fake):
+            report = run_workflow(self.root, self.recipe(
+                self.step(required=["review.pdf"]), self.step()),
+                metadata_consent=True)
+        self.assertEqual(report["executed_steps"], 1)
+        self.assertEqual(report["status"], "NEEDS_REVIEW")
+        self.assertEqual(calls, [("review.pdf",)])
+        self.assertFalse(report["owner_folder_contents_opened"])
+        self.assertFalse(report["nas_verified"])
+        self.assertEqual(report["release_gate"], "HOLD")
+
+    def test_fully_present_checks_still_advance_both_steps(self):
+        report = run_workflow(self.root, self.recipe(
+            self.step(required=["README.md"]),
+            self.step(required=["review.pdf"])), metadata_consent=True)
+        self.assertEqual(report["executed_steps"], 2)
+        self.assertEqual([x["items"][0]["state"] for x in report["steps"]],
+                         ["PRESENT", "PRESENT"])
+        self.assertEqual(report["status"], "NEEDS_REVIEW")
+
+
 if __name__ == "__main__":
     unittest.main()

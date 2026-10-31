@@ -72,6 +72,15 @@ def run_workflow(root: Path, recipe: Any, *, metadata_consent: bool = False) -> 
         if step["status"] in {"BLOCKED", "NOT_CHECKED", "WAITING_USER", "WAITING_APPROVAL"}:
             answer["status"] = "BLOCKED"
             break
+        # Subsequent steps may depend on the previous evidence. The G64 recipe
+        # does not encode independent dependency edges, so fail closed rather
+        # than read later owner files after an unresolved version or unsafe item.
+        # All PRESENT observations remain allowed to advance the local workflow.
+        item_states = {item.get("state") for item in step["items"]
+                       if isinstance(item, dict)}
+        if item_states & {"VERSION_REVIEW", "NOT_CHECKED"}:
+            answer["status"] = "NEEDS_REVIEW"
+            break
     return answer
 
 def main(argv: list[str] | None = None) -> int:
