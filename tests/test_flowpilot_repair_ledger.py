@@ -63,7 +63,8 @@ class G119LedgerTests(unittest.TestCase):
         run_once("고객별 매출 보고서 만들어줘", "run_private123456", self.db)
         payload = self.db.execute("SELECT detail FROM fp119_events").fetchall()
         self.assertNotIn("고객별 매출 보고서", repr(payload))
-        self.assertNotIn("customer", repr(payload))
+        self.assertNotIn("create customer revenue summary", repr(payload))
+        # Public fixed template IDs may contain the word customer; raw goals must not.
 
     def test_rejects_bad_run_ids_and_wrong_types(self):
         for key in ("../private", "run_short", "", "raw customer", "run_x"*30, None):

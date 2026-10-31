@@ -62,6 +62,20 @@ class G119PolicyTests(unittest.TestCase):
             self.assertEqual(r["status"], "INVALID_STATE_OR_TIME")
             self.assertFalse(r["actions_executed"])
 
+    def test_revoked_consent_does_not_echo_invalid_private_state(self):
+        secret = {"private": "owner-secret-key"}
+        row = evaluate_tick(HOT, secret, 100, opted_in=False)
+        self.assertEqual(row["status"], "DISABLED_NO_CONSENT")
+        self.assertNotIn("owner-secret-key", json.dumps(row))
+        self.assertEqual(row["next_state"], new_state())
+
+    def test_unhashable_forged_id_fails_closed(self):
+        row = evaluate_tick(HOT, {"schema": "flowpilot-proactive-policy-v1",
+                                  "last_tick": 300, "recent": [
+                                      {"time": 300, "id": ["injected"]}
+                                  ]}, 301, opted_in=True)
+        self.assertEqual(row["status"], "INVALID_STATE_OR_TIME")
+
     def test_no_alerts_and_missing_metrics(self):
         r = evaluate_tick({"disk_used_percent": 50}, new_state(), 1000, opted_in=True)
         self.assertEqual(r["status"], "NO_ALERTS")

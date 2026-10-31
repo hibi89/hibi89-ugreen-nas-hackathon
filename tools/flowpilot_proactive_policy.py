@@ -30,7 +30,8 @@ def _valid_state(state: dict) -> bool:
         return False
     if any(type(e) is not dict or set(e) != {"time", "id"}
            or type(e["time"]) is not int or not 0 <= e["time"] <= state["last_tick"]
-           or e["id"] not in _ALLOWED_IDS for e in state["recent"]):
+           or type(e["id"]) is not str or e["id"] not in _ALLOWED_IDS
+           for e in state["recent"]):
         return False
     return all(state["recent"][i]["time"] <= state["recent"][i+1]["time"]
                for i in range(len(state["recent"]) - 1))
@@ -44,7 +45,7 @@ def evaluate_tick(telemetry: dict, state: dict, now: int, *,
             "telemetry_verified": False, "release_gate": "HOLD"}
     if type(opted_in) is not bool or not opted_in:
         return {**base, "status": "DISABLED_NO_CONSENT", "proposals": [],
-                "next_state": state}
+                "next_state": state if _valid_state(state) else new_state()}
     if not _valid_state(state) or type(now) is not int or not 0 <= now <= 4102444800:
         return {**base, "status": "INVALID_STATE_OR_TIME", "proposals": [],
                 "next_state": state}
