@@ -212,6 +212,78 @@ class G137ReviewTests(unittest.TestCase):
             write_new_report_html(self.home / "blocked.txt", result)
         self.assertFalse(self.html.exists())
 
+    def test_single_snapshot_review_before_second_capture(self):
+        initial = self.capture(PREV, "new")
+        self.assertEqual(initial["audit_result"], "BLOCKED")
+        db_before = self.db.read_bytes()
+        with patch("flowpilot_owner_local_audit._valid_root", side_effect=AssertionError("SCANNED")):
+            result = self.review("review", db=self.db, run_id=PREV)
+        self.assertEqual(result["status"], "LOCAL_SNAPSHOT_REVIEW_REQUIRED")
+        self.assertEqual(result["audit_result"], "BLOCKED")
+        self.assertEqual([x["state"] for x in result["items"]], ["PRESENT", "MISSING"])
+        self.assertTrue(result["scope_match_verified_locally"])
+        self.assertFalse(result["local_folder_inspected"])
+        self.assertFalse(result["database_modified"])
+        self.assertEqual(db_before, self.db.read_bytes())
+        write_new_report_html(self.html, result)
+        markup = self.html.read_text(encoding="utf-8")
+        self.assertIn("BLOCKED", markup)
+        self.assertIn("MISSING", markup)
+        self.assertIn("RELEASE HOLD", markup)
+        self.assertIn("default-src 'none'", markup)
+        for secret in (str(self.root), "README.md", "release/final.pdf", "PRIVATE_OWNER_CONTENT"):
+            self.assertNotIn(secret, json.dumps(result))
+            self.assertNotIn(secret, markup)
+            self.assertNotIn(secret, db_before.decode("latin1"))
+
+    def test_single_snapshot_rejects_wrong_scope(self):
+        self.capture(PREV, "new")
+        before = self.db.read_bytes()
+        result = self.review("review", db=self.db, run_id=PREV,
+                             instructions="파일 확인: README.md")
+        self.assertEqual(result["status"], "SNAPSHOT_SCOPE_MISMATCH")
+        self.assertFalse(result["database_modified"])
+        self.assertEqual(before, self.db.read_bytes())
+
+    def test_single_snapshot_missing_record_is_read_only(self):
+        result = self.review("review", db=self.db, run_id=PREV)
+        self.assertEqual(result["status"], "LOCAL_SNAPSHOT_REVIEW_REFUSED")
+        self.assertFalse(self.db.exists())
+
+    def test_single_snapshot_denies_unexpected_consent_and_id(self):
+        self.capture(PREV, "new")
+        for kw in ({"approve_local_metadata": True}, {"mode": "read"},
+                   {"previous_id": CURR}, {"current_id": CURR}):
+            result = self.review("review", db=self.db, run_id=PREV, **kw)
+            self.assertEqual(result["status"], "INVALID_REVIEW_ARGUMENTS")
+        self.assertEqual(self.review("review", db=self.db, run_id="bad")["status"],
+                         "INVALID_SNAPSHOT_RUN_ID")
+
+    def test_single_snapshot_html_untrusted_items_fail_closed(self):
+        self.capture(PREV, "new")
+        result = self.review("review", db=self.db, run_id=PREV)
+        result["items"][0]["state"] = "<script>evil</script>"
+        with self.assertRaises(ValueError):
+            render_review_html(result)
+        self.assertFalse(self.html.exists())
+
+    def test_single_snapshot_cli_readback_new_html(self):
+        self.capture(PREV, "new")
+        out = subprocess.run(
+            [sys.executable, str(ROOT / "tools/flowpilot_local_review_cli.py"),
+             "--action", "review", "--instructions", INSTRUCTIONS,
+             "--root", str(self.root), "--db", str(self.db),
+             "--run-id", PREV, "--html-out", str(self.html)],
+            capture_output=True, text=True, timeout=30,
+        )
+        self.assertEqual(out.returncode, 0, out.stderr)
+        report = json.loads(out.stdout)
+        self.assertEqual(report["status"], "LOCAL_SNAPSHOT_REVIEW_REQUIRED")
+        self.assertTrue(report["local_html_created"])
+        self.assertTrue(self.html.exists())
+        self.assertNotIn("README.md", out.stdout + out.stderr)
+        self.assertNotIn(str(self.db), out.stdout + out.stderr)
+
 
 if __name__ == "__main__":
     unittest.main()

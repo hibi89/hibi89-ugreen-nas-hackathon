@@ -18,6 +18,7 @@ from flowpilot_text_workflow import parse_instructions, WorkflowRefused
 from flowpilot_owner_local_audit import inspect_owner_folder, OwnerAuditError
 from flowpilot_local_audit_ledger import run_local_audit_ledger
 from flowpilot_local_audit_delta import compare_local_audits
+from flowpilot_local_snapshot_review import inspect_local_snapshot
 
 _SCHEMA = "flowpilot-local-review-cli-v1"
 _ALLOWED_STATES = frozenset(("PRESENT", "MISSING", "VERSION_REVIEW", "NOT_CHECKED"))
@@ -54,7 +55,7 @@ def review_local(*, action: str, instructions: str, root: Path,
     base = _base()
     if type(approve_local_metadata) is not bool or type(approve_local_db_write) is not bool:
         return {**base, "status": "INVALID_FLAGS"}
-    if type(action) is not str or action not in ("preview", "capture", "compare"):
+    if type(action) is not str or action not in ("preview", "capture", "compare", "review"):
         return {**base, "status": "UNSUPPORTED_ACTION"}
     if not isinstance(root, Path):
         return {**base, "status": "INVALID_SCOPE"}
@@ -92,6 +93,19 @@ def review_local(*, action: str, instructions: str, root: Path,
                     "evidence_integrity": captured.get("evidence_integrity", "NOT_RUN"),
                     "database_modified": captured.get("database_modified", False),
                     "local_metadata_check_completed": captured.get("local_metadata_check_completed", False)}
+        if action == "review":
+            if (not isinstance(db, Path) or type(run_id) is not str
+                    or mode is not None or previous_id is not None
+                    or current_id is not None or approve_local_metadata
+                    or approve_local_db_write):
+                return {**base, "status": "INVALID_REVIEW_ARGUMENTS"}
+            snapshot = inspect_local_snapshot(
+                db, run_id, root=root, required=required,
+                candidates=candidates or None, goal=goal)
+            if snapshot["status"] != "LOCAL_SNAPSHOT_REVIEW_REQUIRED":
+                return {**base, "status": snapshot["status"],
+                        "database_modified": False, "local_folder_inspected": False}
+            return {**base, **snapshot, "local_folder_inspected": False}
         if (not isinstance(db, Path) or type(previous_id) is not str
                 or type(current_id) is not str or run_id is not None or mode is not None
                 or approve_local_metadata or approve_local_db_write):
@@ -108,8 +122,62 @@ def review_local(*, action: str, instructions: str, root: Path,
         return {**base, "status": "LOCAL_REVIEW_REFUSED"}
 
 
+
+def render_single_snapshot_html(value: dict) -> str:
+    """Static, allowlisted index-only HTML for a single scoped LOCAL receipt."""
+    if (type(value) is not dict
+            or value.get("schema") != "flowpilot-local-snapshot-review-v1"
+            or value.get("status") != "LOCAL_SNAPSHOT_REVIEW_REQUIRED"
+            or value.get("release_gate") != "HOLD"
+            or value.get("scope_match_verified_locally") is not True
+            or value.get("nas_verified") is not False
+            or value.get("database_modified") is not False
+            or value.get("owner_folder_inspected_again") is not False):
+        raise ValueError("INVALID_LOCAL_SNAPSHOT")
+    items = value.get("items")
+    count = value.get("item_count")
+    if (type(items) is not list or type(count) is not int
+            or not 1 <= count <= 100 or len(items) != count
+            or value.get("audit_result") not in ("BLOCKED", "NEEDS_REVIEW")):
+        raise ValueError("INVALID_SNAPSHOT_ITEMS")
+    rows = []
+    has_missing = False
+    for idx, item in enumerate(items, 1):
+        if (type(item) is not dict
+                or set(item) != {"index", "state", "local_reference_count"}
+                or type(item["index"]) is not int or item["index"] != idx
+                or type(item["state"]) is not str
+                or item["state"] not in _ALLOWED_STATES
+                or type(item["local_reference_count"]) is not int
+                or not 0 <= item["local_reference_count"] <= 20):
+            raise ValueError("UNTRUSTED_SNAPSHOT_ITEM")
+        has_missing |= item["state"] == "MISSING"
+        rows.append("<tr><td>" + str(idx) + "</td><td>"
+                    + escape(item["state"]) + "</td><td>"
+                    + str(item["local_reference_count"]) + "</td></tr>")
+    if (value["audit_result"] == "BLOCKED") != has_missing:
+        raise ValueError("INCONSISTENT_SNAPSHOT_RESULT")
+    return ("<!doctype html><html lang='en'><head><meta charset='utf-8'>"
+            "<meta http-equiv='Content-Security-Policy' content=\"default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'\">"
+            "<meta name='viewport' content='width=device-width,initial-scale=1'>"
+            "<title>FlowPilot local single snapshot</title>"
+            "<style>body{font:15px system-ui,sans-serif;max-width:860px;margin:32px auto;padding:20px;color:#1d2935}"
+            "table{border-collapse:collapse;width:100%}td,th{padding:10px;border:1px solid #bfc9d2;text-align:left}"
+            "h1{font-size:24px}footer{margin-top:30px;font-weight:700}small{color:#59687a}</style></head>"
+            "<body><main><h1>FlowPilot 3.0 local snapshot review</h1>"
+            "<p>Local audit result: " + escape(value["audit_result"]) + "</p>"
+            "<p>Items reviewed: " + str(count) + "</p>"
+            "<table><thead><tr><th>Item index</th><th>State</th><th>Local reference count</th></tr></thead>"
+            "<tbody>" + "".join(rows) + "</tbody></table>"
+            "<p><small>Read-only local SQLite checksum; no filenames, paths, contents,"
+            " signed timestamps or independently attested provenance.</small></p>"
+            "<footer>RELEASE HOLD — NOT A REAL ULIYA EXPERT OR NAS TEST</footer></main></body></html>")
+
+
 def render_review_html(value: dict) -> str:
-    """Render only recognized sanitized delta receipts as self-contained inert HTML."""
+    """Render recognized scope-bound receipts as self-contained inert HTML."""
+    if type(value) is dict and value.get("schema") == "flowpilot-local-snapshot-review-v1":
+        return render_single_snapshot_html(value)
     if (type(value) is not dict or value.get("status") not in _ALLOWED_RESULTS
             or value.get("schema") != "flowpilot-local-audit-delta-v1"
             or value.get("release_gate") != "HOLD"
@@ -175,7 +243,7 @@ def write_new_report_html(path: Path, report: dict) -> None:
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Bounded local review CLI; NO actual NAS/Expert")
-    ap.add_argument("--action", required=True, choices=("preview", "capture", "compare"))
+    ap.add_argument("--action", required=True, choices=("preview", "capture", "compare", "review"))
     ap.add_argument("--instructions", required=True, help="One G64 bounded command, e.g. '파일 확인: README.md'")
     ap.add_argument("--root", type=Path, required=True, help="Local directory (not a NAS mount)")
     ap.add_argument("--db", type=Path)
@@ -187,7 +255,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--approve-local-db-write", action="store_true")
     ap.add_argument("--html-out", type=Path, help="EXPLICIT new absolute .html report; compare only")
     args = ap.parse_args(argv)
-    if args.html_out is not None and args.action != "compare":
+    if args.html_out is not None and args.action not in ("compare", "review"):
         result = {**_base(), "status": "HTML_ONLY_FOR_COMPARE"}
     else:
         result = review_local(
@@ -196,7 +264,7 @@ def main(argv: list[str] | None = None) -> int:
             current_id=args.current_id, mode=args.mode,
             approve_local_metadata=args.approve_local_metadata,
             approve_local_db_write=args.approve_local_db_write)
-        if args.action == "compare" and args.html_out is not None and result["status"] in _ALLOWED_RESULTS:
+        if args.action in ("compare", "review") and args.html_out is not None and result["status"] in _ALLOWED_RESULTS:
             try:
                 write_new_report_html(args.html_out, result)
                 result = {**result, "local_html_created": True}
@@ -204,7 +272,8 @@ def main(argv: list[str] | None = None) -> int:
                 result = {**_base(), "status": "HTML_EXPORT_REFUSED"}
     print(json.dumps(result, ensure_ascii=True, sort_keys=True))
     accepted = {"WAITING_TWO_SEPARATE_LOCAL_APPROVALS", "LOCAL_METADATA_EVIDENCE_STORED_REVIEW_REQUIRED",
-                "SNAPSHOT_DELTA_REVIEW_REQUIRED", "SNAPSHOTS_EQUAL_REVIEW_REQUIRED"}
+                "SNAPSHOT_DELTA_REVIEW_REQUIRED", "SNAPSHOTS_EQUAL_REVIEW_REQUIRED",
+                "LOCAL_SNAPSHOT_REVIEW_REQUIRED"}
     return 0 if result["status"] in accepted else 2
 
 
