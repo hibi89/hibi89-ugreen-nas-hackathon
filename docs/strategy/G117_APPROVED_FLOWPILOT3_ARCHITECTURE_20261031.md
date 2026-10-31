@@ -46,7 +46,7 @@ Official sources (for human review):
 | G116 deterministic Architect/Security/Builder/QA with bounded graph correction | 975 Linux total and Windows full regression | VERIFIED |
 | G117 pinned Docker smoke contract + opt-in synthetic signal advisor | New tests; verify exact new source SHA and CI | IMPLEMENTED, CI pending until checked |
 | G118 fixed code-owned container fixture scripts + optional pinned Docker runner | 2 scripts run with local Python; optional real Docker execution only on authorized machine | CODE/LOCAL SCRIPT VERIFIED; REAL CONTAINER NOT_RUN |
-| G119 true input/output repairs, persistent consent + separate trusted telemetry watcher | Idempotency/recovery and actual supplied event attestations | NOT IMPLEMENTED |
+| G119 SQLite replay-safe local QA event journal + opt-in numeric alert throttle | 1022 total Linux CI / Windows full PASS; no watcher or production recovery | OFFLINE VERIFIED; LIVE INPUT NOT_RUN |
 | Genuine Uliya Expert/NAS + first-party G103 check | Exact owner/private skills, current vendor kit, authorization, real result readback | NOT_RUN / RELEASE HOLD |
 | Round1 submit | Entrant rights, PDF/ZIP exact-byte signoff, explicit submission instruction | NOT_SUBMITTED |
 
