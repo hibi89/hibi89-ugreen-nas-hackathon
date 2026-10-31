@@ -106,7 +106,8 @@ class G122TimelineTests(unittest.TestCase):
                         ("run_g122tamper12",))
         self.db.commit()
         row=self.run_timeline(run_id="run_g122tamper12")
-        self.assertEqual(row["status"],"DUPLICATE_BLOCKED")
+        self.assertEqual(row["status"],"PRIOR_LOCAL_EVIDENCE_INVALID")
+        self.assertEqual(row["evidence_integrity"],"LOCAL_CHAIN_INVALID")
         self.assertFalse(row["local_synthetic_qa_executed_again"])
 
     def test_html_static_no_inline_scripts_or_private_data(self):
@@ -145,7 +146,7 @@ class G122TimelineTests(unittest.TestCase):
             input="\n".join(OK)+"\n",capture_output=True,text=True,timeout=20,
         )
         self.assertEqual(p.returncode,0,p.stderr)
-        obj=json.loads(p.stdout)
+        obj=json.loads(p.stdout[p.stdout.index("{"):])
         self.assertEqual(obj["status"],"LOCAL_SYNTHETIC_QA_PASS_NATIVE_HOLD")
         self.assertEqual(obj["evidence_integrity"],"LOCAL_CHAIN_INTACT")
         self.assertTrue(p.stdout.isascii())

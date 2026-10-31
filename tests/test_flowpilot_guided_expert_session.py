@@ -120,6 +120,16 @@ class G121GuidedExpertTests(unittest.TestCase):
             path.write_bytes(self.kit)
             with self.assertRaises(GuidedRefused):
                 _load_pinned_kit(path)
+    def test_exact_pinned_local_zip_can_be_read_in_controlled_fixture(self):
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as tmp:
+            path=Path(tmp)/"kit.zip"
+            path.write_bytes(self.kit)
+            # Mock only the expected digest in this test; no real vendor
+            # provenance, native SDK or NAS access is claimed.
+            with patch("flowpilot_guided_expert_session.EXPECTED_SHA256", self.sha):
+                self.assertEqual(_load_pinned_kit(path),self.kit)
+
     def test_cli_no_kit_korean_input_windows_compatible(self):
         p=subprocess.run(
             [sys.executable,str(ROOT/"tools/flowpilot_guided_expert_session.py"),

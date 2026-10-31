@@ -148,7 +148,17 @@ def run_session_timeline(
     if qa is None:
         outcome = "NO_SYNTHETIC_EXECUTION"
     elif qa["status"] in ("DUPLICATE_BLOCKED", "RUN_ID_GOAL_CONFLICT"):
-        outcome = qa["status"]
+        # A prior run ID is never launched again. If the old chain exists,
+        # an invalid history must not be disguised as a benign duplicate.
+        try:
+            prior_integrity = verify_record(db, run_id)["status"]
+        except sqlite3.Error:
+            prior_integrity = "LOCAL_CHAIN_INVALID"
+        if prior_integrity != "LOCAL_CHAIN_INTACT":
+            outcome = "PRIOR_LOCAL_EVIDENCE_INVALID"
+            integrity = "LOCAL_CHAIN_INVALID"
+        else:
+            outcome = qa["status"]
     elif integrity != "LOCAL_CHAIN_INTACT":
         outcome = "LOCAL_EVIDENCE_UNVERIFIED"
     elif qa["status"] == "SYNTHETIC_LEDGER_PASS":
@@ -244,9 +254,9 @@ def render_offline_dashboard(result: dict) -> str:
 
 def write_new_offline_html(path: Path, result: dict) -> None:
     """Explicit create-only local file: never replace an existing original."""
-    if type(path) is not Path or not path.is_absolute() or path.suffix.lower() != ".html":
+    if not isinstance(path, Path) or not path.is_absolute() or path.suffix.lower() != ".html":
         raise ValueError("Explicit absolute new .html output required")
-    if path.parent.is_symlink() or str(path).startswith(("//", "\\\\")):
+    if any(p.is_symlink() for p in (path.parent, *path.parent.parents)) or str(path).startswith(("//", "\\\\")):
         raise ValueError("Network/reparse output location unsupported")
     content = render_offline_dashboard(result)
     with path.open("x", encoding="utf-8") as stream:

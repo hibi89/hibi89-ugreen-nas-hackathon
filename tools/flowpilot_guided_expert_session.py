@@ -65,7 +65,7 @@ def _scope(root:str,raw:str)->list[str]:
 
 def _load_pinned_kit(path:Path)->bytes:
     """Read a user-selected local official ZIP only after both approvals."""
-    if type(path) is not Path or path.is_symlink() or path.parent.is_symlink():
+    if not isinstance(path, Path) or path.is_symlink() or path.parent.is_symlink():
         raise GuidedRefused("Kit path refused")
     try:
         meta=path.stat()
