@@ -53,6 +53,15 @@ class FlowPilotPipeline(unittest.TestCase):
         self.assertIn("document", [s.id for s in confirmed.plan.steps])
         self.assertFalse(confirmed.actual_nas_verified)
 
+    def test_g111_check_required_does_not_silently_trust_reused_file_identity(self):
+        batch = fixture(seen('README.md', 'synthetic://reused'),
+                        seen('release/output.pdf', 'synthetic://reused'))
+        x = evaluate_offline(**{**BASE, 'request': 'check required files'}, batch=batch)
+        self.assertEqual(x.status, 'NEEDS_REVIEW')
+        self.assertEqual([i.state for i in x.report.items],
+                         [ItemState.NOT_CHECKED, ItemState.NOT_CHECKED])
+        self.assertFalse(x.actual_nas_verified)
+
     def test_g104_missing_signoff_blocks_only_complete_claimed_scan(self):
         root = "/volume1/FLOWPILOT_G104_SYNTHETIC_TEST/project"
         observations = (

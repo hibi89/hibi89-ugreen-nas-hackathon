@@ -125,6 +125,16 @@ def report(
     limitations = ["OFFLINE_EVIDENCE_ASSEMBLY_ONLY; live NAS and Agent provenance NOT_VERIFIED"]
     if not complete:
         limitations.append("No complete verified and authorized file enumeration")
+    # One returned identity must not serve as proof for two distinct paths.
+    # This is a conservative opaque-reference check, not a live-agent trust grant.
+    ref_paths: dict[str, set[str]] = {}
+    for obs in batch.observations:
+        if (isinstance(obs.reference, str) and obs.reference.strip()
+                and obs.is_symlink is False and obs.contained is True):
+            ref_paths.setdefault(obs.reference, set()).add(obs.relative_path)
+    aliased_paths = {p for found in ref_paths.values() if len(found) > 1 for p in found}
+    if aliased_paths:
+        limitations.append("Evidence reference reused across different file paths; affected items NOT_CHECKED")
     rows = []
     for wanted in requested:
         found = [o for o in batch.observations if o.relative_path == wanted]
@@ -141,8 +151,9 @@ def report(
         )
         detected = {o.relative_path for o in candidates
                     if o.reference.strip() and o.is_symlink is False and o.contained is True}
-        if not complete or untrusted_found or untrusted_candidate:
-            state, refs, reason = ItemState.NOT_CHECKED, (), "Scan, permission, symlink target or evidence unverified"
+        if (not complete or untrusted_found or untrusted_candidate
+                or any(o.relative_path in aliased_paths for o in candidates)):
+            state, refs, reason = ItemState.NOT_CHECKED, (), "Scan, permission, path identity, symlink target or evidence unverified"
         elif detected - {wanted} or len(usable) > 1:
             state, refs, reason = ItemState.VERSION_REVIEW, (), "Alternative or competing version requires owner review"
         elif usable:

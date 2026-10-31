@@ -61,6 +61,34 @@ class EvidenceTests(unittest.TestCase):
         r = report(["a.pdf"], good(obs("a.pdf", "1"), obs("a.pdf", "2")))
         self.assertEqual(r.items[0].state, ItemState.VERSION_REVIEW)
 
+    def test_g111_reused_reference_for_two_required_paths_never_proves_both_present(self):
+        batch = good(obs("a.pdf", "id://shared"), obs("b.pdf", "id://shared"))
+        r = report(["a.pdf", "b.pdf"], batch)
+        self.assertEqual([item.state for item in r.items],
+                         [ItemState.NOT_CHECKED, ItemState.NOT_CHECKED])
+        self.assertTrue(any("reused" in s.lower() for s in r.limitations))
+        self.assertEqual(r.overall, Overall.NEEDS_REVIEW)
+
+    def test_g111_reused_reference_with_unrelated_observation_disqualifies_required(self):
+        batch = good(obs("a.pdf", "id://shared"), obs("notes.md", "id://shared"))
+        r = report(["a.pdf"], batch)
+        self.assertEqual(r.items[0].state, ItemState.NOT_CHECKED)
+        self.assertEqual(r.items[0].evidence, ())
+
+    def test_g111_reused_reference_between_version_candidates_does_not_claim_version_conflict(self):
+        batch = good(obs("a.pdf", "id://shared"), obs("a_v2.pdf", "id://shared"))
+        r = report(["a.pdf"], batch, version_candidates={"a.pdf": ["a_v2.pdf"]})
+        self.assertEqual(r.items[0].state, ItemState.NOT_CHECKED)
+        self.assertEqual(r.items[0].evidence, ())
+
+    def test_g111_distinct_references_remain_present_and_version_review(self):
+        batch = good(obs("a.pdf", "id://one"), obs("b.pdf", "id://two"),
+                     obs("a_v2.pdf", "id://three"))
+        normal = report(["a.pdf", "b.pdf"], batch)
+        self.assertEqual([x.state for x in normal.items], [ItemState.PRESENT, ItemState.PRESENT])
+        versions = report(["a.pdf"], batch, version_candidates={"a.pdf": ["a_v2.pdf"]})
+        self.assertEqual(versions.items[0].state, ItemState.VERSION_REVIEW)
+
     def test_restricted_path_refused(self):
         for p in (".env", "credentials/token.txt", ".ssh/id_rsa", "config.json", "a/private_key.pem"):
             with self.subTest(p=p), self.assertRaises(ValueError):
