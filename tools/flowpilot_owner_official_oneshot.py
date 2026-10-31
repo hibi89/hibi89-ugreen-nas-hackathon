@@ -101,7 +101,7 @@ def run(directory: Path, *, download_official_kit: bool = False,
             download_official_kit, execute_official_native_code,
             require_pdf_text)):
         raise OwnerCheckRefused("INVALID_EXPLICIT_PERMISSION")
-    if official_kit_zip is not None and type(official_kit_zip) is not Path:
+    if official_kit_zip is not None and not isinstance(official_kit_zip, Path):
         raise OwnerCheckRefused("INVALID_LOCAL_VENDOR_PATH")
     if official_kit_zip is not None and download_official_kit:
         raise OwnerCheckRefused("CHOOSE_ONE_VENDOR_SOURCE")
