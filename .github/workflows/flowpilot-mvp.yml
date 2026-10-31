@@ -70,6 +70,14 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python render_master_progress.py --check
           exit $LASTEXITCODE
+      - name: G152 real Windows PowerShell 5.1 offline launcher smoke (NO owner kit/vendor)
+        shell: pwsh
+        run: |
+          & powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tools\flowpilot_owner_official_offline.ps1 -ArtifactFolder "$env:RUNNER_TEMP" -OfficialKitZip "$env:RUNNER_TEMP\missing-official-kit.zip" -PreflightOnly
+          if ($LASTEXITCODE -ne 0) { throw "G152 PowerShell local checkout preflight failed" }
+          & powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tools\flowpilot_owner_official_offline.ps1 -ArtifactFolder "$env:RUNNER_TEMP" -OfficialKitZip "$env:RUNNER_TEMP\missing-official-kit.zip"
+          if ($LASTEXITCODE -ne 2) { throw "G152 missing authentic Kit must refuse; no vendor JS" }
+          Write-Host "G152 Windows offline launcher preflight and denial PASS; official Checker NOT_RUN"
       - name: Full Windows PowerShell 5.1 owner-equivalent offline verification
         shell: pwsh
         run: |
