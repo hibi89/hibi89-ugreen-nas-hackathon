@@ -1,0 +1,93 @@
+name: G145 genuine local-only Docker sandbox smoke (NO NAS / NO Uliya)
+on:
+  push:
+    branches: ["lead/ugreen"]
+    paths:
+      - ".github/workflows/g145-real-docker-smoke.yml"
+      - "tools/flowpilot_isolation_contract.py"
+      - "tests/test_flowpilot_isolation_contract.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  actual-docker-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Verify bounded Docker contract without running owner code
+        run: python -m unittest discover -s tests -p 'test_flowpilot_isolation_contract.py' -v
+      - name: Pull public Python base to disposable CI runner; resolve actual immutable local digest
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker pull --quiet python:3.11-alpine > /dev/null
+          python3 - <<'PY'
+          import subprocess
+          from pathlib import Path
+          ref = subprocess.run(["docker", "image", "inspect", "--format",
+                                "{{index .RepoDigests 0}}", "python:3.11-alpine"],
+                                capture_output=True, text=True, timeout=20, check=True).stdout.strip()
+          import re
+          assert re.fullmatch(r"(?:docker\.io/library/)?python@sha256:[0-9a-f]{64}", ref), "Unexpected image provenance"
+          Path("g145-local-docker-ref.txt").write_text(ref+"\n",encoding="ascii")
+          print("RESOLVED_PUBLIC_PYTHON_IMAGE_DIGEST_FROM_LOCAL_DOCKER_CACHE")
+          PY
+      - name: Run real isolated no-network nonroot fixed Python smoke; fail closed
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,json,os,pathlib,sys
+          sys.path.insert(0,"tools")
+          from flowpilot_isolation_contract import run_local_smoke,plan_sandbox
+          ref=pathlib.Path("g145-local-docker-ref.txt").read_text(encoding="ascii").strip()
+          goal="고객별 매출 보고서 만들어줘"
+          plan=plan_sandbox(goal,ref)
+          assert plan.get("status")=="WAITING_LOCAL_DOCKER_APPROVAL"
+          argv=plan["argv"]
+          required={"--pull=never","--network=none","--read-only","--cap-drop=ALL",
+                    "--security-opt=no-new-privileges","--user=65534:65534",
+                    "--pids-limit=32","--memory=128m","--cpus=0.5"}
+          assert required.issubset(set(argv)),"Weak isolation arguments"
+          assert all(flag not in argv for flag in ("-v","--mount","--privileged","--env","--network=host"))
+          result=run_local_smoke(goal,ref,approved=True)
+          success=(result.get("status")=="LOCAL_DOCKER_SMOKE_PASS_NOT_NAS"
+                   and result.get("docker_launched") is True
+                   and result.get("container_sandbox_executed") is True
+                   and result.get("actual_workflow_executed_in_docker") is False
+                   and result.get("nas_verified") is False
+                   and result.get("production_applied") is False
+                   and result.get("release_gate")=="HOLD")
+          report={
+            "type":"G145_REAL_EPHEMERAL_LINUX_DOCKER_SMOKE_NOT_NAS",
+            "github_source_sha":os.environ.get("GITHUB_SHA"),
+            "image_reference_sha256":hashlib.sha256(ref.encode("ascii")).hexdigest(),
+            "image_resolved_to_digest_not_source_pinned":True,
+            "image_provenance_independently_verified":False,
+            "github_runner_is_not_owner_nas":True,
+            "docker_smoke_invoked":result.get("docker_launched",False),
+            "fixed_container_smoke_passed":bool(success),
+            "checked_nonroot_no_network_flags":True,
+            "actual_workflow_executed_in_docker":False,
+            "first_party_uliya_checker_executed":False,
+            "registered_expert_or_real_nas_verified":False,
+            "owner_file_mounted_or_uploaded":False,
+            "devpost_submitted":False,
+            "release_gate":"HOLD"
+          }
+          pathlib.Path("g145-smoke-receipt.json").write_text(
+              json.dumps(report,indent=2,sort_keys=True)+"\n",encoding="utf-8")
+          print(json.dumps(report,sort_keys=True))
+          if not success: raise SystemExit("Real bounded Docker smoke did not meet strict receipt")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: G145-REAL-DOCKER-SMOKE-SANITIZED-RECEIPT
+          path: g145-smoke-receipt.json
+          if-no-files-found: ignore
+          retention-days: 14
