@@ -6,6 +6,7 @@ on:
       - "src/flowpilot/**"
       - "skill/flowpilot-nas/**"
       - "tools/flowpilot_*"
+      - "tools/flowpilot3_official_checker.py"
       - "tools/verify_hae_la_local_e2e.py"
       - "tools/g5*"
       - "tools/check_handoff_sync.py"
