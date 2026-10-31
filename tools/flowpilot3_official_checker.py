@@ -85,7 +85,7 @@ def inspect_pinned_archives(candidate_zip: bytes, vendor_zip: bytes, *,
                     or any(x.is_dir() for x in names)
                     or not all(x == MEMBER or (x.startswith("flowpilot-3/references/")
                                and x.endswith(".md")) for x in expected_members)):
-                raise VerificationRefused("Candidate must contain exact approved Markdown members")
+                raise VerificationRefused("Candidate must contain exact Markdown members (exact approved set)")
             candidate = z.read(MEMBER)
             if sha256(candidate).hexdigest() != expected_source_sha:
                 raise VerificationRefused("Candidate Skill bytes differ from exact selected source pin")
