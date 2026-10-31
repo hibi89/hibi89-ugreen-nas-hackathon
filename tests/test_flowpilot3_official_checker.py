@@ -426,7 +426,7 @@ class G100OfficialKitBoundary(unittest.TestCase):
             self.assertNotIn("DOCKER_TLS_VERIFY", env)
             self.assertNotIn("DOCKER_CERT_PATH", env)
             self.assertFalse(call.kwargs["check"])
-            self.assertEqual(call.kwargs["cwd"], self.path.parent)
+            self.assertEqual(call.kwargs["cwd"], self.path.parent.parent)
         argv = execute_call.args[0]
         for flag in ("--pull=never", "--network=none", "--read-only",
                      "--cap-drop=ALL", "--security-opt=no-new-privileges",
