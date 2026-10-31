@@ -1,0 +1,85 @@
+name: G146 actual synthetic CSV and SQLite workflow + bounded repair in Docker
+on:
+  push:
+    branches: ["lead/ugreen"]
+    paths:
+      - ".github/workflows/g146-real-docker-workflow.yml"
+      - "tools/flowpilot_docker_workflow.py"
+      - "tests/test_flowpilot_docker_workflow.py"
+      - "tools/flowpilot_isolation_contract.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real-synthetic-docker-workflow:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: G146 bounded Docker workflow + security regressions (no owner data)
+        run: python -m unittest discover -s tests -p 'test_flowpilot_docker_workflow.py' -v
+      - name: Fetch public Python image into disposable CI runner; resolve immutable local digest
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker pull --quiet python:3.11-alpine >/dev/null
+          python3 - <<'PY'
+          import pathlib,re,subprocess
+          ref=subprocess.run(["docker","image","inspect","--format",
+                              "{{index .RepoDigests 0}}","python:3.11-alpine"],
+                             text=True,capture_output=True,timeout=25,check=True).stdout.strip()
+          assert re.fullmatch(r"(?:docker\.io/library/)?python@sha256:[0-9a-f]{64}",ref)
+          pathlib.Path("g146-image-local-digest.txt").write_text(ref+"\n",encoding="ascii")
+          print("EPHEMERAL_PUBLIC_IMAGE_RESOLVED_TO_IMMUTABLE_LOCAL_DIGEST")
+          PY
+      - name: Execute real Docker synthetic workflow and verify fail-repair-retest receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,json,os,pathlib,sys
+          sys.path.insert(0,"tools")
+          from flowpilot_docker_workflow import run_workflow
+          image=pathlib.Path("g146-image-local-digest.txt").read_text(encoding="ascii").strip()
+          result=run_workflow("고객별 매출 보고서 만들어줘",image,approved=True)
+          passed=(result.get("status")=="LOCAL_DOCKER_SYNTHETIC_REPAIR_WORKFLOW_PASS"
+                  and result.get("docker_launched") is True
+                  and result.get("actual_synthetic_workflow_executed_in_docker") is True
+                  and result.get("bounded_synthetic_edge_repair_verified") is True
+                  and result.get("actual_customer_workflow_executed") is False
+                  and result.get("arbitrary_llm_code_repair_verified") is False
+                  and result.get("owner_files_opened") is False
+                  and result.get("customer_files_mounted") is False
+                  and result.get("registered_uliya_expert_verified") is False
+                  and result.get("nas_verified") is False
+                  and result.get("production_applied") is False
+                  and result.get("release_gate")=="HOLD")
+          report={
+            "evidence_type":"G146_REAL_EPHEMERAL_LINUX_DOCKER_SYNTHETIC_WORKFLOW",
+            "github_source_sha":os.environ.get("GITHUB_SHA"),
+            "local_image_digest_reference_hash":hashlib.sha256(image.encode()).hexdigest(),
+            "public_base_tag_resolved_at_run_time_not_externally_pinned":True,
+            "actual_docker_container_executed":result.get("docker_launched",False),
+            "synthetic_csv_and_sqlite_workflow_executed":bool(passed),
+            "one_fixed_missing_edge_repaired_and_retested":bool(passed),
+            "original_test_source_preserved":bool(passed),
+            "actual_user_workflow_or_nas_executed":False,
+            "uliya_vendor_checker_executed":False,
+            "no_owner_files_or_mounted_volumes":True,
+            "docker_host_isolation_independently_audited":False,
+            "release_gate":"HOLD"}
+          pathlib.Path("g146-sanitized-receipt.json").write_text(
+              json.dumps(report,sort_keys=True,indent=2)+"\n",encoding="utf-8")
+          print(json.dumps(report,sort_keys=True))
+          if not passed: raise SystemExit("G146 strict synthetic container receipt gate FAILED")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: G146-REAL-SYNTHETIC-WORKFLOW-DOCKER-RECEIPT
+          path: g146-sanitized-receipt.json
+          if-no-files-found: ignore
+          retention-days: 14
