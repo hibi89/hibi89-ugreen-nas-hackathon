@@ -1,0 +1,11 @@
+# G114 first NL→workflow→fixture test→operator runbook vertical slice
+
+- New command: `python tools/flowpilot_builder_rehearsal.py --goal "고객별 매출 보고서 만들어줘"` (or exact supported English equivalent).
+- Reuses pre-existing `flowpilot_csv_e2e.run_session` with its bounded CSV Graph, explicit local approval gate, Decimal report writer and SQLite audit; does not introduce a second engine or arbitrary code generation.
+- Creates *only* disposable code-owned temp CSV and SQLite. Expected first malformed fixture refuses without output; replaces that disposable fixture with valid values; previews without writing; runs approved **test fixture**; verifies exact CSV totals, source SHA integrity, SQLite audit count and report SHA; rejects a second attempt to overwrite the same output.
+- Returns graph, six tested checks, source/output hashes, and concrete Markdown steps with preview/approval commands, validation, rollback and unsupported NAS/scheduler caveats.
+- Only existing exact allowlisted natural-language goals are supported; arbitrary "build anything", daily scheduling, external transfers, real NAS install, Uliya Expert invocation, user folder execution, HAE/LA backend invocation and Devpost submission are **NOT** implemented or verified.
+- Official Round1 Markdown-only Skill ZIP, G103 owner-private artifacts, canonical master and original data are unchanged. Original repo history is recovery.
+- Test commands: `python -m unittest discover -s tests -p 'test_flowpilot_builder_rehearsal.py' -v`; full GitHub Actions on pushed code is the exact-source verification gate. The new six focused tests do not themselves prove genuine NAS execution.
+- Approved G113 alternative B is incremental: this first vertical slice uses a supported pre-existing CSV reporting path. Next design/implementation step is a typed, capability-checked multi-template compiler and explicit platform adapter with verifiable permission/schema. No claim of general-purpose AI self-repair.
+- Release gates HOLD: genuine G103 first-party Uliya checker against official kit, registered Experts/native schema, explicit owner NAS consent, private exact artifact rights and Devpost signoff. Official Round1 2026-11-16 16:45 KST.
