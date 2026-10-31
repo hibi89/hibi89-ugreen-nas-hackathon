@@ -137,7 +137,7 @@ def main(argv: list[str] | None = None) -> int:
     except (AssertionError, ReportRefused, OSError, ValueError, TypeError):
         print(json.dumps({"status": "LOCAL_REHEARSAL_FAILED", "release_gate": "HOLD"}))
         return 2
-    print(json.dumps(result, ensure_ascii=False, indent=2))
+    print(json.dumps(result, ensure_ascii=True, indent=2))
     return 0 if result["status"] == "SYNTHETIC_LOCAL_REHEARSAL_PASS" else 1
 
 

@@ -52,6 +52,17 @@ class WorkflowBuilderRehearsalTests(unittest.TestCase):
         self.assertFalse(value["uliya_expert_invoked"])
         self.assertEqual(value["release_gate"], "HOLD")
 
+    def test_cli_korean_goal_is_ascii_encoded_json(self):
+        # Windows PowerShell 5.1 legacy codepage must not prevent JSON output.
+        proc = subprocess.run([sys.executable, str(ROOT / "tools" / "flowpilot_builder_rehearsal.py"),
+                               "--goal", "고객별 매출 보고서 만들어줘"],
+                              capture_output=True, text=True, timeout=20)
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        self.assertTrue(proc.stdout.isascii())
+        value = json.loads(proc.stdout)
+        self.assertEqual(value["status"], "SYNTHETIC_LOCAL_REHEARSAL_PASS")
+        self.assertEqual(value["requested_goal"], "고객별 매출 보고서 만들어줘")
+
     def test_cli_refuses_unimplemented_daily_scheduling(self):
         proc = subprocess.run([sys.executable, str(ROOT / "tools" / "flowpilot_builder_rehearsal.py"),
                                "--goal", "매일 CSV 예약 작업 만들어줘"],
