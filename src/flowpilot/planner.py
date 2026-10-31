@@ -126,15 +126,15 @@ def _has_conflicting_explicit_tasks(request: str) -> bool:
     Exclude slash-delimited paths: a name such as handoff/summarize.md must not
     itself count as an instruction to read document contents.
     """
-    text = re.sub(r"(?<!\\w)[^\\s/]+/[^\\s]+", " ", request.casefold())
+    text = re.sub(r"(?<!\w)[^\s/]+/[^\s]+", " ", request.casefold())
     explicit = [
-        bool(re.search(r"(?<![\\w/_.-])summari[sz]e(?![\\w/_.-])", text)
+        bool(re.search(r"(?<![\w/_.-])summari[sz]e(?![\w/_.-])", text)
              or re.search(r"(?<![/_.-])요약(?:해|하|할)", text)),
-        bool(re.search(r"\\b(?:compare|review)\\s+versions?\\b", text)
+        bool(re.search(r"\b(?:compare|review)\s+versions?\b", text)
              or "버전 비교" in text or "버전들을 비교" in text),
-        bool(re.search(r"\\bcheck\\s+(?:required|missing)\\b", text)
+        bool(re.search(r"\bcheck\s+(?:required|missing)\b", text)
              or "필수 파일 확인" in text or "누락 파일 확인" in text),
-        bool(re.search(r"\\baudit\\s+(?:handoff|deliverables?)\\b", text)
+        bool(re.search(r"\baudit\s+(?:handoff|deliverables?)\b", text)
              or "납품 감사" in text or "인계 감사" in text),
     ]
     return sum(explicit) > 1
