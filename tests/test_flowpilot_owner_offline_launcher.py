@@ -28,6 +28,11 @@ class G152OfflineLauncherContractTests(unittest.TestCase):
         self.assertIn("if ($PreflightOnly)", source)
         self.assertIn("EXECUTION_NOT_ALLOWED_DURING_PREFLIGHT", source)
 
+    def test_single_executable_selection_under_multiple_windows_python_installs(self):
+        source = SCRIPT.read_text(encoding="utf-8")
+        self.assertIn("Get-Command 'python' -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1", source)
+        self.assertIn("Get-Command 'node' -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1", source)
+
     def test_exact_private_pair_and_kit_passing_without_upload(self):
         source = SCRIPT.read_text(encoding="utf-8")
         self.assertIn("'flowpilot_owner_official_oneshot.py'", source)

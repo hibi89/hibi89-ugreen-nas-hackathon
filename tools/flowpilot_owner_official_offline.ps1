@@ -32,7 +32,7 @@ if (!(Test-Path -LiteralPath $entry -PathType Leaf) -or
     !(Test-Path -LiteralPath $gate -PathType Leaf)) {
     Refuse 'LOCAL_CHECKOUT_MODULES_MISSING'
 }
-$python = Get-Command 'python' -CommandType Application -ErrorAction SilentlyContinue
+$python = Get-Command 'python' -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
 if ($null -eq $python) { Refuse 'PYTHON_311_OR_NEWER_REQUIRED' }
 & $python.Source -c 'import sys; sys.exit(0 if sys.version_info >= (3, 11) else 2)'
 if ($LASTEXITCODE -ne 0) { Refuse 'PYTHON_311_OR_NEWER_REQUIRED' }
@@ -53,7 +53,7 @@ if (!(Test-Path -LiteralPath $OfficialKitZip -PathType Leaf)) {
 if ($ExecuteOfficialNativeCode) {
     # Only an explicit switch permits official vendor JS execution.
     # This preflight must not be treated as proof of the vendor Checker result.
-    $node = Get-Command 'node' -CommandType Application -ErrorAction SilentlyContinue
+    $node = Get-Command 'node' -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
     if ($null -eq $node) { Refuse 'NODE_22_OR_NEWER_REQUIRED' }
     $nodeVersion = & $node.Source --version
     if ($LASTEXITCODE -ne 0 -or $nodeVersion -notmatch '^v([0-9]+)\.') {
