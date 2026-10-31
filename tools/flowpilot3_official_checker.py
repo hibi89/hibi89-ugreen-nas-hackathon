@@ -164,14 +164,19 @@ def _sanitized_checker_result(code: int, stdout: str, stderr: str, *, mode: str)
     numbers = {k: summary.get(k) for k in ("errors", "warnings", "info")}
     valid_numbers = all(type(value) is int and value >= 0 for value in numbers.values())
     diagnostics = data.get("diagnostics")
+    # A zero-count summary can still conceal an error diagnostic. Refuse all
+    # inconsistent or missing diagnostic collections instead of claiming PASS.
+    diagnostics_complete = isinstance(diagnostics, list)
+    diagnostics_empty = diagnostics_complete and len(diagnostics) == 0
     diagnostic_codes = [str(d.get("code"))[:80] for d in diagnostics[:40]
                         if isinstance(d, dict) and isinstance(d.get("code"), str)] if isinstance(diagnostics, list) else []
     clean = (code == 0 and data.get("status") == "static-pass" and valid_numbers
-             and all(value == 0 for value in numbers.values()))
+             and all(value == 0 for value in numbers.values()) and diagnostics_empty)
     return {"result": "OFFICIAL_STATIC_PASS_REVIEW_ONLY" if clean else "OFFICIAL_WARN_OR_FAIL_HOLD",
             "checker_exit_code": code, "checker_status": str(data.get("status"))[:100],
             "checker_summary": numbers if valid_numbers else "UNVERIFIED_SUMMARY",
             "diagnostic_codes": diagnostic_codes,
+            "diagnostics_consistent_with_zero_summary": diagnostics_empty,
             "checker_stderr_present": bool(stderr.strip()), "mode": mode,
             "official_checker_executed": True, "registered_expert_verified": False,
             "real_nas_verified": False, "owner_release_approved": False,

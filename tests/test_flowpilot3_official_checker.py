@@ -83,7 +83,7 @@ class G100OfficialKitBoundary(unittest.TestCase):
 
     def test_zero_warnings_does_not_release(self):
         payload = json.dumps({"status": "static-pass", "summary": {
-            "errors": 0, "warnings": 0, "info": 0}})
+            "errors": 0, "warnings": 0, "info": 0}, "diagnostics": []})
         with patch.object(gate, "_execute", return_value=(0, payload, "")):
             result = gate.check(self.path, self.vendor, mode="native",
                                 native_risk_approved=True)
@@ -105,6 +105,30 @@ class G100OfficialKitBoundary(unittest.TestCase):
         forged = '{"status":"static-pass","status":"static-pass","summary":{"errors":0,"warnings":0,"info":0}}'
         result = gate._sanitized_checker_result(0, forged, "", mode="native")
         self.assertEqual(result["result"], "UNVERIFIED_NON_JSON_CHECKER_OUTPUT")
+
+    def test_inconsistent_error_diagnostic_cannot_pass(self):
+        payload = json.dumps({"status": "static-pass", "summary": {
+            "errors": 0, "warnings": 0, "info": 0}, "diagnostics": [
+                {"code": "INCONSISTENT_FATAL", "severity": "error"}]})
+        result = gate._sanitized_checker_result(0, payload, "", mode="docker")
+        self.assertEqual(result["result"], "OFFICIAL_WARN_OR_FAIL_HOLD")
+        self.assertFalse(result["diagnostics_consistent_with_zero_summary"])
+        self.assertIn("INCONSISTENT_FATAL", result["diagnostic_codes"])
+        self.assertEqual(result["release_gate"], "HOLD")
+
+    def test_missing_diagnostics_cannot_pass(self):
+        payload = json.dumps({"status": "static-pass", "summary": {
+            "errors": 0, "warnings": 0, "info": 0}})
+        result = gate._sanitized_checker_result(0, payload, "", mode="docker")
+        self.assertEqual(result["result"], "OFFICIAL_WARN_OR_FAIL_HOLD")
+        self.assertFalse(result["diagnostics_consistent_with_zero_summary"])
+
+    def test_malformed_diagnostics_cannot_pass(self):
+        payload = json.dumps({"status": "static-pass", "summary": {
+            "errors": 0, "warnings": 0, "info": 0}, "diagnostics": "NOT_A_LIST"})
+        result = gate._sanitized_checker_result(0, payload, "", mode="docker")
+        self.assertEqual(result["result"], "OFFICIAL_WARN_OR_FAIL_HOLD")
+        self.assertFalse(result["diagnostics_consistent_with_zero_summary"])
 
     def test_inspect_command_never_claims_success(self):
         with patch.object(sys, "argv", ["check", "--candidate-zip", str(self.path),
