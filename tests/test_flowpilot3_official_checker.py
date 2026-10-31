@@ -167,5 +167,102 @@ class G100OfficialKitBoundary(unittest.TestCase):
         self.assertFalse(json.loads(out.getvalue())["official_checker_executed"])
 
 
+    def test_g139_exact_multifile_profile_synthetic_inspect_only(self):
+        files = {
+            gate.MEMBER: self.source,
+            gate.G139_MEMBERS[1]: b"# synthetic capability reference\n",
+            gate.G139_MEMBERS[2]: b"# synthetic safety reference\n",
+        }
+        raw = zip_bytes(files)
+        self.path.write_bytes(raw)
+        with patch.object(gate, "G139_CANDIDATE_SHA", sha256(self.source).hexdigest()), \
+             patch.object(gate, "G139_CANDIDATE_ZIP_SHA", sha256(raw).hexdigest()), \
+             patch.object(gate, "_execute", side_effect=AssertionError("No execution")):
+            result = gate.check(self.path, self.vendor, mode="inspect", candidate_profile="g139")
+        self.assertEqual(result["candidate_profile"], "g139")
+        self.assertEqual(result["candidate_member_count"], 3)
+        self.assertEqual(result["release_gate"], "HOLD")
+        self.assertFalse(result["official_checker_executed"])
+
+    def test_g139_missing_reference_fails_before_checker(self):
+        incomplete = zip_bytes({gate.MEMBER: self.source,
+                                gate.G139_MEMBERS[1]: b"# synthetic\n"})
+        self.path.write_bytes(incomplete)
+        with patch.object(gate, "G139_CANDIDATE_SHA", sha256(self.source).hexdigest()), \
+             patch.object(gate, "G139_CANDIDATE_ZIP_SHA", sha256(incomplete).hexdigest()), \
+             patch.object(gate, "_execute", side_effect=AssertionError("No execution")):
+            with self.assertRaisesRegex(gate.VerificationRefused, "exact approved"):
+                gate.check(self.path, self.vendor, mode="docker", candidate_profile="g139")
+
+    def test_g139_ref_only_tamper_rejected_by_pinned_zip(self):
+        files = {gate.MEMBER: self.source,
+                 gate.G139_MEMBERS[1]: b"# changed", gate.G139_MEMBERS[2]: b"# expected"}
+        self.path.write_bytes(zip_bytes(files))
+        with patch.object(gate, "G139_CANDIDATE_SHA", sha256(self.source).hexdigest()):
+            with self.assertRaisesRegex(gate.VerificationRefused, "SHA256"):
+                gate.check(self.path, self.vendor, mode="inspect", candidate_profile="g139")
+
+    def test_g139_exact_three_files_passed_to_checker_without_vendor_execution(self):
+        files = {gate.MEMBER: self.source,
+                 gate.G139_MEMBERS[1]: b"# synthetic capability reference",
+                 gate.G139_MEMBERS[2]: b"# synthetic safety reference"}
+        raw = zip_bytes(files)
+        self.path.write_bytes(raw)
+        payload = json.dumps({"status": "static-pass", "summary":
+                              {"errors": 0, "warnings": 0, "info": 0},
+                              "diagnostics": []})
+        def fake_checker(vendor, candidate, mode):
+            self.assertTrue((candidate / "SKILL.md").exists())
+            for name in gate.G139_MEMBERS[1:]:
+                expected_path = candidate.parent / name
+                self.assertEqual(expected_path.read_bytes(), files[name])
+            return (0, payload, "")
+        with patch.object(gate, "G139_CANDIDATE_SHA", sha256(self.source).hexdigest()), \
+             patch.object(gate, "G139_CANDIDATE_ZIP_SHA", sha256(raw).hexdigest()), \
+             patch.object(gate, "_execute", side_effect=fake_checker):
+            result = gate.check(self.path, self.vendor, mode="native",
+                                native_risk_approved=True, candidate_profile="g139")
+        self.assertEqual(result["result"], "OFFICIAL_STATIC_PASS_REVIEW_ONLY")
+        self.assertEqual(result["release_gate"], "HOLD")
+        self.assertEqual(result["candidate_member_count"], 3)
+
+    def test_g139_reference_mutation_during_checker_fails_closed(self):
+        files = {gate.MEMBER: self.source,
+                 gate.G139_MEMBERS[1]: b"# synthetic capability reference",
+                 gate.G139_MEMBERS[2]: b"# synthetic safety reference"}
+        raw = zip_bytes(files)
+        self.path.write_bytes(raw)
+        def mutator(vendor, candidate, mode):
+            (candidate / "references" / "SAFETY_AND_SCENARIOS.md").write_bytes(b"changed")
+            return (0, "{}", "")
+        with patch.object(gate, "G139_CANDIDATE_SHA", sha256(self.source).hexdigest()), \
+             patch.object(gate, "G139_CANDIDATE_ZIP_SHA", sha256(raw).hexdigest()), \
+             patch.object(gate, "_execute", side_effect=mutator):
+            with self.assertRaisesRegex(gate.VerificationRefused, "changed during Checker"):
+                gate.check(self.path, self.vendor, mode="native",
+                           native_risk_approved=True, candidate_profile="g139")
+
+    def test_g139_stored_exact_pins_are_full_sha256(self):
+        self.assertRegex(gate.G139_CANDIDATE_SHA, r"\A[0-9a-f]{64}\Z")
+        self.assertRegex(gate.G139_CANDIDATE_ZIP_SHA, r"\A[0-9a-f]{64}\Z")
+        self.assertEqual(len(gate.G139_MEMBERS), 3)
+
+    def test_g139_inspect_cli_never_implies_execution(self):
+        files = {gate.MEMBER: self.source,
+                 gate.G139_MEMBERS[1]: b"# synthetic",
+                 gate.G139_MEMBERS[2]: b"# synthetic"}
+        raw = zip_bytes(files)
+        self.path.write_bytes(raw)
+        with patch.object(gate, "G139_CANDIDATE_SHA", sha256(self.source).hexdigest()), \
+             patch.object(gate, "G139_CANDIDATE_ZIP_SHA", sha256(raw).hexdigest()), \
+             patch.object(sys, "argv", ["check", "--candidate-zip", str(self.path),
+                  "--official-kit-zip", str(self.vendor), "--candidate-profile", "g139"]), \
+             redirect_stdout(StringIO()) as output:
+            code = gate.main()
+        self.assertEqual(code, 2)
+        self.assertEqual(json.loads(output.getvalue())["candidate_member_count"], 3)
+        self.assertIn('"official_checker_executed": false', output.getvalue().lower())
+
+
 if __name__ == "__main__":
     unittest.main()

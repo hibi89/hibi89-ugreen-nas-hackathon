@@ -22,6 +22,14 @@ CANDIDATE_SHA = "f21c184f4a0bf370d438b3918a345870faf9d69ee88aac239fe13241a8960ca
 CANDIDATE_ZIP_SHA = "f28acfbeba9d3a6e33b9977d1ea1de15b50ca48dbc505144c0b2cb719efc2cfc"
 G103_CANDIDATE_SHA = "f940bcd884b83d80fbecf533caee7d492488c274e1d3eab2b99b034b92428e15"
 G103_CANDIDATE_ZIP_SHA = "1496103b5c1b15da113867ed0cab57ad1e2dab0be80c2f06fd049cac359bf11b"
+# G141 exact owner-review G139 private candidate; never place ZIP bytes in public GitHub.
+G139_CANDIDATE_SHA = "a13e07121e3e72b49300e0e5581ecf9d9edfd09e1fb69d481f3b2a811d6cb063"
+G139_CANDIDATE_ZIP_SHA = "fb948d50be12f548ad48dd527cd858f3d5e5e73fd611de2a502f89acff8478e1"
+G139_MEMBERS = (
+    "flowpilot-3/SKILL.md",
+    "flowpilot-3/references/CAPABILITY_AND_PLAN_CONTRACT.md",
+    "flowpilot-3/references/SAFETY_AND_SCENARIOS.md",
+)
 VENDOR_ZIP_SHA = "cf557e5a022e4297892f39768132855154232efdedeb726b2845450ccd70e1b3"
 MEMBER = "flowpilot-3/SKILL.md"
 MAX_CANDIDATE = 10_000_000
@@ -65,14 +73,19 @@ def _safe_names(z: ZipFile, *, count: int, expanded: int, per_entry: int) -> lis
 
 
 def inspect_pinned_archives(candidate_zip: bytes, vendor_zip: bytes, *,
-                            expected_source_sha: str | None = None) -> dict:
+                            expected_source_sha: str | None = None,
+                            expected_members: tuple[str, ...] = (MEMBER,)) -> dict:
     if expected_source_sha is None:
         expected_source_sha = CANDIDATE_SHA  # Legacy G99 regression compatibility.
     try:
         with ZipFile(BytesIO(candidate_zip)) as z:
-            names = _safe_names(z, count=1, expanded=1_000_000, per_entry=1_000_000)
-            if len(names) != 1 or names[0].filename != MEMBER or names[0].is_dir():
-                raise VerificationRefused("Candidate must contain one exact Markdown Skill")
+            names = _safe_names(z, count=100, expanded=10_000_000, per_entry=1_000_000)
+            if (not expected_members or len(set(expected_members)) != len(expected_members)
+                    or set(x.filename for x in names) != set(expected_members)
+                    or any(x.is_dir() for x in names)
+                    or not all(x == MEMBER or (x.startswith("flowpilot-3/references/")
+                               and x.endswith(".md")) for x in expected_members)):
+                raise VerificationRefused("Candidate must contain exact approved Markdown members")
             candidate = z.read(MEMBER)
             if sha256(candidate).hexdigest() != expected_source_sha:
                 raise VerificationRefused("Candidate Skill bytes differ from exact selected source pin")
@@ -93,7 +106,8 @@ def inspect_pinned_archives(candidate_zip: bytes, vendor_zip: bytes, *,
     except (BadZipFile, RuntimeError, OSError) as exc:
         raise VerificationRefused("Invalid pinned ZIP archive") from exc
     return {"source_sha256": expected_source_sha, "vendor_archive_sha256": VENDOR_ZIP_SHA,
-            "checker_relative_root": root, "member_count": len(members)}
+            "checker_relative_root": root, "member_count": len(members),
+            "candidate_member_count": len(expected_members)}
 
 
 def _prepare_toolkit(vendor_zip: bytes, extracted: Path, root: str) -> Path:
@@ -195,15 +209,17 @@ def check(candidate: Path, kit: Path, *, mode: str, native_risk_approved: bool =
     if mode == "native" and not native_risk_approved:
         raise VerificationRefused("Native execution requires explicit risk approval")
     # Profiles are immutable source/ZIP pairs; untrusted CLI users cannot supply arbitrary hashes.
-    profiles = {"g99": (CANDIDATE_SHA, CANDIDATE_ZIP_SHA),
-                "g103": (G103_CANDIDATE_SHA, G103_CANDIDATE_ZIP_SHA)}
+    profiles = {"g99": (CANDIDATE_SHA, CANDIDATE_ZIP_SHA, (MEMBER,)),
+                "g103": (G103_CANDIDATE_SHA, G103_CANDIDATE_ZIP_SHA, (MEMBER,)),
+                "g139": (G139_CANDIDATE_SHA, G139_CANDIDATE_ZIP_SHA, G139_MEMBERS)}
     if candidate_profile not in profiles:
         raise VerificationRefused("Unsupported exact candidate profile")
-    expected_source, expected_zip = profiles[candidate_profile]
+    expected_source, expected_zip, expected_members = profiles[candidate_profile]
     candidate_bytes = _read_pinned(candidate, digest=expected_zip, size_limit=MAX_CANDIDATE)
     vendor_bytes = _read_pinned(kit, digest=VENDOR_ZIP_SHA, size_limit=MAX_VENDOR)
     details = inspect_pinned_archives(candidate_bytes, vendor_bytes,
-                                      expected_source_sha=expected_source)
+                                      expected_source_sha=expected_source,
+                                      expected_members=expected_members)
     details["candidate_profile"] = candidate_profile
     if mode == "inspect":
         return {"status": "EXACT_SOURCE_AND_VENDOR_PIN_VERIFIED_NO_CHECKER_RUN",
@@ -212,12 +228,20 @@ def check(candidate: Path, kit: Path, *, mode: str, native_risk_approved: bool =
         base = Path(temp)
         skill = base / "candidate" / "flowpilot-3"
         skill.mkdir(parents=True)
+        member_hashes = {}
         with ZipFile(BytesIO(candidate_bytes)) as z:
-            (skill / "SKILL.md").write_bytes(z.read(MEMBER))
+            # Only exact, already verified relative paths; no extractall for candidate.
+            for name in expected_members:
+                target = base / "candidate" / name
+                target.parent.mkdir(parents=True, exist_ok=True)
+                blob = z.read(name)
+                target.write_bytes(blob)
+                member_hashes[name] = sha256(blob).hexdigest()
         vendor = _prepare_toolkit(vendor_bytes, base / "official", details["checker_relative_root"])
         code, stdout, stderr = _execute(vendor, skill, mode=mode)
-        if sha256((skill / "SKILL.md").read_bytes()).hexdigest() != expected_source:
-            raise VerificationRefused("Skill source changed during Checker run")
+        if any(sha256((base / "candidate" / name).read_bytes()).hexdigest() != digest
+               for name, digest in member_hashes.items()):
+            raise VerificationRefused("Candidate files changed during Checker run")
         return {"status": "OFFICIAL_CHECKER_EXECUTED_WITH_PINNED_SOURCE", **details,
                 **_sanitized_checker_result(code, stdout, stderr, mode=mode)}
 
@@ -227,7 +251,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--candidate-zip", type=Path, required=True)
     parser.add_argument("--official-kit-zip", type=Path, required=True)
     parser.add_argument("--mode", choices=("inspect", "docker", "native"), default="inspect")
-    parser.add_argument("--candidate-profile", choices=("g99", "g103"), default="g99",
+    parser.add_argument("--candidate-profile", choices=("g99", "g103", "g139"), default="g99",
                         help="Select exact reviewed source/ZIP pins; no arbitrary hash overrides")
     parser.add_argument("--accept-native-code-execution-risk", action="store_true")
     args = parser.parse_args(argv)
