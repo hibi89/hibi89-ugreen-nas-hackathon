@@ -45,9 +45,13 @@ Official sources (for human review):
 | G115 two typed templates with disposable fixture execution | 964 Linux total and Windows full regression | VERIFIED |
 | G116 deterministic Architect/Security/Builder/QA with bounded graph correction | 975 Linux total and Windows full regression | VERIFIED |
 | G117 pinned Docker smoke contract + opt-in synthetic signal advisor | New tests; verify exact new source SHA and CI | IMPLEMENTED, CI pending until checked |
-| G118 controlled containerized *workflow* test with strict fixtures and evidence | Must really execute in a trusted container; no mocks counted as actual | NOT VERIFIED |
+| G118 fixed code-owned container fixture scripts + optional pinned Docker runner | 2 scripts run with local Python; optional real Docker execution only on authorized machine | CODE/LOCAL SCRIPT VERIFIED; REAL CONTAINER NOT_RUN |
 | G119 true input/output repairs, persistent consent + separate trusted telemetry watcher | Idempotency/recovery and actual supplied event attestations | NOT IMPLEMENTED |
 | Genuine Uliya Expert/NAS + first-party G103 check | Exact owner/private skills, current vendor kit, authorization, real result readback | NOT_RUN / RELEASE HOLD |
 | Round1 submit | Entrant rights, PDF/ZIP exact-byte signoff, explicit submission instruction | NOT_SUBMITTED |
 
 Never alter G103 owner-private bytes, canonical older Skill, official ZIP/PDF, or begin 3h NAS activation without separate authorization.
+
+
+## G118 implementation addendum (2026-10-31 KST)
+See `docs/integrations/G118_PINNED_CONTAINER_FIXTURE_RUNNER_20261031.md`. The G118 runner uses G117 local Unix Docker endpoint, no image pull/network, read-only image, non-root and resource controls; two fixed source scripts verify a synthetic CSV report or missing→restored file fixture. Exact final local Linux/Windows CI at `e8bb37dd876f2f415bf202452e73ff2b1ee486b8` PASS (997 Linux pass, 5 skip; Windows full pass). Real Docker runtime remains NOT_RUN and does not establish native Uliya Skill execution.
