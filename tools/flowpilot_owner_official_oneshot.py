@@ -95,13 +95,19 @@ def verify_owner_pair(directory: Path, *, pdf_text: bool = False) -> dict:
 
 def run(directory: Path, *, download_official_kit: bool = False,
         execute_official_native_code: bool = False,
-        require_pdf_text: bool = False) -> dict:
+        require_pdf_text: bool = False,
+        official_kit_zip: Path | None = None) -> dict:
     if any(type(x) is not bool for x in (
             download_official_kit, execute_official_native_code,
             require_pdf_text)):
         raise OwnerCheckRefused("INVALID_EXPLICIT_PERMISSION")
-    if execute_official_native_code and not download_official_kit:
-        raise OwnerCheckRefused("VENDOR_EXECUTION_NEEDS_SEPARATE_DOWNLOAD_APPROVAL")
+    if official_kit_zip is not None and type(official_kit_zip) is not Path:
+        raise OwnerCheckRefused("INVALID_LOCAL_VENDOR_PATH")
+    if official_kit_zip is not None and download_official_kit:
+        raise OwnerCheckRefused("CHOOSE_ONE_VENDOR_SOURCE")
+    if (execute_official_native_code and not download_official_kit
+            and official_kit_zip is None):
+        raise OwnerCheckRefused("VENDOR_EXECUTION_NEEDS_VERIFIED_KIT_SOURCE")
     pair = verify_owner_pair(directory, pdf_text=require_pdf_text)
     if pair.get("status") != "G147_EXACT_LOCAL_PAIR_VERIFIED_NOT_OFFICIAL":
         raise OwnerCheckRefused("LOCAL_OWNER_PAIR_NOT_VERIFIED")
@@ -119,9 +125,16 @@ def run(directory: Path, *, download_official_kit: bool = False,
         "private_artifacts_uploaded": False,
         "release_gate": "HOLD",
     }
-    if not download_official_kit:
+    if not download_official_kit and official_kit_zip is None:
         return {**base, "status": "G147_LOCAL_PRECHECK_ONLY_NO_NETWORK"}
-    vendor = _download_authenticated_kit()
+    if official_kit_zip is not None:
+        vendor = _read_file(official_kit_zip, VENDOR_MAX)
+        if sha256(vendor).hexdigest() != official.VENDOR_ZIP_SHA:
+            raise OwnerCheckRefused("LOCAL_VENDOR_SHA256_MISMATCH")
+        vendor_origin = "OWNER_PROVIDED_OFFICIAL_KIT"
+    else:
+        vendor = _download_authenticated_kit()
+        vendor_origin = "UGREEN_LINKED_PUBLIC_CDN"
     with tempfile.TemporaryDirectory(prefix="g150-private-verify-") as tmp:
         vendor_path = Path(tmp) / "authenticated-official-kit.zip"
         vendor_path.write_bytes(vendor)
@@ -133,7 +146,8 @@ def run(directory: Path, *, download_official_kit: bool = False,
                 raise OwnerCheckRefused("UNEXPECTED_CHECKER_EXECUTION")
             return {**base,
                     "status": "G147_VENDOR_BYTES_AUTHENTIC_LOCAL_CHECKER_NOT_RUN",
-                    "official_vendor_digest_verified": True}
+                    "official_vendor_digest_verified": True,
+                    "vendor_source": vendor_origin}
         checked = official.check(
             directory / ZIP_FILE, vendor_path, mode="native",
             native_risk_approved=True, candidate_profile="g147")
@@ -143,6 +157,7 @@ def run(directory: Path, *, download_official_kit: bool = False,
         return {**base,
                 "status": "G147_OFFICIAL_CHECKER_EXECUTED_OWNER_REVIEW_ONLY",
                 "official_vendor_digest_verified": True,
+                "vendor_source": vendor_origin,
                 "official_checker_executed": True,
                 "checker_result": checked.get("result"),
                 "checker_summary": checked.get("checker_summary"),
@@ -161,13 +176,17 @@ def main(argv: list[str] | None = None) -> int:
                    help="Require local PyMuPDF and check actual PDF text")
     p.add_argument("--download-official-kit", action="store_true",
                    help="Authorize public HTTPS GET to UGREEN-linked Shopify CDN")
+    p.add_argument("--official-kit-zip", type=Path,
+                   help="Use already downloaded SHA256-pinned vendor ZIP locally; "
+                        "no CDN request; mutually exclusive with download")
     p.add_argument("--execute-official-native-code", action="store_true",
                    help="Separately authorize executing authenticated UGREEN JS via installed Node")
     args = p.parse_args(argv)
     try:
         result = run(args.folder, download_official_kit=args.download_official_kit,
                      execute_official_native_code=args.execute_official_native_code,
-                     require_pdf_text=args.require_pdf_text)
+                     require_pdf_text=args.require_pdf_text,
+                     official_kit_zip=args.official_kit_zip)
     except (OwnerCheckRefused, local_gate.ArtifactRefused,
             official.VerificationRefused, OSError, ValueError,
             ImportError, RuntimeError) as exc:

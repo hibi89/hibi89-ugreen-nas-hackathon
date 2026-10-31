@@ -138,5 +138,106 @@ class G150Test(unittest.TestCase):
         self.assertNotIn(str(self.directory), out.call_args.args[0])
 
 
+    def test_g151_local_vendor_uses_local_bytes_no_network_and_inspect_only(self):
+        vendor = b"synthetic predownloaded official kit fixture"
+        kit_path = self.directory / "owner-kit.zip"
+        kit_path.write_bytes(vendor)
+        with patch.object(g150, "verify_owner_pair", return_value=self.pair), \
+             patch.object(g150.official, "VENDOR_ZIP_SHA", g150.sha256(vendor).hexdigest()), \
+             patch.object(g150, "_download_authenticated_kit",
+                          side_effect=AssertionError("NO NETWORK FOR LOCAL KIT")), \
+             patch.object(g150.official, "check",
+                          return_value={"official_checker_executed": False}) as checker:
+            r = g150.run(self.directory, official_kit_zip=kit_path)
+        self.assertEqual(r["status"], "G147_VENDOR_BYTES_AUTHENTIC_LOCAL_CHECKER_NOT_RUN")
+        self.assertEqual(r["vendor_source"], "OWNER_PROVIDED_OFFICIAL_KIT")
+        self.assertTrue(r["official_vendor_digest_verified"])
+        self.assertFalse(r["official_checker_executed"])
+        self.assertEqual(r["release_gate"], "HOLD")
+        self.assertEqual(checker.call_args.kwargs["mode"], "inspect")
+
+    def test_g151_local_kit_native_code_requires_separate_explicit_opt_in(self):
+        vendor = b"synthetic local kit"
+        kit_path = self.directory / "kit.zip"
+        kit_path.write_bytes(vendor)
+        fake_report = {
+            "status": "OFFICIAL_CHECKER_EXECUTED_WITH_PINNED_SOURCE",
+            "official_checker_executed": True,
+            "result": "OFFICIAL_WARN_OR_FAIL_HOLD",
+            "diagnostic_codes": ["SYNTHETIC_WARNING"],
+        }
+        with patch.object(g150, "verify_owner_pair", return_value=self.pair), \
+             patch.object(g150.official, "VENDOR_ZIP_SHA", g150.sha256(vendor).hexdigest()), \
+             patch.object(g150, "_download_authenticated_kit",
+                          side_effect=AssertionError("NO NETWORK")), \
+             patch.object(g150.official, "check", return_value=fake_report) as checker:
+            r = g150.run(self.directory, official_kit_zip=kit_path,
+                         execute_official_native_code=True)
+        self.assertEqual(r["vendor_source"], "OWNER_PROVIDED_OFFICIAL_KIT")
+        self.assertTrue(r["official_checker_executed"])
+        self.assertEqual(r["release_gate"], "HOLD")
+        self.assertEqual(checker.call_args.kwargs["mode"], "native")
+        self.assertTrue(checker.call_args.kwargs["native_risk_approved"])
+
+    def test_g151_wrong_local_vendor_digest_refused_before_any_vendor_code(self):
+        kit_path = self.directory / "invalid-kit.zip"
+        kit_path.write_bytes(b"untrusted vendor payload")
+        with patch.object(g150, "verify_owner_pair", return_value=self.pair), \
+             patch.object(g150, "_download_authenticated_kit",
+                          side_effect=AssertionError("NO NETWORK")), \
+             patch.object(g150.official, "check",
+                          side_effect=AssertionError("NO VENDOR")):
+            with self.assertRaisesRegex(g150.OwnerCheckRefused, "SHA256"):
+                g150.run(self.directory, official_kit_zip=kit_path,
+                         execute_official_native_code=True)
+
+    def test_g151_symlink_vendor_refused_before_checker(self):
+        target = self.directory / "vendor-target.zip"
+        target.write_bytes(b"malicious")
+        link = self.directory / "vendor-link.zip"
+        try:
+            link.symlink_to(target)
+        except (OSError, NotImplementedError):
+            self.skipTest("Cannot create symlink on this platform")
+        with patch.object(g150, "verify_owner_pair", return_value=self.pair), \
+             patch.object(g150, "_download_authenticated_kit",
+                          side_effect=AssertionError("NO NETWORK")), \
+             patch.object(g150.official, "check",
+                          side_effect=AssertionError("NO VENDOR")):
+            with self.assertRaisesRegex(g150.OwnerCheckRefused, "MISSING_OR_UNSAFE"):
+                g150.run(self.directory, official_kit_zip=link)
+
+    def test_g151_download_and_explicit_local_kit_mutually_exclusive(self):
+        kit_path = self.directory / "kit.zip"
+        with patch.object(g150, "verify_owner_pair",
+                          side_effect=AssertionError("MUST REFUSE BEFORE OWNER READ")):
+            with self.assertRaisesRegex(g150.OwnerCheckRefused, "CHOOSE_ONE"):
+                g150.run(self.directory, official_kit_zip=kit_path,
+                         download_official_kit=True)
+
+    def test_g151_cli_local_vendor_option_passes_explicit_path_without_network(self):
+        from contextlib import redirect_stdout
+        from io import StringIO
+        kit_path = self.directory / "kit.zip"
+        with patch.object(g150, "run",
+                          return_value={"status": "G147_VENDOR_BYTES_AUTHENTIC_LOCAL_CHECKER_NOT_RUN",
+                                        "release_gate": "HOLD"}) as run, \
+             redirect_stdout(StringIO()) as out:
+            rc = g150.main(["--folder", str(self.directory),
+                            "--official-kit-zip", str(kit_path)])
+        self.assertEqual(rc, 0)
+        self.assertEqual(run.call_args.kwargs["official_kit_zip"], kit_path)
+        self.assertFalse(run.call_args.kwargs["download_official_kit"])
+        self.assertFalse(run.call_args.kwargs["execute_official_native_code"])
+        self.assertNotIn(str(kit_path), out.getvalue())
+
+    def test_g151_absent_vendor_and_execute_still_refuses(self):
+        with patch.object(g150, "verify_owner_pair",
+                          side_effect=AssertionError("MUST REFUSE EARLY")):
+            with self.assertRaisesRegex(g150.OwnerCheckRefused, "VERIFIED_KIT_SOURCE"):
+                g150.run(self.directory, execute_official_native_code=True)
+
+
+
 if __name__ == "__main__":
     unittest.main()
