@@ -169,16 +169,171 @@ def _load(path: Path, limit: int) -> bytes:
     return raw
 
 
+
+# G148 extends the existing G140 local-only artifact gate; it does not change
+# older G139 validation. These G147 pins are PUBLIC HASHES, never private bytes.
+_G147_BASE = "FlowPilot3_G147_RULES_ALIGNED_OWNER_REVIEW_NOT_SUBMITTED"
+_G147_EXPECTED = {
+    "zip": "d8c66b24000b6fb1f7ea8b0d69417febfc83128d935e9b8db33dd382bb9c64c1",
+    "pdf": "bf5319f0b840747e53d3a84f78e4006bc932a4d5d2bd0671c9c43c6f3877b90f",
+    "flowpilot-3/SKILL.md": "1062bba52833e3bbbc5f020739f80d2dee1dc2f2b428016e342075525bf2bc6d",
+    "flowpilot-3/references/CAPABILITY_AND_PLAN_CONTRACT.md": "4fa2235bdc164334f3592b16a358986718fc49a057ba800e931f5f7fc5017f49",
+    "flowpilot-3/references/SAFETY_AND_SCENARIOS.md": "baf04355555f689266b46ba0866c25a022003d79ae8ad3f9475eda0408cc6ad0",
+}
+
+
+def verify_g147_candidate(pdf: bytes, skill_zip: bytes, manifest_raw: bytes, *,
+                          require_pdf_text: bool = False) -> dict:
+    """Read ONLY owner-supplied local bytes. Every result remains release HOLD.
+
+    Hash validation is separate from mandatory first-party Uliya Checker and
+    from any native NAS test. Optional PDF text reading requires local PyMuPDF.
+    """
+    if type(require_pdf_text) is not bool:
+        raise ArtifactRefused("INVALID_PDF_TEXT_FLAG")
+    if (type(pdf) is not bytes or not 0 < len(pdf) <= _MAX_PDF
+            or not pdf.startswith(b"%PDF-") or b"%%EOF" not in pdf[-1024:]
+            or type(skill_zip) is not bytes or not 0 < len(skill_zip) <= _MAX_ZIP):
+        raise ArtifactRefused("INVALID_G147_DOCUMENT_BYTES")
+    # Do not let a self-authored manifest authorize different ZIP/PDF bytes.
+    if _digest(skill_zip) != _G147_EXPECTED["zip"] or _digest(pdf) != _G147_EXPECTED["pdf"]:
+        raise ArtifactRefused("G147_PINNED_PAIR_CHANGED")
+    m = _manifest(manifest_raw)
+    if (m.get("schema") != "g147-exact-owner-review-v1"
+            or m.get("release_gate") != "HOLD"
+            or m.get("owner_review_only") is not True
+            or any(m.get(k) is not False for k in (
+                "first_party_checker_executed", "registered_uliya_expert_verified",
+                "real_nas_verified", "devpost_submitted"))
+            or m.get("package_member_count") != 3
+            or type(m.get("substantive_english_word_count")) is not int
+            or not 1 <= m["substantive_english_word_count"] <= 500
+            or type(m.get("pdf_pages")) is not int or m["pdf_pages"] != 1):
+        raise ArtifactRefused("INVALID_G147_RELEASE_METADATA")
+    artifacts = m.get("artifacts")
+    expected_artifacts = {
+        _G147_BASE + ".pdf": pdf,
+        _G147_BASE + ".zip": skill_zip,
+    }
+    if type(artifacts) is not dict or set(artifacts) != set(expected_artifacts):
+        raise ArtifactRefused("INVALID_G147_PAIR_MANIFEST")
+    for filename, content in expected_artifacts.items():
+        item = artifacts[filename]
+        if (type(item) is not dict or set(item) != {"bytes", "sha256"}
+                or type(item["bytes"]) is not int or item["bytes"] != len(content)
+                or item["sha256"] != _digest(content)):
+            raise ArtifactRefused("G147_STALE_PAIR_MANIFEST")
+    members = {}
+    try:
+        with ZipFile(io.BytesIO(skill_zip)) as z:
+            infos = z.infolist()
+            allowed = set(_G147_EXPECTED) - {"pdf", "zip"}
+            if len(infos) != 3 or set(x.filename for x in infos) != allowed:
+                raise ArtifactRefused("G147_UNEXPECTED_MARKDOWN_MEMBERS")
+            for info in infos:
+                name = info.filename
+                if (info.is_dir() or info.flag_bits & 1
+                        or stat.S_ISLNK(info.external_attr >> 16)
+                        or not 0 < info.file_size <= _MAX_FILE):
+                    raise ArtifactRefused("G147_UNSAFE_MEMBER")
+                content = z.read(info)
+                if _digest(content) != _G147_EXPECTED[name]:
+                    raise ArtifactRefused("G147_MEMBER_PIN_CHANGED")
+                members[name] = content
+            if z.testzip() is not None or sum(map(len, members.values())) > _MAX_UNPACKED:
+                raise ArtifactRefused("G147_CORRUPT_OR_OVERSIZED_ZIP")
+    except (BadZipFile, RuntimeError, EOFError, OSError, OverflowError) as exc:
+        raise ArtifactRefused("G147_CORRUPT_ZIP") from exc
+    records = m.get("package_members")
+    if (type(records) is not list or len(records) != 3
+            or any(type(r) is not dict or set(r) != {"name", "bytes", "sha256"}
+                   or type(r["name"]) is not str or type(r["bytes"]) is not int
+                   or type(r["sha256"]) is not str for r in records)
+            or {r["name"]: (r["bytes"], r["sha256"]) for r in records}
+            != {name: (len(b), _digest(b)) for name, b in members.items()}):
+        raise ArtifactRefused("G147_MEMBER_MANIFEST_DRIFT")
+    try:
+        text = members[_ENTRY].decode("utf-8")
+        for name, raw in members.items():
+            if name != _ENTRY:
+                raw.decode("utf-8")
+                relative = name.removeprefix("flowpilot-3/")
+                if f"]({relative})" not in text:
+                    raise ArtifactRefused("G147_UNLINKED_REFERENCE")
+    except UnicodeError as exc:
+        raise ArtifactRefused("G147_INVALID_UTF8") from exc
+    if (not re.match(r"\A---\r?\nname: flowpilot-3\r?\ndescription: [^\r\n]{1,1024}\r?\n---\r?\n", text)
+            or not all(term in text.casefold()
+                       for term in ("hackathon-original", "chatgpt", "third-party",
+                                    "registered", "release_gate"))):
+        # Release gate is a return-schema field, not a requirement in the Skill;
+        # use the explicit consent/rights terms in candidate text instead.
+        if not re.match(r"\A---\r?\nname: flowpilot-3\r?\ndescription: [^\r\n]{1,1024}\r?\n---\r?\n", text):
+            raise ArtifactRefused("G147_INVALID_FRONTMATTER")
+        if not all(term in text.casefold() for term in (
+                "hackathon-original", "chatgpt", "third-party",
+                "registered", "rights check")):
+            raise ArtifactRefused("G147_MISSING_DISCLOSURES")
+    text_checked = False
+    if require_pdf_text:
+        try:
+            import fitz
+        except ImportError as exc:
+            raise ArtifactRefused("G147_PDF_TEXT_READER_UNAVAILABLE") from exc
+        try:
+            with fitz.open(stream=pdf, filetype="pdf") as doc:
+                if doc.needs_pass or doc.page_count != 1:
+                    raise ArtifactRefused("G147_PDF_LOCKED_OR_MULTIPAGE")
+                content = doc[0].get_text(sort=True)
+                first, end = content.find("1. What does"), content.find("Disclosures (excluded")
+                if first < 0 or end <= first:
+                    raise ArtifactRefused("G147_PDF_QA_BLOCK_MISSING")
+                substantive = content[first:end]
+                indices = [int(match.group(1)) for match in re.finditer(
+                    r"(?m)^([1-9]|10)\.\s+\S+", substantive)]
+                if indices != list(range(1, 11)) or len(substantive.split()) > 500:
+                    raise ArtifactRefused("G147_PDF_QA_MISSING_OR_OVER_LIMIT")
+                if "UGREEN Uliya/UGOS" not in content or "ChatGPT" not in content:
+                    raise ArtifactRefused("G147_PDF_DISCLOSURE_MISSING")
+            text_checked = True
+        except (RuntimeError, ValueError, TypeError, AttributeError) as exc:
+            raise ArtifactRefused("G147_PDF_TEXT_UNVERIFIED") from exc
+    return {
+        "schema": "flowpilot-g148-g147-owner-final-byte-gate-v1",
+        "status": "G147_EXACT_LOCAL_PAIR_VERIFIED_NOT_OFFICIAL",
+        "candidate_profile": "g147",
+        "skill_zip_sha256": _digest(skill_zip),
+        "pdf_sha256": _digest(pdf),
+        "markdown_member_count": 3, "pdf_text_verified": text_checked,
+        "pdf_visual_layout_independently_certified": False,
+        "official_checker_executed": False,
+        "registered_expert_verified": False, "real_nas_verified": False,
+        "owner_rights_approved": False, "devpost_submitted": False,
+        "release_gate": "HOLD", "private_content_returned": False,
+    }
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(description="Private local G139 artifact parity; not official Checker")
     p.add_argument("--pdf", type=Path, required=True)
     p.add_argument("--zip", type=Path, required=True)
     p.add_argument("--manifest", type=Path, required=True)
+    p.add_argument("--profile", choices=("g139", "g147"), default="g139")
+    p.add_argument("--require-pdf-text", action="store_true",
+                   help="Use installed PyMuPDF to inspect G147 actual PDF text")
     args = p.parse_args(argv)
     try:
-        result = verify_candidate(
-            _load(args.pdf, _MAX_PDF), _load(args.zip, _MAX_ZIP),
-            _load(args.manifest, _MAX_JSON))
+        if args.profile == "g147":
+            result = verify_g147_candidate(
+                _load(args.pdf, _MAX_PDF), _load(args.zip, _MAX_ZIP),
+                _load(args.manifest, _MAX_JSON),
+                require_pdf_text=args.require_pdf_text)
+        elif args.require_pdf_text:
+            raise ArtifactRefused("G139_PDF_TEXT_UNSUPPORTED_BY_THIS_GATE")
+        else:
+            result = verify_candidate(
+                _load(args.pdf, _MAX_PDF), _load(args.zip, _MAX_ZIP),
+                _load(args.manifest, _MAX_JSON))
         code = 0
     except (ArtifactRefused, ValueError, TypeError, OSError):
         result = {"schema": "flowpilot-g140-owner-artifact-byte-gate-v1",
