@@ -94,7 +94,7 @@ class G63SequentialLocalWorkflow(unittest.TestCase):
         accessed = []
         def record(*args, **kwargs):
             if kwargs.get("metadata_consent"):
-                accessed.extend(kwargs.get("required", []))
+                accessed.extend(args[1])
             return real_inspector(*args, **kwargs)
         with patch("flowpilot_local_workflow.inspect_owner_folder", side_effect=record):
             report = run_workflow(self.root, recipe, metadata_consent=True)
