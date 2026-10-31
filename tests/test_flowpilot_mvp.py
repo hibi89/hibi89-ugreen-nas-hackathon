@@ -189,6 +189,39 @@ class FlowPilotMVP(unittest.TestCase):
                        processing_destination_confirmed="true")
         self.assertNotIn("document", [s.id for s in p.steps])
 
+    def test_g110_multi_mode_check_and_summary_requests_one_mode(self):
+        p = draft_plan(**{**P, "request": "check required files and summarize handoff/summary.md"},
+                       document_approved=True,
+                       returned_document_refs=("synthetic://g104/summary",),
+                       processing_destination_confirmed=True)
+        self.assertEqual(p.state, State.WAITING_USER)
+        self.assertEqual(p.steps, ())
+        self.assertIn("MULTIPLE_EXPLICIT_INTENTS_NOT_EXECUTED", p.limitations)
+
+    def test_g110_multi_mode_compare_and_summary_do_not_silently_pick_content(self):
+        p = draft_plan(**{**P, "request": "compare versions and summarize the selected document"},
+                       document_approved=True,
+                       returned_document_refs=("synthetic://g104/summary",),
+                       processing_destination_confirmed=True)
+        self.assertEqual(p.state, State.WAITING_USER)
+        self.assertIsNone(p.intent)
+
+    def test_g110_multi_mode_audit_and_compare_requires_selection(self):
+        p = draft_plan(**{**P, "request": "audit handoff and compare versions"})
+        self.assertEqual(p.state, State.WAITING_USER)
+        self.assertEqual(p.steps, ())
+
+    def test_g110_filename_text_does_not_trigger_multimode_gate(self):
+        p = draft_plan(**{**P, "request": "check required handoff/summarize.md"})
+        self.assertEqual(p.state, State.READY_FOR_ADAPTER_CHECK)
+        self.assertEqual(p.intent, Intent.CHECK_REQUIRED)
+
+    def test_g110_one_mode_handoff_summary_still_requires_content_consent(self):
+        p = draft_plan(**{**P, "request": "summarize handoff/summary.md"})
+        self.assertEqual(p.state, State.READY_FOR_ADAPTER_CHECK)
+        self.assertEqual(p.intent, Intent.SUMMARIZE_SELECTED)
+        self.assertNotIn("document", (step.id for step in p.steps))
+
     def test_markdown_source_no_scripts_or_real_nas_claim(self):
         skill = (ROOT / "skill" / "flowpilot-nas" / "SKILL.md").read_text(encoding="utf-8")
         self.assertTrue(skill.startswith("---\nname: flowpilot-nas\n"))

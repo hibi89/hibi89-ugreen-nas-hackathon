@@ -120,6 +120,26 @@ def _intent(request: str) -> Intent | None:
     return None
 
 
+def _has_conflicting_explicit_tasks(request: str) -> bool:
+    """Require a user selection when multiple distinct action verbs are explicit.
+
+    Exclude slash-delimited paths: a name such as handoff/summarize.md must not
+    itself count as an instruction to read document contents.
+    """
+    text = re.sub(r"(?<!\\w)[^\\s/]+/[^\\s]+", " ", request.casefold())
+    explicit = [
+        bool(re.search(r"(?<![\\w/_.-])summari[sz]e(?![\\w/_.-])", text)
+             or re.search(r"(?<![/_.-])요약(?:해|하|할)", text)),
+        bool(re.search(r"\\b(?:compare|review)\\s+versions?\\b", text)
+             or "버전 비교" in text or "버전들을 비교" in text),
+        bool(re.search(r"\\bcheck\\s+(?:required|missing)\\b", text)
+             or "필수 파일 확인" in text or "누락 파일 확인" in text),
+        bool(re.search(r"\\baudit\\s+(?:handoff|deliverables?)\\b", text)
+             or "납품 감사" in text or "인계 감사" in text),
+    ]
+    return sum(explicit) > 1
+
+
 def draft_plan(
     request: str,
     root: str = "",
@@ -142,6 +162,10 @@ def draft_plan(
         return Plan(State.WAITING_USER, None, "", (), (), ("What NAS handoff/check/version/document task?",), tuple(limitations))
     if _WRITES.search(request):
         return Plan(State.BLOCKED, None, "", (), (), (), ("Mutating or external-transfer requests are outside the contest read-only MVP",))
+    if _has_conflicting_explicit_tasks(request):
+        return Plan(State.WAITING_USER, None, "", (), (),
+                    ("Multiple different tasks requested. Select one mode: required-file check, version review, handoff audit, or selected-document summary.",),
+                    tuple(limitations) + ("MULTIPLE_EXPLICIT_INTENTS_NOT_EXECUTED",))
     intent = _intent(request)
     if intent is None:
         return Plan(State.WAITING_USER, None, "", (), (), ("Choose handoff audit, required-file check, version review, or selected-document summary.",), tuple(limitations))
