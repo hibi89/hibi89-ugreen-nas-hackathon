@@ -58,7 +58,8 @@ class FlowPilotMVP(unittest.TestCase):
 
     def test_summary_only_exact_selected_refs(self):
         p = draft_plan(**{**P, "request": "summarize document"},
-                       document_approved=True, returned_document_refs=("actual-reference-1",))
+                       document_approved=True, returned_document_refs=("actual-reference-1",),
+                       processing_destination_confirmed=True)
         self.assertEqual(tuple(s.id for s in p.steps), ("inventory", "document", "report"))
 
     def test_g104_explicit_summary_of_handoff_document_preserves_document_consent(self):
@@ -68,7 +69,8 @@ class FlowPilotMVP(unittest.TestCase):
         self.assertNotIn("document", (s.id for s in pending.steps))
         self.assertIn("DOCUMENT_STAGE_WAITING_SEPARATE_APPROVAL_AND_REAL_FILE_REFS", pending.limitations)
         approved = draft_plan(**args, document_approved=True,
-                             returned_document_refs=("synthetic://g104/summary",))
+                             returned_document_refs=("synthetic://g104/summary",),
+                             processing_destination_confirmed=True)
         self.assertEqual(tuple(s.id for s in approved.steps), ("inventory", "document", "report"))
         self.assertFalse(approved.did_access_nas)
 
@@ -152,7 +154,8 @@ class FlowPilotMVP(unittest.TestCase):
     def test_invalid_document_ref_is_not_trusted(self):
         with self.assertRaises(ValueError):
             draft_plan(**{**P, "request": "summarize document"},
-                       document_approved=True, returned_document_refs=("",))
+                       document_approved=True, returned_document_refs=("",),
+                       processing_destination_confirmed=True)
 
     def test_untrusted_string_metadata_approval_does_not_unlock_plan(self):
         x = draft_plan(**{**P, "metadata_approved": "true"})
@@ -170,6 +173,21 @@ class FlowPilotMVP(unittest.TestCase):
                        returned_document_refs=("synthetic://a",))
         self.assertEqual(x.state, State.READY_FOR_ADAPTER_CHECK)
         self.assertNotIn("document", [s.id for s in x.steps])
+
+    def test_g109_unknown_processing_metadata_consent_cannot_plan_content(self):
+        p = draft_plan(**{**P, "request": "summarize handoff/summary.md"},
+                       document_approved=True,
+                       returned_document_refs=("synthetic://g104/summary",))
+        self.assertEqual(p.intent, Intent.SUMMARIZE_SELECTED)
+        self.assertNotIn("document", [s.id for s in p.steps])
+        self.assertIn("DOCUMENT_PROCESSING_DESTINATION_UNVERIFIED", p.limitations)
+
+    def test_g109_destination_string_claim_cannot_plan_content(self):
+        p = draft_plan(**{**P, "request": "summarize handoff/summary.md"},
+                       document_approved=True,
+                       returned_document_refs=("synthetic://g104/summary",),
+                       processing_destination_confirmed="true")
+        self.assertNotIn("document", [s.id for s in p.steps])
 
     def test_markdown_source_no_scripts_or_real_nas_claim(self):
         skill = (ROOT / "skill" / "flowpilot-nas" / "SKILL.md").read_text(encoding="utf-8")

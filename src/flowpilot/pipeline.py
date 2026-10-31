@@ -32,6 +32,7 @@ def evaluate_offline(
     batch: ObservationBatch | None = None,
     document_approved: bool = False,
     returned_document_refs: Sequence[str] = (),
+    processing_destination_confirmed: bool = False,
     version_candidates: dict[str, Sequence[str]] | None = None,
 ) -> FlowResult:
     """Compose pure plan and evidence stages; never execute registered agents."""
@@ -49,6 +50,7 @@ def evaluate_offline(
         unknown_processing_accepted=unknown_processing_accepted,
         document_approved=document_approved,
         returned_document_refs=eligible_refs,
+        processing_destination_confirmed=processing_destination_confirmed,
     )
     base = ("OFFLINE_ONLY", "LIVE_REGISTERED_AGENT_NOT_INVOKED",
             "PERMISSION_FLAGS_ARE_UNVERIFIED_CALLER_ASSERTIONS")

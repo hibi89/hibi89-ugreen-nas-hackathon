@@ -31,10 +31,27 @@ class FlowPilotPipeline(unittest.TestCase):
         self.assertNotIn("document", [s.id for s in pending.plan.steps])
         self.assertFalse(pending.actual_nas_verified)
         approved = evaluate_offline(**kwargs, document_approved=True,
-                                    returned_document_refs=("synthetic://g104/summary",))
+                                    returned_document_refs=("synthetic://g104/summary",),
+                                    processing_destination_confirmed=True)
         self.assertEqual(approved.status, "NEEDS_REVIEW")
         self.assertIn("document", [s.id for s in approved.plan.steps])
         self.assertFalse(approved.actual_nas_verified)
+
+    def test_g109_content_consent_alone_cannot_plan_unknown_destination(self):
+        root = "/volume1/FLOWPILOT_G104_SYNTHETIC_TEST/project"
+        batch = ObservationBatch(root, (seen("handoff/summary.md", "synthetic://g104/summary"),),
+                                 True, True, True, True)
+        kwargs = dict(request="summarize handoff/summary.md", root=root,
+                      required_paths=("handoff/summary.md",), metadata_approved=True,
+                      unknown_processing_accepted=True, batch=batch,
+                      document_approved=True, returned_document_refs=("synthetic://g104/summary",))
+        unsafe = evaluate_offline(**kwargs)
+        self.assertEqual(unsafe.status, "NEEDS_REVIEW")
+        self.assertNotIn("document", [s.id for s in unsafe.plan.steps])
+        self.assertIn("DOCUMENT_PROCESSING_DESTINATION_UNVERIFIED", unsafe.plan.limitations)
+        confirmed = evaluate_offline(**kwargs, processing_destination_confirmed=True)
+        self.assertIn("document", [s.id for s in confirmed.plan.steps])
+        self.assertFalse(confirmed.actual_nas_verified)
 
     def test_g104_missing_signoff_blocks_only_complete_claimed_scan(self):
         root = "/volume1/FLOWPILOT_G104_SYNTHETIC_TEST/project"
@@ -99,7 +116,8 @@ class FlowPilotPipeline(unittest.TestCase):
         self.assertEqual(x.status,'BLOCKED');self.assertIn('UNATTRIBUTABLE_DOCUMENT_REFERENCE',x.limitations)
 
     def test_approved_document_ref_still_not_nas_validation(self):
-        x=evaluate_offline(**{**BASE,'request':'summarize document'},batch=fixture(seen('README.md','synthetic://a'),seen('release/output.pdf','synthetic://b')),document_approved=True,returned_document_refs=('synthetic://a',))
+        x=evaluate_offline(**{**BASE,'request':'summarize document'},batch=fixture(seen('README.md','synthetic://a'),seen('release/output.pdf','synthetic://b')),document_approved=True,returned_document_refs=('synthetic://a',),
+                           processing_destination_confirmed=True)
         self.assertEqual(x.status,'NEEDS_REVIEW');self.assertEqual([s.id for s in x.plan.steps],['inventory','document','report'])
 
     def test_writes_blocked_before_evidence(self):

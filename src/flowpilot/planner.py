@@ -129,6 +129,7 @@ def draft_plan(
     unknown_processing_accepted: bool = False,
     document_approved: bool = False,
     returned_document_refs: Sequence[str] = (),
+    processing_destination_confirmed: bool = False,
 ) -> Plan:
     """Draft one bounded read-only flow, without pretending runtime support.
 
@@ -169,9 +170,16 @@ def draft_plan(
         if document_approved is True and returned_document_refs:
             if any(not isinstance(ref, str) or not ref.strip() for ref in returned_document_refs):
                 raise ValueError("Invalid returned document reference")
-            steps.append(Step("document", "document-agent", "Only exact verified returned references, separately approved; never widen scope"))
+        # Metadata-only consent to UNKNOWN processing is not permission to
+        # send file contents for document reading. A separate affirmative,
+        # exact destination confirmation is required, not truthy text or 1.
+        if (document_approved is True and returned_document_refs
+                and processing_destination_confirmed is True):
+            steps.append(Step("document", "document-agent", "Only exact verified returned references at a separately confirmed processing destination; never widen scope"))
         else:
             limitations.append("DOCUMENT_STAGE_WAITING_SEPARATE_APPROVAL_AND_REAL_FILE_REFS")
-            questions.append("After file-agent returns exact references, separately approve selected content and the question.")
+            if processing_destination_confirmed is not True:
+                limitations.append("DOCUMENT_PROCESSING_DESTINATION_UNVERIFIED")
+            questions.append("After file-agent returns exact references, separately approve selected content, verify its processing destination, and supply the question.")
     steps.append(Step("report", "parent-skill", "Evidence-linked PRESENT/MISSING/NOT_CHECKED/VERSION_REVIEW; no optimistic READY"))
     return Plan(State.READY_FOR_ADAPTER_CHECK, intent, root, paths, tuple(steps), tuple(questions), tuple(limitations))
