@@ -1,3 +1,9 @@
+## LATEST OWNER-APPROVED PRODUCT DIRECTION — 2026-10-31 (supersedes 2026-10-24 tentative ProjectReady-only scope)
+- **Final product aim:** FlowPilot 3.0 natural-language UGREEN NAS workflow maker: collect scope/consent → typed implementation design → trusted template/agent cooperation → isolated synthetic tests → bounded failure diagnosis/repair/retest → step-by-step reproducible user guidance → separately authorized supported NAS action/readback. ProjectReady audit is one template/subsystem, not the full product.
+- **Integrated innovation:** (1) verified sandbox safety/self-healing as central goal, (3) Architect/Security/Builder/QA review council, (2) optional proactive read-only suggestions based on consented telemetry. No undisclosed permanent NAS watcher, arbitrary shell/Docker calls, external data transfer, or autopatch. Real Docker workflow and LLM-based repair must be verified before claiming them.
+- **Hackathon compliance remains binding:** actual Uliya Skill ZIP contains only allowed Markdown; use only verified registered Expert abilities, not arbitrary script executors. Off-Skill Python/Docker development harness does not by itself confer NAS runtime capability. NAS/Creator, paid services, external sharing, user data access and Devpost submission still need distinct owner approval. Initial PDF under 500 substantive English words and deadline 2026-11-16 16:45 KST unchanged.
+- **Current source:** G114-G116 verified only bounded local templates; G117 architecture/contract tests subject to exact-source CI. Follow `docs/strategy/G117_APPROVED_FLOWPILOT3_ARCHITECTURE_20261031.md` and latest `HANDOFF.md`/ `STATUS.md` over obsolete historical statements below.
+
 # UGREEN 요구사항 — 2026-10-24 스냅샷
 
 ## 확정된 운영 제약
