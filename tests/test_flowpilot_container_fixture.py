@@ -1,6 +1,7 @@
 """G118 fixed Docker fixture scripts: local Python execution and Docker mock boundaries."""
 import hashlib
 import json
+import os
 import subprocess
 import sys
 import unittest
@@ -27,7 +28,15 @@ class G118ContainerFixtureTests(unittest.TestCase):
                 r = subprocess.run([sys.executable, "-I", "-B", "-c", script],
                                    capture_output=True, text=True, timeout=10)
                 self.assertEqual(r.returncode, 0, r.stderr)
-                self.assertTrue(_trusted_receipt(template, r.stdout))
+                receipt = json.loads(r.stdout)
+                self.assertTrue(receipt["invalid_fixture_refused"])
+                self.assertTrue(receipt["expected_output_verified"])
+                self.assertTrue(receipt["source_preserved"])
+                self.assertEqual(receipt["nonroot"],
+                                 os.name == "posix" and os.getuid() != 0)
+                # Windows local Python is not a Linux-container uid proof.
+                self.assertEqual(_trusted_receipt(template, r.stdout),
+                                 os.name == "posix" and os.getuid() != 0)
 
     def test_pinned_plan_only_is_nonexecuting_and_security_flags_preserved(self):
         p = plan_container_fixture(GOAL, PINNED)

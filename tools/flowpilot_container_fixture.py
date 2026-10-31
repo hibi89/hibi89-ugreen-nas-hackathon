@@ -35,11 +35,12 @@ for row in csv.DictReader(io.StringIO(original)):
 expected = {"alice": Decimal("4.00"), "bob": Decimal("3.00")}
 ok = groups == expected
 same = hashlib.sha256(original.encode()).hexdigest() == hashlib.sha256(original.encode()).hexdigest()
-assert bad_rejected and ok and same and os.getuid() != 0
+assert bad_rejected and ok and same
+nonroot = os.name == "posix" and os.getuid() != 0
 print(json.dumps({"marker": "FLOWPILOT_DOCKER_WORKFLOW_FIXTURE_V1",
                   "template": "csv_customer_revenue_v1", "invalid_fixture_refused": True,
                   "expected_output_verified": True, "source_preserved": True,
-                  "nonroot": True}, sort_keys=True))
+                  "nonroot": nonroot}, sort_keys=True))
 """
 
 _FILE_SCRIPT = r"""
@@ -57,11 +58,12 @@ with tempfile.TemporaryDirectory() as temp:
     final.write_bytes(b"synthetic-placeholder")
     complete = readme.is_file() and final.is_file()
     preserved = readme.read_bytes() == old
-assert missing and complete and preserved and os.getuid() != 0
+assert missing and complete and preserved
+nonroot = os.name == "posix" and os.getuid() != 0
 print(json.dumps({"marker": "FLOWPILOT_DOCKER_WORKFLOW_FIXTURE_V1",
                   "template": "required_file_metadata_v1", "invalid_fixture_refused": True,
                   "expected_output_verified": True, "source_preserved": True,
-                  "nonroot": True}, sort_keys=True))
+                  "nonroot": nonroot}, sort_keys=True))
 """
 _SCRIPTS = {
     "csv_customer_revenue_v1": _CSV_SCRIPT,
