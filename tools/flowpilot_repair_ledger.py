@@ -7,6 +7,7 @@ deterministic template review + disposable fixture tests, NOT production.
 from __future__ import annotations
 
 import argparse
+from contextlib import closing
 import hashlib
 import json
 import re
@@ -167,7 +168,9 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
     try:
         with tempfile.TemporaryDirectory(prefix="flowpilot-g119-") as tmp:
-            with sqlite3.connect(Path(tmp) / "evidence.sqlite") as db:
+            # sqlite3.Connection context manager does NOT close the handle.
+            # Explicit closing is required before Windows deletes the scratch dir.
+            with closing(sqlite3.connect(Path(tmp) / "evidence.sqlite")) as db:
                 result = run_once(args.goal, args.run_id, db,
                                   inject_test_fault=args.inject_test_fault)
                 if result["status"] == "SYNTHETIC_LEDGER_PASS":
