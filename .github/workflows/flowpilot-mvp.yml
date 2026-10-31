@@ -78,6 +78,7 @@ jobs:
           & powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tools\flowpilot_owner_official_offline.ps1 -ArtifactFolder "$env:RUNNER_TEMP" -OfficialKitZip "$env:RUNNER_TEMP\missing-official-kit.zip"
           if ($LASTEXITCODE -ne 2) { throw "G152 missing authentic Kit must refuse; no vendor JS" }
           Write-Host "G152 Windows offline launcher preflight and denial PASS; official Checker NOT_RUN"
+          exit 0  # Expected second subprocess exit 2 was asserted; do not inherit it as job failure.
       - name: Full Windows PowerShell 5.1 owner-equivalent offline verification
         shell: pwsh
         run: |
