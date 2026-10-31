@@ -33,6 +33,21 @@ class G152OfflineLauncherContractTests(unittest.TestCase):
         self.assertIn("Get-Command 'python' -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1", source)
         self.assertIn("Get-Command 'node' -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1", source)
 
+    def test_g153_pair_only_requires_no_vendor_zip_and_never_runs_vendor(self):
+        source = SCRIPT.read_text(encoding="utf-8")
+        self.assertIn("[switch]$VerifyOwnerPairOnly", source)
+        self.assertIn("if ($VerifyOwnerPairOnly) {", source)
+        self.assertIn("OWNER_PAIR_ONLY_REFUSES_VENDOR_FLAGS", source)
+        self.assertIn("$pairArgs = @($entry, '--folder', $ArtifactFolder)", source)
+        self.assertIn("& $python.Source @pairArgs", source)
+        self.assertIn("if ([string]::IsNullOrWhiteSpace($OfficialKitZip))", source)
+        self.assertIn("OFFICIAL_KIT_PATH_REQUIRED", source)
+
+    def test_g153_pdf_text_stays_explicit_optional(self):
+        source = SCRIPT.read_text(encoding="utf-8")
+        self.assertIn("if ($RequirePdfText) { $pairArgs += '--require-pdf-text' }", source)
+        self.assertIn("if ($ExecuteOfficialNativeCode -or $PSBoundParameters.ContainsKey('OfficialKitZip'))", source)
+
     def test_exact_private_pair_and_kit_passing_without_upload(self):
         source = SCRIPT.read_text(encoding="utf-8")
         self.assertIn("'flowpilot_owner_official_oneshot.py'", source)

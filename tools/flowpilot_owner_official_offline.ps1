@@ -3,7 +3,8 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory=$true)][string]$ArtifactFolder,
-    [Parameter(Mandatory=$true)][string]$OfficialKitZip,
+    [string]$OfficialKitZip,
+    [switch]$VerifyOwnerPairOnly,
     [switch]$ExecuteOfficialNativeCode,
     [switch]$RequirePdfText,
     [switch]$PreflightOnly
@@ -38,13 +39,27 @@ if ($null -eq $python) { Refuse 'PYTHON_311_OR_NEWER_REQUIRED' }
 if ($LASTEXITCODE -ne 0) { Refuse 'PYTHON_311_OR_NEWER_REQUIRED' }
 
 if ($PreflightOnly) {
-    if ($ExecuteOfficialNativeCode) { Refuse 'EXECUTION_NOT_ALLOWED_DURING_PREFLIGHT' }
+    if ($ExecuteOfficialNativeCode -or $VerifyOwnerPairOnly) { Refuse 'EXECUTION_NOT_ALLOWED_DURING_PREFLIGHT' }
     Write-Output '{"schema":"flowpilot-g152-offline-windows-launcher-v1","status":"LOCAL_CHECKOUT_PYTHON_READY_NO_OWNER_INPUT_READ","official_checker_executed":false,"private_artifacts_uploaded":false,"release_gate":"HOLD"}'
     exit 0
 }
 
 if (!(Test-Path -LiteralPath $ArtifactFolder -PathType Container)) {
     Refuse 'OWNER_ARTIFACT_FOLDER_MISSING'
+}
+# G153: Owner-only artifact parity never touches vendor code or network.
+# It stays usable without an authentic Kit in hand, and never authorizes release.
+if ($VerifyOwnerPairOnly) {
+    if ($ExecuteOfficialNativeCode -or $PSBoundParameters.ContainsKey('OfficialKitZip')) {
+        Refuse 'OWNER_PAIR_ONLY_REFUSES_VENDOR_FLAGS'
+    }
+    $pairArgs = @($entry, '--folder', $ArtifactFolder)
+    if ($RequirePdfText) { $pairArgs += '--require-pdf-text' }
+    & $python.Source @pairArgs
+    exit $LASTEXITCODE
+}
+if ([string]::IsNullOrWhiteSpace($OfficialKitZip)) {
+    Refuse 'OFFICIAL_KIT_PATH_REQUIRED'
 }
 if (!(Test-Path -LiteralPath $OfficialKitZip -PathType Leaf)) {
     Refuse 'LOCAL_VENDOR_KIT_FILE_MISSING'
