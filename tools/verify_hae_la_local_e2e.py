@@ -47,6 +47,26 @@ def validate_pending_identity(preview: dict, *, require_g82: bool) -> str | None
     return pending
 
 
+def _strict_receipt_payload(raw: str) -> dict:
+    """Reject ambiguous SQLite JSON before matching the expected LA row."""
+    def unique_keys(pairs: list[tuple[str, object]]) -> dict:
+        parsed: dict = {}
+        for key, value in pairs:
+            if key in parsed:
+                raise ValueError("Duplicate JSON key in LA SQLite receipt")
+            parsed[key] = value
+        return parsed
+
+    def reject_constant(value: str) -> None:
+        raise ValueError("Nonfinite JSON constant in LA SQLite receipt")
+
+    parsed = json.loads(raw, object_pairs_hook=unique_keys,
+                        parse_constant=reject_constant)
+    if not isinstance(parsed, dict):
+        raise ValueError("LA SQLite receipt payload must be an object")
+    return parsed
+
+
 def verify_business_receipts(business: Path, run_id: str) -> bool:
     """Independently inspect LA's exact synthetic SQLite payloads and source digest."""
     if not business.is_file() or not isinstance(run_id, str) or not PENDING.fullmatch(run_id):
@@ -66,12 +86,12 @@ def verify_business_receipts(business: Path, run_id: str) -> bool:
         return len(records) == len(expected) and all(
             type(row_number) is int and row_number == expected_number
             and source_digest == expected_digest
-            and isinstance(payload, str) and json.loads(payload) == expected_data
+            and isinstance(payload, str) and _strict_receipt_payload(payload) == expected_data
             for (row_number, source_digest, payload),
                 (expected_number, expected_digest, expected_data)
             in zip(records, expected)
         )
-    except (sqlite3.DatabaseError, OSError, ValueError, TypeError):
+    except (sqlite3.DatabaseError, OSError, ValueError, TypeError, RecursionError):
         return False
 
 

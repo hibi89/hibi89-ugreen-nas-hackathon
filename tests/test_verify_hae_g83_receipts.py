@@ -45,6 +45,32 @@ class G83AcceptanceEvidenceTests(unittest.TestCase):
                            ("0" * 64,))
             self.assertFalse(verify_business_receipts(path, RUN))
 
+    def test_ambiguous_sqlite_json_rejected_without_mutating_records(self):
+        with TemporaryDirectory() as d:
+            path = Path(d) / "business.sqlite"
+            with closing(sqlite3.connect(path)) as db, db:
+                db.execute("CREATE TABLE csv_records (run_id TEXT, row_number INT,"
+                           " source_sha256 TEXT, payload_json TEXT)")
+                for number, name in ((1, "SyntheticAlice"), (2, "SyntheticBob")):
+                    db.execute("INSERT INTO csv_records VALUES (?,?,?,?)",
+                               (RUN, number, sha256(FIXTURE).hexdigest(),
+                                json.dumps({"id": str(number + 10), "name": name})))
+            self.assertTrue(verify_business_receipts(path, RUN))
+            ambiguous = (
+                '{"id":"11","id":"11","name":"SyntheticAlice"}',
+                '{"id":"11","name":"SyntheticAlice","id":"11"}',
+                '{"id":"11","name":"SyntheticAlice","unused":NaN}',
+            )
+            for forged in ambiguous:
+                with self.subTest(forged=forged), closing(sqlite3.connect(path)) as db:
+                    with db:
+                        db.execute("UPDATE csv_records SET payload_json=? "
+                                   "WHERE run_id=? AND row_number=1", (forged, RUN))
+                    self.assertFalse(verify_business_receipts(path, RUN))
+                    self.assertEqual(db.execute(
+                        "SELECT payload_json FROM csv_records WHERE run_id=? "
+                        "AND row_number=1", (RUN,)).fetchone()[0], forged)
+
     def test_absent_and_wrong_schema_never_report_verified(self):
         with TemporaryDirectory() as d:
             path = Path(d) / "missing.sqlite"
