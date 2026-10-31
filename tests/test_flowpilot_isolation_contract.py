@@ -27,6 +27,7 @@ class G117SandboxContractTests(unittest.TestCase):
         self.assertNotIn("-v", argv)
         self.assertNotIn("--privileged", argv)
         self.assertNotIn("--env", argv)
+        self.assertIn("--host=unix:///var/run/docker.sock", argv)
         self.assertEqual(argv[-5:-4], [GOOD])
         self.assertFalse(p["docker_launched"])
 
@@ -59,12 +60,16 @@ class G117SandboxContractTests(unittest.TestCase):
             stdout=json.dumps({"marker": "FLOWPILOT_DISPOSABLE_CONTAINER_SMOKE_V1",
                                "nonroot": True, "python": True}), stderr="")
         with patch("flowpilot_isolation_contract.shutil.which", return_value="/usr/bin/docker"), \
+             patch("flowpilot_isolation_contract._local_socket_ready", return_value=True), \
              patch("flowpilot_isolation_contract.subprocess.run", return_value=response) as run:
             p = run_local_smoke(GOAL, GOOD, approved=True)
         self.assertEqual(p["status"], "LOCAL_DOCKER_SMOKE_PASS_NOT_NAS")
         argv = run.call_args.args[0]
         self.assertEqual(argv[0], "/usr/bin/docker")
         self.assertTrue(run.call_args.kwargs["shell"] is False)
+        self.assertEqual(run.call_args.kwargs["env"]["DOCKER_HOST"],
+                         "unix:///var/run/docker.sock")
+        self.assertNotIn("DOCKER_CONTEXT", run.call_args.kwargs["env"])
         self.assertTrue(run.call_args.kwargs["timeout"] <= 15)
         self.assertFalse(p["actual_workflow_executed_in_docker"])
         self.assertFalse(p["docker_host_isolation_independently_verified"])
@@ -75,6 +80,7 @@ class G117SandboxContractTests(unittest.TestCase):
             with self.subTest(out=out):
                 response = subprocess.CompletedProcess([], rc, stdout=out, stderr="private")
                 with patch("flowpilot_isolation_contract.shutil.which", return_value="/usr/bin/docker"), \
+                     patch("flowpilot_isolation_contract._local_socket_ready", return_value=True), \
                      patch("flowpilot_isolation_contract.subprocess.run", return_value=response):
                     p = run_local_smoke(GOAL, GOOD, approved=True)
                 self.assertEqual(p["status"], "LOCAL_DOCKER_SMOKE_FAILED")
@@ -82,10 +88,19 @@ class G117SandboxContractTests(unittest.TestCase):
 
     def test_subprocess_timeout_fails_closed(self):
         with patch("flowpilot_isolation_contract.shutil.which", return_value="/usr/bin/docker"), \
+             patch("flowpilot_isolation_contract._local_socket_ready", return_value=True), \
              patch("flowpilot_isolation_contract.subprocess.run",
                    side_effect=subprocess.TimeoutExpired(["docker"], 15)):
             p = run_local_smoke(GOAL, GOOD, approved=True)
         self.assertEqual(p["status"], "LOCAL_DOCKER_SMOKE_FAILED")
+
+    def test_docker_binary_without_local_socket_never_executes(self):
+        with patch("flowpilot_isolation_contract.shutil.which", return_value="/usr/bin/docker"), \
+             patch("flowpilot_isolation_contract._local_socket_ready", return_value=False), \
+             patch("flowpilot_isolation_contract.subprocess.run",
+                   side_effect=AssertionError("must not execute")):
+            r = run_local_smoke(GOAL, GOOD, approved=True)
+        self.assertEqual(r["status"], "LOCAL_DOCKER_NOT_AVAILABLE")
 
     def test_cli_plan_only_is_ascii_json_and_never_runs(self):
         cmd = [sys.executable, str(ROOT/"tools"/"flowpilot_isolation_contract.py"),

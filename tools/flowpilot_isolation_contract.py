@@ -8,9 +8,12 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import shutil
+import stat
 import subprocess
+import tempfile
 
 from flowpilot_task_compiler import compile_goal
 
@@ -21,6 +24,16 @@ _SCRIPT = (
     "print(json.dumps({'marker':'FLOWPILOT_DISPOSABLE_CONTAINER_SMOKE_V1',"
     "'nonroot':os.getuid()!=0,'python':True},sort_keys=True))"
 )
+
+
+def _local_socket_ready() -> bool:
+    """Do not inherit Docker contexts/remote endpoints from the caller."""
+    path = "/var/run/docker.sock"
+    try:
+        return (os.name == "posix" and not os.path.islink(path)
+                and stat.S_ISSOCK(os.stat(path).st_mode))
+    except (OSError, ValueError):
+        return False
 
 
 def plan_sandbox(goal: str, image: str) -> dict:
@@ -37,7 +50,7 @@ def plan_sandbox(goal: str, image: str) -> dict:
         return {"status": "BLOCKED_UNPINNED_IMAGE", "docker_launched": False,
                 "nas_verified": False, "release_gate": "HOLD"}
     argv = [
-        "docker", "run", "--rm", "--pull=never",
+        "docker", "--host=unix:///var/run/docker.sock", "run", "--rm", "--pull=never",
         "--network=none", "--read-only", "--cap-drop=ALL",
         "--security-opt=no-new-privileges", "--pids-limit=32",
         "--memory=128m", "--cpus=0.5", "--user=65534:65534",
@@ -77,16 +90,22 @@ def run_local_smoke(goal: str, image: str, *, approved: bool = False) -> dict:
     if not approved:
         return plan
     binary = shutil.which("docker")
-    if not binary:
+    if not binary or not _local_socket_ready():
         return {
             "status": "LOCAL_DOCKER_NOT_AVAILABLE", "docker_launched": False,
             "nas_verified": False, "release_gate": "HOLD",
         }
     cmd = [binary, *plan["argv"][1:]]
     try:
-        run = subprocess.run(cmd, shell=False, capture_output=True,
-                             text=True, encoding="utf-8", errors="replace",
-                             timeout=15, check=False)
+        with tempfile.TemporaryDirectory(prefix="flowpilot-docker-cli-") as config:
+            # A fresh Docker config prevents use of the owner\'s auth, plugins or
+            # named remote context; --host pins the local Unix daemon socket.
+            env = {"PATH": os.environ.get("PATH", "/usr/bin:/bin"),
+                   "HOME": config, "DOCKER_CONFIG": config,
+                   "DOCKER_HOST": "unix:///var/run/docker.sock"}
+            run = subprocess.run(cmd, shell=False, capture_output=True,
+                                 text=True, encoding="utf-8", errors="replace",
+                                 timeout=15, check=False, env=env)
     except (OSError, subprocess.TimeoutExpired):
         return {"status": "LOCAL_DOCKER_SMOKE_FAILED",
                 "docker_launched": False, "nas_verified": False,
