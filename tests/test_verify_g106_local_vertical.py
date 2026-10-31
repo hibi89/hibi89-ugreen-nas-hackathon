@@ -29,7 +29,12 @@ def fixture_zip(*, symlink=False):
 class G106LocalRealOS(unittest.TestCase):
     def setUp(self):
         self.raw = fixture_zip()
-        p = patch.object(verify, "PIN", sha256(self.raw).hexdigest())
+        # verify_archive captures its PIN as a default argument at definition
+        # time. Test only: call the *real* verifier with a synthetic fixture pin,
+        # without weakening the production G104 default SHA.
+        self.synthetic_pin = sha256(self.raw).hexdigest()
+        p = patch.object(v, "verify_archive", side_effect=lambda raw:
+                         verify.verify_archive(raw, expected_sha=self.synthetic_pin))
         p.start()
         self.addCleanup(p.stop)
 
@@ -55,9 +60,9 @@ class G106LocalRealOS(unittest.TestCase):
 
     def test_symlink_in_allowlisted_member_refused(self):
         bad = fixture_zip(symlink=True)
-        with patch.object(verify, "PIN", sha256(bad).hexdigest()):
-            with self.assertRaises(v.LocalVerticalRefused):
-                v.run_exact_fixture(bad)
+        self.synthetic_pin = sha256(bad).hexdigest()
+        with self.assertRaises(v.LocalVerticalRefused):
+            v.run_exact_fixture(bad)
 
     def test_empty_and_nonzip_inputs_fail(self):
         for blob in (b"", b"PK\x03\x04"):
