@@ -71,6 +71,7 @@ def compare_local_audits(
             if exists is None:
                 return {**base, "status": "NO_METADATA_RECORDS"}
             pairs = []
+            insertion_ids = []
             for run_id in (previous_id, current_id):
                 validated = _read(db, run_id)
                 status = validated.get("status")
@@ -82,14 +83,27 @@ def compare_local_audits(
                     return {**base, "status": "INCOMPLETE_SNAPSHOT_BLOCKED"}
                 if status != "READ_ONLY_LOCAL_METADATA_EVIDENCE" or not validated.get("local_observation_complete"):
                     return {**base, "status": "FAILED_OR_UNVERIFIED_SNAPSHOT_BLOCKED"}
-                salt, stored_scope = db.execute(
-                    "SELECT salt, scope_sha FROM fp134_metadata_runs WHERE run_id=?",
+                sequence_row = db.execute(
+                    "SELECT rowid, salt, scope_sha FROM fp134_metadata_runs WHERE run_id=?",
                     (run_id,),
                 ).fetchone()
+                # G134 has no timestamps. SQLite rowid reflects insertion order
+                # for this original schema but is NOT an immutable signed clock.
+                if sequence_row is None:
+                    return {**base, "status": "SNAPSHOT_NOT_FOUND"}
+                insertion_id, salt, stored_scope = sequence_row
+                if type(insertion_id) is not int or insertion_id <= 0:
+                    return {**base, "status": "UNVERIFIABLE_SNAPSHOT_ORDER"}
                 if _scope_digest(salt, root=root, goal=goal,
                                  required=required, candidates=versions) != stored_scope:
                     return {**base, "status": "SNAPSHOT_SCOPE_MISMATCH"}
                 pairs.append(validated)
+                insertion_ids.append(insertion_id)
+            # Prevent reversing a recovery into an invented new loss, or vice
+            # versa. Rowids are only a local database ordering hint, not an
+            # independently notarized timestamp or true wall-clock evidence.
+            if insertion_ids[0] >= insertion_ids[1]:
+                return {**base, "status": "REVERSED_OR_UNVERIFIABLE_SNAPSHOT_ORDER"}
             previous, current = pairs
             if (previous["item_count"] != current["item_count"]
                     or previous["item_count"] != len(required)
@@ -97,6 +111,7 @@ def compare_local_audits(
                 return {**base, "status": "INCOMPATIBLE_SNAPSHOT_STRUCTURE"}
             changes: list[dict] = []
             new_missing, resolved_missing, new_uncertainty = 0, 0, 0
+            newly_observed_missing = 0
             for old, new in zip(previous["items"], current["items"]):
                 if (type(old.get("index")) is not int
                         or old["index"] != new.get("index")
@@ -110,8 +125,12 @@ def compare_local_audits(
                         "reference_count_before": old["local_reference_count"],
                         "reference_count_after": new["local_reference_count"],
                     })
-                    if old["state"] != "MISSING" and new["state"] == "MISSING":
+                    if old["state"] == "PRESENT" and new["state"] == "MISSING":
                         new_missing += 1
+                    elif old["state"] in ("NOT_CHECKED", "VERSION_REVIEW") and new["state"] == "MISSING":
+                        # The previous observation was uncertain: do NOT
+                        # pretend a newly observed absence is a new loss.
+                        newly_observed_missing += 1
                     if old["state"] == "MISSING" and new["state"] == "PRESENT":
                         resolved_missing += 1
                     if old["state"] == "PRESENT" and new["state"] in ("NOT_CHECKED", "VERSION_REVIEW"):
@@ -124,7 +143,9 @@ def compare_local_audits(
                 "previous_audit_result": previous["audit_result"],
                 "current_audit_result": current["audit_result"],
                 "item_count": len(required),
+                "snapshot_order_basis": "LOCAL_SQLITE_ROWID_NOT_SIGNED_TIMESTAMP",
                 "change_count": len(changes), "new_missing_count": new_missing,
+                "newly_observed_missing_from_uncertain_count": newly_observed_missing,
                 "resolved_missing_to_present_count": resolved_missing,
                 "new_uncertainty_count": new_uncertainty,
                 "changes": changes,

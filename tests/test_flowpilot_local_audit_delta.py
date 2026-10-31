@@ -88,6 +88,45 @@ class DeltaTests(unittest.TestCase):
         self.assertEqual(report["resolved_missing_to_present_count"], 0)
         self.assertEqual(report["changes"][0]["after"], "MISSING")
 
+    def test_reversed_database_snapshot_order_is_refused(self):
+        self.two()
+        # A caller can swap ids; old logic falsely called the recovery a
+        # fresh missing-file incident. Never accept a backward history.
+        backward = self.delta(previous_id=CURR, current_id=PREV)
+        self.assertEqual(backward["status"], "REVERSED_OR_UNVERIFIABLE_SNAPSHOT_ORDER")
+        self.assertNotIn("new_missing_count", backward)
+        self.assertFalse(backward["database_modified"])
+
+    def test_newly_observed_missing_was_not_proven_new_loss(self):
+        # Construct a legitimately checksummed historic NOT_CHECKED result.
+        self.capture(PREV, mode="new")
+        with closing(sqlite3.connect(self.db)) as db:
+            salt, scope = db.execute(
+                "SELECT salt,scope_sha FROM fp134_metadata_runs WHERE run_id=?", (PREV,)
+            ).fetchone()
+            old_states = [[1, "PRESENT", 1], [2, "NOT_CHECKED", 0]]
+            db.execute(
+                "UPDATE fp134_metadata_runs SET state=?, summary_json=?, digest=? WHERE run_id=?",
+                ("NEEDS_REVIEW", json.dumps(old_states, separators=(",", ":")),
+                 _digest(PREV, salt, scope, "NEEDS_REVIEW", old_states), PREV),
+            )
+            db.commit()
+        self.capture(CURR, mode="append")
+        delta = self.delta()
+        self.assertEqual(delta["new_missing_count"], 0)
+        self.assertEqual(delta["newly_observed_missing_from_uncertain_count"], 1)
+        self.assertEqual(delta["changes"][0]["before"], "NOT_CHECKED")
+        self.assertEqual(delta["changes"][0]["after"], "MISSING")
+        self.assertEqual(delta["snapshot_order_basis"], "LOCAL_SQLITE_ROWID_NOT_SIGNED_TIMESTAMP")
+
+    def test_evidence_retroactive_rowid_reorder_does_not_pass_as_chronology(self):
+        self.two()
+        # This is not cryptographic replay attestation: simply establish
+        # that an impossible row sequence cannot be accepted silently.
+        backward = self.delta(current_id=PREV, previous_id=CURR)
+        self.assertEqual(backward["release_gate"], "HOLD")
+        self.assertEqual(backward["status"], "REVERSED_OR_UNVERIFIABLE_SNAPSHOT_ORDER")
+
     def test_identical_snapshots_still_require_human_review(self):
         self.capture(PREV, mode="new")
         self.capture(CURR, mode="append")
