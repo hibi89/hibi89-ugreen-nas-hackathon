@@ -130,6 +130,35 @@ class G100OfficialKitBoundary(unittest.TestCase):
         self.assertEqual(result["result"], "OFFICIAL_WARN_OR_FAIL_HOLD")
         self.assertFalse(result["diagnostics_consistent_with_zero_summary"])
 
+    def test_g103_exact_profile_with_synthetic_inputs_maintains_hold(self):
+        with patch.object(gate, "G103_CANDIDATE_SHA", sha256(self.source).hexdigest()), \
+             patch.object(gate, "G103_CANDIDATE_ZIP_SHA", sha256(self.candidate).hexdigest()):
+            result = gate.check(self.path, self.vendor, mode="inspect", candidate_profile="g103")
+        self.assertEqual(result["candidate_profile"], "g103")
+        self.assertEqual(result["source_sha256"], sha256(self.source).hexdigest())
+        self.assertEqual(result["release_gate"], "HOLD")
+        self.assertFalse(result["official_checker_executed"])
+
+    def test_g103_profile_without_matching_exact_bytes_is_refused(self):
+        with self.assertRaisesRegex(gate.VerificationRefused, "SHA256"):
+            gate.check(self.path, self.vendor, mode="inspect", candidate_profile="g103")
+
+    def test_unknown_profile_fails_before_any_kit_read(self):
+        with self.assertRaisesRegex(gate.VerificationRefused, "Unsupported exact"):
+            gate.check(self.path, self.vendor, mode="inspect", candidate_profile="g104")
+
+    def test_g103_cli_inspect_never_claims_official_checker(self):
+        with patch.object(gate, "G103_CANDIDATE_SHA", sha256(self.source).hexdigest()), \
+             patch.object(gate, "G103_CANDIDATE_ZIP_SHA", sha256(self.candidate).hexdigest()):
+            with patch.object(sys, "argv", [
+                 "check", "--candidate-zip", str(self.path), "--official-kit-zip", str(self.vendor),
+                 "--candidate-profile", "g103"]), redirect_stdout(StringIO()) as out:
+                code = gate.main()
+        self.assertEqual(code, 2)
+        result = json.loads(out.getvalue())
+        self.assertEqual(result["candidate_profile"], "g103")
+        self.assertFalse(result["official_checker_executed"])
+
     def test_inspect_command_never_claims_success(self):
         with patch.object(sys, "argv", ["check", "--candidate-zip", str(self.path),
                     "--official-kit-zip", str(self.vendor)]), redirect_stdout(StringIO()) as out:

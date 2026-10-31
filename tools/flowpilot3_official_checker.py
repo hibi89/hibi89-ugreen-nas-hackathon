@@ -20,6 +20,8 @@ from zipfile import BadZipFile, ZipFile
 
 CANDIDATE_SHA = "f21c184f4a0bf370d438b3918a345870faf9d69ee88aac239fe13241a8960ca6"
 CANDIDATE_ZIP_SHA = "f28acfbeba9d3a6e33b9977d1ea1de15b50ca48dbc505144c0b2cb719efc2cfc"
+G103_CANDIDATE_SHA = "f940bcd884b83d80fbecf533caee7d492488c274e1d3eab2b99b034b92428e15"
+G103_CANDIDATE_ZIP_SHA = "1496103b5c1b15da113867ed0cab57ad1e2dab0be80c2f06fd049cac359bf11b"
 VENDOR_ZIP_SHA = "cf557e5a022e4297892f39768132855154232efdedeb726b2845450ccd70e1b3"
 MEMBER = "flowpilot-3/SKILL.md"
 MAX_CANDIDATE = 10_000_000
@@ -62,15 +64,18 @@ def _safe_names(z: ZipFile, *, count: int, expanded: int, per_entry: int) -> lis
     return members
 
 
-def inspect_pinned_archives(candidate_zip: bytes, vendor_zip: bytes) -> dict:
+def inspect_pinned_archives(candidate_zip: bytes, vendor_zip: bytes, *,
+                            expected_source_sha: str | None = None) -> dict:
+    if expected_source_sha is None:
+        expected_source_sha = CANDIDATE_SHA  # Legacy G99 regression compatibility.
     try:
         with ZipFile(BytesIO(candidate_zip)) as z:
             names = _safe_names(z, count=1, expanded=1_000_000, per_entry=1_000_000)
             if len(names) != 1 or names[0].filename != MEMBER or names[0].is_dir():
                 raise VerificationRefused("Candidate must contain one exact Markdown Skill")
             candidate = z.read(MEMBER)
-            if sha256(candidate).hexdigest() != CANDIDATE_SHA:
-                raise VerificationRefused("Candidate Skill bytes differ from G99 source pin")
+            if sha256(candidate).hexdigest() != expected_source_sha:
+                raise VerificationRefused("Candidate Skill bytes differ from exact selected source pin")
         with ZipFile(BytesIO(vendor_zip)) as z:
             members = _safe_names(z, count=MAX_VENDOR_MEMBERS,
                                   expanded=MAX_VENDOR_UNCOMPRESSED, per_entry=MAX_VENDOR_ENTRY)
@@ -87,7 +92,7 @@ def inspect_pinned_archives(candidate_zip: bytes, vendor_zip: bytes) -> dict:
                 raise VerificationRefused("Vendor ZIP corruption")
     except (BadZipFile, RuntimeError, OSError) as exc:
         raise VerificationRefused("Invalid pinned ZIP archive") from exc
-    return {"source_sha256": CANDIDATE_SHA, "vendor_archive_sha256": VENDOR_ZIP_SHA,
+    return {"source_sha256": expected_source_sha, "vendor_archive_sha256": VENDOR_ZIP_SHA,
             "checker_relative_root": root, "member_count": len(members)}
 
 
@@ -183,14 +188,23 @@ def _sanitized_checker_result(code: int, stdout: str, stderr: str, *, mode: str)
             "devpost_submitted": False, "release_gate": "HOLD"}
 
 
-def check(candidate: Path, kit: Path, *, mode: str, native_risk_approved: bool = False) -> dict:
+def check(candidate: Path, kit: Path, *, mode: str, native_risk_approved: bool = False,
+          candidate_profile: str = "g99") -> dict:
     if mode not in ("inspect", "docker", "native"):
         raise VerificationRefused("Invalid execution mode")
     if mode == "native" and not native_risk_approved:
         raise VerificationRefused("Native execution requires explicit risk approval")
-    candidate_bytes = _read_pinned(candidate, digest=CANDIDATE_ZIP_SHA, size_limit=MAX_CANDIDATE)
+    # Profiles are immutable source/ZIP pairs; untrusted CLI users cannot supply arbitrary hashes.
+    profiles = {"g99": (CANDIDATE_SHA, CANDIDATE_ZIP_SHA),
+                "g103": (G103_CANDIDATE_SHA, G103_CANDIDATE_ZIP_SHA)}
+    if candidate_profile not in profiles:
+        raise VerificationRefused("Unsupported exact candidate profile")
+    expected_source, expected_zip = profiles[candidate_profile]
+    candidate_bytes = _read_pinned(candidate, digest=expected_zip, size_limit=MAX_CANDIDATE)
     vendor_bytes = _read_pinned(kit, digest=VENDOR_ZIP_SHA, size_limit=MAX_VENDOR)
-    details = inspect_pinned_archives(candidate_bytes, vendor_bytes)
+    details = inspect_pinned_archives(candidate_bytes, vendor_bytes,
+                                      expected_source_sha=expected_source)
+    details["candidate_profile"] = candidate_profile
     if mode == "inspect":
         return {"status": "EXACT_SOURCE_AND_VENDOR_PIN_VERIFIED_NO_CHECKER_RUN",
                 **details, "official_checker_executed": False, "release_gate": "HOLD"}
@@ -202,7 +216,7 @@ def check(candidate: Path, kit: Path, *, mode: str, native_risk_approved: bool =
             (skill / "SKILL.md").write_bytes(z.read(MEMBER))
         vendor = _prepare_toolkit(vendor_bytes, base / "official", details["checker_relative_root"])
         code, stdout, stderr = _execute(vendor, skill, mode=mode)
-        if sha256((skill / "SKILL.md").read_bytes()).hexdigest() != CANDIDATE_SHA:
+        if sha256((skill / "SKILL.md").read_bytes()).hexdigest() != expected_source:
             raise VerificationRefused("Skill source changed during Checker run")
         return {"status": "OFFICIAL_CHECKER_EXECUTED_WITH_PINNED_SOURCE", **details,
                 **_sanitized_checker_result(code, stdout, stderr, mode=mode)}
@@ -213,11 +227,14 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--candidate-zip", type=Path, required=True)
     parser.add_argument("--official-kit-zip", type=Path, required=True)
     parser.add_argument("--mode", choices=("inspect", "docker", "native"), default="inspect")
+    parser.add_argument("--candidate-profile", choices=("g99", "g103"), default="g99",
+                        help="Select exact reviewed source/ZIP pins; no arbitrary hash overrides")
     parser.add_argument("--accept-native-code-execution-risk", action="store_true")
     args = parser.parse_args(argv)
     try:
         report = check(args.candidate_zip, args.official_kit_zip, mode=args.mode,
-                       native_risk_approved=args.accept_native_code_execution_risk)
+                       native_risk_approved=args.accept_native_code_execution_risk,
+                       candidate_profile=args.candidate_profile)
         exit_code = 0 if report.get("result") == "OFFICIAL_STATIC_PASS_REVIEW_ONLY" else 2
     except (VerificationRefused, OSError, ValueError) as exc:
         report = {"status": "CHECKER_NOT_VERIFIED", "reason": type(exc).__name__,
