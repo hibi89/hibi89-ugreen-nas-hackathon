@@ -30,6 +30,7 @@ _EXPECTED = {
 # This script contains every fixture byte; no host code or user files enter it.
 _WORKFLOW_SCRIPT = r'''
 import csv
+from contextlib import closing
 from decimal import Decimal, InvalidOperation
 import hashlib
 import io
@@ -92,7 +93,7 @@ with tempfile.TemporaryDirectory(prefix="fp146-") as tmp:
     assert hashlib.sha256(output_bytes).hexdigest() == OUTPUT_SHA
     assert output_bytes == b"customer,total\nalice,4.00\nbob,3.00\n"
     dbfile = base / "audit.sqlite3"
-    with sqlite3.connect(dbfile) as db:
+    with closing(sqlite3.connect(dbfile)) as db:
         db.execute("CREATE TABLE audit (customer TEXT PRIMARY KEY, total TEXT NOT NULL)")
         for customer in sorted(sums):
             db.execute("INSERT INTO audit VALUES (?,?)",
