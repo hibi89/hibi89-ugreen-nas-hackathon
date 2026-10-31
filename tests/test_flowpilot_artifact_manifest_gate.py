@@ -228,7 +228,7 @@ class G148ExactG147OwnerPairTests(unittest.TestCase):
     def test_double_json_key_cannot_approve(self):
         raw = json.dumps(self.manifest).encode()
         raw = raw.replace(b'"release_gate":', b'"release_gate": "READY", "release_gate":', 1)
-        with self.assertRaisesRegex(ArtifactRefused, "DUPLICATE"):
+        with self.assertRaisesRegex(ArtifactRefused, "MANIFEST_INVALID"):
             self.gate.verify_g147_candidate(self.pdf, self.z, raw)
 
     def test_default_g139_entrypoint_still_g140_and_bad_g147_paths_refused(self):

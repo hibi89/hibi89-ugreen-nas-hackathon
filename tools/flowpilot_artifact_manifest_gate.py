@@ -262,18 +262,14 @@ def verify_g147_candidate(pdf: bytes, skill_zip: bytes, manifest_raw: bytes, *,
                     raise ArtifactRefused("G147_UNLINKED_REFERENCE")
     except UnicodeError as exc:
         raise ArtifactRefused("G147_INVALID_UTF8") from exc
-    if (not re.match(r"\A---\r?\nname: flowpilot-3\r?\ndescription: [^\r\n]{1,1024}\r?\n---\r?\n", text)
-            or not all(term in text.casefold()
-                       for term in ("hackathon-original", "chatgpt", "third-party",
-                                    "registered", "release_gate"))):
-        # Release gate is a return-schema field, not a requirement in the Skill;
-        # use the explicit consent/rights terms in candidate text instead.
-        if not re.match(r"\A---\r?\nname: flowpilot-3\r?\ndescription: [^\r\n]{1,1024}\r?\n---\r?\n", text):
-            raise ArtifactRefused("G147_INVALID_FRONTMATTER")
-        if not all(term in text.casefold() for term in (
-                "hackathon-original", "chatgpt", "third-party",
-                "registered", "rights check")):
-            raise ArtifactRefused("G147_MISSING_DISCLOSURES")
+    if not re.match(
+            r"\A---\r?\nname: flowpilot-3\r?\ndescription: [^\r\n]{1,1024}\r?\n---\r?\n",
+            text):
+        raise ArtifactRefused("G147_INVALID_FRONTMATTER")
+    if not all(term in text.casefold() for term in (
+            "hackathon-original", "chatgpt", "third-party",
+            "registered", "rights check")):
+        raise ArtifactRefused("G147_MISSING_DISCLOSURES")
     text_checked = False
     if require_pdf_text:
         try:
