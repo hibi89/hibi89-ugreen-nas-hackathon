@@ -93,6 +93,17 @@ def _safe(value: str, *, root: bool) -> str:
 
 def _intent(request: str) -> Intent | None:
     r = request.casefold()
+    # Explicit task verbs take precedence over nouns in selected filenames.
+    # E.g. "summarize handoff/summary.md" is a content-read request, NOT
+    # a handoff audit; planning it as an audit could bypass document consent.
+    # Keep the established general "check project handoff deliverables" audit
+    # interpretation, unless a more specific action was requested.
+    if any(s in r for s in ("summarize", "summarise", "요약해", "요약하", "요약할")):
+        return Intent.SUMMARIZE_SELECTED
+    if any(s in r for s in ("compare version", "review version", "버전 비교", "버전들을 비교")):
+        return Intent.REVIEW_VERSIONS
+    if any(s in r for s in ("check required", "check missing", "필수 파일 확인", "누락 파일 확인")):
+        return Intent.CHECK_REQUIRED
     if any(s in r for s in ("handoff", "deliverable", "납품", "인계", "프로젝트 준비")):
         return Intent.HANDOFF_AUDIT
     if any(s in r for s in ("version", "compare", "conflict", "버전", "최종본", "비교")):

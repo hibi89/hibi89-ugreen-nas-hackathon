@@ -61,6 +61,40 @@ class FlowPilotMVP(unittest.TestCase):
                        document_approved=True, returned_document_refs=("actual-reference-1",))
         self.assertEqual(tuple(s.id for s in p.steps), ("inventory", "document", "report"))
 
+    def test_g104_explicit_summary_of_handoff_document_preserves_document_consent(self):
+        args = {**P, "request": "summarize handoff/summary.md"}
+        pending = draft_plan(**args)
+        self.assertEqual(pending.intent, Intent.SUMMARIZE_SELECTED)
+        self.assertNotIn("document", (s.id for s in pending.steps))
+        self.assertIn("DOCUMENT_STAGE_WAITING_SEPARATE_APPROVAL_AND_REAL_FILE_REFS", pending.limitations)
+        approved = draft_plan(**args, document_approved=True,
+                             returned_document_refs=("synthetic://g104/summary",))
+        self.assertEqual(tuple(s.id for s in approved.steps), ("inventory", "document", "report"))
+        self.assertFalse(approved.did_access_nas)
+
+    def test_g104_explicit_version_comparison_is_not_shadowed_by_handoff(self):
+        args = {**P, "request": "compare versions of handoff review drafts"}
+        p = draft_plan(**args)
+        self.assertEqual(p.intent, Intent.REVIEW_VERSIONS)
+        self.assertEqual(tuple(s.id for s in p.steps), ("inventory", "versions", "report"))
+
+    def test_g104_explicit_required_check_not_shadowed_by_document_name(self):
+        args = {**P, "request": "check required handoff/summary.md"}
+        p = draft_plan(**args)
+        self.assertEqual(p.intent, Intent.CHECK_REQUIRED)
+        self.assertEqual(tuple(s.id for s in p.steps), ("inventory", "report"))
+
+    def test_g104_korean_explicit_summary_not_shadowed_by_handoff(self):
+        args = {**P, "request": "납품 인계 문서를 요약해줘"}
+        p = draft_plan(**args)
+        self.assertEqual(p.intent, Intent.SUMMARIZE_SELECTED)
+        self.assertNotIn("document", (s.id for s in p.steps))
+
+    def test_g104_general_handoff_audit_still_works(self):
+        args = {**P, "request": "audit handoff including version disagreements"}
+        p = draft_plan(**args)
+        self.assertEqual(p.intent, Intent.HANDOFF_AUDIT)
+
     def test_denies_mutations_even_if_approved(self):
         for request in ("delete files", "move delivery", "업로드 전송"):
             with self.subTest(request=request):
