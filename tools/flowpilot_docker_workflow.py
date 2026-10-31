@@ -64,7 +64,7 @@ assert not valid(proposal), "Deliberate missing edge was not refused"
 repaired = repair_missing_last_edge(proposal)
 assert repaired is not None and valid(repaired), "Exact one-edge repair failed"
 
-with tempfile.TemporaryDirectory(dir="/tmp", prefix="fp146-") as tmp:
+with tempfile.TemporaryDirectory(prefix="fp146-") as tmp:
     base = Path(tmp)
     source = base / "synthetic-source.csv"
     source.write_bytes(SOURCE)
