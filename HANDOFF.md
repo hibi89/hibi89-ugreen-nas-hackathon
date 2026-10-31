@@ -1,3 +1,15 @@
+## G130 — PDF answer parity module integrated (2026-11-01 KST)
+1. Goal: automate PDF extracted text vs owner G103 ten-question source; official Round1 constraints unchanged.
+2. New: `tools/flowpilot_pdf_parity.py`, `tests/test_flowpilot_pdf_parity.py`; original owner artifacts and canonical Skill untouched. Code SHA `4949bdd75dd3de00adedb80baeed943a9659fda5`, test SHA `f751677b026b16e88b3d3177e9dac0a72f372922`.
+3. Local synthetic PyMuPDF tests: 5 PASS, 0 FAIL, 0 SKIP. New GitHub CI and original private G103 PDF run: NOT_VERIFIED; prior G123 CI separate historical evidence.
+4. Alternative: modify G123 pinned parity gate vs independent local PDF text gate. Chose independent to preserve original hashes and keep optional dependency isolated. Extracted text substring parity does not prove layout or semantic parity.
+5. Status: code integrated, local synthetic pass; first-party Uliya checker, real NAS, Docker, Devpost, owner release: HOLD/NOT_RUN. No API, data uploads or paid access.
+6. No new errors in synthetic tests; host git clone DNS failed earlier, so GitHub connector commits used. Avoid repeat download of missing official kit.
+7. Repo `hibi89/hibi89-ugreen-nas-hackathon`, branch `lead/ugreen`; final documentation HEAD must be independently confirmed. New paths above; prior G125 original hashes retained.
+8. Vercel N/A; Python 3.11 + optional PyMuPDF; no secrets. Original G103 private files remain owner-held, not public repo.
+9. Next: verify GitHub CI, run exact owner-private PDF locally if available, official vendor checker when authentic kit is available; approval needed for original modification or submission.
+10. As of 2026-11-01 KST; new 5 local tests PASS, actual native/official gates NOT_RUN. Completion estimate 85% provisional, remaining 15%, external blockers excluded from deterministic hour estimate.
+
 ## G125 — Exact original Round1 files separated and verified, official Kit still blocked — 2026-10-31 KST
 
 1. **Aim and official requirements.** FlowPilot 3.0 Round1 candidate must provide the 10-question <=500 substantive English-word, <=1MB English PDF and an <=10MB Markdown-only ZIP containing SKILL.md. Per official Devpost rules, no demo video or real NAS evidence required for Round1; deadline 2026-11-15 23:45 Pacific / 2026-11-16 16:45 KST. Final NAS work and the advanced G117 approved 3-pillar vision are separate.
