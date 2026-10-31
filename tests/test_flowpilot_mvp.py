@@ -95,6 +95,31 @@ class FlowPilotMVP(unittest.TestCase):
         p = draft_plan(**args)
         self.assertEqual(p.intent, Intent.HANDOFF_AUDIT)
 
+    def test_g108_filename_summarize_does_not_turn_check_into_content_read(self):
+        args = {**P, "request": "check required handoff/summarize.md"}
+        p = draft_plan(**args, document_approved=True,
+                       returned_document_refs=("synthetic://content",))
+        self.assertEqual(p.intent, Intent.CHECK_REQUIRED)
+        self.assertEqual(tuple(s.id for s in p.steps), ("inventory", "report"))
+
+    def test_g108_summary_named_file_does_not_shadow_version_comparison(self):
+        p = draft_plan(**{**P, "request": "compare versions of handoff/summarize.md"})
+        self.assertEqual(p.intent, Intent.REVIEW_VERSIONS)
+        self.assertEqual(tuple(s.id for s in p.steps), ("inventory", "versions", "report"))
+
+    def test_g108_korean_filename_not_mistaken_for_summary_command(self):
+        p = draft_plan(**{**P, "request": "필수 파일 확인: handoff/요약해.md"})
+        self.assertEqual(p.intent, Intent.CHECK_REQUIRED)
+        self.assertNotIn("document", (s.id for s in p.steps))
+
+    def test_g108_explicit_summary_commands_still_require_document_consent(self):
+        for request in ("summarize handoff/summary.md",
+                        "summarise handoff/summary.md", "납품 문서를 요약해주세요"):
+            with self.subTest(request=request):
+                p = draft_plan(**{**P, "request": request})
+                self.assertEqual(p.intent, Intent.SUMMARIZE_SELECTED)
+                self.assertNotIn("document", (s.id for s in p.steps))
+
     def test_denies_mutations_even_if_approved(self):
         for request in ("delete files", "move delivery", "업로드 전송"):
             with self.subTest(request=request):

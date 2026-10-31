@@ -98,7 +98,12 @@ def _intent(request: str) -> Intent | None:
     # a handoff audit; planning it as an audit could bypass document consent.
     # Keep the established general "check project handoff deliverables" audit
     # interpretation, unless a more specific action was requested.
-    if any(s in r for s in ("summarize", "summarise", "요약해", "요약하", "요약할")):
+    # A file name such as handoff/summarize.md is NOT a summary command.
+    # Treat an English verb as standalone only, excluding path separators,
+    # extensions and compound names. Korean imperatives are recognized even
+    # with polite/inflected endings, but not when immediately in a path/name.
+    if (re.search(r"(?<![\w/_.-])summari[sz]e(?![\w/_.-])", r)
+            or re.search(r"(?<![/_.-])요약(?:해|하|할)", r)):
         return Intent.SUMMARIZE_SELECTED
     if any(s in r for s in ("compare version", "review version", "버전 비교", "버전들을 비교")):
         return Intent.REVIEW_VERSIONS
