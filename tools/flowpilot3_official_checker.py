@@ -189,7 +189,10 @@ def _sanitized_checker_result(code: int, stdout: str, stderr: str, *, mode: str)
     diagnostics_empty = diagnostics_complete and len(diagnostics) == 0
     diagnostic_codes = [str(d.get("code"))[:80] for d in diagnostics[:40]
                         if isinstance(d, dict) and isinstance(d.get("code"), str)] if isinstance(diagnostics, list) else []
-    clean = (code == 0 and data.get("status") == "static-pass" and valid_numbers
+    # A silent stdout PASS with warnings/errors on stderr is not a clean vendor run.
+    # Keep the boundary equivalent to the historical G45 isolated first-party gate.
+    clean = (code == 0 and not stderr.strip()
+             and data.get("status") == "static-pass" and valid_numbers
              and all(value == 0 for value in numbers.values()) and diagnostics_empty)
     return {"result": "OFFICIAL_STATIC_PASS_REVIEW_ONLY" if clean else "OFFICIAL_WARN_OR_FAIL_HOLD",
             "checker_exit_code": code, "checker_status": str(data.get("status"))[:100],

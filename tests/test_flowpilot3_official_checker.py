@@ -264,5 +264,40 @@ class G100OfficialKitBoundary(unittest.TestCase):
         self.assertIn('"official_checker_executed": false', output.getvalue().lower())
 
 
+    def test_stderr_warning_cannot_be_promoted_to_clean_official_pass(self):
+        payload = json.dumps({"status": "static-pass", "summary": {
+            "errors": 0, "warnings": 0, "info": 0}, "diagnostics": []})
+        report = gate._sanitized_checker_result(
+            0, payload, "Error: extra diagnostic printed by vendor", mode="docker")
+        self.assertEqual(report["result"], "OFFICIAL_WARN_OR_FAIL_HOLD")
+        self.assertTrue(report["checker_stderr_present"])
+        self.assertEqual(report["release_gate"], "HOLD")
+        self.assertFalse(report["owner_release_approved"])
+        self.assertNotIn("extra diagnostic", json.dumps(report))
+
+    def test_nonzero_exit_with_zero_summary_still_fails(self):
+        payload = json.dumps({"status": "static-pass", "summary": {
+            "errors": 0, "warnings": 0, "info": 0}, "diagnostics": []})
+        report = gate._sanitized_checker_result(2, payload, "", mode="docker")
+        self.assertEqual(report["result"], "OFFICIAL_WARN_OR_FAIL_HOLD")
+        self.assertEqual(report["checker_exit_code"], 2)
+
+    def test_boolean_summary_zero_is_not_int_zero(self):
+        payload = json.dumps({"status": "static-pass", "summary": {
+            "errors": False, "warnings": 0, "info": 0}, "diagnostics": []})
+        report = gate._sanitized_checker_result(0, payload, "", mode="docker")
+        self.assertEqual(report["result"], "OFFICIAL_WARN_OR_FAIL_HOLD")
+        self.assertEqual(report["checker_summary"], "UNVERIFIED_SUMMARY")
+
+    def test_blank_stderr_retains_empty_diagnostic_semantics(self):
+        payload = json.dumps({"status": "static-pass", "summary": {
+            "errors": 0, "warnings": 0, "info": 0}, "diagnostics": []})
+        report = gate._sanitized_checker_result(0, payload, " \t\n", mode="docker")
+        self.assertEqual(report["result"], "OFFICIAL_STATIC_PASS_REVIEW_ONLY")
+        self.assertFalse(report["checker_stderr_present"])
+        self.assertEqual(report["release_gate"], "HOLD")
+
+
+
 if __name__ == "__main__":
     unittest.main()
