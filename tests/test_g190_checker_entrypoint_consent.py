@@ -51,7 +51,8 @@ class G190CheckerEntrypointConsentTests(unittest.TestCase):
     def test_official_consent_does_not_bypass_sha_or_missing_source(self):
         with self.assertRaisesRegex(gate.VerificationRefused, "Missing, nonregular"):
             gate.check(self.missing_candidate, self.missing_kit, mode="docker",
-                       candidate_profile="g188", official_risk_approved=True)
+                       candidate_profile="g188", official_risk_approved=True,
+                       expected_docker_image_id="sha256:" + ("a" * 64))
 
     def test_inspect_still_enters_read_only_validation_without_code_execution(self):
         with patch.object(gate, "_read_pinned",

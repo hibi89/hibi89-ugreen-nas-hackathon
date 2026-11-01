@@ -34,6 +34,7 @@ class G100OfficialKitBoundary(unittest.TestCase):
             "uliya-skill-kit/scripts/check-skill.mjs": b"// synthetic only",
             "uliya-skill-kit/data/capability-catalog.json": b"{}",
         })
+        self.docker_image = "sha256:" + ("a" * 64)  # synthetic image only
         self.path = base / "candidate.zip"
         self.vendor = base / "kit.zip"
         self.path.write_bytes(self.candidate)
@@ -192,7 +193,8 @@ class G100OfficialKitBoundary(unittest.TestCase):
              patch.object(gate, "G139_CANDIDATE_ZIP_SHA", sha256(incomplete).hexdigest()), \
              patch.object(gate, "_execute", side_effect=AssertionError("No execution")):
             with self.assertRaisesRegex(gate.VerificationRefused, "exact approved"):
-                gate.check(self.path, self.vendor, mode="docker", candidate_profile="g139", official_risk_approved=True)
+                gate.check(self.path, self.vendor, mode="docker", candidate_profile="g139", official_risk_approved=True,
+                           expected_docker_image_id=self.docker_image)
 
     def test_g139_ref_only_tamper_rejected_by_pinned_zip(self):
         files = {gate.MEMBER: self.source,
@@ -337,7 +339,8 @@ class G100OfficialKitBoundary(unittest.TestCase):
              patch.object(gate, "G147_CANDIDATE_ZIP_SHA", sha256(good).hexdigest()), \
              patch.object(gate, "_execute", side_effect=AssertionError("vendor executed")):
             with self.assertRaisesRegex(gate.VerificationRefused, "SHA256"):
-                gate.check(self.path, self.vendor, mode="docker", candidate_profile="g147", official_risk_approved=True)
+                gate.check(self.path, self.vendor, mode="docker", candidate_profile="g147", official_risk_approved=True,
+                           expected_docker_image_id=self.docker_image)
 
     def test_g147_multifile_reference_contents_supplied_to_mock_only(self):
         files = {gate.MEMBER: self.source,
@@ -391,13 +394,13 @@ class G100OfficialKitBoundary(unittest.TestCase):
              patch.object(gate.subprocess, "run",
                           side_effect=AssertionError("Private mounts must not be sent")):
             with self.assertRaisesRegex(gate.VerificationRefused, "local Unix Docker"):
-                gate._execute(self.path.parent, self.path.parent, mode="docker")
+                gate._execute(self.path.parent, self.path.parent, mode="docker", docker_image_id=self.docker_image)
 
     def test_g149_docker_uses_pinned_local_endpoint_without_inherited_credentials(self):
         from subprocess import CompletedProcess
         import os
         outputs = [
-            CompletedProcess([], 0, stdout=b"image-present", stderr=b""),
+            CompletedProcess([], 0, stdout=(self.docker_image + "\n").encode(), stderr=b""),
             CompletedProcess([], 0, stdout=b'{"status":"static-pass"}', stderr=b""),
         ]
         with patch.object(gate.shutil, "which", return_value="/usr/bin/docker"), \
@@ -409,7 +412,7 @@ class G100OfficialKitBoundary(unittest.TestCase):
                  "DOCKER_CERT_PATH": "/private/key",
              }), patch.object(gate.subprocess, "run", side_effect=outputs) as run:
             exit_code, stdout, stderr = gate._execute(
-                self.path.parent, self.path.parent, mode="docker")
+                self.path.parent, self.path.parent, mode="docker", docker_image_id=self.docker_image)
         self.assertEqual((exit_code, stdout, stderr),
                          (0, '{"status":"static-pass"}', ""))
         self.assertEqual(run.call_count, 2)
@@ -435,7 +438,7 @@ class G100OfficialKitBoundary(unittest.TestCase):
         self.assertNotIn("--privileged", argv)
         self.assertNotIn("--network=host", argv)
         self.assertEqual(argv[-3:],
-                         ["node:22-alpine", "/vendor/scripts/check-skill.mjs",
+                         [self.docker_image, "/vendor/scripts/check-skill.mjs",
                           "/candidate/flowpilot-3"])
 
     def test_g149_missing_local_image_does_not_run_or_pull(self):
@@ -445,10 +448,10 @@ class G100OfficialKitBoundary(unittest.TestCase):
              patch.object(gate.subprocess, "run",
                           return_value=CompletedProcess([], 1, b"", b"")) as run:
             with self.assertRaisesRegex(gate.VerificationRefused, "no pull"):
-                gate._execute(self.path.parent, self.path.parent, mode="docker")
+                gate._execute(self.path.parent, self.path.parent, mode="docker", docker_image_id=self.docker_image)
         self.assertEqual(run.call_count, 1)
         self.assertEqual(run.call_args.args[0][-3:],
-                         ["image", "inspect", "node:22-alpine"])
+                         ["image", "inspect", "--format", "{{.Id}}", self.docker_image])
 
     def test_g149_docker_never_emits_untrusted_stderr_from_bad_vendor(self):
         from subprocess import CompletedProcess
@@ -459,7 +462,7 @@ class G100OfficialKitBoundary(unittest.TestCase):
                  CompletedProcess([], 0, b"", b""),
                  CompletedProcess([], 2, b'{"status":"fail"}', stderr)]):
             code, stdout, err = gate._execute(self.path.parent, self.path.parent,
-                                              mode="docker")
+                                              mode="docker", docker_image_id=self.docker_image)
         self.assertEqual(code, 2)
         self.assertEqual(err, stderr.decode())
         sanitized = gate._sanitized_checker_result(code, stdout, err, mode="docker")

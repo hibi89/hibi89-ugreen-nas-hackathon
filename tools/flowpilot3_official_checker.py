@@ -149,14 +149,22 @@ def _read_checker_output(result: subprocess.CompletedProcess) -> tuple[int, str,
             result.stderr.decode("utf-8", "replace"))
 
 
-def _execute(vendor: Path, candidate: Path, *, mode: str) -> tuple[int, str, str]:
+def _valid_image_id(value: object) -> bool:
+    # Content ID pins identity, but cannot attest who built the image.
+    return isinstance(value, str) and re.fullmatch(r"sha256:[0-9a-f]{64}", value) is not None
+
+
+def _execute(vendor: Path, candidate: Path, *, mode: str,
+             docker_image_id: str | None = None) -> tuple[int, str, str]:
     if mode == "docker":
+        if not _valid_image_id(docker_image_id):
+            raise VerificationRefused("Exact reviewed Docker image SHA256 ID required")
         # NEVER inherit owner DOCKER_HOST/CONTEXT/TLS credentials or default
         # configuration: a remote daemon would receive private candidate mounts.
         docker = shutil.which("docker")
         if not docker or not _local_docker_socket_ready():
             raise VerificationRefused("Verified local Unix Docker daemon unavailable; no remote fallback")
-        image = "node:22-alpine"
+        image = docker_image_id
         try:
             with tempfile.TemporaryDirectory(prefix="ugreen-official-docker-config-") as config:
                 env = {"PATH": os.environ.get("PATH", "/usr/bin:/bin"),
@@ -164,11 +172,13 @@ def _execute(vendor: Path, candidate: Path, *, mode: str) -> tuple[int, str, str
                        "DOCKER_HOST": "unix:///var/run/docker.sock"}
                 base = [docker, "--host=unix:///var/run/docker.sock",
                         "--config", config]
-                inspect = subprocess.run(base + ["image", "inspect", image],
+                inspect = subprocess.run(base + ["image", "inspect", "--format", "{{.Id}}", image],
                                          cwd=vendor.parent, env=env,
                                          capture_output=True, timeout=20, check=False)
                 if inspect.returncode != 0:
-                    raise VerificationRefused("Locally installed Node image unavailable; no pull")
+                    raise VerificationRefused("Reviewed Docker image ID unavailable; no pull")
+                if inspect.stdout.strip() != image.encode("ascii") or inspect.stderr.strip():
+                    raise VerificationRefused("Local Docker image identity mismatch; execution denied")
                 cmd = base + [
                     "run", "--rm", "--pull=never",
                     "--network=none", "--read-only", "--cap-drop=ALL",
@@ -252,7 +262,8 @@ def _sanitized_checker_result(code: int, stdout: str, stderr: str, *, mode: str)
 
 
 def check(candidate: Path, kit: Path, *, mode: str, native_risk_approved: bool = False,
-          candidate_profile: str = "g99", official_risk_approved: bool = False) -> dict:
+          candidate_profile: str = "g99", official_risk_approved: bool = False,
+          expected_docker_image_id: str | None = None) -> dict:
     if mode not in ("inspect", "docker", "native"):
         raise VerificationRefused("Invalid execution mode")
     # G190: guard the callable API as well as main(); direct imports must not
@@ -261,6 +272,10 @@ def check(candidate: Path, kit: Path, *, mode: str, native_risk_approved: bool =
         raise VerificationRefused("Vendor Checker execution requires explicit owner approval")
     if mode == "native" and native_risk_approved is not True:
         raise VerificationRefused("Native execution requires explicit risk approval")
+    # G191: deny before reading owner ZIPs if image has no reviewed immutable ID.
+    # This checks identity, NOT image provenance, nor vendor execution consent.
+    if mode == "docker" and not _valid_image_id(expected_docker_image_id):
+        raise VerificationRefused("Exact reviewed Docker image SHA256 ID required")
     # Profiles are immutable source/ZIP pairs; untrusted CLI users cannot supply arbitrary hashes.
     profiles = {"g99": (CANDIDATE_SHA, CANDIDATE_ZIP_SHA, (MEMBER,)),
                 "g103": (G103_CANDIDATE_SHA, G103_CANDIDATE_ZIP_SHA, (MEMBER,)),
@@ -293,7 +308,11 @@ def check(candidate: Path, kit: Path, *, mode: str, native_risk_approved: bool =
                 target.write_bytes(blob)
                 member_hashes[name] = sha256(blob).hexdigest()
         vendor = _prepare_toolkit(vendor_bytes, base / "official", details["checker_relative_root"])
-        code, stdout, stderr = _execute(vendor, skill, mode=mode)
+        if mode == "docker":
+            code, stdout, stderr = _execute(
+                vendor, skill, mode=mode, docker_image_id=expected_docker_image_id)
+        else:
+            code, stdout, stderr = _execute(vendor, skill, mode=mode)
         if any(sha256((base / "candidate" / name).read_bytes()).hexdigest() != digest
                for name, digest in member_hashes.items()):
             raise VerificationRefused("Candidate files changed during Checker run")
@@ -308,6 +327,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--mode", choices=("inspect", "docker", "native"), default="inspect")
     parser.add_argument("--candidate-profile", choices=("g99", "g103", "g139", "g147", "g188"), default="g99",
                         help="Select exact reviewed source/ZIP pins; no arbitrary hash overrides")
+    parser.add_argument("--expected-docker-image-id",
+                        help="Independently reviewed locally installed Docker image ID sha256:<64 hex>")
     parser.add_argument("--accept-native-code-execution-risk", action="store_true")
     parser.add_argument("--accept-official-code-execution-risk", action="store_true",
                         help="Explicit consent to run pinned vendor JS, including Docker mode")
@@ -322,7 +343,8 @@ def main(argv: list[str] | None = None) -> int:
         report = check(args.candidate_zip, args.official_kit_zip, mode=args.mode,
                        native_risk_approved=args.accept_native_code_execution_risk,
                        candidate_profile=args.candidate_profile,
-                       official_risk_approved=args.accept_official_code_execution_risk)
+                       official_risk_approved=args.accept_official_code_execution_risk,
+                       expected_docker_image_id=args.expected_docker_image_id)
         exit_code = 0 if report.get("result") == "OFFICIAL_STATIC_PASS_REVIEW_ONLY" else 2
     except (VerificationRefused, OSError, ValueError) as exc:
         report = {"status": "CHECKER_NOT_VERIFIED", "reason": type(exc).__name__,
