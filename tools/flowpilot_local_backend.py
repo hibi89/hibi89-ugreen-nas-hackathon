@@ -58,7 +58,7 @@ def _path_gate(path: Path, *, create: bool) -> None:
     if not create:
         try:
             s = path.stat()
-            if (not stat.S_ISREG(s.st_mode) or not 0 < s.st_size < MAX_DB_BYTES or
+            if (not stat.S_ISREG(s.st_mode) or not 0 <= s.st_size < MAX_DB_BYTES or
                     (os.name != "nt" and s.st_nlink != 1)):
                 raise BackendRefused("DB_NOT_OWNED_OR_OVERSIZED")
         except OSError as exc:
