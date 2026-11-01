@@ -68,6 +68,10 @@ el("connect").addEventListener("click", () => act(async () => {
   const input = el("token");
   const candidate = input.value;
   input.value = "";
+  // A new login attempt invalidates any previous authority even if input is bad.
+  token = ""; workflow = null; verifiedPlan = null; review = null;
+  el("synthetic-consent").checked = false; el("metadata-consent").checked = false;
+  el("connection-status").textContent = "기존 세션 폐기 · 인증 확인 중";
   if (candidate.length < 32 || candidate.length > 256) throw Error("토큰 길이는 32–256자여야 합니다.");
   token = candidate;
   try {
