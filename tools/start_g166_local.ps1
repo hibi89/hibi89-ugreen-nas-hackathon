@@ -24,6 +24,36 @@ if ($dbPath.Equals($checkout, [System.StringComparison]::OrdinalIgnoreCase) -or
 if (-not (Test-Path -LiteralPath ([System.IO.Path]::GetDirectoryName($dbPath)) -PathType Container)) {
   throw "DB parent directory must exist; refusing implicit directory creation."
 }
+# G168: stored SQLite must not follow an existing NTFS junction/symlink
+# to an unexpected location, including a public checkout or a network share.
+# This scans the DB parent only; metadata-root remains untouched until consent.
+function Assert-PlainDbParent([string]$Target) {
+  $parent = [System.IO.Path]::GetDirectoryName([System.IO.Path]::GetFullPath($Target))
+  while (-not [string]::IsNullOrEmpty($parent)) {
+    if (-not (Test-Path -LiteralPath $parent -PathType Container)) {
+      throw "DB parent is missing or inaccessible."
+    }
+    $entry = Get-Item -LiteralPath $parent -Force -ErrorAction Stop
+    if (($entry.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+      throw "DB ancestor is a symlink/junction/reparse point; refusing."
+    }
+    $next = [System.IO.Path]::GetDirectoryName($parent.TrimEnd('\\','/'))
+    if ([string]::IsNullOrEmpty($next) -or
+        $next.Equals($parent, [System.StringComparison]::OrdinalIgnoreCase)) {
+      break
+    }
+    $parent = $next
+  }
+  $drive = [System.IO.Path]::GetPathRoot([System.IO.Path]::GetFullPath($Target))
+  if ($drive.StartsWith("\\\\") -or $drive.StartsWith("//")) {
+    throw "Network SQLite path denied."
+  }
+  if ((Test-Path -LiteralPath $drive) -and
+      ([System.IO.DriveInfo]::new($drive)).DriveType -eq [System.IO.DriveType]::Network) {
+    throw "Mapped network SQLite volume denied."
+  }
+}
+Assert-PlainDbParent $dbPath
 if ($InitNewDb -and (Test-Path -LiteralPath $Db)) {
   throw "Database already exists; refusing -InitNewDb overwrite."
 }
