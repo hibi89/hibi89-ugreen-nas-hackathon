@@ -25,7 +25,7 @@ B. Serve zero-dependency static dashboard from the exact existing 127.0.0.1 back
 Requires Python 3.11, an **existing private parent directory** outside the checkout for the new SQLite file, and an actual local, non-NAS optional metadata root. For a new DB:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\start_g166_local.ps1 -Db "C:\private\flowpilot-g166.sqlite" -InitNewDb -MetadataRoot "C:\private\g166-disposable-folder"
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\start_g166_local.ps1 -DbFile "C:\private\flowpilot-g166.sqlite" -InitNewDb -MetadataRoot "C:\private\g166-disposable-folder"
 ```
 
 To resume the same DB, remove `-InitNewDb`. To disable file-metadata access, omit `-MetadataRoot` completely. The script prints a fresh token **only to the operator's terminal** and a local URL (`http://127.0.0.1:8766/dashboard`); it does not upload/save the token. The terminal output is sensitive and should not be recorded or posted. Ctrl+C stops the server; back up the private SQLite DB only after shutdown. Existing owner DBs from before G164 must not be silently migrated.

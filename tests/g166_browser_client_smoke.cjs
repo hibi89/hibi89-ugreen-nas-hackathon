@@ -8,7 +8,10 @@ const auth = process.argv[3];
 if (!/^http:\/\/127\.0\.0\.1:\d+$/.test(base) || !auth || auth.length < 32) {
   throw Error("local smoke parameters missing");
 }
-globalThis.crypto = webcrypto;
+// Modern Node exposes crypto as a read-only global getter; retain its native WebCrypto.
+if (!globalThis.crypto?.subtle) {
+  Object.defineProperty(globalThis, "crypto", {value: webcrypto, configurable: true});
+}
 const nativeFetch = globalThis.fetch;
 let rejectOneMetadataApproval = false;
 globalThis.fetch = (route, init) => {

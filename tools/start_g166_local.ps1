@@ -1,21 +1,21 @@
 # G166 owner-local start only. Does not register/login/start UGREEN trial.
-# Usage: powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\start_g166_local.ps1 -Db C:\private\g166.sqlite -InitNewDb
+# Usage: powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\start_g166_local.ps1 -DbFile C:\private\g166.sqlite -InitNewDb
 param(
-  [Parameter(Mandatory=$true)][string]$Db,
+  [Parameter(Mandatory=$true)][string]$DbFile,
   [switch]$InitNewDb,
   [string]$MetadataRoot = "",
   [int]$Port = 8766,
   [string]$Python = "python"
 )
 $ErrorActionPreference = "Stop"
-if (-not [System.IO.Path]::IsPathRooted($Db) -or -not $Db.EndsWith(".sqlite")) {
+if (-not [System.IO.Path]::IsPathRooted($DbFile) -or -not $DbFile.EndsWith(".sqlite")) {
   throw "Provide an absolute .sqlite path outside the Git repository."
 }
 if ($Port -lt 1024 -or $Port -gt 65535) { throw "Port must be 1024..65535." }
 # Prevent even an explicitly initialized private DB from being created anywhere
 # under the public checkout, not only beneath tools/ (G166 previously missed root).
 $checkout = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot "..")).TrimEnd('\', '/')
-$dbPath = [System.IO.Path]::GetFullPath($Db)
+$dbPath = [System.IO.Path]::GetFullPath($DbFile)
 $separator = [System.IO.Path]::DirectorySeparatorChar
 if ($dbPath.Equals($checkout, [System.StringComparison]::OrdinalIgnoreCase) -or
     $dbPath.StartsWith($checkout + $separator, [System.StringComparison]::OrdinalIgnoreCase)) {
@@ -54,10 +54,10 @@ function Assert-PlainDbParent([string]$Target) {
   }
 }
 Assert-PlainDbParent $dbPath
-if ($InitNewDb -and (Test-Path -LiteralPath $Db)) {
+if ($InitNewDb -and (Test-Path -LiteralPath $DbFile)) {
   throw "Database already exists; refusing -InitNewDb overwrite."
 }
-if (-not $InitNewDb -and -not (Test-Path -LiteralPath $Db)) {
+if (-not $InitNewDb -and -not (Test-Path -LiteralPath $DbFile)) {
   throw "New DB requires explicit -InitNewDb."
 }
 if ($MetadataRoot -ne "") {
@@ -82,7 +82,7 @@ $env:FLOWPILOT_LOCAL_API_TOKEN = (& $Python -c "import secrets; print(secrets.to
 if ($LASTEXITCODE -ne 0 -or $env:FLOWPILOT_LOCAL_API_TOKEN.Length -lt 32) {
   throw "Failed to generate a sufficiently long ephemeral token."
 }
-$arguments = @((Join-Path $PSScriptRoot "flowpilot_local_backend.py"), "--db", $Db, "--port", "$Port")
+$arguments = @((Join-Path $PSScriptRoot "flowpilot_local_backend.py"), "--db", $DbFile, "--port", "$Port")
 if ($InitNewDb) { $arguments += "--init-db" }
 if ($MetadataRoot -ne "") { $arguments += @("--metadata-root", $MetadataRoot) }
 Write-Host ("Open browser on same machine: http://127.0.0.1:" + $Port + "/dashboard")

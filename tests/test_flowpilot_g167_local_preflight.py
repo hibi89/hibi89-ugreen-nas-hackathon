@@ -43,6 +43,8 @@ class G167PreflightTests(unittest.TestCase):
         self.assertIn("OrdinalIgnoreCase", text)
         self.assertIn("DriveType]::Network", text)
         self.assertIn("Assert-PlainDbParent", text)
+        self.assertIn("[string]$DbFile", text)
+        self.assertNotIn("[string]$Db,", text)
         self.assertIn("ReparsePoint", text)
         self.assertIn("Mapped network SQLite volume denied", text)
         self.assertIn("DB parent directory must exist", text)
@@ -65,7 +67,7 @@ class G167PreflightTests(unittest.TestCase):
             completed = subprocess.run([
                 shell, "-NoProfile", "-ExecutionPolicy", "Bypass",
                 "-File", str(ROOT / "tools" / "start_g166_local.ps1"),
-                "-Db", str(candidate), "-InitNewDb"
+                "-DbFile", str(candidate), "-InitNewDb"
             ], capture_output=True, text=True, timeout=15, check=False)
             self.assertNotEqual(completed.returncode, 0)
             self.assertIn("reparse point", completed.stdout + completed.stderr)
@@ -82,7 +84,7 @@ class G167PreflightTests(unittest.TestCase):
         self.assertFalse(not_a_real_db.exists())
         command = [shell, "-NoProfile", "-ExecutionPolicy", "Bypass",
                    "-File", str(ROOT / "tools" / "start_g166_local.ps1"),
-                   "-Db", str(not_a_real_db), "-InitNewDb"]
+                   "-DbFile", str(not_a_real_db), "-InitNewDb"]
         result = subprocess.run(command, capture_output=True, text=True,
                                 timeout=15, check=False)
         self.assertNotEqual(result.returncode, 0)
