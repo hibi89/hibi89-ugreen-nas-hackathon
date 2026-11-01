@@ -132,7 +132,12 @@ def main():
     try:
         result=run_browser()
     except Exception as exc:
-        result={"status":"REAL_BROWSER_NOT_VERIFIED",
+        # A browser that actually launched but failed its assertions is a
+        # failed E2E, not a success and not the same as missing dependencies.
+        detail=str(exc)
+        blocked="ERR_BLOCKED_BY_ADMINISTRATOR" in detail
+        result={"status":"REAL_BROWSER_E2E_BLOCKED_BY_ENVIRONMENT" if blocked
+                else "REAL_BROWSER_E2E_FAILED",
                 "reason_type":type(exc).__name__,"release_gate":"HOLD"}
     print(json.dumps(result,ensure_ascii=True,sort_keys=True))
     return 0 if result["status"]=="REAL_LOCAL_BROWSER_E2E_PASS_NOT_NAS" else 2
