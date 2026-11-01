@@ -74,7 +74,7 @@ async function main(){
   assert.equal(elems.guide.disabled,false,"guide requires a workflow");
   await click("guide");
   assert.match(elems.output.textContent,/합성 전용 7단계 운영 가이드/);
-  assert.match(elems.output.textContent,/7\\. 운영 전 승인 게이트/);
+  assert.match(elems.output.textContent,/7\. 운영 전 승인 게이트/);
   assert.doesNotMatch(elems.output.textContent,/FLOWPILOT_LOCAL_API_TOKEN|Bearer /);
   assert.equal(elems.approve.disabled,true,"cannot approve before council test");
   await click("plan");
