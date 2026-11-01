@@ -506,7 +506,7 @@ def create_server(backend: Backend, token: str, *, port: int=0):
                 self.send_header(k,v)
             self.end_headers()
             self.wfile.write(data)
-        def guarded(self):
+        def host_guarded(self):
             host=self.headers.get("Host","")
             valid={f"127.0.0.1:{self.server.server_port}",
                    f"localhost:{self.server.server_port}","127.0.0.1","localhost"}
@@ -515,11 +515,48 @@ def create_server(backend: Backend, token: str, *, port: int=0):
                   {f"http://127.0.0.1:{self.server.server_port}",
                    f"http://localhost:{self.server.server_port}"}):
                 self.send(403,{"error":"HOST_ORIGIN_DENIED"});return False
+            return True
+        def guarded(self):
+            if not self.host_guarded():return False
             auth=self.headers.get("Authorization","")
             if not hmac.compare_digest(auth,"Bearer "+token):
                 self.send(403,{"error":"AUTH_REQUIRED"});return False
             return True
+        def serve_dashboard_asset(self,path):
+            # Public only to loopback; static bytes contain no bearer token.
+            # Credentials are entered by the owner and held in JS memory only.
+            files={"/dashboard":"flowpilot_g166_dashboard.html",
+                   "/dashboard.js":"flowpilot_g166_dashboard.js",
+                   "/dashboard.css":"flowpilot_g166_dashboard.css"}
+            types={"/dashboard":"text/html; charset=utf-8",
+                   "/dashboard.js":"text/javascript; charset=utf-8",
+                   "/dashboard.css":"text/css; charset=utf-8"}
+            try:
+                asset=Path(__file__).with_name(files[path])
+                if not asset.is_file() or asset.stat().st_size>100000:
+                    raise OSError("missing or oversized local dashboard asset")
+                raw=asset.read_bytes()
+            except OSError:
+                self.send(404,{"error":"DASHBOARD_ASSET_UNAVAILABLE"});return
+            self.send_response(200)
+            for key,value in (
+                    ("Content-Type",types[path]),
+                    ("Content-Length",str(len(raw))),
+                    ("Cache-Control","no-store"),
+                    ("Referrer-Policy","no-referrer"),
+                    ("X-Content-Type-Options","nosniff"),
+                    ("X-Frame-Options","DENY"),
+                    ("Content-Security-Policy",
+                     "default-src 'none'; script-src 'self'; style-src 'self'; "
+                     "connect-src 'self'; img-src 'none'; object-src 'none'; "
+                     "base-uri 'none'; form-action 'none'; frame-ancestors 'none'")):
+                self.send_header(key,value)
+            self.end_headers()
+            self.wfile.write(raw)
         def dispatch(self,method):
+            if method=="GET" and self.path in ("/dashboard","/dashboard.js","/dashboard.css"):
+                if self.host_guarded():self.serve_dashboard_asset(self.path)
+                return
             if not self.guarded():return
             path=self.path
             if "?" in path or "#" in path:
