@@ -11,6 +11,7 @@ on:
       - "tools/g5*"
       - "tools/check_handoff_sync.py"
       - "tests/test_*.py"
+      - "tests/g166_browser_client_smoke.cjs"
       - "verify_local.ps1"
       - ".github/workflows/flowpilot-mvp.yml"
   workflow_dispatch:
