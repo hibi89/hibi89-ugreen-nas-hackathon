@@ -38,17 +38,19 @@ def run_browser():
         browser=None
         try:
             with sync_playwright() as playwright:
+                # Prefer the host's already-installed Chrome. Attempting
+                # Playwright's absent bundled Chromium wastes a full timeout
+                # and makes headless CI vulnerable to transient runner load.
+                binary=next((shutil.which(name) for name in
+                             ("chromium","chromium-browser","google-chrome","msedge")
+                             if shutil.which(name)),None)
                 try:
-                    browser=playwright.chromium.launch(headless=True,timeout=10000)
+                    browser=playwright.chromium.launch(
+                        executable_path=binary,headless=True,timeout=30000)
                 except Exception:
-                    binary=next((shutil.which(name) for name in
-                                 ("chromium","chromium-browser","google-chrome","msedge")
-                                 if shutil.which(name)),None)
-                    if binary is None:
-                        return {"status":"REAL_BROWSER_NOT_VERIFIED",
-                                "reason":"BROWSER_BINARY_UNAVAILABLE","release_gate":"HOLD"}
-                    browser=playwright.chromium.launch(executable_path=binary,
-                                                       headless=True,timeout=10000)
+                    # Browser execution can be environment-blocked. Never
+                    # substitute a mocked DOM and never report a false PASS.
+                    raise
                 context=browser.new_context(accept_downloads=True)
                 page=context.new_page()
                 page.on("pageerror",lambda error: errors.append(str(error)))
