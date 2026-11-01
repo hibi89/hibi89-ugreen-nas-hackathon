@@ -57,6 +57,21 @@ class BackendRefused(ValueError):
         super().__init__(code)
 
 
+def _unique_json_object(pairs):
+    """Reject duplicate consent/action keys at EVERY nesting level."""
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError("DUPLICATE_JSON_KEY")
+        result[key] = value
+    return result
+
+
+def _reject_json_nonfinite(value):
+    """RFC JSON forbids NaN and Infinity; never reinterpret input telemetry."""
+    raise ValueError("JSON_NONFINITE_NUMBER")
+
+
 def _hash(data: object) -> str:
     return sha256(json.dumps(data, sort_keys=True, separators=(",", ":"),
                              ensure_ascii=True).encode("ascii")).hexdigest()
@@ -747,8 +762,14 @@ def create_server(backend: Backend, token: str, *, port: int=0):
                     except ValueError:size=-1
                     if size<2 or size>MAX_BODY:
                         self.send(413,{"error":"BODY_LIMIT"});return
-                    try:body=json.loads(self.rfile.read(size))
-                    except (ValueError,UnicodeError):
+                    try:
+                        raw=self.rfile.read(size)
+                        # JSON over HTTP must be UTF-8. Detect duplicated consent,
+                        # acknowledgement and telemetry keys before dispatch.
+                        body=json.loads(raw.decode("utf-8"),
+                                        object_pairs_hook=_unique_json_object,
+                                        parse_constant=_reject_json_nonfinite)
+                    except (ValueError,UnicodeError,RecursionError):
                         self.send(400,{"error":"INVALID_JSON"});return
                     if type(body) is not dict:
                         self.send(400,{"error":"JSON_OBJECT_REQUIRED"});return
