@@ -51,7 +51,7 @@ class MetadataGate:
     def _public(token: str, item: dict) -> dict:
         return {
             "schema": SCHEMA, "review_id": token, "status": item["status"],
-            "scope_sha256": item["digest"], "required_count": len(item["required"]),
+            "scope_sha256": item["digest"], "required_count": item["required_count"],
             "approved_local_metadata_access": item["status"] in
                 ("LOCAL_METADATA_FINDINGS_READY", "LOCAL_METADATA_BLOCKED"),
             "inspection_result": item["result"],
@@ -94,6 +94,7 @@ class MetadataGate:
                              sort_keys=True, separators=(",", ":")).encode("ascii")
             digest = sha256(raw).hexdigest()
             item = {"created": time.monotonic(), "goal": goal, "required": items,
+                    "required_count": len(items),
                     "digest": digest, "status": "WAITING_APPROVAL", "result": None}
             self._reviews[token] = item
             return self._public(token, item)

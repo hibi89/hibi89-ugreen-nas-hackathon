@@ -44,6 +44,7 @@ class G165Tests(unittest.TestCase):
         found = gate.approve(plan["review_id"], plan["scope_sha256"],
                              "APPROVE_LOCAL_METADATA_READ_ONLY")
         self.assertEqual(found["status"], "LOCAL_METADATA_BLOCKED")
+        self.assertEqual(found["required_count"], 2)
         self.assertEqual(found["inspection_result"],
                          [{"index": 1, "state": "PRESENT"}, {"index": 2, "state": "MISSING"}])
         self.assertEqual(before, (self.root / "README.md").read_bytes())
@@ -70,6 +71,7 @@ class G165Tests(unittest.TestCase):
         plan = gate.begin("check required files", ["README.md"])
         canceled=gate.cancel(plan["review_id"])
         self.assertEqual(canceled["status"],"CANCELED")
+        self.assertEqual(canceled["required_count"],1)
         with self.assertRaisesRegex(MetadataRefused,"CONSUMED"):
             gate.approve(plan["review_id"],plan["scope_sha256"],
                          "APPROVE_LOCAL_METADATA_READ_ONLY")
