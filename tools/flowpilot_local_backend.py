@@ -24,6 +24,7 @@ from flowpilot_task_compiler import compile_goal
 from flowpilot_code_council import run_council
 from flowpilot_repair_ledger import run_once, verify_record
 from flowpilot_proactive_advisor import advise_local
+from flowpilot_g164_report_artifact import fixture_csv, ArtifactRefused
 
 SCHEMA = "flowpilot-backend-local-v1"
 IDENTITY = "flowpilot-g161-owner-created-backend-v1"
@@ -89,6 +90,10 @@ class Backend:
                            "seq INTEGER NOT NULL, kind TEXT NOT NULL, "
                            "previous_sha TEXT NOT NULL, event_sha TEXT NOT NULL,"
                            "PRIMARY KEY(wf_id, seq))")
+                db.execute("CREATE TABLE fp_backend_artifacts ("
+                           "wf_id TEXT PRIMARY KEY, template TEXT NOT NULL, "
+                           "receipt_sha TEXT NOT NULL, content_sha TEXT NOT NULL,"
+                           "csv_bytes BLOB NOT NULL)")
                 db.commit()  # closing() never implicitly commits transactions.
         with closing(self._connect()) as db:
             try:
@@ -360,6 +365,32 @@ class Backend:
             db.commit()
             return self.get(wf_id)
 
+    def report(self,wf_id) -> tuple[bytes,str]:
+        """GET a persisted binary artifact, only when G119 receipt is intact."""
+        with self.lock, closing(self._connect()) as db:
+            row=self._row(db,wf_id)
+            if row[5]!="COMPLETE_LOCAL_SYNTHETIC":
+                raise BackendRefused("REPORT_NOT_YET_COMPLETE")
+            # G163 verifies canonical plan, exact human approval sequence,
+            # G119 terminal and matching backend/G119 receipt before export.
+            self.evidence(wf_id)
+            try:
+                stored=db.execute("SELECT template,receipt_sha,content_sha,csv_bytes "
+                                  "FROM fp_backend_artifacts WHERE wf_id=?",
+                                  (wf_id,)).fetchone()
+            except sqlite3.Error as exc:
+                raise BackendRefused("REPORT_SCHEMA_MISSING") from exc
+            if (not stored or stored[0]!=row[3] or
+                    type(stored[1]) is not str or type(row[6]) is not str
+                    or not hmac.compare_digest(stored[1],row[6]) or
+                    type(stored[2]) is not str or len(stored[2])!=64):
+                raise BackendRefused("REPORT_BINDING_MISMATCH")
+            content=stored[3]
+            if (type(content) is not bytes or not 0<len(content)<=4096 or
+                    not hmac.compare_digest(stored[2],sha256(content).hexdigest())):
+                raise BackendRefused("REPORT_CONTENT_CORRUPTED")
+            return content,stored[2]
+
     def run(self,wf_id):
         with self.lock, closing(self._connect()) as db:
             row=self._row(db,wf_id)
@@ -368,6 +399,10 @@ class Backend:
                 return self.get(wf_id)
             if row[5]!="APPROVED_SYNTHETIC":
                 raise BackendRefused("RUN_STATE_CONFLICT")
+            # Existing DB from pre-G164 is never modified/migrated silently.
+            if db.execute("SELECT name FROM sqlite_master WHERE type='table' "
+                          "AND name='fp_backend_artifacts'").fetchone() is None:
+                raise BackendRefused("ARTIFACT_SCHEMA_NEEDS_OWNER_MIGRATION")
             # Commit reservation BEFORE calling the already replay-protected
             # G119 engine. A crash leaves RUNNING, never silently reruns.
             db.execute("BEGIN IMMEDIATE")
@@ -382,8 +417,17 @@ class Backend:
             except (ValueError,sqlite3.Error):
                 intact=False
             good=result.get("status")=="SYNTHETIC_LEDGER_PASS" and intact
+            content=None
+            if good:
+                try:
+                    content=fixture_csv(row[3],result.get("synthetic_test_evidence"))
+                except (ArtifactRefused,ValueError,TypeError):
+                    good=False
             receipt=result.get("receipt_sha256") if good else None
             db.execute("BEGIN IMMEDIATE")
+            if good:
+                db.execute("INSERT INTO fp_backend_artifacts VALUES(?,?,?,?,?)",
+                           (wf_id,row[3],receipt,sha256(content).hexdigest(),content))
             db.execute("UPDATE fp_backend_workflows SET state=?, receipt_sha=? WHERE wf_id=?",
                        ("COMPLETE_LOCAL_SYNTHETIC" if good else "BLOCKED",receipt,wf_id))
             self._event(db,wf_id,"LOCAL_SYNTHETIC_RUN_PASS" if good else "RUN_BLOCKED")
@@ -405,7 +449,20 @@ class Backend:
                                    (run_id,)).fetchone()
             except (ValueError,sqlite3.Error):
                 intact=False;outcome=None
-            good=bool(intact and outcome and outcome[0]=="PASS")
+            # Never mark a previous attempt complete without its already
+            # committed artifact. Do not rerun the G119 fixture to repair it.
+            try:
+                stored=db.execute("SELECT receipt_sha,content_sha,csv_bytes "
+                                  "FROM fp_backend_artifacts WHERE wf_id=?",
+                                  (wf_id,)).fetchone()
+            except sqlite3.Error:
+                stored=None
+            good=bool(intact and outcome and outcome[0]=="PASS" and stored and
+                      type(stored[0]) is str and
+                      hmac.compare_digest(stored[0],outcome[1]) and
+                      type(stored[2]) is bytes and 0<len(stored[2])<=4096 and
+                      type(stored[1]) is str and len(stored[1])==64 and
+                      hmac.compare_digest(stored[1],sha256(stored[2]).hexdigest()))
             db.execute("BEGIN IMMEDIATE")
             db.execute("UPDATE fp_backend_workflows SET state=?,receipt_sha=? WHERE wf_id=?",
                        ("COMPLETE_LOCAL_SYNTHETIC" if good else "INTERRUPTED_BLOCKED",
@@ -432,6 +489,18 @@ def create_server(backend: Backend, token: str, *, port: int=0):
                 self.send_header(k,v)
             self.end_headers()
             self.wfile.write(raw)
+        def send_csv(self,data,digest):
+            self.send_response(200)
+            for k,v in (("Content-Type","text/csv; charset=utf-8"),
+                        ("Content-Disposition",'attachment; filename="flowpilot-synthetic-fixture.csv"'),
+                        ("Cache-Control","no-store"),
+                        ("X-Content-Type-Options","nosniff"),
+                        ("Content-Security-Policy","default-src 'none'"),
+                        ("X-Flowpilot-Content-SHA256",digest),
+                        ("Content-Length",str(len(data)))):
+                self.send_header(k,v)
+            self.end_headers()
+            self.wfile.write(data)
         def guarded(self):
             host=self.headers.get("Host","")
             valid={f"127.0.0.1:{self.server.server_port}",
@@ -459,8 +528,12 @@ def create_server(backend: Backend, token: str, *, port: int=0):
                         data=backend.list()
                     elif re.fullmatch(r"/v1/workflows/wf_[0-9a-f]{32}",path):
                         data=backend.get(path.rsplit("/",1)[-1])
-                    elif re.fullmatch(r"/v1/workflows/wf_[0-9a-f]{32}/(plan|audit|evidence)",path):
+                    elif re.fullmatch(r"/v1/workflows/wf_[0-9a-f]{32}/(plan|audit|evidence|report)",path):
                         wf,action=path.rsplit("/",2)[-2:]
+                        if action=="report":
+                            blob,digest=backend.report(wf)
+                            self.send_csv(blob,digest)
+                            return
                         data=getattr(backend,action)(wf)
                     else:
                         self.send(404,{"error":"UNKNOWN_ROUTE"});return

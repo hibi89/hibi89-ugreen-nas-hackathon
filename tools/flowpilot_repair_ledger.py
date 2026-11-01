@@ -123,7 +123,9 @@ def run_once(goal: str, run_id: str, db: sqlite3.Connection, *,
         "schema": _SCHEMA, "status": "SYNTHETIC_LEDGER_PASS" if success else "SYNTHETIC_LEDGER_BLOCKED",
         "run_id": run_id, "template": plan["template"], "receipt_sha256": final_sha,
         "repair_count": reviewed.get("repair_count", 0) if "reviewed" in locals() else 0,
-        "synthetic_fixture_executed": bool(success), "actual_docker_executed": False,
+        "synthetic_fixture_executed": bool(success),
+        "synthetic_test_evidence": reviewed.get("test_evidence") if success else None,
+        "actual_docker_executed": False,
         "nas_verified": False, "production_applied": False, "release_gate": "HOLD",
     }
 
