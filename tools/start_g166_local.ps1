@@ -42,7 +42,7 @@ if ($MetadataRoot -ne "") {
   $rootPath = [System.IO.Path]::GetFullPath($MetadataRoot)
   $rootDrive = [System.IO.Path]::GetPathRoot($rootPath)
   if ($null -ne $rootDrive -and (Test-Path -LiteralPath $rootDrive)) {
-    $driveType = (New-Object System.IO.DriveInfo($rootDrive)).DriveType
+    $driveType = ([System.IO.DriveInfo]::new($rootDrive)).DriveType
     if ($driveType -eq [System.IO.DriveType]::Network) {
       throw "Network/mapped NAS drive is not a permitted MetadataRoot."
     }
