@@ -101,7 +101,7 @@ async function main(){
   await click("meta-cancel");
   assert.match(elems["metadata-summary"].textContent,/CANCELED/);
   // G176: a failed cancel reply must not retain a usable ticket or consent.
-  elems.required.value="README.md\\nnot-here.pdf";
+  elems.required.value="README.md\nnot-here.pdf";
   await click("meta-preview");
   elems["metadata-consent"].checked=true;
   elems["metadata-consent"].fire("change");
