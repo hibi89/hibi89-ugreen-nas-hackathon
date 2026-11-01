@@ -25,6 +25,7 @@ from flowpilot_code_council import run_council
 from flowpilot_repair_ledger import run_once, verify_record
 from flowpilot_proactive_advisor import advise_local
 from flowpilot_g164_report_artifact import fixture_csv, ArtifactRefused, CANONICAL_CSV
+from flowpilot_g165_local_metadata_api import MetadataGate, MetadataRefused
 
 SCHEMA = "flowpilot-backend-local-v1"
 IDENTITY = "flowpilot-g161-owner-created-backend-v1"
@@ -68,10 +69,12 @@ def _path_gate(path: Path, *, create: bool) -> None:
 
 
 class Backend:
-    def __init__(self, path: Path, *, create: bool = False):
+    def __init__(self, path: Path, *, create: bool = False,
+                 metadata_root: Path | None = None):
         _path_gate(path, create=create)
         self.path = path
         self.lock = threading.RLock()
+        self.metadata = MetadataGate(metadata_root)
         if create:
             flags = os.O_CREAT | os.O_EXCL | os.O_RDWR | getattr(os, "O_NOFOLLOW", 0)
             try:
@@ -528,6 +531,8 @@ def create_server(backend: Backend, token: str, *, port: int=0):
                               "nas_verified":False,"release_gate":"HOLD"}
                     elif path=="/v1/workflows":
                         data=backend.list()
+                    elif re.fullmatch(r"/v1/local-metadata/reviews/rev_[0-9a-f]{32}",path):
+                        data=backend.metadata.get(path.rsplit("/",1)[-1])
                     elif re.fullmatch(r"/v1/workflows/wf_[0-9a-f]{32}",path):
                         data=backend.get(path.rsplit("/",1)[-1])
                     elif re.fullmatch(r"/v1/workflows/wf_[0-9a-f]{32}/(plan|audit|evidence|report)",path):
@@ -558,6 +563,19 @@ def create_server(backend: Backend, token: str, *, port: int=0):
                         if set(body)!={"goal","request_id"}:
                             raise BackendRefused("UNEXPECTED_KEYS",400)
                         data=backend.create(body["goal"],body["request_id"])
+                    elif path=="/v1/local-metadata/preview":
+                        if set(body)!={"goal","required"}:
+                            raise BackendRefused("UNEXPECTED_KEYS",400)
+                        data=backend.metadata.begin(body["goal"],body["required"])
+                    elif path=="/v1/local-metadata/approve":
+                        if set(body)!={"review_id","scope_sha256","acknowledgement"}:
+                            raise BackendRefused("UNEXPECTED_KEYS",400)
+                        data=backend.metadata.approve(body["review_id"],body["scope_sha256"],
+                                                      body["acknowledgement"])
+                    elif path=="/v1/local-metadata/cancel":
+                        if set(body)!={"review_id"}:
+                            raise BackendRefused("UNEXPECTED_KEYS",400)
+                        data=backend.metadata.cancel(body["review_id"])
                     elif path=="/v1/advice":
                         if set(body)!={"telemetry","opt_in"}:
                             raise BackendRefused("UNEXPECTED_KEYS",400)
@@ -576,7 +594,7 @@ def create_server(backend: Backend, token: str, *, port: int=0):
                                 raise BackendRefused("UNEXPECTED_KEYS",400)
                             data=getattr(backend,action)(wf)
                 self.send(200,data)
-            except BackendRefused as exc:
+            except (BackendRefused, MetadataRefused) as exc:
                 self.send(exc.status,{"error":exc.code,"release_gate":"HOLD"})
             except (OSError,sqlite3.Error,AssertionError,ValueError):
                 self.send(409,{"error":"LOCAL_BACKEND_REFUSED","release_gate":"HOLD"})
@@ -591,13 +609,15 @@ def main(argv=None):
     p=argparse.ArgumentParser(description="LOCAL synthetic FlowPilot backend, no real NAS")
     p.add_argument("--db",type=Path,required=True)
     p.add_argument("--init-db",action="store_true")
+    p.add_argument("--metadata-root",type=Path,
+                   help="Explicit operator-selected local non-NAS folder; never exposed through HTTP")
     p.add_argument("--port",type=int,default=8766)
     a=p.parse_args(argv)
     token=os.environ.get("FLOWPILOT_LOCAL_API_TOKEN","")
     try:
-        backend=Backend(a.db,create=a.init_db)
+        backend=Backend(a.db,create=a.init_db,metadata_root=a.metadata_root)
         server=create_server(backend,token,port=a.port)
-    except (BackendRefused,OSError,sqlite3.Error):
+    except (BackendRefused,MetadataRefused,OSError,sqlite3.Error):
         print(json.dumps({"status":"LOCAL_BACKEND_START_REFUSED","release_gate":"HOLD"}))
         return 2
     try:
