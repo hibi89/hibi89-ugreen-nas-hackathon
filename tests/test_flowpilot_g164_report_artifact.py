@@ -73,6 +73,16 @@ class G164Tests(unittest.TestCase):
         with self.assertRaisesRegex(BackendRefused,"REPORT_CONTENT_CORRUPTED"):
             self.b.report(wf)
 
+    def test_blob_and_mutable_digest_forged_together_is_still_denied(self):
+        wf=self.completed()
+        forged=b"customer,total_revenue\r\nmallory,1000000\r\n"
+        with closing(self.b._connect()) as db:
+            db.execute("UPDATE fp_backend_artifacts SET csv_bytes=?,content_sha=? "
+                       "WHERE wf_id=?",(forged,sha256(forged).hexdigest(),wf))
+            db.commit()
+        with self.assertRaisesRegex(BackendRefused,"REPORT_CANONICAL_FIXTURE_DRIFT"):
+            self.b.report(wf)
+
     def test_receipt_forgery_fails_closed(self):
         wf=self.completed()
         with closing(self.b._connect()) as db:

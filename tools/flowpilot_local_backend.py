@@ -24,7 +24,7 @@ from flowpilot_task_compiler import compile_goal
 from flowpilot_code_council import run_council
 from flowpilot_repair_ledger import run_once, verify_record
 from flowpilot_proactive_advisor import advise_local
-from flowpilot_g164_report_artifact import fixture_csv, ArtifactRefused
+from flowpilot_g164_report_artifact import fixture_csv, ArtifactRefused, CANONICAL_CSV
 
 SCHEMA = "flowpilot-backend-local-v1"
 IDENTITY = "flowpilot-g161-owner-created-backend-v1"
@@ -389,6 +389,8 @@ class Backend:
             if (type(content) is not bytes or not 0<len(content)<=4096 or
                     not hmac.compare_digest(stored[2],sha256(content).hexdigest())):
                 raise BackendRefused("REPORT_CONTENT_CORRUPTED")
+            if content!=CANONICAL_CSV.get(row[3]):
+                raise BackendRefused("REPORT_CANONICAL_FIXTURE_DRIFT")
             return content,stored[2]
 
     def run(self,wf_id):
