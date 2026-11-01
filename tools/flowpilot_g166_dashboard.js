@@ -111,10 +111,37 @@ el("create").addEventListener("click", () => act(async () => {
 }));
 el("list").addEventListener("click", () => act(async () => {
   const result = await json("/v1/workflows");
+  const names = {
+    required_file_metadata_v1: "필수 파일 점검 (합성)",
+    csv_customer_revenue_v1: "고객별 매출 보고서 (합성)"
+  };
+  const states = new Set(["PLANNED","TESTED","APPROVED_SYNTHETIC",
+    "RUNNING","COMPLETE_LOCAL_SYNTHETIC","BLOCKED","INTERRUPTED_BLOCKED"]);
+  if (result.status !== "LOCAL_WORKFLOW_LIST" || result.release_gate !== "HOLD" ||
+      result.nas_verified !== false || !Array.isArray(result.workflows) ||
+      result.workflows.length > 20 || result.count !== result.workflows.length ||
+      !result.workflows.every(id => /^wf_[0-9a-f]{32}$/.test(id)) ||
+      new Set(result.workflows).size !== result.workflows.length)
+    throw Error("워크플로 목록 응답 검증 실패");
+  // Be compatible with earlier local backends returning only workflow IDs.
+  const detailed = Array.isArray(result.summaries);
+  if (detailed && (result.summaries.length !== result.workflows.length ||
+      !result.summaries.every((item, i) => item.workflow_id === result.workflows[i] &&
+        Object.prototype.hasOwnProperty.call(names, item.template) &&
+        states.has(item.status))))
+    throw Error("목록 템플릿·상태 검증 실패");
   const select = el("existing");
   select.replaceChildren(new Option("선택 안 함", ""));
-  for (const id of result.workflows) select.add(new Option(id, id));
-  status("로컬 워크플로 조회 완료"); output(result);
+  for (let i = 0; i < result.workflows.length; i++) {
+    const id = result.workflows[i];
+    const item = detailed ? result.summaries[i] : null;
+    // Labels are derived from code-owned template names, never stored goal text.
+    const label = item ? names[item.template] + " · " + item.status + " · " + id.slice(-6) : id;
+    select.add(new Option(label, id));
+  }
+  status("검증된 로컬 워크플로 상태 목록 · 재개하려면 선택 후 불러오기");
+  output({status:result.status, count:result.count, summaries:result.summaries || [],
+    nas_verified:false, release_gate:"HOLD"});
 }));
 el("load").addEventListener("click", () => act(async () => {
   const id = el("existing").value;

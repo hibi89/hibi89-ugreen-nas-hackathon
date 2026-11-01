@@ -214,12 +214,27 @@ class Backend:
             return self._public(row,integrity)
 
     def list(self):
-        """At most 20 recent local-only workflow states; never expose request IDs."""
+        """Resume up to 20 recent workflows with verified code-owned type and state.
+
+        Preserve legacy workflows IDs; add bounded summaries without user goals,
+        request IDs, file names, tokens, or private execution parameters.
+        """
         with self.lock, closing(self._connect()) as db:
             rows=db.execute("SELECT wf_id FROM fp_backend_workflows ORDER BY rowid DESC LIMIT 20").fetchall()
+            summaries=[]
+            for (wf_id,) in rows:
+                item=self.get(wf_id)  # Validate event chain and known state.
+                guide=self.guide(wf_id)  # Validate state/history, plan and completed receipt.
+                if (item["template"] not in _GUIDE_FIXTURES or
+                        guide["workflow_state"] != item["status"] or
+                        guide["template"] != item["template"]):
+                    raise BackendRefused("LIST_WORKFLOW_INTEGRITY_INVALID")
+                summaries.append({"workflow_id":wf_id,"template":item["template"],
+                                  "status":item["status"]})
             return {"schema":SCHEMA,"status":"LOCAL_WORKFLOW_LIST",
-                    "workflows":[self.get(wf_id)["workflow_id"] for (wf_id,) in rows],
-                    "count":len(rows),"nas_verified":False,"release_gate":"HOLD"}
+                    "workflows":[x["workflow_id"] for x in summaries],
+                    "summaries":summaries,
+                    "count":len(summaries),"nas_verified":False,"release_gate":"HOLD"}
 
     def plan(self,wf_id):
         """Return trusted compiled graph only after re-deriving and hashing it."""

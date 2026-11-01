@@ -140,7 +140,12 @@ async function main(){
   assert.equal(globalThis.__downloads,1,"one authenticated CSV download after digest verified");
   assert.match(elems.output.textContent,/LOCAL_SYNTHETIC_CSV_SHA_VERIFIED/);
   await click("list");
-  assert(elems.existing.options.some(x=>x.value===workflowId),"workflow listed from SQLite");
+  const saved = elems.existing.options.find(x=>x.value===workflowId);
+  assert(saved,"workflow listed from SQLite");
+  assert.match(saved.label,/필수 파일 점검 \(합성\)/,"stored type is shown");
+  assert.match(saved.label,/COMPLETE_LOCAL_SYNTHETIC/,"stored status is shown");
+  assert.match(saved.label,new RegExp(workflowId.slice(-6)+"$"),"opaque ID is shortened");
+  assert(!saved.label.includes("check required files"),"raw user goal is never shown");
   elems.existing.value=workflowId;elems.existing.fire("change");
   await click("load");assert.equal(elems["workflow-state"].textContent,"COMPLETE_LOCAL_SYNTHETIC");
   elems.required.value="README.md\nnot-here.pdf";
