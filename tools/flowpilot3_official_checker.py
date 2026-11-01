@@ -300,8 +300,16 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--candidate-profile", choices=("g99", "g103", "g139", "g147"), default="g99",
                         help="Select exact reviewed source/ZIP pins; no arbitrary hash overrides")
     parser.add_argument("--accept-native-code-execution-risk", action="store_true")
+    parser.add_argument("--accept-official-code-execution-risk", action="store_true",
+                        help="Explicit consent to run pinned vendor JS, including Docker mode")
     args = parser.parse_args(argv)
     try:
+        # Docker isolation is a containment measure, NOT permission to execute vendor JS.
+        # Refuse without owner consent before reading any private or vendor bytes.
+        if args.mode in ("docker", "native") and not args.accept_official_code_execution_risk:
+            raise VerificationRefused("Explicit vendor Checker execution approval required")
+        if args.mode == "native" and not args.accept_native_code_execution_risk:
+            raise VerificationRefused("Additional native execution risk approval required")
         report = check(args.candidate_zip, args.official_kit_zip, mode=args.mode,
                        native_risk_approved=args.accept_native_code_execution_risk,
                        candidate_profile=args.candidate_profile)
