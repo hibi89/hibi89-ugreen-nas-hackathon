@@ -235,6 +235,52 @@ class Backend:
             details=_GUIDE_FIXTURES.get(row[3])
             if details is None:
                 raise BackendRefused("GUIDE_TEMPLATE_UNSUPPORTED")
+            # State alone is mutable: validate the actual append-only event
+            # order before showing any progress. Reading must never mutate DB.
+            history=[event[0] for event in db.execute(
+                "SELECT kind FROM fp_backend_events WHERE wf_id=? ORDER BY seq",
+                (wf_id,)).fetchall()]
+            tested=["CREATED","SYNTHETIC_QA_PASS"]
+            approved=tested+["SYNTHETIC_ONLY_APPROVED"]
+            running=approved+["RUN_RESERVED"]
+            expected={
+                "PLANNED":[["CREATED"]],
+                "TESTED":[tested],
+                "APPROVED_SYNTHETIC":[approved],
+                "RUNNING":[running],
+                "COMPLETE_LOCAL_SYNTHETIC":[
+                    running+["LOCAL_SYNTHETIC_RUN_PASS"],
+                    running+["RUN_RECONCILED_WITH_LEDGER"]],
+                "BLOCKED":[["CREATED","SYNTHETIC_QA_BLOCKED"],
+                           running+["RUN_BLOCKED"]],
+                "INTERRUPTED_BLOCKED":[running+["RUN_INTERRUPTED_NO_RETRY"]],
+            }
+            state=row[5]
+            if history not in expected[state]:
+                raise BackendRefused("GUIDE_EVENT_SEQUENCE_INVALID")
+            local_completed={
+                "PLANNED":2,"TESTED":3,"APPROVED_SYNTHETIC":4,
+                "RUNNING":4,"COMPLETE_LOCAL_SYNTHETIC":6,
+                "BLOCKED":2 if history==["CREATED","SYNTHETIC_QA_BLOCKED"] else 4,
+                "INTERRUPTED_BLOCKED":4,
+            }[state]
+            next_steps={
+                "PLANNED":(3,"계획 SHA 확인 후 4역할 합성 테스트"),
+                "TESTED":(4,"계획 SHA 재확인 후 합성 실행에만 별도 동의"),
+                "APPROVED_SYNTHETIC":(5,"승인된 합성 실행 선택"),
+                "RUNNING":(5,"재실행하지 말고 중단 작업 복구 조회"),
+                "COMPLETE_LOCAL_SYNTHETIC":(7,
+                    "로컬 합성 완료 · 공식 Uliya 검증과 실제 NAS 권한은 별도"),
+                "BLOCKED":(None,"차단된 실행 · 자동 재시도 금지, 새 계획부터 재검토"),
+                "INTERRUPTED_BLOCKED":(None,
+                    "복구 차단 · 자동 재실행 금지, 원인 검토 후 새 계획 필요"),
+            }
+            next_step, next_action=next_steps[state]
+            # A forged mutable report hash must NEVER yield a completed guide.
+            # report() also validates G119 evidence, exact approval order and
+            # code-owned CSV bytes, without rerunning any synthetic operation.
+            if state=="COMPLETE_LOCAL_SYNTHETIC":
+                self.report(wf_id)
             steps=[
                 {"number":1,"title":"검증 범위",
                  "instruction":"테스트 전용 템플릿: "+details[0],
@@ -258,10 +304,29 @@ class Backend:
                  "instruction":"실제 NAS 사용 전 공식 Creator·Checker, 등록 Expert 권한, 소유자 승인 별도 확인",
                  "expected":"NOT_VERIFIED · RELEASE HOLD · NAS 체험 미사용"},
             ]
+            for step in steps:
+                number=step["number"]
+                if number==7:
+                    progress="OFFICIAL_BLOCKED"
+                elif number<=local_completed:
+                    progress="VERIFIED_LOCAL"
+                elif number==next_step:
+                    progress="RECOVERY_REQUIRED" if state=="RUNNING" else "NEXT"
+                elif state in ("BLOCKED","INTERRUPTED_BLOCKED") and number==local_completed+1:
+                    progress="STOPPED"
+                else:
+                    progress="WAITING"
+                step["progress"]=progress
             data={"schema":"flowpilot-local-operator-guide-v1",
                   "status":"SYNTHETIC_OPERATOR_GUIDE_READY_NOT_NAS",
                   "workflow_id":wf_id,"template":row[3],
                   "plan_sha256":row[4],"steps":steps,
+                  "workflow_state":state,
+                  "verified_local_steps":local_completed,
+                  "total_local_steps":6,
+                  "next_step_number":next_step,
+                  "next_action":next_action,
+                  "audit_event_count":len(history),
                   "source":"CODE_OWNED_FIXED_TEMPLATE",
                   "read_only":True,"commands_executed":False,
                   "owner_files_accessed":False,"real_nas_verified":False,

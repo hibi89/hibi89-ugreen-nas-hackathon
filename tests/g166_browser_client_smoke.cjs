@@ -74,7 +74,11 @@ async function main(){
   assert.equal(elems.guide.disabled,false,"guide requires a workflow");
   await click("guide");
   assert.match(elems.output.textContent,/합성 전용 7단계 운영 가이드/);
-  assert.match(elems.output.textContent,/7\. 운영 전 승인 게이트/);
+  assert.match(elems.output.textContent,/현재 실행 상태: PLANNED/);
+  assert.match(elems.output.textContent,/로컬 검증 단계: 2\/6/);
+  assert.match(elems.output.textContent,/3\. \[NEXT\] 4역할 합성 검증/);
+  assert.match(elems.output.textContent,/브라우저 대조 완료/);
+  assert.match(elems.output.textContent,/7\. \[OFFICIAL_BLOCKED\] 운영 전 승인 게이트/);
   assert.doesNotMatch(elems.output.textContent,/FLOWPILOT_LOCAL_API_TOKEN|Bearer /);
   assert.equal(elems.approve.disabled,true,"cannot approve before council test");
   await click("plan");
@@ -90,6 +94,11 @@ async function main(){
   assert.equal(elems["workflow-state"].textContent,"APPROVED_SYNTHETIC");
   await click("run");
   assert.equal(elems["workflow-state"].textContent,"COMPLETE_LOCAL_SYNTHETIC");
+  await click("guide");
+  assert.match(elems.output.textContent,/현재 실행 상태: COMPLETE_LOCAL_SYNTHETIC/);
+  assert.match(elems.output.textContent,/로컬 검증 단계: 6\/6/);
+  assert.match(elems.output.textContent,/6\. \[VERIFIED_LOCAL\] 감사·산출물/);
+  assert.match(elems.output.textContent,/7\. \[OFFICIAL_BLOCKED\] 운영 전 승인 게이트/);
   await click("audit");assert.match(elems.output.textContent,/LOCAL_CHAIN_INTACT/);
   await click("evidence");assert.match(elems.output.textContent,/NOT_NAS/);
   await click("report");

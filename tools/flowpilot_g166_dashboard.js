@@ -125,20 +125,49 @@ el("guide").addEventListener("click", () => act(async () => {
   const result = await json("/v1/workflows/" + workflow.workflow_id + "/guide");
   if (result.workflow_id !== workflow.workflow_id ||
       result.plan_sha256 !== workflow.plan_sha256 ||
+      result.workflow_state !== workflow.status ||
       result.status !== "SYNTHETIC_OPERATOR_GUIDE_READY_NOT_NAS" ||
       result.release_gate !== "HOLD" || result.real_nas_verified !== false ||
       result.commands_executed !== false || result.owner_files_accessed !== false ||
+      result.total_local_steps !== 6 ||
+      !Number.isInteger(result.verified_local_steps) ||
+      result.verified_local_steps < 0 || result.verified_local_steps > 6 ||
       !Array.isArray(result.steps) || result.steps.length !== 7 ||
+      !result.steps.every((step, idx) => step.number === idx + 1 &&
+        ["VERIFIED_LOCAL","NEXT","WAITING","RECOVERY_REQUIRED","STOPPED","OFFICIAL_BLOCKED"].includes(step.progress)) ||
+      result.steps[6].progress !== "OFFICIAL_BLOCKED" ||
+      typeof result.next_action !== "string" ||
       !/^[0-9a-f]{64}$/.test(result.guide_sha256))
-    throw Error("가이드 출처 또는 계획 일치 검증 실패");
+    throw Error("가이드 출처 또는 현재 상태 일치 검증 실패");
+  // Verify the API-owned SHA against a canonical serialization in-browser.
+  // Python: json.dumps(sort_keys=True,separators=(',', ':'),ensure_ascii=True).
+  function canonical(value) {
+    if (Array.isArray(value)) return "[" + value.map(canonical).join(",") + "]";
+    if (value !== null && typeof value === "object")
+      return "{" + Object.keys(value).sort().map(key =>
+        canonical(key) + ":" + canonical(value[key])).join(",") + "}";
+    const serialized = JSON.stringify(value);
+    return typeof value === "string" ? serialized.replace(/[\u007f-\uffff]/g,
+      char => "\\u" + char.charCodeAt(0).toString(16).padStart(4,"0")) : serialized;
+  }
+  const copy = {...result}; delete copy.guide_sha256;
+  const hash = await crypto.subtle.digest("SHA-256",
+    new TextEncoder().encode(canonical(copy)));
+  const verified = Array.from(new Uint8Array(hash),
+    x => x.toString(16).padStart(2,"0")).join("");
+  if (verified !== result.guide_sha256)
+    throw Error("가이드 SHA-256 무결성 오류");
   const lines = [
     "FlowPilot 3.0 · 합성 전용 7단계 운영 가이드",
     "실제 NAS / Uliya / Docker 실행 검증 아님 · RELEASE HOLD",
+    "현재 실행 상태: " + result.workflow_state,
+    "로컬 검증 단계: " + result.verified_local_steps + "/6 · 공식 승인 별도",
+    "다음 작업: " + result.next_action,
     "계획 SHA-256: " + result.plan_sha256,
-    "가이드 SHA-256: " + result.guide_sha256,
+    "가이드 SHA-256: " + result.guide_sha256 + " (브라우저 대조 완료)",
     "",
     ...result.steps.map((step, idx) =>
-      (idx + 1) + ". " + step.title + "\n  " +
+      (idx + 1) + ". [" + step.progress + "] " + step.title + "\n  " +
       step.instruction + "\n  예상 결과: " + step.expected)
   ];
   status("단계별 운영 안내 표시 · 코드를 실행하지 않았습니다.");

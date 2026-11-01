@@ -45,8 +45,71 @@ class BackendTests(unittest.TestCase):
                 guide["guide_sha256"]=digest
                 self.assertEqual(api.Backend(self.db).guide(wf),guide)
                 self.assertEqual(self.b.get(wf)["event_count"],before)
+                self.assertEqual(guide["workflow_state"],"PLANNED")
+                self.assertEqual(guide["verified_local_steps"],2)
+                self.assertEqual(guide["steps"][2]["progress"],"NEXT")
+                self.assertEqual(guide["steps"][6]["progress"],"OFFICIAL_BLOCKED")
                 self.b.test(wf)
-                self.assertEqual(self.b.guide(wf),guide)
+                tested=self.b.guide(wf)
+                self.assertEqual(tested["workflow_state"],"TESTED")
+                self.assertEqual(tested["verified_local_steps"],3)
+                self.assertEqual(tested["steps"][3]["progress"],"NEXT")
+                self.assertNotEqual(tested["guide_sha256"],guide["guide_sha256"])
+                self.assertEqual(tested["guide_sha256"],api._hash(
+                    {k:v for k,v in tested.items() if k!="guide_sha256"}))
+                self.b.approve(wf,record["plan_sha256"],"APPROVE_SYNTHETIC_ONLY")
+                approved=self.b.guide(wf)
+                self.assertEqual(approved["verified_local_steps"],4)
+                self.assertEqual(approved["steps"][4]["progress"],"NEXT")
+                self.b.run(wf)
+                finished=self.b.guide(wf)
+                self.assertEqual(finished["workflow_state"],"COMPLETE_LOCAL_SYNTHETIC")
+                self.assertEqual(finished["verified_local_steps"],6)
+                self.assertEqual(finished["steps"][6]["progress"],"OFFICIAL_BLOCKED")
+                self.assertEqual(finished["next_step_number"],7)
+                self.assertEqual(api.Backend(self.db).guide(wf),finished)
+
+    def test_guide_running_never_claims_synthetic_completion(self):
+        record=self.b.create(GOAL,"req_g179running111")
+        wf=record["workflow_id"]
+        self.b.test(wf)
+        self.b.approve(wf,record["plan_sha256"],"APPROVE_SYNTHETIC_ONLY")
+        with api.closing(self.b._connect()) as db:
+            db.execute("UPDATE fp_backend_workflows SET state='RUNNING' WHERE wf_id=?",
+                       (wf,))
+            self.b._event(db,wf,"RUN_RESERVED")
+            db.commit()
+        guide=self.b.guide(wf)
+        self.assertEqual(guide["workflow_state"],"RUNNING")
+        self.assertEqual(guide["verified_local_steps"],4)
+        self.assertEqual(guide["steps"][4]["progress"],"RECOVERY_REQUIRED")
+        self.assertIn("복구 조회",guide["next_action"])
+        self.assertEqual(self.b.get(wf)["status"],"RUNNING")
+
+    def test_guide_uses_completed_report_integrity_gate(self):
+        record=self.b.create(GOAL,"req_g179forged11")
+        wf=record["workflow_id"]
+        self.b.test(wf)
+        self.b.approve(wf,record["plan_sha256"],"APPROVE_SYNTHETIC_ONLY")
+        self.b.run(wf)
+        with api.closing(self.b._connect()) as db:
+            fake=b"phase,required_1,required_2\\r\\ncorrupt,YES,YES\\r\\n"
+            db.execute("UPDATE fp_backend_artifacts SET csv_bytes=?, content_sha=? "
+                       "WHERE wf_id=?",(fake,api.sha256(fake).hexdigest(),wf))
+            db.commit()
+        with self.assertRaisesRegex(api.BackendRefused,"REPORT_CANONICAL_FIXTURE_DRIFT"):
+            self.b.guide(wf)
+
+    def test_guide_rejects_history_that_disagrees_with_state(self):
+        record=self.b.create(GOAL,"req_g179hist11")
+        wf=record["workflow_id"]
+        # Replacing a mutable status cannot manufacture QA and consent evidence.
+        with api.closing(self.b._connect()) as db:
+            db.execute("UPDATE fp_backend_workflows SET state='TESTED' WHERE wf_id=?",
+                       (wf,))
+            db.commit()
+        with self.assertRaisesRegex(api.BackendRefused,"GUIDE_EVENT_SEQUENCE_INVALID"):
+            self.b.guide(wf)
 
     def test_guide_blocks_plan_tamper_and_unknown_workflow(self):
         record=self.b.create(GOAL,"req_g178guidebad")
@@ -198,6 +261,10 @@ class BackendTests(unittest.TestCase):
         self.assertEqual(guide_code,200)
         self.assertEqual(guide["plan_sha256"],record["plan_sha256"])
         self.assertEqual(len(guide["steps"]),7)
+        self.assertEqual(guide["workflow_state"],"COMPLETE_LOCAL_SYNTHETIC")
+        self.assertEqual(guide["verified_local_steps"],6)
+        self.assertEqual(guide["next_step_number"],7)
+        self.assertEqual(guide["steps"][6]["progress"],"OFFICIAL_BLOCKED")
         self.assertFalse(guide["real_nas_verified"])
         self.assertEqual(guide["guide_sha256"],
                          api._hash({k:v for k,v in guide.items() if k!="guide_sha256"}))
