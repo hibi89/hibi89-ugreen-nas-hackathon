@@ -12,7 +12,18 @@ if (-not [System.IO.Path]::IsPathRooted($Db) -or -not $Db.EndsWith(".sqlite")) {
   throw "Provide an absolute .sqlite path outside the Git repository."
 }
 if ($Port -lt 1024 -or $Port -gt 65535) { throw "Port must be 1024..65535." }
-if ($Db -like ($PSScriptRoot + "*")) { throw "DB may not reside under the source tools folder." }
+# Prevent even an explicitly initialized private DB from being created anywhere
+# under the public checkout, not only beneath tools/ (G166 previously missed root).
+$checkout = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot "..")).TrimEnd('\', '/')
+$dbPath = [System.IO.Path]::GetFullPath($Db)
+$separator = [System.IO.Path]::DirectorySeparatorChar
+if ($dbPath.Equals($checkout, [System.StringComparison]::OrdinalIgnoreCase) -or
+    $dbPath.StartsWith($checkout + $separator, [System.StringComparison]::OrdinalIgnoreCase)) {
+  throw "DB must be outside the GitHub checkout."
+}
+if (-not (Test-Path -LiteralPath ([System.IO.Path]::GetDirectoryName($dbPath)) -PathType Container)) {
+  throw "DB parent directory must exist; refusing implicit directory creation."
+}
 if ($InitNewDb -and (Test-Path -LiteralPath $Db)) {
   throw "Database already exists; refusing -InitNewDb overwrite."
 }
@@ -25,6 +36,16 @@ if ($MetadataRoot -ne "") {
   }
   if ($MetadataRoot.StartsWith("\\") -or $MetadataRoot.StartsWith("//")) {
     throw "UNC/network metadata root forbidden."
+  }
+  # Windows drive-letter mappings can point to a remote SMB/NAS share,
+  # even if a path does not start with \\. Fail closed on network drives.
+  $rootPath = [System.IO.Path]::GetFullPath($MetadataRoot)
+  $rootDrive = [System.IO.Path]::GetPathRoot($rootPath)
+  if ($null -ne $rootDrive -and (Test-Path -LiteralPath $rootDrive)) {
+    $driveType = (New-Object System.IO.DriveInfo($rootDrive)).DriveType
+    if ($driveType -eq [System.IO.DriveType]::Network) {
+      throw "Network/mapped NAS drive is not a permitted MetadataRoot."
+    }
   }
 }
 $env:FLOWPILOT_LOCAL_API_TOKEN = (& $Python -c "import secrets; print(secrets.token_urlsafe(48))").Trim()
