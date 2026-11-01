@@ -554,6 +554,15 @@ def create_server(backend: Backend, token: str, *, port: int=0):
             self.end_headers()
             self.wfile.write(raw)
         def dispatch(self,method):
+            if method=="GET" and self.path=="/favicon.ico":
+                # Chromium requests favicon automatically. 204 avoids false
+                # console 403/404 failures without exposing API/credentials.
+                if self.host_guarded():
+                    self.send_response(204)
+                    self.send_header("Cache-Control","no-store")
+                    self.send_header("Content-Length","0")
+                    self.end_headers()
+                return
             if method=="GET" and self.path in ("/dashboard","/dashboard.js","/dashboard.css"):
                 if self.host_guarded():self.serve_dashboard_asset(self.path)
                 return
