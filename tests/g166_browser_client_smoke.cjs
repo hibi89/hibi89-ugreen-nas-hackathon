@@ -88,6 +88,13 @@ async function main(){
   assert.match(elems["metadata-summary"].textContent,/LOCAL_METADATA_BLOCKED/);
   assert.doesNotMatch(elems.output.textContent,/not-here\.pdf|README\.md/);
   await click("meta-status");
+  elems.token.value="short";
+  await click("connect");  // refusal must discard the PREVIOUS valid bearer
+  assert.equal(elems.create.disabled,true,"bad reauth cannot retain previous token");
+  assert.equal(elems.token.value,"");
+  elems.token.value=auth;
+  await click("connect");  // fresh auth required after bad attempt
+  assert.equal(elems.create.disabled,false);
   await click("disconnect");
   assert.equal(elems.create.disabled,true);
   assert.equal(elems.token.value,"");
