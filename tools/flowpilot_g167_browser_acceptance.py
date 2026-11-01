@@ -13,6 +13,7 @@ import secrets
 import shutil
 from tempfile import TemporaryDirectory
 import threading
+from traceback import extract_tb
 
 from flowpilot_local_backend import Backend, create_server
 
@@ -136,9 +137,19 @@ def main():
         # failed E2E, not a success and not the same as missing dependencies.
         detail=str(exc)
         blocked="ERR_BLOCKED_BY_ADMINISTRATOR" in detail
+        # Report reproducible code location + first error line only. No browser
+        # headers, bearer token, customer paths or raw request payloads.
+        frames=[frame.lineno for frame in extract_tb(exc.__traceback__)
+                if Path(frame.filename).name == Path(__file__).name]
+        first_line=detail.splitlines()[0][:160] if detail else "UNKNOWN"
+        if any(word in first_line.lower() for word in
+               ("bearer", "authorization", "token", "cookie")):
+            first_line="REDACTED"
         result={"status":"REAL_BROWSER_E2E_BLOCKED_BY_ENVIRONMENT" if blocked
                 else "REAL_BROWSER_E2E_FAILED",
-                "reason_type":type(exc).__name__,"release_gate":"HOLD"}
+                "reason_type":type(exc).__name__,
+                "failure_source_line":frames[-1] if frames else None,
+                "reason_first_line":first_line,"release_gate":"HOLD"}
     print(json.dumps(result,ensure_ascii=True,sort_keys=True))
     return 0 if result["status"]=="REAL_LOCAL_BROWSER_E2E_PASS_NOT_NAS" else 2
 
