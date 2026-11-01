@@ -213,6 +213,25 @@ class Backend:
             integrity=self._verify_events(db,wf_id)
             return self._public(row,integrity)
 
+    def verified_get(self,wf_id):
+        """Safely read back a workflow after an ambiguous execution response.
+
+        A hash-consistent event journal alone does not show that the mutable
+        state is truthful. Re-derive the plan, enforce state/event ordering,
+        and verify the completed synthetic receipt before publishing a state.
+        Both reads share the same reentrant lock; no write, retry, or approval.
+        """
+        with self.lock:
+            guide=self.guide(wf_id)
+            item=self.get(wf_id)
+            if (guide["workflow_id"]!=item["workflow_id"] or
+                    guide["workflow_state"]!=item["status"] or
+                    guide["plan_sha256"]!=item["plan_sha256"] or
+                    guide["template"]!=item["template"] or
+                    guide["audit_event_count"]!=item["event_count"]):
+                raise BackendRefused("STATUS_READBACK_INTEGRITY_INVALID")
+            return item
+
     def list(self):
         """Resume up to 20 recent workflows with verified code-owned type and state.
 
@@ -757,7 +776,9 @@ def create_server(backend: Backend, token: str, *, port: int=0):
                     elif re.fullmatch(r"/v1/local-metadata/reviews/rev_[0-9a-f]{32}",path):
                         data=backend.metadata.get(path.rsplit("/",1)[-1])
                     elif re.fullmatch(r"/v1/workflows/wf_[0-9a-f]{32}",path):
-                        data=backend.get(path.rsplit("/",1)[-1])
+                        # G185: an uncertain POST must never be reconciled from
+                        # a forged mutable state without validating event order.
+                        data=backend.verified_get(path.rsplit("/",1)[-1])
                     elif re.fullmatch(r"/v1/workflows/wf_[0-9a-f]{32}/(plan|guide|audit|evidence|report)",path):
                         wf,action=path.rsplit("/",2)[-2:]
                         if action=="report":
