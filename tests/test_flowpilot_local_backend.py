@@ -308,7 +308,7 @@ class BackendTests(unittest.TestCase):
             self.b.evidence(wf)
 
     def test_no_network_or_nas_backend_dependency(self):
-        text=Path(api.__file__).read_text()
+        text=Path(api.__file__).read_text(encoding="utf-8")
         for word in ("requests.post(", "urllib.request", "docker run", "NAS SSH", "Devpost API"):
             self.assertNotIn(word,text)
 
