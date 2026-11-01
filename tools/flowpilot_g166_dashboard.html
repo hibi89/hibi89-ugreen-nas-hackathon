@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>FlowPilot 3.0 | Local G166</title>
+<link rel="stylesheet" href="/dashboard.css">
+<script src="/dashboard.js" defer></script>
+</head>
+<body>
+<header><div><p class="eyebrow">UGREEN FLOWPILOT / G166 LOCAL ONLY</p><h1>FlowPilot 3.0</h1><p>합성 데이터 기반 승인·감사 대시보드. 실제 NAS/Uliya Expert 기능이 아닙니다.</p></div><strong class="hold">RELEASE HOLD · NAS NOT TESTED</strong></header>
+<main>
+<section class="panel" aria-labelledby="connection-title"><h2 id="connection-title">1 · 로컬 연결</h2>
+<p>API는 이 화면과 동일한 127.0.0.1 서버에서만 동작합니다. 토큰은 브라우저 메모리에만 보관합니다.</p>
+<div class="line"><label for="token">FLOWPILOT_LOCAL_API_TOKEN</label><input id="token" type="password" autocomplete="off" spellcheck="false" placeholder="실행 시 생성한 로컬 토큰"><button id="connect" type="button">연결 확인</button><button id="disconnect" type="button" class="quiet">연결 해제</button></div>
+<p id="connection-status" role="status" aria-live="polite">미연결 · 토큰 미저장</p></section>
+<section class="panel" aria-labelledby="workflow-title"><h2 id="workflow-title">2 · 합성 워크플로</h2>
+<div class="line"><label for="goal">검증된 목표</label><select id="goal"><option value="check required files">필수 파일 점검 (합성)</option><option value="고객별 매출 보고서 만들어줘">고객별 매출 보고서 (합성)</option></select><button id="create" type="button">계획 생성</button><button id="list" type="button" class="quiet">최근 실행 조회</button></div>
+<div class="line"><label for="existing">기존 워크플로</label><select id="existing"><option value="">선택 안 함</option></select><button id="load" type="button" class="quiet">불러오기</button></div>
+<div class="readout"><span>현재 ID: <code id="workflow-id">없음</code></span><span>상태: <strong id="workflow-state">미생성</strong></span></div>
+<div class="actions"><button id="plan" type="button">계획·해시 확인</button><button id="test" type="button">4역할 합성 테스트</button><button id="approve" type="button" class="approval">합성 실행 승인</button><button id="run" type="button">합성 실행</button><button id="audit" type="button">감사 조회</button><button id="evidence" type="button">증거 조회</button><button id="report" type="button">검증 후 CSV 다운로드</button><button id="recover" type="button" class="quiet">중단 작업 복구 조회</button></div>
+<div class="consent"><input id="synthetic-consent" type="checkbox"><label for="synthetic-consent">계획 SHA-256과 TESTED 상태를 확인했으며 <b>합성 실행에만</b> 동의합니다. 실제 NAS 접근 권한을 승인하지 않습니다.</label></div>
+<p id="plan-hash" class="mono">계획 SHA-256: 미확인</p></section>
+<section class="panel" aria-labelledby="metadata-title"><h2 id="metadata-title">3 · 선택적 로컬 메타데이터 점검</h2>
+<p>서버 시작 시 지정한 비 NAS 로컬 폴더에 한정합니다. 미리보기에서는 파일 시스템을 조회하지 않으며, 승인 후 lstat만 수행합니다.</p>
+<label for="required">상대 경로 목록 (한 줄당 하나, 1–20개)</label><textarea id="required" rows="3" spellcheck="false" placeholder="README.md&#10;release/final.pdf"></textarea>
+<div class="actions"><button id="meta-preview" type="button">읽기 전 미리보기</button><button id="meta-approve" type="button" class="approval">1회 읽기 승인</button><button id="meta-cancel" type="button" class="quiet">승인 취소</button><button id="meta-status" type="button" class="quiet">결과 재조회</button></div>
+<div class="consent"><input id="metadata-consent" type="checkbox"><label for="metadata-consent">선택한 비 NAS 로컬 폴더의 메타데이터를 한 번 읽는 데 동의합니다. 파일 내용·NAS 공유는 포함하지 않습니다.</label></div>
+<p id="metadata-summary" class="mono">검토 세션 없음</p></section>
+<section class="panel" aria-labelledby="output-title"><div class="line"><h2 id="output-title">4 · 응답 및 감사 로그</h2><button id="clear" class="quiet" type="button">화면 지우기</button></div>
+<p id="notice" role="status" aria-live="polite">로컬 대시보드 준비 · 연결 전 실행 불가</p>
+<pre id="output" tabindex="0">실행 결과는 이 영역에 표시됩니다. 토큰과 로컬 파일 이름을 로그에 복사하지 마세요.</pre></section>
+</main><footer>G166 · Python stdlib / SQLite · Bearer token · 127.0.0.1 only · Devpost NOT SUBMITTED · UGOS 3시간 체험 NOT STARTED</footer>
+</body></html>
