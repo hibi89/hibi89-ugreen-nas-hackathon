@@ -29,6 +29,10 @@ G139_CANDIDATE_ZIP_SHA = "fb948d50be12f548ad48dd527cd858f3d5e5e73fd611de2a502f89
 # AI-tool and platform-license disclosures; public GitHub stores no candidate.
 G147_CANDIDATE_SHA = "1062bba52833e3bbbc5f020739f80d2dee1dc2f2b428016e342075525bf2bc6d"
 G147_CANDIDATE_ZIP_SHA = "d8c66b24000b6fb1f7ea8b0d69417febfc83128d935e9b8db33dd382bb9c64c1"
+# G189 isolated, owner-private G188 optional format-correction draft.
+# Adding a pin does NOT authorize submission, official checker execution, or Creator claims.
+G188_CANDIDATE_SHA = "4baf816e7deafa7dec544d93209f8ae3d1fb6400515212d2eb1d9b5fe0f6acca"
+G188_CANDIDATE_ZIP_SHA = "568ad542d829b07ca910ca974ca39f2c29ed210558a40354b6518cabfc73ceef"
 G139_MEMBERS = (
     "flowpilot-3/SKILL.md",
     "flowpilot-3/references/CAPABILITY_AND_PLAN_CONTRACT.md",
@@ -257,7 +261,8 @@ def check(candidate: Path, kit: Path, *, mode: str, native_risk_approved: bool =
     profiles = {"g99": (CANDIDATE_SHA, CANDIDATE_ZIP_SHA, (MEMBER,)),
                 "g103": (G103_CANDIDATE_SHA, G103_CANDIDATE_ZIP_SHA, (MEMBER,)),
                 "g139": (G139_CANDIDATE_SHA, G139_CANDIDATE_ZIP_SHA, G139_MEMBERS),
-                "g147": (G147_CANDIDATE_SHA, G147_CANDIDATE_ZIP_SHA, G139_MEMBERS)}
+                "g147": (G147_CANDIDATE_SHA, G147_CANDIDATE_ZIP_SHA, G139_MEMBERS),
+                "g188": (G188_CANDIDATE_SHA, G188_CANDIDATE_ZIP_SHA, G139_MEMBERS)}
     if candidate_profile not in profiles:
         raise VerificationRefused("Unsupported exact candidate profile")
     expected_source, expected_zip, expected_members = profiles[candidate_profile]
@@ -297,7 +302,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--candidate-zip", type=Path, required=True)
     parser.add_argument("--official-kit-zip", type=Path, required=True)
     parser.add_argument("--mode", choices=("inspect", "docker", "native"), default="inspect")
-    parser.add_argument("--candidate-profile", choices=("g99", "g103", "g139", "g147"), default="g99",
+    parser.add_argument("--candidate-profile", choices=("g99", "g103", "g139", "g147", "g188"), default="g99",
                         help="Select exact reviewed source/ZIP pins; no arbitrary hash overrides")
     parser.add_argument("--accept-native-code-execution-risk", action="store_true")
     parser.add_argument("--accept-official-code-execution-risk", action="store_true",
