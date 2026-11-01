@@ -44,3 +44,9 @@ python -m unittest discover -s tests -p 'test_*.py'
 ```
 
 Windows full owner-equivalent: `powershell.exe -ExecutionPolicy Bypass -File .\verify_local.ps1 -Mode full`. GitHub Actions run [41280521670](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/41280521670) checked Linux and Windows. Production URL: NOT_APPLICABLE.
+
+## G163 evidence export
+
+`GET /v1/workflows/<workflow_id>/evidence` returns JSON only after a completed, explicitly approved **local synthetic** run. Requires the same local bearer token and strict loopback Host/Origin as all other endpoints. It validates the G162 plan hash, complete ordered approval/execution event history, the actual G119 SQLite journal, PASS terminal, four deterministic council role approvals, and equality between the backend receipt and G119 `final_sha`. The response contains role labels and synthetic PASS, original receipt SHA and report SHA derived from this bounded JSON. Any mismatch returns a refusal and cannot cause a repeat run.
+
+This is an integrity-checked **development fixture evidence JSON** endpoint, not a downloadable CSV report, independent notarization, production execution evidence, or Uliya/NAS attestation. No owner content or paths returned. Test with `python -m unittest discover -s tests -p 'test_flowpilot_local_backend.py' -v`. G163 source SHA `253b78f97ea9c5b0a592d243e290757ed41c79fb` (Linux and Windows CI [41282599589](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/41282599589) PASS).
