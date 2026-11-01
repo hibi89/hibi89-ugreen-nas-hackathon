@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
+from tempfile import TemporaryDirectory
 import sys
 import unittest
 
@@ -41,8 +42,35 @@ class G167PreflightTests(unittest.TestCase):
         self.assertIn("outside the GitHub checkout", text)
         self.assertIn("OrdinalIgnoreCase", text)
         self.assertIn("DriveType]::Network", text)
+        self.assertIn("Assert-PlainDbParent", text)
+        self.assertIn("ReparsePoint", text)
+        self.assertIn("Mapped network SQLite volume denied", text)
         self.assertIn("DB parent directory must exist", text)
         self.assertIn("Remove-Item Env:FLOWPILOT_LOCAL_API_TOKEN", text)
+
+    @unittest.skipUnless(os.name == "nt", "NTFS reparse refusal is Windows-only")
+    def test_windows_launcher_refuses_linked_private_db_parent(self):
+        shell = shutil.which("powershell.exe")
+        if not shell:
+            self.skipTest("Windows PowerShell unavailable")
+        with TemporaryDirectory(prefix="g168-safe-db-") as tmp:
+            target = Path(tmp) / "real"
+            target.mkdir()
+            alias = Path(tmp) / "linked"
+            try:
+                alias.symlink_to(target, target_is_directory=True)
+            except (OSError, NotImplementedError):
+                self.skipTest("Local directory link creation unavailable")
+            candidate = alias / "synthetic.sqlite"
+            completed = subprocess.run([
+                shell, "-NoProfile", "-ExecutionPolicy", "Bypass",
+                "-File", str(ROOT / "tools" / "start_g166_local.ps1"),
+                "-Db", str(candidate), "-InitNewDb"
+            ], capture_output=True, text=True, timeout=15, check=False)
+            self.assertNotEqual(completed.returncode, 0)
+            self.assertIn("reparse point", completed.stdout + completed.stderr)
+            self.assertFalse((target / "synthetic.sqlite").exists())
+            self.assertNotIn("Local-only API token", completed.stdout)
 
     @unittest.skipUnless(os.name == "nt", "PowerShell 5.1 live refusal only on Windows")
     def test_windows_launcher_cannot_initialize_db_inside_checkout(self):
