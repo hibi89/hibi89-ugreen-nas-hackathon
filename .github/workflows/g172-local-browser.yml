@@ -1,0 +1,38 @@
+name: UGREEN G172 real Chromium acceptance (LOCAL SYNTHETIC, NO NAS)
+on:
+  push:
+    branches: ["lead/ugreen"]
+    paths:
+      - ".github/workflows/g172-local-browser.yml"
+      - "tools/flowpilot_g167_browser_acceptance.py"
+      - "tools/flowpilot_g166_dashboard.*"
+      - "tools/flowpilot_local_backend.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  chromium-local-only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Require a preinstalled headless browser (do not download vendor browser)
+        run: |
+          python - <<'PY'
+          import shutil
+          options = ("google-chrome", "chromium", "chromium-browser")
+          present = next((name for name in options if shutil.which(name)), None)
+          if not present:
+              raise SystemExit("BROWSER_BINARY_UNAVAILABLE: no binary install or NAS fallback")
+          print("LOCAL_BROWSER_BINARY_PRESENT:", present)
+          PY
+      - name: Install pinned Python Playwright client only
+        run: python -m pip install --no-input --disable-pip-version-check "playwright==1.56.0"
+      - name: Actual Chromium DOM, localhost HTTP SQLite, CSV SHA and consent E2E
+        run: python tools/flowpilot_g167_browser_acceptance.py
+      - name: Explicit release boundary
+        run: |
+          echo "G172: REAL local synthetic Chromium only. NAS, Uliya Expert, UGOS trial and Devpost NOT_RUN. Release HOLD."
