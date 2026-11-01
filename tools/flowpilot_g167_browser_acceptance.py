@@ -96,6 +96,58 @@ def run_browser():
                 page.locator("#metadata-consent").check()
                 page.locator("#meta-approve").click()
                 expect(page.locator("#metadata-summary")).to_contain_text("LOCAL_METADATA_BLOCKED")
+
+                # G175: the actual localhost server consumes a one-use metadata
+                # approval, but the browser receives a corrupt reply. The
+                # UI must revoke the consumed ticket and approval immediately.
+                page.locator("#required").fill("README.md")
+                page.locator("#meta-preview").click()
+                expect(page.locator("#metadata-summary")).to_contain_text("WAITING_APPROVAL")
+                page.locator("#metadata-consent").check()
+                consumed=[]
+                def obscure_consumed_approval(route):
+                    upstream=route.fetch()
+                    consumed.append((upstream.status,upstream.json().get("status")))
+                    # A 200 with an interrupted JSON body mimics a lost reply
+                    # without creating a noisy intentional HTTP error in Chrome.
+                    route.fulfill(status=200,content_type="application/json",body="{")
+                page.route("**/v1/local-metadata/approve", obscure_consumed_approval, times=1)
+                page.locator("#meta-approve").click()
+                expect(page.locator("#notice")).to_contain_text("요청 거부 또는 연결 오류")
+                expect(page.locator("#metadata-summary")).to_have_text("검토 세션 없음")
+                assert consumed==[(200,"LOCAL_METADATA_FINDINGS_READY")]
+                assert page.locator("#required").input_value()==""
+                expect(page.locator("#metadata-consent")).not_to_be_checked()
+                expect(page.locator("#meta-approve")).to_be_disabled()
+
+                # Only a fresh preview and new explicit consent may approve
+                # a second read after an uncertain first response.
+                page.locator("#required").fill("README.md")
+                page.locator("#meta-preview").click()
+                expect(page.locator("#metadata-summary")).to_contain_text("WAITING_APPROVAL")
+                expect(page.locator("#meta-approve")).to_be_disabled()
+                page.locator("#metadata-consent").check()
+                page.locator("#meta-approve").click()
+                expect(page.locator("#metadata-summary")).to_contain_text(
+                    "LOCAL_METADATA_FINDINGS_READY")
+
+                # Starting a new preview must invalidate an older actionable
+                # ticket/checkbox even if the new preview response is broken.
+                page.locator("#required").fill("README.md")
+                page.locator("#meta-preview").click()
+                expect(page.locator("#metadata-summary")).to_contain_text("WAITING_APPROVAL")
+                page.locator("#metadata-consent").check()
+                page.route("**/v1/local-metadata/preview",
+                           lambda route: route.fulfill(
+                               status=200, content_type="application/json", body="{"),
+                           times=1)
+                page.locator("#required").fill("../restricted-private-path")
+                page.locator("#meta-preview").click()
+                expect(page.locator("#notice")).to_contain_text("요청 거부 또는 연결 오류")
+                expect(page.locator("#metadata-summary")).to_have_text("검토 세션 없음")
+                assert page.locator("#required").input_value()==""
+                expect(page.locator("#metadata-consent")).not_to_be_checked()
+                expect(page.locator("#meta-approve")).to_be_disabled()
                 page.locator("#token").fill("short")
                 page.locator("#connect").click()
                 expect(page.locator("#create")).to_be_disabled()
@@ -107,7 +159,9 @@ def run_browser():
                     "status":"REAL_LOCAL_BROWSER_E2E_PASS_NOT_NAS",
                     "checks":["DOM_RENDER","TOKEN_CLEAR","PLAN_TEST_APPROVE_RUN",
                               "AUDIT_EVIDENCE","CSV_SHA_DOWNLOAD","METADATA_CONSENT",
-                              "INVALID_REAUTH_CLEARS_AUTH"],
+                              "INVALID_REAUTH_CLEARS_AUTH",
+                              "METADATA_APPROVAL_REPLY_LOSS_FAIL_CLOSED",
+                              "METADATA_PREVIEW_FAILURE_REVOKES_CONSENT"],
                     "real_nas_verified":False,"trial_started":False,"release_gate":"HOLD"
                 }
         finally:
