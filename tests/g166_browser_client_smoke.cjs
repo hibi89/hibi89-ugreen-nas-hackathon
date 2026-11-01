@@ -93,12 +93,12 @@ async function main(){
   assert.equal(elems["meta-approve"].disabled,true,"old review cannot be approved");
   assert.match(elems["metadata-summary"].textContent,/검토 세션 없음/);
   assert.match(elems.notice.textContent,/요청 거부|연결 오류/);
-  // A client-invalid replacement must also fail closed without a network call.
+  // A valid replacement after a refusal still needs a NEW explicit consent.
   elems.required.value="secret-private-name.txt";
   await click("meta-preview");
-  assert.equal(elems.required.value,"","client-invalid raw path cleared");
-  assert.equal(elems["meta-approve"].disabled,false,
-    "valid one-line preview still requires fresh checkbox");
+  assert.equal(elems.required.value,"","new raw path cleared");
+  assert.equal(elems["metadata-consent"].checked,false);
+  assert.equal(elems["meta-approve"].disabled,true,"new ticket needs fresh checkbox");
   // Refuse blank new input even if a good review was open.
   elems.required.value="";
   await click("meta-preview");
