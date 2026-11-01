@@ -66,6 +66,35 @@ def run_browser():
                 page.locator("#connect").click()
                 expect(page.locator("#connection-status")).to_contain_text("로컬 연결 확인")
                 assert page.locator("#token").input_value()==""
+                # G180: explicit, manually entered synthetic metrics only.
+                expect(page.locator("#advice-submit")).to_be_disabled()
+                page.locator("#advice-disk").fill("95")
+                expect(page.locator("#advice-submit")).to_be_disabled()
+                page.locator("#advice-errors").fill("3")
+                page.locator("#advice-backup").fill("73")
+                page.locator("#advice-consent").check()
+                page.locator("#advice-submit").click()
+                expect(page.locator("#output")).to_contain_text("제안 건수: 3")
+                expect(page.locator("#output")).to_contain_text("디스크 용량 검토")
+                expect(page.locator("#output")).to_contain_text("반복 오류 로그 검토")
+                expect(page.locator("#output")).to_contain_text("백업 주기 검토")
+                expect(page.locator("#output")).to_contain_text("실제 NAS 수집/검증 없음")
+                assert page.locator("#advice-disk").input_value()==""
+                assert page.locator("#advice-errors").input_value()==""
+                assert page.locator("#advice-backup").input_value()==""
+                expect(page.locator("#advice-consent")).not_to_be_checked()
+                expect(page.locator("#advice-submit")).to_be_disabled()
+                page.locator("#advice-disk").fill("20")
+                page.locator("#advice-consent").check()
+                page.locator("#advice-submit").click()
+                expect(page.locator("#output")).to_contain_text("NO_ALERTS_IN_SUPPLIED_DATA")
+                expect(page.locator("#output")).to_contain_text("미입력 항목: 2개")
+                page.locator("#advice-disk").fill("101")
+                page.locator("#advice-consent").check()
+                page.locator("#advice-submit").click()
+                expect(page.locator("#notice")).to_contain_text("요청 거부")
+                expect(page.locator("#advice-consent")).not_to_be_checked()
+                expect(page.locator("#advice-submit")).to_be_disabled()
                 page.locator("#create").click()
                 expect(page.locator("#workflow-state")).to_have_text("PLANNED")
                 page.locator("#guide").click()
@@ -208,7 +237,8 @@ def run_browser():
                               "METADATA_PREVIEW_FAILURE_REVOKES_CONSENT",
                               "METADATA_CANCEL_REPLY_LOSS_FAIL_CLOSED",
                               "PLAN_BOUND_SEVEN_STEP_OPERATOR_GUIDE",
-                              "STATE_AWARE_GUIDE_WITH_CANONICAL_SHA"],
+                              "STATE_AWARE_GUIDE_WITH_CANONICAL_SHA",
+                              "OPT_IN_MANUAL_TELEMETRY_PROPOSALS_ONLY"],
                     "real_nas_verified":False,"trial_started":False,"release_gate":"HOLD"
                 }
         finally:

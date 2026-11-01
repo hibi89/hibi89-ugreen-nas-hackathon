@@ -15,6 +15,7 @@ if (!globalThis.crypto?.subtle) {
 const nativeFetch = globalThis.fetch;
 let rejectOneMetadataApproval = false;
 let rejectOneMetadataCancel = false;
+let adviceCalls = 0;
 globalThis.fetch = (route, init) => {
   if (route === "/v1/local-metadata/approve" && rejectOneMetadataApproval) {
     rejectOneMetadataApproval = false;
@@ -28,16 +29,18 @@ globalThis.fetch = (route, init) => {
       status:503, headers:{"Content-Type":"application/json"}
     }));
   }
+  if (route === "/v1/advice") adviceCalls++;
   return nativeFetch(base + route, init);
 };
 const ids = ["token","connect","disconnect","clear","connection-status","notice","output",
   "workflow-id","workflow-state","plan-hash","metadata-summary","goal","existing","create",
   "list","load","plan","guide","test","approve","run","audit","evidence","report","recover",
   "synthetic-consent","metadata-consent","required","meta-preview","meta-approve",
-  "meta-cancel","meta-status"];
+  "meta-cancel","meta-status","advice-disk","advice-errors","advice-backup",
+  "advice-consent","advice-submit","advice-summary"];
 const buttonIds = ["connect","disconnect","clear","create","list","load","plan","guide",
   "test","approve","run","audit","evidence","report","recover","meta-preview",
-  "meta-approve","meta-cancel","meta-status"];
+  "meta-approve","meta-cancel","meta-status","advice-submit"];
 class FakeElement {
   constructor(id) {this.id=id;this.value="";this.checked=false;this.disabled=false;
     this.textContent="";this.handlers={};this.options=[];}
@@ -68,6 +71,38 @@ async function main(){
   await click("connect");
   assert.equal(elems.token.value,"","token must clear from password DOM");
   assert.match(elems["connection-status"].textContent,/연결 확인/);
+  // Explicit, single-use opt-in; invalid values never hit the server.
+  assert.equal(elems["advice-submit"].disabled,true,"no unsolicited telemetry request");
+  elems["advice-disk"].value="95"; elems["advice-disk"].fire("input");
+  assert.equal(elems["advice-submit"].disabled,true,"numeric sample alone is not consent");
+  elems["advice-errors"].value="3";
+  elems["advice-backup"].value="73";
+  elems["advice-consent"].checked=true;elems["advice-consent"].fire("change");
+  await click("advice-submit");
+  assert.equal(adviceCalls,1,"one consent = one request");
+  assert.match(elems.output.textContent,/제안 건수: 3/);
+  assert.match(elems.output.textContent,/디스크 용량 검토/);
+  assert.match(elems.output.textContent,/반복 오류 로그 검토/);
+  assert.match(elems.output.textContent,/백업 주기 검토/);
+  assert.match(elems.output.textContent,/실제 NAS 수집\/검증 없음/);
+  assert.equal(elems["advice-disk"].value,"");
+  assert.equal(elems["advice-errors"].value,"");
+  assert.equal(elems["advice-backup"].value,"");
+  assert.equal(elems["advice-consent"].checked,false);
+  assert.equal(elems["advice-submit"].disabled,true);
+  elems["advice-disk"].value="20";elems["advice-disk"].fire("input");
+  elems["advice-consent"].checked=true;elems["advice-consent"].fire("change");
+  await click("advice-submit");
+  assert.equal(adviceCalls,2);
+  assert.match(elems.output.textContent,/NO_ALERTS_IN_SUPPLIED_DATA/);
+  assert.match(elems.output.textContent,/미입력 항목: 2개/);
+  elems["advice-disk"].value="101";elems["advice-disk"].fire("input");
+  elems["advice-consent"].checked=true;elems["advice-consent"].fire("change");
+  await click("advice-submit");
+  assert.equal(adviceCalls,2,"invalid metric refused before network send");
+  assert.equal(elems["advice-disk"].value,"");
+  assert.equal(elems["advice-consent"].checked,false);
+  assert.match(elems.notice.textContent,/요청 거부/);
   await click("create");
   assert.match(elems["workflow-id"].textContent,/^wf_[0-9a-f]{32}$/);
   const workflowId=elems["workflow-id"].textContent;
@@ -167,10 +202,14 @@ async function main(){
   assert.doesNotMatch(elems.output.textContent,/not-here\.pdf|README\.md/);
   await click("meta-status");
   elems.required.value="private-raw-path.txt";
+  elems["advice-disk"].value="97";
+  elems["advice-consent"].checked=true;
   elems.existing.value=workflowId;
   elems.token.value="short";
   await click("connect");  // refusal must discard the PREVIOUS valid bearer
   assert.equal(elems.required.value,"","reauth must scrub private textarea");
+  assert.equal(elems["advice-disk"].value,"","reauth scrubs manual samples");
+  assert.equal(elems["advice-consent"].checked,false,"reauth revokes advice consent");
   assert.equal(elems.existing.value,"","reauth must clear previous workflow selection");
   assert.equal(elems.create.disabled,true,"bad reauth cannot retain previous token");
   assert.equal(elems.token.value,"");

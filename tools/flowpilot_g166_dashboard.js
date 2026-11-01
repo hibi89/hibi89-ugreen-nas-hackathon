@@ -5,6 +5,16 @@ const controls = [...document.querySelectorAll("button")];
 let token = "", workflow = null, verifiedPlan = null, review = null, busy = false;
 function status(message) { el("notice").textContent = message; }
 function output(data) { el("output").textContent = typeof data === "string" ? data : JSON.stringify(data, null, 2); }
+const adviceFields = [
+  ["advice-disk", "disk_used_percent", 100],
+  ["advice-errors", "repeated_error_count", 87600],
+  ["advice-backup", "backup_age_hours", 87600]
+];
+function clearAdvice() {
+  for (const [id] of adviceFields) el(id).value = "";
+  el("advice-consent").checked = false;
+  el("advice-summary").textContent = "동의 전 · 수치 미전송 · 자동 감시 없음";
+}
 function sync() {
   el("workflow-id").textContent = workflow?.workflow_id || "없음";
   el("workflow-state").textContent = workflow?.status || "미생성";
@@ -21,6 +31,8 @@ function sync() {
     const s = workflow?.status;
     const rules = {
       load: !!el("existing").value, plan: !!workflow, guide: !!workflow,
+      "advice-submit": el("advice-consent").checked &&
+        adviceFields.some(([id]) => el(id).value !== ""),
       test: s === "PLANNED", approve: s === "TESTED" && !!verifiedPlan && el("synthetic-consent").checked,
       run: s === "APPROVED_SYNTHETIC", audit: !!workflow,
       evidence: s === "COMPLETE_LOCAL_SYNTHETIC", report: s === "COMPLETE_LOCAL_SYNTHETIC",
@@ -71,7 +83,7 @@ el("connect").addEventListener("click", () => act(async () => {
   // A new login attempt invalidates any previous authority even if input is bad.
   token = ""; workflow = null; verifiedPlan = null; review = null;
   el("synthetic-consent").checked = false; el("metadata-consent").checked = false;
-  el("required").value = "";
+  el("required").value = ""; clearAdvice();
   el("existing").replaceChildren(new Option("선택 안 함", ""));
   el("connection-status").textContent = "기존 세션 폐기 · 인증 확인 중";
   if (candidate.length < 32 || candidate.length > 256) throw Error("토큰 길이는 32–256자여야 합니다.");
@@ -87,7 +99,7 @@ el("connect").addEventListener("click", () => act(async () => {
 }));
 el("disconnect").addEventListener("click", () => {
   token = ""; workflow = null; verifiedPlan = null; review = null;
-  el("token").value = ""; el("required").value = "";
+  el("token").value = ""; el("required").value = ""; clearAdvice();
   el("existing").replaceChildren(new Option("선택 안 함", ""));
   el("synthetic-consent").checked = false; el("metadata-consent").checked = false;
   el("connection-status").textContent = "연결 해제 · 토큰 폐기";
@@ -266,9 +278,77 @@ el("meta-status").addEventListener("click", () => act(async () => {
   review = await json("/v1/local-metadata/reviews/" + review.review_id);
   status("저장된 메모리 내 메타데이터 상태 재조회 · 재실행 없음"); output(review);
 }));
+// Existing G117 advisor: only user-provided numeric samples, never a NAS watcher.
+el("advice-submit").addEventListener("click", () => act(async () => {
+  if (!el("advice-consent").checked)
+    throw Error("일회성 수치 분석에 별도 동의가 필요합니다.");
+  const values = adviceFields.map(([id, key, upper]) =>
+    ({key, value:el(id).value, upper}));
+  // Revoke this one-use consent and wipe inputs before validation/network I/O.
+  clearAdvice();
+  const telemetry = {};
+  for (const {key, value, upper} of values) {
+    if (value === "") continue;
+    if (!/^[0-9]+$/.test(value) || Number(value) > upper)
+      throw Error("수치 입력은 범위 내 정수만 허용합니다.");
+    telemetry[key] = Number(value);
+  }
+  if (!Object.keys(telemetry).length)
+    throw Error("수치 최소 1개가 필요합니다.");
+  el("advice-summary").textContent = "일회성 분석 요청 · 재사용 동의 없음";
+  const result = await json("/v1/advice", {telemetry, opt_in:true});
+  const codes = {
+    REVIEW_DISK_CAPACITY:"디스크 용량 검토",
+    REVIEW_REPEATED_ERRORS:"반복 오류 로그 검토",
+    REVIEW_BACKUP_FRESHNESS:"백업 주기 검토"
+  };
+  const allowed = ["disk_used_percent","repeated_error_count","backup_age_hours"];
+  const suggestionIds = result.suggestions?.map(s => s.id);
+  if (result.schema !== "flowpilot-proactive-suggestions-v1" ||
+      !["SUGGESTIONS_READY","NO_ALERTS_IN_SUPPLIED_DATA"].includes(result.status) ||
+      result.source !== "UNVERIFIED_OPERATOR_SUPPLIED_METRICS" ||
+      result.nas_polled !== false || result.telemetry_verified !== false ||
+      result.actions_executed !== false || result.background_service_started !== false ||
+      result.external_notifications_sent !== false || result.release_gate !== "HOLD" ||
+      !Array.isArray(result.suggestions) || result.suggestions.length > 3 ||
+      result.suggestion_count !== result.suggestions.length ||
+      !Array.isArray(result.evaluated_fields) ||
+      result.evaluated_fields.length !== Object.keys(telemetry).length ||
+      !result.evaluated_fields.every(key => allowed.includes(key) &&
+        Object.prototype.hasOwnProperty.call(telemetry, key)) ||
+      !Array.isArray(result.missing_inputs_not_checked) ||
+      result.missing_inputs_not_checked.length !== 3 - result.evaluated_fields.length ||
+      !result.missing_inputs_not_checked.every(key => allowed.includes(key) &&
+        !Object.prototype.hasOwnProperty.call(telemetry, key)) ||
+      !suggestionIds.every(id => Object.prototype.hasOwnProperty.call(codes,id)) ||
+      new Set(suggestionIds).size !== suggestionIds.length ||
+      !result.suggestions.every(s => s.status === "PROPOSAL_ONLY" &&
+        s.requires_explicit_user_approval_to_act === true &&
+        s.verified_on_real_nas === false) ||
+      (result.status === "SUGGESTIONS_READY") !== (result.suggestions.length > 0))
+    throw Error("일회성 제안 응답 검증 실패");
+  const message = result.suggestions.length ?
+    "사람의 검토가 필요한 제안 " + result.suggestions.length + "개" :
+    "입력된 수치에서 제안 조건 미검출";
+  el("advice-summary").textContent = message + " · 미입력 미확인 " +
+    result.missing_inputs_not_checked.length + "개 · 동의 재사용 불가";
+  const lines = [
+    "FlowPilot · 일회성 수동 입력 상태 제안",
+    "원본 출처: 사용자 수동 입력 · 실제 NAS 수집/검증 없음",
+    "로컬 상태: " + result.status,
+    "제안 건수: " + result.suggestion_count,
+    "미입력 항목: " + result.missing_inputs_not_checked.length + "개 (NOT_CHECKED)",
+    ...result.suggestions.map((s,i) => (i + 1) + ". " + codes[s.id] +
+      " · 사람 검토 필요 · 자동 조치 없음"),
+    "외부 알림 0건 · 자동 수정 0건 · RELEASE HOLD"
+  ];
+  status("일회성 제안 검증 완료 · 실제 NAS 감시 아님"); output(lines.join("\n"));
+}));
 el("synthetic-consent").addEventListener("change", sync);
+el("advice-consent").addEventListener("change", sync);
+for (const [id] of adviceFields) el(id).addEventListener("input", sync);
 el("metadata-consent").addEventListener("change", sync);
 el("existing").addEventListener("change", sync);
 el("clear").addEventListener("click", () => { output("화면 로그 초기화"); status("대기"); });
-window.addEventListener("pagehide", () => { token = ""; });
+window.addEventListener("pagehide", () => { token = ""; clearAdvice(); });
 sync();

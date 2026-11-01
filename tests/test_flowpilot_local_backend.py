@@ -311,6 +311,29 @@ class BackendTests(unittest.TestCase):
         with self.assertRaisesRegex(api.BackendRefused,"ADVICE_TELEMETRY_INVALID"):
             self.b.advice({"owner_private_path":"secret"},opt_in=True)
 
+    def test_advice_is_operator_sample_only_and_db_unchanged(self):
+        self.b.create(GOAL,"req_g180noside1")
+        before=self.b.list()
+        off=self.b.advice({"disk_used_percent":95},opt_in=False)
+        self.assertEqual(off["status"],"DISABLED_NO_CONSENT")
+        self.assertFalse(off["actions_executed"])
+        high=self.b.advice({"disk_used_percent":95,
+                            "repeated_error_count":3,
+                            "backup_age_hours":73},opt_in=True)
+        self.assertEqual(high["status"],"SUGGESTIONS_READY")
+        self.assertEqual(high["suggestion_count"],3)
+        self.assertEqual({p["status"] for p in high["suggestions"]},{"PROPOSAL_ONLY"})
+        self.assertEqual(high["source"],"UNVERIFIED_OPERATOR_SUPPLIED_METRICS")
+        self.assertFalse(high["nas_polled"])
+        self.assertFalse(high["background_service_started"])
+        self.assertFalse(high["external_notifications_sent"])
+        low=self.b.advice({"disk_used_percent":20},opt_in=True)
+        self.assertEqual(low["status"],"NO_ALERTS_IN_SUPPLIED_DATA")
+        self.assertEqual(len(low["missing_inputs_not_checked"]),2)
+        self.assertEqual(self.b.list(),before)
+        with self.assertRaisesRegex(api.BackendRefused,"ADVICE_TELEMETRY_INVALID"):
+            self.b.advice({"disk_used_percent":101},opt_in=True)
+
     def test_g163_complete_receipt_export_uses_real_g119_sqlite(self):
         w=self.b.create(GOAL,"req_export12345678")
         wf=w["workflow_id"]

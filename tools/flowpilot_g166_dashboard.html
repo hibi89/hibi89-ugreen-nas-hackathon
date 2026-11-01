@@ -28,7 +28,19 @@
 <div class="actions"><button id="meta-preview" type="button">읽기 전 미리보기</button><button id="meta-approve" type="button" class="approval">1회 읽기 승인</button><button id="meta-cancel" type="button" class="quiet">승인 취소</button><button id="meta-status" type="button" class="quiet">결과 재조회</button></div>
 <div class="consent"><input id="metadata-consent" type="checkbox"><label for="metadata-consent">선택한 비 NAS 로컬 폴더의 메타데이터를 한 번 읽는 데 동의합니다. 파일 내용·NAS 공유는 포함하지 않습니다.</label></div>
 <p id="metadata-summary" class="mono">검토 세션 없음</p></section>
-<section class="panel" aria-labelledby="output-title"><div class="line"><h2 id="output-title">4 · 응답 및 감사 로그</h2><button id="clear" class="quiet" type="button">화면 지우기</button></div>
+<section class="panel" aria-labelledby="advisor-title">
+<h2 id="advisor-title">4 · 선택적 상태 제안 (수동 입력)</h2>
+<p>사용자가 직접 입력한 수치만 일회성으로 분석합니다. 실제 NAS에서 수집하지 않으며, 자동 감시·수정·알림은 없습니다. 미입력 항목은 확인하지 않은 것으로 표시합니다.</p>
+<div class="telemetry-fields">
+<label for="advice-disk">디스크 사용률 (%)<input id="advice-disk" type="text" inputmode="numeric" maxlength="3" autocomplete="off" spellcheck="false" placeholder="0–100 (선택)"></label>
+<label for="advice-errors">반복 오류 횟수<input id="advice-errors" type="text" inputmode="numeric" maxlength="5" autocomplete="off" spellcheck="false" placeholder="0–87600 (선택)"></label>
+<label for="advice-backup">마지막 백업 이후 시간 (시간)<input id="advice-backup" type="text" inputmode="numeric" maxlength="5" autocomplete="off" spellcheck="false" placeholder="0–87600 (선택)"></label>
+</div>
+<div class="consent"><input id="advice-consent" type="checkbox"><label for="advice-consent">지금 입력한 수치를 로컬 서버에서 <b>한 번만 분석</b>하는 데 동의합니다. 실제 NAS 수치 검증이나 자동 작업 실행은 승인하지 않습니다.</label></div>
+<div class="actions"><button id="advice-submit" type="button">일회성 제안 확인</button></div>
+<p id="advice-summary" class="mono" role="status" aria-live="polite">동의 전 · 수치 미전송 · 자동 감시 없음</p>
+</section>
+<section class="panel" aria-labelledby="output-title"><div class="line"><h2 id="output-title">5 · 응답 및 감사 로그</h2><button id="clear" class="quiet" type="button">화면 지우기</button></div>
 <p id="notice" role="status" aria-live="polite">로컬 대시보드 준비 · 연결 전 실행 불가</p>
 <pre id="output" tabindex="0">실행 결과는 이 영역에 표시됩니다. 토큰과 로컬 파일 이름을 로그에 복사하지 마세요.</pre></section>
 </main><footer>G166 · Python stdlib / SQLite · Bearer token · 127.0.0.1 only · Devpost NOT SUBMITTED · UGOS 3시간 체험 NOT STARTED</footer>
