@@ -450,7 +450,7 @@ class G100OfficialKitBoundary(unittest.TestCase):
             with self.assertRaisesRegex(gate.VerificationRefused, "no pull"):
                 gate._execute(self.path.parent, self.path.parent, mode="docker", docker_image_id=self.docker_image)
         self.assertEqual(run.call_count, 1)
-        self.assertEqual(run.call_args.args[0][-3:],
+        self.assertEqual(run.call_args.args[0][-5:],
                          ["image", "inspect", "--format", "{{.Id}}", self.docker_image])
 
     def test_g149_docker_never_emits_untrusted_stderr_from_bad_vendor(self):
@@ -459,7 +459,7 @@ class G100OfficialKitBoundary(unittest.TestCase):
         with patch.object(gate.shutil, "which", return_value="/usr/bin/docker"), \
              patch.object(gate, "_local_docker_socket_ready", return_value=True), \
              patch.object(gate.subprocess, "run", side_effect=[
-                 CompletedProcess([], 0, b"", b""),
+                 CompletedProcess([], 0, (self.docker_image + "\n").encode(), b""),
                  CompletedProcess([], 2, b'{"status":"fail"}', stderr)]):
             code, stdout, err = gate._execute(self.path.parent, self.path.parent,
                                               mode="docker", docker_image_id=self.docker_image)
