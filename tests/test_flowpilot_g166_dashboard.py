@@ -99,6 +99,9 @@ class G166LocalDashboardTests(unittest.TestCase):
         self.assertIn("crypto.subtle.digest", js)
         self.assertIn("APPROVE_LOCAL_METADATA_READ_ONLY", js)
         self.assertIn("APPROVE_SYNTHETIC_ONLY", js)
+        self.assertIn('id="refresh"', html)
+        self.assertIn("UNKNOWN_REQUIRES_READBACK", js)
+        self.assertIn('json("/v1/workflows/" + id)', js)
 
     @unittest.skipUnless(shutil.which("node"), "Node.js unavailable, JS runtime NOT_VERIFIED")
     def test_js_syntax_and_simulated_dom_over_real_http(self):

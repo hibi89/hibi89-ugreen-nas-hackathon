@@ -13,10 +13,31 @@ if (!globalThis.crypto?.subtle) {
   Object.defineProperty(globalThis, "crypto", {value: webcrypto, configurable: true});
 }
 const nativeFetch = globalThis.fetch;
+let rejectOneRunReply = false;
+let runRequestCount = 0;
+let readbackCount = 0;
 let rejectOneMetadataApproval = false;
 let rejectOneMetadataCancel = false;
 let adviceCalls = 0;
 globalThis.fetch = (route, init) => {
+  if (route.endsWith("/run") && route.startsWith("/v1/workflows/wf_")) {
+    runRequestCount++;
+    if (rejectOneRunReply) {
+      rejectOneRunReply = false;
+      // The real HTTP POST reaches SQLite and commits, but the client sees
+      // an artificial HTTP 503 instead of the successful response.
+      return nativeFetch(base + route, init).then(() =>
+        new Response(JSON.stringify({error:"SIMULATED_LOST_RUN_REPLY"}), {
+          status:503, headers:{"Content-Type":"application/json"}
+        }));
+    }
+  }
+  if (route.startsWith("/v1/workflows/wf_") &&
+      !route.includes("/plan") && !route.includes("/guide") &&
+      !route.includes("/audit") && !route.includes("/evidence") &&
+      !route.includes("/report") && !route.endsWith("/run") &&
+      !route.endsWith("/recover") && !route.endsWith("/test") &&
+      !route.endsWith("/approve")) readbackCount++;
   if (route === "/v1/local-metadata/approve" && rejectOneMetadataApproval) {
     rejectOneMetadataApproval = false;
     return Promise.resolve(new Response(JSON.stringify({error:"SIMULATED_HTTP_503"}), {
@@ -34,12 +55,12 @@ globalThis.fetch = (route, init) => {
 };
 const ids = ["token","connect","disconnect","clear","connection-status","notice","output",
   "workflow-id","workflow-state","plan-hash","metadata-summary","goal","existing","create",
-  "list","load","plan","guide","test","approve","run","audit","evidence","report","recover",
+  "list","load","plan","guide","test","approve","run","refresh","audit","evidence","report","recover",
   "synthetic-consent","metadata-consent","required","meta-preview","meta-approve",
   "meta-cancel","meta-status","advice-disk","advice-errors","advice-backup",
   "advice-consent","advice-submit","advice-summary"];
 const buttonIds = ["connect","disconnect","clear","create","list","load","plan","guide",
-  "test","approve","run","audit","evidence","report","recover","meta-preview",
+  "test","approve","run","refresh","audit","evidence","report","recover","meta-preview",
   "meta-approve","meta-cancel","meta-status","advice-submit"];
 class FakeElement {
   constructor(id) {this.id=id;this.value="";this.checked=false;this.disabled=false;
@@ -127,8 +148,23 @@ async function main(){
   assert.equal(elems.approve.disabled,false);
   await click("approve");
   assert.equal(elems["workflow-state"].textContent,"APPROVED_SYNTHETIC");
+  // Run-response-loss after the actual local backend committed must not
+  // leave an enabled re-execution button or silently resubmit.
+  rejectOneRunReply = true;
   await click("run");
+  assert.equal(runRequestCount,1,"only one synthetic run POST");
+  assert.equal(elems.run.disabled,true,"ambiguous result cannot rerun");
+  assert.equal(elems.refresh.disabled,false,"safe GET status reconciliation available");
+  assert.match(elems["workflow-state"].textContent,/결과 미확인/);
+  assert.equal(elems["synthetic-consent"].checked,false);
+  assert.match(elems.notice.textContent,/요청 거부|연결 오류/);
+  const beforeReadback = readbackCount;
+  await click("refresh");
+  assert.equal(readbackCount,beforeReadback+1,"one read-only status GET");
+  assert.equal(runRequestCount,1,"readback never repeats run POST");
   assert.equal(elems["workflow-state"].textContent,"COMPLETE_LOCAL_SYNTHETIC");
+  assert.match(elems.notice.textContent,/실행 재요청 없음/);
+  assert.equal(elems.run.disabled,true);
   await click("guide");
   assert.match(elems.output.textContent,/현재 실행 상태: COMPLETE_LOCAL_SYNTHETIC/);
   assert.match(elems.output.textContent,/로컬 검증 단계: 6\/6/);

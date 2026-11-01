@@ -17,7 +17,8 @@ function clearAdvice() {
 }
 function sync() {
   el("workflow-id").textContent = workflow?.workflow_id || "없음";
-  el("workflow-state").textContent = workflow?.status || "미생성";
+  el("workflow-state").textContent = workflow?.status === "UNKNOWN_REQUIRES_READBACK" ?
+    "결과 미확인 · 조회 필요" : workflow?.status || "미생성";
   el("plan-hash").textContent = verifiedPlan ? "검증한 계획 SHA-256: " + verifiedPlan :
     "계획 SHA-256: 미확인";
   el("metadata-summary").textContent = review ? "검토 ID: " + review.review_id +
@@ -30,11 +31,15 @@ function sync() {
     if (!token || busy) { button.disabled = true; continue; }
     const s = workflow?.status;
     const rules = {
-      load: !!el("existing").value, plan: !!workflow, guide: !!workflow,
+      load: !!el("existing").value,
+      refresh: !!workflow?.workflow_id,
+      plan: !!workflow && workflow.status !== "UNKNOWN_REQUIRES_READBACK",
+      guide: !!workflow && workflow.status !== "UNKNOWN_REQUIRES_READBACK",
       "advice-submit": el("advice-consent").checked &&
         adviceFields.some(([id]) => el(id).value !== ""),
       test: s === "PLANNED", approve: s === "TESTED" && !!verifiedPlan && el("synthetic-consent").checked,
-      run: s === "APPROVED_SYNTHETIC", audit: !!workflow,
+      run: s === "APPROVED_SYNTHETIC",
+      audit: !!workflow && s !== "UNKNOWN_REQUIRES_READBACK",
       evidence: s === "COMPLETE_LOCAL_SYNTHETIC", report: s === "COMPLETE_LOCAL_SYNTHETIC",
       recover: s === "RUNNING", "meta-approve": review?.status === "WAITING_APPROVAL" && el("metadata-consent").checked,
       "meta-cancel": review?.status === "WAITING_APPROVAL", "meta-status": !!review
@@ -225,10 +230,47 @@ el("approve").addEventListener("click", () => act(async () => {
   }));
   status("합성 실행만 승인됨 · NAS 접근 미승인"); output(workflow);
 }));
+el("refresh").addEventListener("click", () => act(async () => {
+  const id = workflow?.workflow_id;
+  if (!/^wf_[0-9a-f]{32}$/.test(id || "")) throw Error("조회할 워크플로가 없습니다.");
+  // GET-only reconciliation; it never executes, approves, or retries a POST.
+  const result = await json("/v1/workflows/" + id);
+  const states = ["PLANNED","TESTED","APPROVED_SYNTHETIC","RUNNING",
+    "COMPLETE_LOCAL_SYNTHETIC","BLOCKED","INTERRUPTED_BLOCKED"];
+  const templates = ["required_file_metadata_v1","csv_customer_revenue_v1"];
+  if (result.workflow_id !== id || !states.includes(result.status) ||
+      !templates.includes(result.template) || !/^[a-f0-9]{64}$/.test(result.plan_sha256) ||
+      result.release_gate !== "HOLD" || result.synthetic_only !== true ||
+      result.nas_verified !== false || !Number.isInteger(result.event_count) ||
+      result.event_count < 1)
+    throw Error("저장된 상태 응답 검증 실패 · 재실행 금지");
+  resetWorkflow(result);
+  status(result.status === "RUNNING" ?
+    "실행 예약 상태 · 재실행 금지, 중단 작업 복구 조회 필요" :
+    result.status === "COMPLETE_LOCAL_SYNTHETIC" ?
+    "서버 기록으로 합성 완료 확인 · 실행 재요청 없음" :
+    "서버 저장 상태 확인: " + result.status + " · 이전 동의 재사용 불가");
+  output(result);
+}));
 el("run").addEventListener("click", () => act(async () => {
   if (workflow?.status !== "APPROVED_SYNTHETIC") throw Error("승인된 합성 실행만 가능합니다.");
-  resetWorkflow(await json("/v1/workflows/" + workflow.workflow_id + "/run", {}));
-  status("로컬 합성 실행 완료 · 증거와 CSV를 개별 확인하세요."); output(workflow);
+  const id = workflow.workflow_id;
+  // Mark the browser state unknown BEFORE the POST. If the response is lost
+  // after SQLite commit, we must never leave an enabled duplicate Run button.
+  workflow = {workflow_id:id, status:"UNKNOWN_REQUIRES_READBACK"};
+  verifiedPlan = null;
+  el("synthetic-consent").checked = false;
+  sync();
+  const result = await json("/v1/workflows/" + id + "/run", {});
+  if (result.workflow_id !== id || result.synthetic_only !== true ||
+      result.release_gate !== "HOLD" ||
+      !["COMPLETE_LOCAL_SYNTHETIC","BLOCKED"].includes(result.status))
+    throw Error("합성 실행 응답 미확정 · 현재 상태를 읽기 전용으로 확인하세요");
+  resetWorkflow(result);
+  status(result.status === "COMPLETE_LOCAL_SYNTHETIC" ?
+    "로컬 합성 실행 완료 · 감사·CSV 별도 확인" :
+    "합성 실행 차단 · 자동 재시도 금지, 감사 조회 필요");
+  output(result);
 }));
 for (const name of ["audit", "evidence"]) {
   el(name).addEventListener("click", () => act(async () => {
