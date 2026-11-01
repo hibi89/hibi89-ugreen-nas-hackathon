@@ -20,7 +20,7 @@ from flowpilot_local_backend import Backend, create_server
 
 def run_browser():
     try:
-        from playwright.sync_api import sync_playwright
+        from playwright.sync_api import sync_playwright, expect
     except ImportError:
         return {"status":"REAL_BROWSER_NOT_VERIFIED", "reason":"PLAYWRIGHT_NOT_INSTALLED",
                 "release_gate":"HOLD"}
@@ -62,33 +62,25 @@ def run_browser():
                 assert page.locator("#create").is_disabled()
                 page.locator("#token").fill(token)
                 page.locator("#connect").click()
-                page.wait_for_function(
-                    'document.getElementById("connection-status").textContent.includes("로컬 연결 확인")')
+                expect(page.locator("#connection-status")).to_contain_text("로컬 연결 확인")
                 assert page.locator("#token").input_value()==""
                 page.locator("#create").click()
-                page.wait_for_function(
-                    'document.getElementById("workflow-state").textContent === "PLANNED"')
+                expect(page.locator("#workflow-state")).to_have_text("PLANNED")
                 page.locator("#plan").click()
-                page.wait_for_function(
-                    'document.getElementById("plan-hash").textContent.includes("검증한 계획 SHA-256")')
+                expect(page.locator("#plan-hash")).to_contain_text("검증한 계획 SHA-256")
                 assert page.locator("#approve").is_disabled()
                 page.locator("#test").click()
-                page.wait_for_function(
-                    'document.getElementById("workflow-state").textContent === "TESTED"')
+                expect(page.locator("#workflow-state")).to_have_text("TESTED")
                 page.locator("#plan").click()
                 page.locator("#synthetic-consent").check()
                 page.locator("#approve").click()
-                page.wait_for_function(
-                    'document.getElementById("workflow-state").textContent === "APPROVED_SYNTHETIC"')
+                expect(page.locator("#workflow-state")).to_have_text("APPROVED_SYNTHETIC")
                 page.locator("#run").click()
-                page.wait_for_function(
-                    'document.getElementById("workflow-state").textContent === "COMPLETE_LOCAL_SYNTHETIC"')
+                expect(page.locator("#workflow-state")).to_have_text("COMPLETE_LOCAL_SYNTHETIC")
                 page.locator("#audit").click()
-                page.wait_for_function(
-                    'document.getElementById("output").textContent.includes("LOCAL_CHAIN_INTACT")')
+                expect(page.locator("#output")).to_contain_text("LOCAL_CHAIN_INTACT")
                 page.locator("#evidence").click()
-                page.wait_for_function(
-                    'document.getElementById("output").textContent.includes("LOCAL_SYNTHETIC_EVIDENCE_VERIFIED_NOT_NAS")')
+                expect(page.locator("#output")).to_contain_text("LOCAL_SYNTHETIC_EVIDENCE_VERIFIED_NOT_NAS")
                 with page.expect_download(timeout=8000) as transfer:
                     page.locator("#report").click()
                 download=transfer.value
@@ -98,18 +90,15 @@ def run_browser():
                 assert sha256(saved.read_bytes()).hexdigest() in page.locator("#output").inner_text()
                 page.locator("#required").fill("README.md\nmissing.pdf")
                 page.locator("#meta-preview").click()
-                page.wait_for_function(
-                    'document.getElementById("metadata-summary").textContent.includes("WAITING_APPROVAL")')
+                expect(page.locator("#metadata-summary")).to_contain_text("WAITING_APPROVAL")
                 assert page.locator("#required").input_value()==""
                 assert page.locator("#meta-approve").is_disabled()
                 page.locator("#metadata-consent").check()
                 page.locator("#meta-approve").click()
-                page.wait_for_function(
-                    'document.getElementById("metadata-summary").textContent.includes("LOCAL_METADATA_BLOCKED")')
+                expect(page.locator("#metadata-summary")).to_contain_text("LOCAL_METADATA_BLOCKED")
                 page.locator("#token").fill("short")
                 page.locator("#connect").click()
-                page.wait_for_function(
-                    'document.getElementById("create").disabled === true')
+                expect(page.locator("#create")).to_be_disabled()
                 assert page.locator("#token").input_value()==""
                 if errors:
                     raise RuntimeError("BROWSER_CONSOLE_OR_NETWORK_ERROR")
