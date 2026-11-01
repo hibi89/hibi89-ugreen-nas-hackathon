@@ -77,7 +77,7 @@ class Backend:
                 os.close(fd)
             except OSError as exc:
                 raise BackendRefused("DB_EXCLUSIVE_CREATE_FAILED") from exc
-            with self._connect() as db:
+            with closing(self._connect()) as db:
                 db.execute("CREATE TABLE fp_backend_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL)")
                 db.execute("INSERT INTO fp_backend_meta VALUES('identity',?)", (IDENTITY,))
                 db.execute("CREATE TABLE fp_backend_workflows ("
@@ -88,7 +88,8 @@ class Backend:
                            "seq INTEGER NOT NULL, kind TEXT NOT NULL, "
                            "previous_sha TEXT NOT NULL, event_sha TEXT NOT NULL,"
                            "PRIMARY KEY(wf_id, seq))")
-        with self._connect() as db:
+                db.commit()  # closing() never implicitly commits transactions.
+        with closing(self._connect()) as db:
             try:
                 if db.execute("SELECT value FROM fp_backend_meta WHERE key='identity'").fetchone() != (IDENTITY,):
                     raise BackendRefused("DB_IDENTITY_MISMATCH")
