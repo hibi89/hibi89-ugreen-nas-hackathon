@@ -84,12 +84,38 @@ async function main(){
   elems.required.value="README.md\nnot-here.pdf";
   await click("meta-preview");
   elems["metadata-consent"].checked=true; elems["metadata-consent"].fire("change");
+  assert.equal(elems["meta-approve"].disabled,false,"first review is approvable");
+  // A failed replacement preview must revoke BOTH the old review and consent.
+  elems.required.value="../blocked.txt";
+  await click("meta-preview");  // backend rejects traversal; act catches HTTP 400
+  assert.equal(elems.required.value,"","rejected raw path scrubbed from DOM");
+  assert.equal(elems["metadata-consent"].checked,false,"old metadata consent revoked");
+  assert.equal(elems["meta-approve"].disabled,true,"old review cannot be approved");
+  assert.match(elems["metadata-summary"].textContent,/검토 세션 없음/);
+  assert.match(elems.notice.textContent,/요청 거부|연결 오류/);
+  // A client-invalid replacement must also fail closed without a network call.
+  elems.required.value="secret-private-name.txt";
+  await click("meta-preview");
+  assert.equal(elems.required.value,"","client-invalid raw path cleared");
+  assert.equal(elems["meta-approve"].disabled,false,
+    "valid one-line preview still requires fresh checkbox");
+  // Refuse blank new input even if a good review was open.
+  elems.required.value="";
+  await click("meta-preview");
+  assert.equal(elems["meta-approve"].disabled,true,"blank preview revokes old ticket");
+  elems.required.value="README.md\nnot-here.pdf";
+  await click("meta-preview");
+  elems["metadata-consent"].checked=true; elems["metadata-consent"].fire("change");
   await click("meta-approve");
   assert.match(elems["metadata-summary"].textContent,/LOCAL_METADATA_BLOCKED/);
   assert.doesNotMatch(elems.output.textContent,/not-here\.pdf|README\.md/);
   await click("meta-status");
+  elems.required.value="private-raw-path.txt";
+  elems.existing.value=workflowId;
   elems.token.value="short";
   await click("connect");  // refusal must discard the PREVIOUS valid bearer
+  assert.equal(elems.required.value,"","reauth must scrub private textarea");
+  assert.equal(elems.existing.value,"","reauth must clear previous workflow selection");
   assert.equal(elems.create.disabled,true,"bad reauth cannot retain previous token");
   assert.equal(elems.token.value,"");
   elems.token.value=auth;
