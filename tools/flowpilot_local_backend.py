@@ -36,6 +36,18 @@ MAX_DB_BYTES = 16 * 1024 * 1024
 _ALLOWED_STATES = frozenset(("PLANNED", "TESTED", "APPROVED_SYNTHETIC",
                              "RUNNING", "COMPLETE_LOCAL_SYNTHETIC", "BLOCKED",
                              "INTERRUPTED_BLOCKED"))
+# G178: trusted, code-owned descriptions only. Never render owner goals/paths
+# as runnable steps and never confuse synthetic receipts with NAS capability.
+_GUIDE_FIXTURES = {
+    "csv_customer_revenue_v1": (
+        "고객별 매출 합성 CSV (alice 4.00, bob 3.00)",
+        "합성 CSV 고객별 집계 결과가 정확히 두 행이고 합계가 7.00",
+    ),
+    "required_file_metadata_v1": (
+        "일회성 테스트 폴더의 두 필수 항목 (합성 데이터)",
+        "초기 PRESENT/MISSING → 합성 복구 후 PRESENT/PRESENT",
+    ),
+}
 
 
 class BackendRefused(ValueError):
@@ -204,6 +216,58 @@ class Backend:
                 raise BackendRefused("PLAN_HASH_DRIFT")
             return {"schema":SCHEMA,"workflow_id":wf_id,"plan":plan,
                     "plan_sha256":row[4],**proof,"release_gate":"HOLD"}
+
+    def guide(self,wf_id):
+        """Deterministic read-only operator guide; not a NAS execution plan.
+
+        Derive from the existing allowlisted typed template on each GET.
+        Never run the fixture, read owner files, store a new DB record, or
+        interpret caller-controlled text as executable commands.
+        """
+        with self.lock, closing(self._connect()) as db:
+            row=self._row(db,wf_id)
+            self._verify_events(db,wf_id)
+            compiled=compile_goal(row[2])
+            if (compiled.get("status")!="READY_FOR_SYNTHETIC_TEST"
+                    or compiled.get("template")!=row[3]
+                    or _hash(compiled)!=row[4]):
+                raise BackendRefused("GUIDE_PLAN_DRIFT")
+            details=_GUIDE_FIXTURES.get(row[3])
+            if details is None:
+                raise BackendRefused("GUIDE_TEMPLATE_UNSUPPORTED")
+            steps=[
+                {"number":1,"title":"검증 범위",
+                 "instruction":"테스트 전용 템플릿: "+details[0],
+                 "expected":"실제 NAS/고객 파일 접근 0건"},
+                {"number":2,"title":"계획 검증",
+                 "instruction":"계획·해시 확인으로 고정 DAG와 SHA-256을 비교",
+                 "expected":"READY_FOR_SYNTHETIC_TEST 및 계획 해시 일치"},
+                {"number":3,"title":"4역할 합성 검증",
+                 "instruction":"4역할 합성 테스트를 실행하고 BLOCKED 여부를 확인",
+                 "expected":"TESTED (실제 AI 다중 에이전트가 아님)"},
+                {"number":4,"title":"명시적 합성 승인",
+                 "instruction":"계획 해시를 다시 확인한 뒤 합성 실행에만 별도 동의",
+                 "expected":"APPROVED_SYNTHETIC (실제 NAS 권한 없음)"},
+                {"number":5,"title":"합성 실행",
+                 "instruction":"코드 소유 일회성 테스트만 실행하고 증거를 조회",
+                 "expected":"COMPLETE_LOCAL_SYNTHETIC 또는 안전한 BLOCKED"},
+                {"number":6,"title":"감사·산출물",
+                 "instruction":"감사 해시 체인, 4역할 증거, 검증된 CSV SHA-256을 대조",
+                 "expected":details[1]},
+                {"number":7,"title":"운영 전 승인 게이트",
+                 "instruction":"실제 NAS 사용 전 공식 Creator·Checker, 등록 Expert 권한, 소유자 승인 별도 확인",
+                 "expected":"NOT_VERIFIED · RELEASE HOLD · NAS 체험 미사용"},
+            ]
+            data={"schema":"flowpilot-local-operator-guide-v1",
+                  "status":"SYNTHETIC_OPERATOR_GUIDE_READY_NOT_NAS",
+                  "workflow_id":wf_id,"template":row[3],
+                  "plan_sha256":row[4],"steps":steps,
+                  "source":"CODE_OWNED_FIXED_TEMPLATE",
+                  "read_only":True,"commands_executed":False,
+                  "owner_files_accessed":False,"real_nas_verified":False,
+                  "registered_expert_invoked":False,"trial_started":False,
+                  "release_gate":"HOLD"}
+            return {**data,"guide_sha256":_hash(data)}
 
     def audit(self,wf_id):
         """Read back event-chain integrity and independently check G119 receipt."""
@@ -599,7 +663,7 @@ def create_server(backend: Backend, token: str, *, port: int=0):
                         data=backend.metadata.get(path.rsplit("/",1)[-1])
                     elif re.fullmatch(r"/v1/workflows/wf_[0-9a-f]{32}",path):
                         data=backend.get(path.rsplit("/",1)[-1])
-                    elif re.fullmatch(r"/v1/workflows/wf_[0-9a-f]{32}/(plan|audit|evidence|report)",path):
+                    elif re.fullmatch(r"/v1/workflows/wf_[0-9a-f]{32}/(plan|guide|audit|evidence|report)",path):
                         wf,action=path.rsplit("/",2)[-2:]
                         if action=="report":
                             blob,digest=backend.report(wf)

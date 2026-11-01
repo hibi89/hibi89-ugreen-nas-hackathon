@@ -68,6 +68,10 @@ def run_browser():
                 assert page.locator("#token").input_value()==""
                 page.locator("#create").click()
                 expect(page.locator("#workflow-state")).to_have_text("PLANNED")
+                page.locator("#guide").click()
+                expect(page.locator("#output")).to_contain_text("합성 전용 7단계 운영 가이드")
+                expect(page.locator("#output")).to_contain_text("7. 운영 전 승인 게이트")
+                expect(page.locator("#output")).to_contain_text("NAS / Uliya / Docker 실행 검증 아님")
                 page.locator("#plan").click()
                 expect(page.locator("#plan-hash")).to_contain_text("검증한 계획 SHA-256")
                 assert page.locator("#approve").is_disabled()
@@ -193,7 +197,8 @@ def run_browser():
                               "INVALID_REAUTH_CLEARS_AUTH",
                               "METADATA_APPROVAL_REPLY_LOSS_FAIL_CLOSED",
                               "METADATA_PREVIEW_FAILURE_REVOKES_CONSENT",
-                              "METADATA_CANCEL_REPLY_LOSS_FAIL_CLOSED"],
+                              "METADATA_CANCEL_REPLY_LOSS_FAIL_CLOSED",
+                              "PLAN_BOUND_SEVEN_STEP_OPERATOR_GUIDE"],
                     "real_nas_verified":False,"trial_started":False,"release_gate":"HOLD"
                 }
         finally:

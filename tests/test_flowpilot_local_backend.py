@@ -23,6 +23,43 @@ class BackendTests(unittest.TestCase):
         self.db=Path(self.temp.name)/"flowpilot.sqlite"
         self.b=api.Backend(self.db,create=True)
 
+    def test_guide_is_reproducible_readonly_and_bound_to_two_templates(self):
+        for index,goal in enumerate((GOAL,"고객별 매출 보고서 만들어줘")):
+            with self.subTest(goal=goal):
+                record=self.b.create(goal,"req_g178guide"+str(index)+"id")
+                wf=record["workflow_id"]
+                before=self.b.get(wf)["event_count"]
+                guide=self.b.guide(wf)
+                self.assertEqual(guide["status"],"SYNTHETIC_OPERATOR_GUIDE_READY_NOT_NAS")
+                self.assertEqual(guide["workflow_id"],wf)
+                self.assertEqual(guide["plan_sha256"],record["plan_sha256"])
+                self.assertEqual(guide["release_gate"],"HOLD")
+                self.assertEqual(len(guide["steps"]),7)
+                self.assertEqual([x["number"] for x in guide["steps"]],list(range(1,8)))
+                self.assertIn("실제 NAS",guide["steps"][-1]["instruction"])
+                self.assertFalse(guide["commands_executed"])
+                self.assertFalse(guide["owner_files_accessed"])
+                self.assertFalse(guide["real_nas_verified"])
+                digest=guide.pop("guide_sha256")
+                self.assertEqual(digest,api._hash(guide))
+                guide["guide_sha256"]=digest
+                self.assertEqual(api.Backend(self.db).guide(wf),guide)
+                self.assertEqual(self.b.get(wf)["event_count"],before)
+                self.b.test(wf)
+                self.assertEqual(self.b.guide(wf),guide)
+
+    def test_guide_blocks_plan_tamper_and_unknown_workflow(self):
+        record=self.b.create(GOAL,"req_g178guidebad")
+        wf=record["workflow_id"]
+        with self.assertRaisesRegex(api.BackendRefused,"WORKFLOW_NOT_FOUND"):
+            self.b.guide("wf_"+"f"*32)
+        with api.closing(self.b._connect()) as db:
+            db.execute("UPDATE fp_backend_workflows SET plan_sha=? WHERE wf_id=?",
+                       ("0"*64,wf))
+            db.commit()
+        with self.assertRaisesRegex(api.BackendRefused,"GUIDE_PLAN_DRIFT"):
+            self.b.guide(wf)
+
     def test_no_owner_file_touch_before_or_after_plan(self):
         w=self.b.create(GOAL,"req_abcdefgh1234")
         self.assertEqual(w["status"],"PLANNED")
@@ -154,6 +191,16 @@ class BackendTests(unittest.TestCase):
         self.assertEqual(call("GET","/v1/workflows")[1]["count"],1)
         self.assertEqual(call("GET",path+"/plan")[1]["plan"]["schema"],
                          "flowpilot-typed-workflow-v1")
+        self.assertEqual(call("GET",path+"/guide",auth=False)[0],403)
+        self.assertEqual(call("GET",path+"/guide",
+                              headers={"Origin":"https://evil.test"})[0],403)
+        guide_code,guide=call("GET",path+"/guide")
+        self.assertEqual(guide_code,200)
+        self.assertEqual(guide["plan_sha256"],record["plan_sha256"])
+        self.assertEqual(len(guide["steps"]),7)
+        self.assertFalse(guide["real_nas_verified"])
+        self.assertEqual(guide["guide_sha256"],
+                         api._hash({k:v for k,v in guide.items() if k!="guide_sha256"}))
         self.assertEqual(call("GET",path+"/audit")[1]["execution_evidence_integrity"],
                          "LOCAL_CHAIN_INTACT")
         http_code, evidence=call("GET",path+"/evidence")

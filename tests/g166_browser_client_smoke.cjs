@@ -32,10 +32,10 @@ globalThis.fetch = (route, init) => {
 };
 const ids = ["token","connect","disconnect","clear","connection-status","notice","output",
   "workflow-id","workflow-state","plan-hash","metadata-summary","goal","existing","create",
-  "list","load","plan","test","approve","run","audit","evidence","report","recover",
+  "list","load","plan","guide","test","approve","run","audit","evidence","report","recover",
   "synthetic-consent","metadata-consent","required","meta-preview","meta-approve",
   "meta-cancel","meta-status"];
-const buttonIds = ["connect","disconnect","clear","create","list","load","plan",
+const buttonIds = ["connect","disconnect","clear","create","list","load","plan","guide",
   "test","approve","run","audit","evidence","report","recover","meta-preview",
   "meta-approve","meta-cancel","meta-status"];
 class FakeElement {
@@ -71,6 +71,11 @@ async function main(){
   await click("create");
   assert.match(elems["workflow-id"].textContent,/^wf_[0-9a-f]{32}$/);
   const workflowId=elems["workflow-id"].textContent;
+  assert.equal(elems.guide.disabled,false,"guide requires a workflow");
+  await click("guide");
+  assert.match(elems.output.textContent,/합성 전용 7단계 운영 가이드/);
+  assert.match(elems.output.textContent,/7\\. 운영 전 승인 게이트/);
+  assert.doesNotMatch(elems.output.textContent,/FLOWPILOT_LOCAL_API_TOKEN|Bearer /);
   assert.equal(elems.approve.disabled,true,"cannot approve before council test");
   await click("plan");
   assert.match(elems["plan-hash"].textContent,/[a-f0-9]{64}/);

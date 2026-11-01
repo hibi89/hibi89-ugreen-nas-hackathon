@@ -20,7 +20,7 @@ function sync() {
     if (!token || busy) { button.disabled = true; continue; }
     const s = workflow?.status;
     const rules = {
-      load: !!el("existing").value, plan: !!workflow,
+      load: !!el("existing").value, plan: !!workflow, guide: !!workflow,
       test: s === "PLANNED", approve: s === "TESTED" && !!verifiedPlan && el("synthetic-consent").checked,
       run: s === "APPROVED_SYNTHETIC", audit: !!workflow,
       evidence: s === "COMPLETE_LOCAL_SYNTHETIC", report: s === "COMPLETE_LOCAL_SYNTHETIC",
@@ -119,6 +119,30 @@ el("plan").addEventListener("click", () => act(async () => {
   verifiedPlan = result.plan_sha256;
   el("synthetic-consent").checked = false;
   status("계획 해시 확인 · 별도 합성 승인 필요"); output(result);
+}));
+el("guide").addEventListener("click", () => act(async () => {
+  if (!workflow) throw Error("가이드를 표시할 워크플로가 없습니다.");
+  const result = await json("/v1/workflows/" + workflow.workflow_id + "/guide");
+  if (result.workflow_id !== workflow.workflow_id ||
+      result.plan_sha256 !== workflow.plan_sha256 ||
+      result.status !== "SYNTHETIC_OPERATOR_GUIDE_READY_NOT_NAS" ||
+      result.release_gate !== "HOLD" || result.real_nas_verified !== false ||
+      result.commands_executed !== false || result.owner_files_accessed !== false ||
+      !Array.isArray(result.steps) || result.steps.length !== 7 ||
+      !/^[0-9a-f]{64}$/.test(result.guide_sha256))
+    throw Error("가이드 출처 또는 계획 일치 검증 실패");
+  const lines = [
+    "FlowPilot 3.0 · 합성 전용 7단계 운영 가이드",
+    "실제 NAS / Uliya / Docker 실행 검증 아님 · RELEASE HOLD",
+    "계획 SHA-256: " + result.plan_sha256,
+    "가이드 SHA-256: " + result.guide_sha256,
+    "",
+    ...result.steps.map((step, idx) =>
+      (idx + 1) + ". " + step.title + "\n  " +
+      step.instruction + "\n  예상 결과: " + step.expected)
+  ];
+  status("단계별 운영 안내 표시 · 코드를 실행하지 않았습니다.");
+  output(lines.join("\n"));
 }));
 el("test").addEventListener("click", () => act(async () => {
   resetWorkflow(await json("/v1/workflows/" + workflow.workflow_id + "/test", {}));
