@@ -210,8 +210,15 @@ class Backend:
                     integrity=verified["status"]
                 except (ValueError,sqlite3.Error):
                     integrity="NOT_VERIFIED"
-            if row[5]=="COMPLETE_LOCAL_SYNTHETIC" and integrity!="LOCAL_CHAIN_INTACT":
-                raise BackendRefused("LEDGER_INTEGRITY_MISMATCH")
+            if row[5]=="COMPLETE_LOCAL_SYNTHETIC":
+                if integrity!="LOCAL_CHAIN_INTACT":
+                    raise BackendRefused("LEDGER_INTEGRITY_MISMATCH")
+                receipt=db.execute("SELECT final_sha FROM fp119_runs WHERE run_id=?",
+                                   ("run_"+wf_id[3:],)).fetchone()
+                if (not receipt or type(row[6]) is not str
+                        or type(receipt[0]) is not str
+                        or not hmac.compare_digest(row[6],receipt[0])):
+                    raise BackendRefused("LEDGER_RECEIPT_MISMATCH")
             return {"schema":SCHEMA,"workflow_id":wf_id,"state":row[5],
                     "audit_events":proof["event_count"],"audit_chain_sha256":proof["last_event_sha256"],
                     "event_integrity":proof["integrity"],"execution_evidence_integrity":integrity,
@@ -249,6 +256,90 @@ class Backend:
             self._event(db,wf_id,"SYNTHETIC_QA_PASS" if good else "SYNTHETIC_QA_BLOCKED")
             db.commit()
             return self.get(wf_id)
+
+    def evidence(self,wf_id):
+        """Export a verified, redacted REAL G119 SQLite fixture receipt.
+
+        This is not an operator report, NAS proof, or an independently signed
+        statement. No source files are read and repeated GET cannot rerun QA.
+        """
+        with self.lock, closing(self._connect()) as db:
+            row=self._row(db,wf_id)
+            self._verify_events(db,wf_id)
+            if row[5]!="COMPLETE_LOCAL_SYNTHETIC":
+                raise BackendRefused("EVIDENCE_REQUIRES_COMPLETED_SYNTHETIC_RUN")
+            plan=compile_goal(row[2])
+            if (plan.get("status")!="READY_FOR_SYNTHETIC_TEST"
+                    or plan.get("template")!=row[3] or _hash(plan)!=row[4]):
+                raise BackendRefused("EVIDENCE_PLAN_DRIFT")
+            events=db.execute(
+                "SELECT kind FROM fp_backend_events WHERE wf_id=? ORDER BY seq",
+                (wf_id,)).fetchall()
+            if ([event[0] for event in events] not in (
+                    ["CREATED","SYNTHETIC_QA_PASS","SYNTHETIC_ONLY_APPROVED",
+                     "RUN_RESERVED","LOCAL_SYNTHETIC_RUN_PASS"],
+                    ["CREATED","SYNTHETIC_QA_PASS","SYNTHETIC_ONLY_APPROVED",
+                     "RUN_RESERVED","RUN_RECONCILED_WITH_LEDGER"])):
+                raise BackendRefused("APPROVAL_OR_RUN_SEQUENCE_INVALID")
+            run_id="run_"+wf_id[3:]
+            try:
+                evidence=verify_record(db,run_id)
+                saved=db.execute("SELECT status,final_sha FROM fp119_runs WHERE run_id=?",
+                                 (run_id,)).fetchone()
+                steps=db.execute(
+                    "SELECT seq,kind,detail FROM fp119_events "
+                    "WHERE run_id=? ORDER BY seq",(run_id,)).fetchall()
+            except (sqlite3.Error,ValueError) as exc:
+                raise BackendRefused("G119_EVIDENCE_UNAVAILABLE") from exc
+            if (evidence.get("status")!="LOCAL_CHAIN_INTACT" or not saved
+                    or saved[0]!="PASS" or type(saved[1]) is not str
+                    or type(row[6]) is not str or len(row[6])!=64
+                    or not hmac.compare_digest(saved[1],row[6])):
+                raise BackendRefused("G119_RECEIPT_MISMATCH")
+            stages=[]
+            if len(steps)<5 or len(steps)>10:
+                raise BackendRefused("G119_EVENT_STRUCTURE_INVALID")
+            for index,(seq,kind,raw) in enumerate(steps,1):
+                if seq!=index or kind not in ("RESERVED","ROLE","TERMINAL"):
+                    raise BackendRefused("G119_EVENT_STRUCTURE_INVALID")
+                try:
+                    data=json.loads(raw)
+                except (ValueError,TypeError) as exc:
+                    raise BackendRefused("G119_DETAIL_INVALID") from exc
+                if type(data) is not dict:
+                    raise BackendRefused("G119_DETAIL_INVALID")
+                if kind=="RESERVED":
+                    if seq!=1 or data!={"template":row[3]}:
+                        raise BackendRefused("G119_RESERVATION_INVALID")
+                elif kind=="TERMINAL":
+                    if seq!=len(steps) or data!={"result":"SYNTHETIC_QA_PASS"}:
+                        raise BackendRefused("G119_TERMINAL_INVALID")
+                else:
+                    if (set(data)!={"role","status"} or
+                            data["role"] not in ("Architect","Security","Builder","Repair","QA")
+                            or data["status"]!="PASS"):
+                        raise BackendRefused("G119_ROLE_INVALID")
+                    stages.append({"role":data["role"],"result":"PASS_SYNTHETIC"})
+            if not {"Architect","Security","Builder","QA"}.issubset(
+                    {item["role"] for item in stages}):
+                raise BackendRefused("G119_REQUIRED_REVIEWS_MISSING")
+            report={
+                "schema":"flowpilot-backend-evidence-v1",
+                "status":"LOCAL_SYNTHETIC_EVIDENCE_VERIFIED_NOT_NAS",
+                "workflow_id":wf_id,
+                "template":row[3],
+                "plan_sha256":row[4],
+                "receipt_sha256":row[6],
+                "audit_event_count":evidence["event_count"],
+                "review_stages":stages,
+                "approval_proven_in_local_chain":True,
+                "customer_files_read":False,
+                "registered_expert_invoked":False,
+                "real_nas_verified":False,
+                "independently_notarized":False,
+                "release_gate":"HOLD",
+            }
+            return {**report, "report_sha256":_hash(report)}
 
     def approve(self,wf_id,plan_sha,ack):
         if type(plan_sha) is not str or type(ack) is not str:
@@ -368,7 +459,7 @@ def create_server(backend: Backend, token: str, *, port: int=0):
                         data=backend.list()
                     elif re.fullmatch(r"/v1/workflows/wf_[0-9a-f]{32}",path):
                         data=backend.get(path.rsplit("/",1)[-1])
-                    elif re.fullmatch(r"/v1/workflows/wf_[0-9a-f]{32}/(plan|audit)",path):
+                    elif re.fullmatch(r"/v1/workflows/wf_[0-9a-f]{32}/(plan|audit|evidence)",path):
                         wf,action=path.rsplit("/",2)[-2:]
                         data=getattr(backend,action)(wf)
                     else:

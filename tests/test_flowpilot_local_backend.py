@@ -156,6 +156,10 @@ class BackendTests(unittest.TestCase):
                          "flowpilot-typed-workflow-v1")
         self.assertEqual(call("GET",path+"/audit")[1]["execution_evidence_integrity"],
                          "LOCAL_CHAIN_INTACT")
+        http_code, evidence=call("GET",path+"/evidence")
+        self.assertEqual(http_code,200)
+        self.assertEqual(evidence["status"],"LOCAL_SYNTHETIC_EVIDENCE_VERIFIED_NOT_NAS")
+        self.assertFalse(evidence["registered_expert_invoked"])
         self.assertEqual(call("POST","/v1/advice",{"telemetry":{"disk_used_percent":96},
                                                 "opt_in":True})[1]["status"],
                          "SUGGESTIONS_READY")
@@ -192,6 +196,69 @@ class BackendTests(unittest.TestCase):
         self.assertFalse(result["actions_executed"])
         with self.assertRaisesRegex(api.BackendRefused,"ADVICE_TELEMETRY_INVALID"):
             self.b.advice({"owner_private_path":"secret"},opt_in=True)
+
+    def test_g163_complete_receipt_export_uses_real_g119_sqlite(self):
+        w=self.b.create(GOAL,"req_export12345678")
+        wf=w["workflow_id"]
+        with self.assertRaisesRegex(api.BackendRefused,"EVIDENCE_REQUIRES_COMPLETED"):
+            self.b.evidence(wf)
+        self.b.test(wf)
+        self.b.approve(wf,w["plan_sha256"],"APPROVE_SYNTHETIC_ONLY")
+        self.b.run(wf)
+        report=self.b.evidence(wf)
+        self.assertEqual(report["status"],"LOCAL_SYNTHETIC_EVIDENCE_VERIFIED_NOT_NAS")
+        self.assertEqual(report["receipt_sha256"],self.b.get(wf)["receipt_sha256"])
+        self.assertTrue(report["approval_proven_in_local_chain"])
+        self.assertEqual({v["role"] for v in report["review_stages"]},
+                         {"Architect","Security","Builder","QA"})
+        self.assertFalse(report["customer_files_read"])
+        self.assertFalse(report["real_nas_verified"])
+        self.assertEqual(report["release_gate"],"HOLD")
+        self.assertEqual(self.b.evidence(wf),report)
+        self.assertEqual(self.b.get(wf)["event_count"],5)
+        self.assertEqual(api._hash({k:v for k,v in report.items() if k!="report_sha256"}),
+                         report["report_sha256"])
+
+    def test_g163_forged_backend_receipt_fails_audit_and_export(self):
+        w=self.b.create(GOAL,"req_forge12345678")
+        wf=w["workflow_id"]
+        self.b.test(wf)
+        self.b.approve(wf,w["plan_sha256"],"APPROVE_SYNTHETIC_ONLY")
+        self.b.run(wf)
+        with api.closing(self.b._connect()) as db:
+            db.execute("UPDATE fp_backend_workflows SET receipt_sha=? WHERE wf_id=?",
+                       ("f"*64,wf))
+            db.commit()
+        with self.assertRaisesRegex(api.BackendRefused,"LEDGER_RECEIPT_MISMATCH"):
+            self.b.audit(wf)
+        with self.assertRaisesRegex(api.BackendRefused,"G119_RECEIPT_MISMATCH"):
+            self.b.evidence(wf)
+
+    def test_g163_forged_approval_history_refused(self):
+        w=self.b.create(GOAL,"req_approvalhist12")
+        wf=w["workflow_id"]
+        self.b.test(wf)
+        self.b.approve(wf,w["plan_sha256"],"APPROVE_SYNTHETIC_ONLY")
+        self.b.run(wf)
+        with api.closing(self.b._connect()) as db:
+            db.execute("UPDATE fp_backend_events SET kind='APPROVED_REAL_NAS' "
+                       "WHERE wf_id=? AND kind='SYNTHETIC_ONLY_APPROVED'",(wf,))
+            db.commit()
+        with self.assertRaisesRegex(api.BackendRefused,"EVENT_CHAIN_INVALID"):
+            self.b.evidence(wf)
+
+    def test_g163_tampered_g119_event_refuses_export(self):
+        w=self.b.create(GOAL,"req_ledgerfake1234")
+        wf=w["workflow_id"]
+        self.b.test(wf)
+        self.b.approve(wf,w["plan_sha256"],"APPROVE_SYNTHETIC_ONLY")
+        self.b.run(wf)
+        with api.closing(self.b._connect()) as db:
+            db.execute("UPDATE fp119_events SET detail=? WHERE run_id=? AND kind='ROLE'",
+                       ('{"role":"QA","status":"PASS"}',"run_"+wf[3:]))
+            db.commit()
+        with self.assertRaisesRegex(api.BackendRefused,"G119_RECEIPT_MISMATCH"):
+            self.b.evidence(wf)
 
     def test_no_network_or_nas_backend_dependency(self):
         text=Path(api.__file__).read_text()
