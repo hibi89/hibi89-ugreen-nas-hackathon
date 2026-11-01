@@ -10,7 +10,16 @@ if (!/^http:\/\/127\.0\.0\.1:\d+$/.test(base) || !auth || auth.length < 32) {
 }
 globalThis.crypto = webcrypto;
 const nativeFetch = globalThis.fetch;
-globalThis.fetch = (route, init) => nativeFetch(base + route, init);
+let rejectOneMetadataApproval = false;
+globalThis.fetch = (route, init) => {
+  if (route === "/v1/local-metadata/approve" && rejectOneMetadataApproval) {
+    rejectOneMetadataApproval = false;
+    return Promise.resolve(new Response(JSON.stringify({error:"SIMULATED_HTTP_503"}), {
+      status:503, headers:{"Content-Type":"application/json"}
+    }));
+  }
+  return nativeFetch(base + route, init);
+};
 const ids = ["token","connect","disconnect","clear","connection-status","notice","output",
   "workflow-id","workflow-state","plan-hash","metadata-summary","goal","existing","create",
   "list","load","plan","test","approve","run","audit","evidence","report","recover",
@@ -105,6 +114,16 @@ async function main(){
   assert.equal(elems["meta-approve"].disabled,true,"blank preview revokes old ticket");
   elems.required.value="README.md\nnot-here.pdf";
   await click("meta-preview");
+  elems["metadata-consent"].checked=true; elems["metadata-consent"].fire("change");
+  rejectOneMetadataApproval = true;  // ambiguous delivery: client gets HTTP 503
+  await click("meta-approve");
+  assert.equal(elems["metadata-consent"].checked,false,"failed approval revokes consent");
+  assert.equal(elems["meta-approve"].disabled,true,"failed approval must not be retried using old ticket");
+  assert.match(elems["metadata-summary"].textContent,/검토 세션 없음/);
+  // New, separately reviewed scope and explicit approval still works.
+  elems.required.value="README.md\nnot-here.pdf";
+  await click("meta-preview");
+  assert.equal(elems["meta-approve"].disabled,true,"replacement ticket needs fresh consent");
   elems["metadata-consent"].checked=true; elems["metadata-consent"].fire("change");
   await click("meta-approve");
   assert.match(elems["metadata-summary"].textContent,/LOCAL_METADATA_BLOCKED/);
