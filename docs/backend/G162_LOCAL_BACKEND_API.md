@@ -50,3 +50,15 @@ Windows full owner-equivalent: `powershell.exe -ExecutionPolicy Bypass -File .\v
 `GET /v1/workflows/<workflow_id>/evidence` returns JSON only after a completed, explicitly approved **local synthetic** run. Requires the same local bearer token and strict loopback Host/Origin as all other endpoints. It validates the G162 plan hash, complete ordered approval/execution event history, the actual G119 SQLite journal, PASS terminal, four deterministic council role approvals, and equality between the backend receipt and G119 `final_sha`. The response contains role labels and synthetic PASS, original receipt SHA and report SHA derived from this bounded JSON. Any mismatch returns a refusal and cannot cause a repeat run.
 
 This is an integrity-checked **development fixture evidence JSON** endpoint, not a downloadable CSV report, independent notarization, production execution evidence, or Uliya/NAS attestation. No owner content or paths returned. Test with `python -m unittest discover -s tests -p 'test_flowpilot_local_backend.py' -v`. G163 source SHA `253b78f97ea9c5b0a592d243e290757ed41c79fb` (Linux and Windows CI [41282599589](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/41282599589) PASS).
+
+## G164 persisted synthetic report (CSV download)
+
+**Requires a NEW explicitly created owner-local SQLite database**, because the G164 table is added by --init-db only. Existing pre-G164 owner DBs are not migrated or overwritten; their /run route refuses ARTIFACT_SCHEMA_NEEDS_OWNER_MIGRATION. Do not delete or replace an older database to bypass this rule.
+
+After the documented create -> synthetic test -> exact plan SHA + APPROVE_SYNTHETIC_ONLY -> run sequence:
+
+\`GET /v1/workflows/<wf_id>/report\`
+
+With Bearer token and loopback Host check, responds with \`text/csv; charset=utf-8\`, \`Content-Disposition: attachment; filename="flowpilot-synthetic-fixture.csv"\`, \`Cache-Control: no-store\` and \`X-Flowpilot-Content-SHA256\` covering the exact bytes. CSV data is from a **code-generated local disposable fixture**, NOT real owner files or NAS. The supported templates are customer revenue (two sample customers) and required-file metadata initial/after-fixture-repair states. The data is actually stored once in SQLite rather than recomputed on GET. Source receipt SHA and report bytes SHA are checked again when downloaded; missing approval, mismatched receipt, corrupted artifact bytes or interrupted run cause refusal without a retry.
+
+G164 code \`tools/flowpilot_g164_report_artifact.py\`, \`tools/flowpilot_local_backend.py\`, G119 source \`tools/flowpilot_repair_ledger.py\`; tests \`tests/test_flowpilot_g164_report_artifact.py\`. Exact feature commit \`2755aa594365e68297b761ce7327954ff412a2cb\`; Linux+Windows [CI 41285302780](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/41285302780) SUCCESS. No genuine Uliya/Expert/NAS/LLM, production deployment or independent audit notarization is claimed.
