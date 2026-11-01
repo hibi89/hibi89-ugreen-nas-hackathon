@@ -11,6 +11,10 @@ G166 now contains a real locally served HTML/CSS/JavaScript dashboard bound to t
 - Optional G165: a checklist of 1–20 relative paths is submitted to `/v1/local-metadata/preview`, then raw textarea is cleared. One-use inspection requires a second explicit checkbox and backend SHA-linked `APPROVE_LOCAL_METADATA_READ_ONLY`. Cancel and status are separate; output contains item indexes/states, not filenames. The root must be operator-chosen at server startup, must not be any NAS share, and is never received from browser requests.
 - Explicit `/recover` does not replay interrupted G119. Errors and lack of connection fail closed. All displayed backend JSON is rendered with textContent, not innerHTML.
 
+## G166 reconnect security follow-up
+
+Every login attempt now clears any previous in-memory bearer token, current workflow, cached plan approval and local metadata consent **before validating the newly entered token**. A malformed second token therefore cannot retain the old session's authority. Added Node simulated-browser regression for bad-token reconnect and subsequent fresh login. Changed UI SHA commit `11010d9f0f1c2f3834dc2a485b0b0e1f3e671255`, test follow-up `91ad550a247218277a617cfec35c58a6f446c197`. The V8 mock-DOM bad-auth / valid-auth recovery sequence passed; real browser/CI remain NOT_VERIFIED.
+
 ## Architecture alternatives and decision
 
 A. Standalone web app on another port or public host: needs CORS, separate credential distribution, additional deployment and API attack surface; **rejected**.
