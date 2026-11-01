@@ -138,6 +138,7 @@ class G189ExactG188ProfileTests(unittest.TestCase):
         call.assert_called_once()
         self.assertEqual(call.call_args.kwargs["candidate_profile"], "g188")
         self.assertEqual(call.call_args.kwargs["mode"], "docker")
+        self.assertIs(call.call_args.kwargs["official_risk_approved"], True)
         self.assertEqual(json.loads(buf.getvalue())["release_gate"], "HOLD")
 
 

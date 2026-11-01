@@ -86,7 +86,7 @@ class G100OfficialKitBoundary(unittest.TestCase):
             "errors": 0, "warnings": 0, "info": 0}, "diagnostics": []})
         with patch.object(gate, "_execute", return_value=(0, payload, "")):
             result = gate.check(self.path, self.vendor, mode="native",
-                                native_risk_approved=True)
+                                native_risk_approved=True, official_risk_approved=True)
         self.assertEqual(result["result"], "OFFICIAL_STATIC_PASS_REVIEW_ONLY")
         self.assertEqual(result["release_gate"], "HOLD")
         self.assertFalse(result["owner_release_approved"])
@@ -97,7 +97,7 @@ class G100OfficialKitBoundary(unittest.TestCase):
                 {"code": "DELEGATION_WORKFLOW_STATIC_VALIDATION_INCOMPLETE"}]})
         with patch.object(gate, "_execute", return_value=(0, payload, "")):
             result = gate.check(self.path, self.vendor, mode="native",
-                                native_risk_approved=True)
+                                native_risk_approved=True, official_risk_approved=True)
         self.assertEqual(result["result"], "OFFICIAL_WARN_OR_FAIL_HOLD")
         self.assertEqual(result["checker_summary"]["warnings"], 1)
 
@@ -192,7 +192,7 @@ class G100OfficialKitBoundary(unittest.TestCase):
              patch.object(gate, "G139_CANDIDATE_ZIP_SHA", sha256(incomplete).hexdigest()), \
              patch.object(gate, "_execute", side_effect=AssertionError("No execution")):
             with self.assertRaisesRegex(gate.VerificationRefused, "exact approved"):
-                gate.check(self.path, self.vendor, mode="docker", candidate_profile="g139")
+                gate.check(self.path, self.vendor, mode="docker", candidate_profile="g139", official_risk_approved=True)
 
     def test_g139_ref_only_tamper_rejected_by_pinned_zip(self):
         files = {gate.MEMBER: self.source,
@@ -221,7 +221,7 @@ class G100OfficialKitBoundary(unittest.TestCase):
              patch.object(gate, "G139_CANDIDATE_ZIP_SHA", sha256(raw).hexdigest()), \
              patch.object(gate, "_execute", side_effect=fake_checker):
             result = gate.check(self.path, self.vendor, mode="native",
-                                native_risk_approved=True, candidate_profile="g139")
+                                native_risk_approved=True, official_risk_approved=True, candidate_profile="g139")
         self.assertEqual(result["result"], "OFFICIAL_STATIC_PASS_REVIEW_ONLY")
         self.assertEqual(result["release_gate"], "HOLD")
         self.assertEqual(result["candidate_member_count"], 3)
@@ -240,7 +240,7 @@ class G100OfficialKitBoundary(unittest.TestCase):
              patch.object(gate, "_execute", side_effect=mutator):
             with self.assertRaisesRegex(gate.VerificationRefused, "changed during Checker"):
                 gate.check(self.path, self.vendor, mode="native",
-                           native_risk_approved=True, candidate_profile="g139")
+                           native_risk_approved=True, official_risk_approved=True, candidate_profile="g139")
 
     def test_g139_stored_exact_pins_are_full_sha256(self):
         self.assertRegex(gate.G139_CANDIDATE_SHA, r"\A[0-9a-f]{64}\Z")
@@ -337,7 +337,7 @@ class G100OfficialKitBoundary(unittest.TestCase):
              patch.object(gate, "G147_CANDIDATE_ZIP_SHA", sha256(good).hexdigest()), \
              patch.object(gate, "_execute", side_effect=AssertionError("vendor executed")):
             with self.assertRaisesRegex(gate.VerificationRefused, "SHA256"):
-                gate.check(self.path, self.vendor, mode="docker", candidate_profile="g147")
+                gate.check(self.path, self.vendor, mode="docker", candidate_profile="g147", official_risk_approved=True)
 
     def test_g147_multifile_reference_contents_supplied_to_mock_only(self):
         files = {gate.MEMBER: self.source,
@@ -357,7 +357,7 @@ class G100OfficialKitBoundary(unittest.TestCase):
              patch.object(gate, "G147_CANDIDATE_ZIP_SHA", sha256(raw).hexdigest()), \
              patch.object(gate, "_execute", side_effect=inspect_fake):
             result = gate.check(self.path, self.vendor, mode="native",
-                                native_risk_approved=True, candidate_profile="g147")
+                                native_risk_approved=True, official_risk_approved=True, candidate_profile="g147")
         self.assertEqual(result["candidate_profile"], "g147")
         self.assertEqual(result["result"], "OFFICIAL_STATIC_PASS_REVIEW_ONLY")
         self.assertEqual(result["release_gate"], "HOLD")

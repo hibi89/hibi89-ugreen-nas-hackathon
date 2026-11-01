@@ -252,10 +252,14 @@ def _sanitized_checker_result(code: int, stdout: str, stderr: str, *, mode: str)
 
 
 def check(candidate: Path, kit: Path, *, mode: str, native_risk_approved: bool = False,
-          candidate_profile: str = "g99") -> dict:
+          candidate_profile: str = "g99", official_risk_approved: bool = False) -> dict:
     if mode not in ("inspect", "docker", "native"):
         raise VerificationRefused("Invalid execution mode")
-    if mode == "native" and not native_risk_approved:
+    # G190: guard the callable API as well as main(); direct imports must not
+    # bypass separate consent or read private owner bytes before approval.
+    if mode in ("docker", "native") and official_risk_approved is not True:
+        raise VerificationRefused("Vendor Checker execution requires explicit owner approval")
+    if mode == "native" and native_risk_approved is not True:
         raise VerificationRefused("Native execution requires explicit risk approval")
     # Profiles are immutable source/ZIP pairs; untrusted CLI users cannot supply arbitrary hashes.
     profiles = {"g99": (CANDIDATE_SHA, CANDIDATE_ZIP_SHA, (MEMBER,)),
@@ -317,7 +321,8 @@ def main(argv: list[str] | None = None) -> int:
             raise VerificationRefused("Additional native execution risk approval required")
         report = check(args.candidate_zip, args.official_kit_zip, mode=args.mode,
                        native_risk_approved=args.accept_native_code_execution_risk,
-                       candidate_profile=args.candidate_profile)
+                       candidate_profile=args.candidate_profile,
+                       official_risk_approved=args.accept_official_code_execution_risk)
         exit_code = 0 if report.get("result") == "OFFICIAL_STATIC_PASS_REVIEW_ONLY" else 2
     except (VerificationRefused, OSError, ValueError) as exc:
         report = {"status": "CHECKER_NOT_VERIFIED", "reason": type(exc).__name__,
