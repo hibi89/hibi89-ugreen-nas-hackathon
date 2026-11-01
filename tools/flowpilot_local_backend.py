@@ -23,6 +23,7 @@ import threading
 from flowpilot_task_compiler import compile_goal
 from flowpilot_code_council import run_council
 from flowpilot_repair_ledger import run_once, verify_record
+from flowpilot_proactive_advisor import advise_local
 
 SCHEMA = "flowpilot-backend-local-v1"
 IDENTITY = "flowpilot-g161-owner-created-backend-v1"
@@ -177,6 +178,56 @@ class Backend:
             integrity=self._verify_events(db,wf_id)
             return self._public(row,integrity)
 
+    def list(self):
+        """At most 20 recent local-only workflow states; never expose request IDs."""
+        with self.lock, closing(self._connect()) as db:
+            rows=db.execute("SELECT wf_id FROM fp_backend_workflows ORDER BY rowid DESC LIMIT 20").fetchall()
+            return {"schema":SCHEMA,"status":"LOCAL_WORKFLOW_LIST",
+                    "workflows":[self.get(wf_id)["workflow_id"] for (wf_id,) in rows],
+                    "count":len(rows),"nas_verified":False,"release_gate":"HOLD"}
+
+    def plan(self,wf_id):
+        """Return trusted compiled graph only after re-deriving and hashing it."""
+        with self.lock, closing(self._connect()) as db:
+            row=self._row(db,wf_id)
+            proof=self._verify_events(db,wf_id)
+            plan=compile_goal(row[2])
+            if plan.get("status")!="READY_FOR_SYNTHETIC_TEST" or _hash(plan)!=row[4]:
+                raise BackendRefused("PLAN_HASH_DRIFT")
+            return {"schema":SCHEMA,"workflow_id":wf_id,"plan":plan,
+                    "plan_sha256":row[4],**proof,"release_gate":"HOLD"}
+
+    def audit(self,wf_id):
+        """Read back event-chain integrity and independently check G119 receipt."""
+        with self.lock, closing(self._connect()) as db:
+            row=self._row(db,wf_id)
+            proof=self._verify_events(db,wf_id)
+            integrity="NO_SYNTHETIC_RUN"
+            if row[5] in ("COMPLETE_LOCAL_SYNTHETIC","BLOCKED","RUNNING",
+                          "INTERRUPTED_BLOCKED"):
+                try:
+                    verified=verify_record(db,"run_"+wf_id[3:])
+                    integrity=verified["status"]
+                except (ValueError,sqlite3.Error):
+                    integrity="NOT_VERIFIED"
+            if row[5]=="COMPLETE_LOCAL_SYNTHETIC" and integrity!="LOCAL_CHAIN_INTACT":
+                raise BackendRefused("LEDGER_INTEGRITY_MISMATCH")
+            return {"schema":SCHEMA,"workflow_id":wf_id,"state":row[5],
+                    "audit_events":proof["event_count"],"audit_chain_sha256":proof["last_event_sha256"],
+                    "event_integrity":proof["integrity"],"execution_evidence_integrity":integrity,
+                    "independently_notarized":False,"real_nas_verified":False,
+                    "release_gate":"HOLD"}
+
+    @staticmethod
+    def advice(telemetry,*,opt_in):
+        """Caller-supplied numeric telemetry, not a live NAS watcher."""
+        if type(opt_in) is not bool:
+            raise BackendRefused("ADVICE_CONSENT_INVALID",400)
+        result=advise_local(telemetry,opt_in=opt_in)
+        if result.get("status") in ("INVALID_CONSENT","INVALID_TELEMETRY"):
+            raise BackendRefused("ADVICE_TELEMETRY_INVALID",422)
+        return result
+
     def test(self,wf_id):
         with self.lock, closing(self._connect()) as db:
             row=self._row(db,wf_id)
@@ -313,8 +364,13 @@ def create_server(backend: Backend, token: str, *, port: int=0):
                     if path=="/v1/health":
                         data={"schema":SCHEMA,"status":"LOCAL_BACKEND_READY",
                               "nas_verified":False,"release_gate":"HOLD"}
+                    elif path=="/v1/workflows":
+                        data=backend.list()
                     elif re.fullmatch(r"/v1/workflows/wf_[0-9a-f]{32}",path):
                         data=backend.get(path.rsplit("/",1)[-1])
+                    elif re.fullmatch(r"/v1/workflows/wf_[0-9a-f]{32}/(plan|audit)",path):
+                        wf,action=path.rsplit("/",2)[-2:]
+                        data=getattr(backend,action)(wf)
                     else:
                         self.send(404,{"error":"UNKNOWN_ROUTE"});return
                 else:
@@ -336,6 +392,10 @@ def create_server(backend: Backend, token: str, *, port: int=0):
                         if set(body)!={"goal","request_id"}:
                             raise BackendRefused("UNEXPECTED_KEYS",400)
                         data=backend.create(body["goal"],body["request_id"])
+                    elif path=="/v1/advice":
+                        if set(body)!={"telemetry","opt_in"}:
+                            raise BackendRefused("UNEXPECTED_KEYS",400)
+                        data=backend.advice(body["telemetry"],opt_in=body["opt_in"])
                     else:
                         match=re.fullmatch(r"/v1/workflows/(wf_[0-9a-f]{32})/(test|approve|run|recover)",path)
                         if not match:

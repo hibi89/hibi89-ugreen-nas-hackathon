@@ -151,9 +151,47 @@ class BackendTests(unittest.TestCase):
             "acknowledgement":"APPROVE_SYNTHETIC_ONLY"})[1]["status"],"APPROVED_SYNTHETIC")
         self.assertEqual(call("POST",path+"/run",{})[1]["status"],"COMPLETE_LOCAL_SYNTHETIC")
         self.assertEqual(call("GET",path)[1]["release_gate"],"HOLD")
+        self.assertEqual(call("GET","/v1/workflows")[1]["count"],1)
+        self.assertEqual(call("GET",path+"/plan")[1]["plan"]["schema"],
+                         "flowpilot-typed-workflow-v1")
+        self.assertEqual(call("GET",path+"/audit")[1]["execution_evidence_integrity"],
+                         "LOCAL_CHAIN_INTACT")
+        self.assertEqual(call("POST","/v1/advice",{"telemetry":{"disk_used_percent":96},
+                                                "opt_in":True})[1]["status"],
+                         "SUGGESTIONS_READY")
         self.assertEqual(call("POST",path+"/recover",{"unexpected":1})[0],400)
         self.assertEqual(call("POST",path+"/run",{},headers={"Origin":"https://evil.test"})[0],403)
         self.assertEqual(call("POST",path+"/run",{},headers={"Transfer-Encoding":"chunked"})[0],400)
+
+    def test_dashboard_read_only_list_plan_and_audit(self):
+        first=self.b.create(GOAL,"req_first12345678")
+        second=self.b.create("고객별 매출 보고서 만들어줘","req_second1234567")
+        listing=self.b.list()
+        self.assertEqual(listing["count"],2)
+        self.assertEqual(listing["workflows"],[second["workflow_id"],first["workflow_id"]])
+        self.assertEqual(self.b.plan(first["workflow_id"])["plan"]["status"],"READY_FOR_SYNTHETIC_TEST")
+        before=self.b.audit(first["workflow_id"])
+        self.assertEqual(before["execution_evidence_integrity"],"NO_SYNTHETIC_RUN")
+        self.b.test(first["workflow_id"])
+        self.b.approve(first["workflow_id"],first["plan_sha256"],"APPROVE_SYNTHETIC_ONLY")
+        self.b.run(first["workflow_id"])
+        self.assertEqual(self.b.audit(first["workflow_id"])["execution_evidence_integrity"],
+                         "LOCAL_CHAIN_INTACT")
+        with api.closing(self.b._connect()) as db:
+            db.execute("UPDATE fp_backend_workflows SET plan_sha='0' WHERE wf_id=?",
+                       (first["workflow_id"],))
+            db.commit()
+        with self.assertRaisesRegex(api.BackendRefused,"PLAN_HASH_DRIFT"):
+            self.b.plan(first["workflow_id"])
+
+    def test_proactive_signal_requires_opt_in_and_never_mutates(self):
+        self.assertEqual(self.b.advice({"disk_used_percent":95},opt_in=False)["status"],
+                         "DISABLED_NO_CONSENT")
+        result=self.b.advice({"disk_used_percent":95},opt_in=True)
+        self.assertEqual(result["suggestions"][0]["status"],"PROPOSAL_ONLY")
+        self.assertFalse(result["actions_executed"])
+        with self.assertRaisesRegex(api.BackendRefused,"ADVICE_TELEMETRY_INVALID"):
+            self.b.advice({"owner_private_path":"secret"},opt_in=True)
 
     def test_no_network_or_nas_backend_dependency(self):
         text=Path(api.__file__).read_text()
