@@ -457,17 +457,35 @@ class Backend:
             # Never mark a previous attempt complete without its already
             # committed artifact. Do not rerun the G119 fixture to repair it.
             try:
-                stored=db.execute("SELECT receipt_sha,content_sha,csv_bytes "
+                stored=db.execute("SELECT template,receipt_sha,content_sha,csv_bytes "
                                   "FROM fp_backend_artifacts WHERE wf_id=?",
                                   (wf_id,)).fetchone()
+                prior=db.execute("SELECT kind FROM fp_backend_events "
+                                 "WHERE wf_id=? ORDER BY seq",(wf_id,)).fetchall()
+                ledger_goal=db.execute("SELECT goal_sha FROM fp119_runs WHERE run_id=?",
+                                       (run_id,)).fetchone()
             except sqlite3.Error:
-                stored=None
-            good=bool(intact and outcome and outcome[0]=="PASS" and stored and
-                      type(stored[0]) is str and
-                      hmac.compare_digest(stored[0],outcome[1]) and
-                      type(stored[2]) is bytes and 0<len(stored[2])<=4096 and
-                      type(stored[1]) is str and len(stored[1])==64 and
-                      hmac.compare_digest(stored[1],sha256(stored[2]).hexdigest()))
+                stored=None;prior=[];ledger_goal=None
+            # A valid SHA of a corrupted CSV is still a corrupted artifact.
+            # Recovery must enforce the SAME exact source/template/CSV checks
+            # as the normal report path, not only compare mutable DB digests.
+            plan=compile_goal(row[2])
+            plan_ok=(plan.get("status")=="READY_FOR_SYNTHETIC_TEST" and
+                     plan.get("template")==row[3] and _hash(plan)==row[4])
+            expected_prior=[("CREATED",),("SYNTHETIC_QA_PASS",),
+                            ("SYNTHETIC_ONLY_APPROVED",),("RUN_RESERVED",)]
+            good=bool(
+                plan_ok and intact and outcome and outcome[0]=="PASS" and
+                type(outcome[1]) is str and len(outcome[1])==64 and
+                ledger_goal and ledger_goal[0]==_hash(
+                    {"template":row[3],"goal":row[2]}) and
+                prior==expected_prior and stored and stored[0]==row[3] and
+                type(stored[1]) is str and
+                hmac.compare_digest(stored[1],outcome[1]) and
+                type(stored[3]) is bytes and 0<len(stored[3])<=4096 and
+                stored[3]==CANONICAL_CSV.get(row[3]) and
+                type(stored[2]) is str and len(stored[2])==64 and
+                hmac.compare_digest(stored[2],sha256(stored[3]).hexdigest()))
             db.execute("BEGIN IMMEDIATE")
             db.execute("UPDATE fp_backend_workflows SET state=?,receipt_sha=? WHERE wf_id=?",
                        ("COMPLETE_LOCAL_SYNTHETIC" if good else "INTERRUPTED_BLOCKED",

@@ -116,6 +116,74 @@ class G164Tests(unittest.TestCase):
         with self.assertRaises(BackendRefused):
             self.b.report(wf)
 
+    def _fixture_running_with_artifact(self, wf):
+        """Reconstruct a reviewable interrupted state without redoing any test."""
+        with closing(self.b._connect()) as db:
+            # G164 run() atomically commits state+artifact in normal operation.
+            # Rewind its final state/event only to exercise recovery's guards.
+            db.execute("UPDATE fp_backend_workflows SET state='RUNNING' WHERE wf_id=?",
+                       (wf,))
+            db.execute("DELETE FROM fp_backend_events WHERE wf_id=? AND "
+                       "kind='LOCAL_SYNTHETIC_RUN_PASS'",(wf,))
+            db.commit()
+
+    def test_recover_matching_artifact_without_reexecuting_fixture(self):
+        wf=self.completed(key="req_g177recoveryok")
+        expected=self.b.report(wf)
+        self._fixture_running_with_artifact(wf)
+        with closing(self.b._connect()) as db:
+            before=db.execute("SELECT count(*) FROM fp119_runs").fetchone()[0]
+        result=Backend(self.p).recover(wf)
+        self.assertEqual(result["status"],"COMPLETE_LOCAL_SYNTHETIC")
+        self.assertEqual(Backend(self.p).report(wf),expected)
+        self.assertEqual(Backend(self.p).recover(wf)["status"],
+                         "COMPLETE_LOCAL_SYNTHETIC")
+        with closing(self.b._connect()) as db:
+            self.assertEqual(db.execute("SELECT count(*) FROM fp119_runs")
+                             .fetchone()[0],before)
+
+    def test_recover_rejects_matching_mutable_hash_of_forged_csv(self):
+        wf=self.completed(key="req_g177forgedcsv")
+        self._fixture_running_with_artifact(wf)
+        forged=b"customer,total_revenue\\r\\nmallory,1000000\\r\\n"
+        with closing(self.b._connect()) as db:
+            db.execute("UPDATE fp_backend_artifacts SET csv_bytes=?,content_sha=? "
+                       "WHERE wf_id=?",(forged,sha256(forged).hexdigest(),wf))
+            db.commit()
+        self.assertEqual(Backend(self.p).recover(wf)["status"],
+                         "INTERRUPTED_BLOCKED")
+        with self.assertRaises(BackendRefused):
+            Backend(self.p).report(wf)
+
+    def test_recover_rejects_template_and_plan_mismatch(self):
+        wf=self.completed(key="req_g177badtemplate")
+        self._fixture_running_with_artifact(wf)
+        with closing(self.b._connect()) as db:
+            db.execute("UPDATE fp_backend_artifacts SET template=? WHERE wf_id=?",
+                       ("required_file_metadata_v1",wf))
+            db.commit()
+        self.assertEqual(Backend(self.p).recover(wf)["status"],
+                         "INTERRUPTED_BLOCKED")
+        wf2=self.completed(key="req_g177wrongplan")
+        self._fixture_running_with_artifact(wf2)
+        with closing(self.b._connect()) as db:
+            db.execute("UPDATE fp_backend_workflows SET plan_sha=? WHERE wf_id=?",
+                       ("0"*64,wf2))
+            db.commit()
+        self.assertEqual(Backend(self.p).recover(wf2)["status"],
+                         "INTERRUPTED_BLOCKED")
+
+    def test_recover_refuses_wrong_audit_event_sequence(self):
+        wf=self.completed(key="req_g177badsequence")
+        # The prior terminal event already exists: just changing state back
+        # to RUNNING must NOT permit appending a second terminal receipt.
+        with closing(self.b._connect()) as db:
+            db.execute("UPDATE fp_backend_workflows SET state='RUNNING' WHERE wf_id=?",
+                       (wf,))
+            db.commit()
+        self.assertEqual(Backend(self.p).recover(wf)["status"],
+                         "INTERRUPTED_BLOCKED")
+
     def test_legacy_owner_db_schema_must_not_auto_migrate(self):
         workflow=self.b.create(C_GOAL,"req_g164oldschema")["workflow_id"]
         self.b.test(workflow)
