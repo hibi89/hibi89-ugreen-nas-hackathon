@@ -1,0 +1,389 @@
+"""G161 FlowPilot 3.0 LOCAL backend: persisted plan -> council -> approval -> synthetic run.
+
+Not Uliya, NAS, production automation, external API or general-purpose NLU.
+All owner-facing inputs are exact allowlisted goals; no owner file paths accepted.
+Only explicit local database creation is permitted. No vendor execution/network.
+"""
+from __future__ import annotations
+
+import argparse
+from contextlib import closing
+from hashlib import sha256
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+import hmac
+import json
+import os
+from pathlib import Path
+import re
+import secrets
+import sqlite3
+import stat
+import threading
+
+from flowpilot_task_compiler import compile_goal
+from flowpilot_code_council import run_council
+from flowpilot_repair_ledger import run_once, verify_record
+
+SCHEMA = "flowpilot-backend-local-v1"
+IDENTITY = "flowpilot-g161-owner-created-backend-v1"
+REQ = re.compile(r"req_[A-Za-z0-9_-]{8,48}\Z")
+WF = re.compile(r"wf_[0-9a-f]{32}\Z")
+MAX_BODY = 2048
+MAX_DB_BYTES = 16 * 1024 * 1024
+_ALLOWED_STATES = frozenset(("PLANNED", "TESTED", "APPROVED_SYNTHETIC",
+                             "RUNNING", "COMPLETE_LOCAL_SYNTHETIC", "BLOCKED",
+                             "INTERRUPTED_BLOCKED"))
+
+
+class BackendRefused(ValueError):
+    def __init__(self, code: str, status: int = 409):
+        self.code = code
+        self.status = status
+        super().__init__(code)
+
+
+def _hash(data: object) -> str:
+    return sha256(json.dumps(data, sort_keys=True, separators=(",", ":"),
+                             ensure_ascii=True).encode("ascii")).hexdigest()
+
+
+def _path_gate(path: Path, *, create: bool) -> None:
+    if (not isinstance(path, Path) or not path.is_absolute() or
+            path.suffix != ".sqlite" or not path.parent.is_dir() or
+            str(path).startswith(("//", "\\\\")) or path.is_symlink() or
+            any(p.is_symlink() for p in (path.parent, *path.parent.parents))):
+        raise BackendRefused("DB_PATH_DENIED", 400)
+    if create and path.exists():
+        raise BackendRefused("DB_EXISTS_NO_OVERWRITE", 409)
+    if not create:
+        try:
+            s = path.stat()
+            if (not stat.S_ISREG(s.st_mode) or not 0 < s.st_size < MAX_DB_BYTES or
+                    (os.name != "nt" and s.st_nlink != 1)):
+                raise BackendRefused("DB_NOT_OWNED_OR_OVERSIZED")
+        except OSError as exc:
+            raise BackendRefused("DB_NOT_FOUND") from exc
+
+
+class Backend:
+    def __init__(self, path: Path, *, create: bool = False):
+        _path_gate(path, create=create)
+        self.path = path
+        self.lock = threading.RLock()
+        if create:
+            flags = os.O_CREAT | os.O_EXCL | os.O_RDWR | getattr(os, "O_NOFOLLOW", 0)
+            try:
+                fd = os.open(path, flags, 0o600)
+                os.close(fd)
+            except OSError as exc:
+                raise BackendRefused("DB_EXCLUSIVE_CREATE_FAILED") from exc
+            with self._connect() as db:
+                db.execute("CREATE TABLE fp_backend_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL)")
+                db.execute("INSERT INTO fp_backend_meta VALUES('identity',?)", (IDENTITY,))
+                db.execute("CREATE TABLE fp_backend_workflows ("
+                           "wf_id TEXT PRIMARY KEY, request_id TEXT NOT NULL UNIQUE,"
+                           "goal TEXT NOT NULL, template TEXT NOT NULL, plan_sha TEXT NOT NULL,"
+                           "state TEXT NOT NULL, receipt_sha TEXT)")
+                db.execute("CREATE TABLE fp_backend_events (wf_id TEXT NOT NULL, "
+                           "seq INTEGER NOT NULL, kind TEXT NOT NULL, "
+                           "previous_sha TEXT NOT NULL, event_sha TEXT NOT NULL,"
+                           "PRIMARY KEY(wf_id, seq))")
+        with self._connect() as db:
+            try:
+                if db.execute("SELECT value FROM fp_backend_meta WHERE key='identity'").fetchone() != (IDENTITY,):
+                    raise BackendRefused("DB_IDENTITY_MISMATCH")
+            except sqlite3.Error as exc:
+                raise BackendRefused("DB_IDENTITY_MISSING") from exc
+
+    def _connect(self):
+        _path_gate(self.path, create=False)
+        db = sqlite3.connect(self.path.as_uri() + "?mode=rw", uri=True, timeout=3)
+        db.execute("PRAGMA busy_timeout=3000")
+        db.execute("PRAGMA foreign_keys=ON")
+        return db
+
+    @staticmethod
+    def _event(db, wf_id: str, kind: str):
+        row = db.execute("SELECT seq,event_sha FROM fp_backend_events WHERE wf_id=? "
+                         "ORDER BY seq DESC LIMIT 1", (wf_id,)).fetchone()
+        seq, prev = (row[0]+1, row[1]) if row else (1, "0"*64)
+        digest = _hash({"wf_id":wf_id, "seq":seq, "kind":kind, "previous_sha":prev})
+        db.execute("INSERT INTO fp_backend_events VALUES (?,?,?,?,?)",
+                   (wf_id, seq, kind, prev, digest))
+
+    @staticmethod
+    def _row(db, wf_id):
+        if not isinstance(wf_id, str) or WF.fullmatch(wf_id) is None:
+            raise BackendRefused("WORKFLOW_ID_INVALID", 400)
+        row = db.execute("SELECT wf_id, request_id, goal, template, plan_sha, state, receipt_sha "
+                         "FROM fp_backend_workflows WHERE wf_id=?", (wf_id,)).fetchone()
+        if row is None:
+            raise BackendRefused("WORKFLOW_NOT_FOUND", 404)
+        if row[5] not in _ALLOWED_STATES:
+            raise BackendRefused("WORKFLOW_STATE_CORRUPT")
+        return row
+
+    @staticmethod
+    def _verify_events(db, wf_id):
+        rows = db.execute("SELECT seq,kind,previous_sha,event_sha FROM fp_backend_events "
+                          "WHERE wf_id=? ORDER BY seq", (wf_id,)).fetchall()
+        prev="0"*64
+        if not rows:
+            raise BackendRefused("EVENT_CHAIN_MISSING")
+        for i,(seq,kind,prior,digest) in enumerate(rows,1):
+            if (seq!=i or prior!=prev or
+                    digest!=_hash({"wf_id":wf_id,"seq":i,"kind":kind,"previous_sha":prior})):
+                raise BackendRefused("EVENT_CHAIN_INVALID")
+            prev=digest
+        return {"integrity":"LOCAL_HASH_CHAIN_INTACT_NOT_NOTARIZED",
+                "event_count":len(rows),"last_event_sha256":prev}
+
+    @staticmethod
+    def _public(row, proof):
+        return {"schema":SCHEMA, "workflow_id":row[0], "template":row[3],
+                "plan_sha256":row[4], "status":row[5], "receipt_sha256":row[6],
+                **proof, "synthetic_only":True, "owner_files_accessed":False,
+                "nas_verified":False, "registered_expert_invoked":False,
+                "production_applied":False, "devpost_submitted":False,
+                "release_gate":"HOLD"}
+
+    def create(self, goal, request_id):
+        if type(goal) is not str or type(request_id) is not str or not REQ.fullmatch(request_id):
+            raise BackendRefused("INVALID_INPUT",400)
+        plan=compile_goal(goal)
+        if plan.get("status")!="READY_FOR_SYNTHETIC_TEST":
+            raise BackendRefused("UNSUPPORTED_GOAL",422)
+        sha=_hash(plan)
+        with self.lock, closing(self._connect()) as db:
+            db.execute("BEGIN IMMEDIATE")
+            old=db.execute("SELECT wf_id,goal FROM fp_backend_workflows WHERE request_id=?",
+                           (request_id,)).fetchone()
+            if old:
+                if old[1]!=goal:
+                    raise BackendRefused("IDEMPOTENCY_KEY_CONFLICT")
+                db.commit()
+                return self.get(old[0])
+            wf_id="wf_"+secrets.token_hex(16)
+            db.execute("INSERT INTO fp_backend_workflows VALUES(?,?,?,?,?,?,NULL)",
+                       (wf_id,request_id,goal,plan["template"],sha,"PLANNED"))
+            self._event(db,wf_id,"CREATED")
+            db.commit()
+        return self.get(wf_id)
+
+    def get(self,wf_id):
+        with self.lock, closing(self._connect()) as db:
+            row=self._row(db,wf_id)
+            integrity=self._verify_events(db,wf_id)
+            return self._public(row,integrity)
+
+    def test(self,wf_id):
+        with self.lock, closing(self._connect()) as db:
+            row=self._row(db,wf_id)
+            self._verify_events(db,wf_id)
+            if row[5] in ("TESTED","APPROVED_SYNTHETIC","COMPLETE_LOCAL_SYNTHETIC"):
+                return self.get(wf_id)
+            if row[5]!="PLANNED":
+                raise BackendRefused("TEST_STATE_CONFLICT")
+            checked=run_council(row[2])
+            good=(checked.get("status")=="OFFLINE_COUNCIL_REHEARSAL_PASS"
+                  and checked.get("actual_nas_verified") is False
+                  and checked.get("owner_nas_accessed") is False
+                  and checked.get("fixture_executed") is True)
+            receipt=_hash({"goal_sha":row[4],"status":checked.get("status"),
+                           "trace":checked.get("trace",[])})
+            db.execute("BEGIN IMMEDIATE")
+            db.execute("UPDATE fp_backend_workflows SET state=?, receipt_sha=? WHERE wf_id=?",
+                       ("TESTED" if good else "BLOCKED",receipt,wf_id))
+            self._event(db,wf_id,"SYNTHETIC_QA_PASS" if good else "SYNTHETIC_QA_BLOCKED")
+            db.commit()
+            return self.get(wf_id)
+
+    def approve(self,wf_id,plan_sha,ack):
+        if type(plan_sha) is not str or type(ack) is not str:
+            raise BackendRefused("APPROVAL_INPUT_INVALID",400)
+        with self.lock, closing(self._connect()) as db:
+            row=self._row(db,wf_id)
+            self._verify_events(db,wf_id)
+            if plan_sha!=row[4] or ack!="APPROVE_SYNTHETIC_ONLY":
+                raise BackendRefused("EXACT_SYNTHETIC_APPROVAL_REQUIRED",403)
+            if row[5]=="APPROVED_SYNTHETIC":
+                return self.get(wf_id)
+            if row[5]!="TESTED":
+                raise BackendRefused("APPROVAL_STATE_CONFLICT")
+            db.execute("BEGIN IMMEDIATE")
+            db.execute("UPDATE fp_backend_workflows SET state='APPROVED_SYNTHETIC' WHERE wf_id=?",
+                       (wf_id,))
+            self._event(db,wf_id,"SYNTHETIC_ONLY_APPROVED")
+            db.commit()
+            return self.get(wf_id)
+
+    def run(self,wf_id):
+        with self.lock, closing(self._connect()) as db:
+            row=self._row(db,wf_id)
+            self._verify_events(db,wf_id)
+            if row[5]=="COMPLETE_LOCAL_SYNTHETIC":
+                return self.get(wf_id)
+            if row[5]!="APPROVED_SYNTHETIC":
+                raise BackendRefused("RUN_STATE_CONFLICT")
+            # Commit reservation BEFORE calling the already replay-protected
+            # G119 engine. A crash leaves RUNNING, never silently reruns.
+            db.execute("BEGIN IMMEDIATE")
+            db.execute("UPDATE fp_backend_workflows SET state='RUNNING' WHERE wf_id=?", (wf_id,))
+            self._event(db,wf_id,"RUN_RESERVED")
+            db.commit()
+            run_id="run_"+wf_id[3:]
+            result=run_once(row[2],run_id,db)
+            try:
+                integrity=verify_record(db,run_id)
+                intact=integrity["status"]=="LOCAL_CHAIN_INTACT"
+            except (ValueError,sqlite3.Error):
+                intact=False
+            good=result.get("status")=="SYNTHETIC_LEDGER_PASS" and intact
+            receipt=result.get("receipt_sha256") if good else None
+            db.execute("BEGIN IMMEDIATE")
+            db.execute("UPDATE fp_backend_workflows SET state=?, receipt_sha=? WHERE wf_id=?",
+                       ("COMPLETE_LOCAL_SYNTHETIC" if good else "BLOCKED",receipt,wf_id))
+            self._event(db,wf_id,"LOCAL_SYNTHETIC_RUN_PASS" if good else "RUN_BLOCKED")
+            db.commit()
+            return self.get(wf_id)
+
+    def recover(self,wf_id):
+        """Explicit reconciliation after restart. Never reruns a reserved job."""
+        with self.lock, closing(self._connect()) as db:
+            row=self._row(db,wf_id)
+            self._verify_events(db,wf_id)
+            if row[5]!="RUNNING":
+                return self.get(wf_id)
+            run_id="run_"+wf_id[3:]
+            try:
+                result=verify_record(db,run_id)
+                intact=result["status"]=="LOCAL_CHAIN_INTACT"
+                outcome=db.execute("SELECT status,final_sha FROM fp119_runs WHERE run_id=?",
+                                   (run_id,)).fetchone()
+            except (ValueError,sqlite3.Error):
+                intact=False;outcome=None
+            good=bool(intact and outcome and outcome[0]=="PASS")
+            db.execute("BEGIN IMMEDIATE")
+            db.execute("UPDATE fp_backend_workflows SET state=?,receipt_sha=? WHERE wf_id=?",
+                       ("COMPLETE_LOCAL_SYNTHETIC" if good else "INTERRUPTED_BLOCKED",
+                        outcome[1] if good else None,wf_id))
+            self._event(db,wf_id,"RUN_RECONCILED_WITH_LEDGER" if good else "RUN_INTERRUPTED_NO_RETRY")
+            db.commit()
+            return self.get(wf_id)
+
+
+def create_server(backend: Backend, token: str, *, port: int=0):
+    if type(token) is not str or len(token)<32 or len(token)>256:
+        raise BackendRefused("TOKEN_MUST_BE_32_PLUS_CHARS",400)
+    class Handler(BaseHTTPRequestHandler):
+        server_version="FlowPilotLocal/1"
+        def log_message(self, format, *args):
+            return  # no owner IDs/tokens/paths in logs
+        def send(self,status,data):
+            raw=json.dumps(data,sort_keys=True).encode("utf-8")
+            self.send_response(status)
+            for k,v in (("Content-Type","application/json; charset=utf-8"),
+                        ("Cache-Control","no-store"),("X-Content-Type-Options","nosniff"),
+                        ("Content-Security-Policy","default-src 'none'"),
+                        ("Content-Length",str(len(raw)))):
+                self.send_header(k,v)
+            self.end_headers()
+            self.wfile.write(raw)
+        def guarded(self):
+            host=self.headers.get("Host","")
+            valid={f"127.0.0.1:{self.server.server_port}",
+                   f"localhost:{self.server.server_port}","127.0.0.1","localhost"}
+            origin=self.headers.get("Origin")
+            if host not in valid or (origin is not None and origin not in
+                  {f"http://127.0.0.1:{self.server.server_port}",
+                   f"http://localhost:{self.server.server_port}"}):
+                self.send(403,{"error":"HOST_ORIGIN_DENIED"});return False
+            auth=self.headers.get("Authorization","")
+            if not hmac.compare_digest(auth,"Bearer "+token):
+                self.send(403,{"error":"AUTH_REQUIRED"});return False
+            return True
+        def dispatch(self,method):
+            if not self.guarded():return
+            path=self.path
+            if "?" in path or "#" in path:
+                self.send(404,{"error":"NO_QUERY_PATH"});return
+            try:
+                if method=="GET":
+                    if path=="/v1/health":
+                        data={"schema":SCHEMA,"status":"LOCAL_BACKEND_READY",
+                              "nas_verified":False,"release_gate":"HOLD"}
+                    elif re.fullmatch(r"/v1/workflows/wf_[0-9a-f]{32}",path):
+                        data=backend.get(path.rsplit("/",1)[-1])
+                    else:
+                        self.send(404,{"error":"UNKNOWN_ROUTE"});return
+                else:
+                    if self.headers.get("Transfer-Encoding") is not None:
+                        self.send(400,{"error":"CHUNKED_BODY_REFUSED"});return
+                    ct=self.headers.get("Content-Type","")
+                    if ct!="application/json":
+                        self.send(415,{"error":"JSON_ONLY"});return
+                    try:size=int(self.headers.get("Content-Length","-1"))
+                    except ValueError:size=-1
+                    if size<2 or size>MAX_BODY:
+                        self.send(413,{"error":"BODY_LIMIT"});return
+                    try:body=json.loads(self.rfile.read(size))
+                    except (ValueError,UnicodeError):
+                        self.send(400,{"error":"INVALID_JSON"});return
+                    if type(body) is not dict:
+                        self.send(400,{"error":"JSON_OBJECT_REQUIRED"});return
+                    if path=="/v1/workflows":
+                        if set(body)!={"goal","request_id"}:
+                            raise BackendRefused("UNEXPECTED_KEYS",400)
+                        data=backend.create(body["goal"],body["request_id"])
+                    else:
+                        match=re.fullmatch(r"/v1/workflows/(wf_[0-9a-f]{32})/(test|approve|run|recover)",path)
+                        if not match:
+                            self.send(404,{"error":"UNKNOWN_ROUTE"});return
+                        wf,action=match.groups()
+                        if action=="approve":
+                            if set(body)!={"plan_sha256","acknowledgement"}:
+                                raise BackendRefused("UNEXPECTED_KEYS",400)
+                            data=backend.approve(wf,body["plan_sha256"],body["acknowledgement"])
+                        else:
+                            if body:
+                                raise BackendRefused("UNEXPECTED_KEYS",400)
+                            data=getattr(backend,action)(wf)
+                self.send(200,data)
+            except BackendRefused as exc:
+                self.send(exc.status,{"error":exc.code,"release_gate":"HOLD"})
+            except (OSError,sqlite3.Error,AssertionError,ValueError):
+                self.send(409,{"error":"LOCAL_BACKEND_REFUSED","release_gate":"HOLD"})
+        def do_GET(self):self.dispatch("GET")
+        def do_POST(self):self.dispatch("POST")
+    server=ThreadingHTTPServer(("127.0.0.1",port),Handler)
+    server.daemon_threads=True
+    return server
+
+
+def main(argv=None):
+    p=argparse.ArgumentParser(description="LOCAL synthetic FlowPilot backend, no real NAS")
+    p.add_argument("--db",type=Path,required=True)
+    p.add_argument("--init-db",action="store_true")
+    p.add_argument("--port",type=int,default=8766)
+    a=p.parse_args(argv)
+    token=os.environ.get("FLOWPILOT_LOCAL_API_TOKEN","")
+    try:
+        backend=Backend(a.db,create=a.init_db)
+        server=create_server(backend,token,port=a.port)
+    except (BackendRefused,OSError,sqlite3.Error):
+        print(json.dumps({"status":"LOCAL_BACKEND_START_REFUSED","release_gate":"HOLD"}))
+        return 2
+    try:
+        print(json.dumps({"status":"LOCAL_BACKEND_LISTENING_NOT_NAS",
+                          "url":f"http://127.0.0.1:{server.server_port}",
+                          "token_in_logs":False,"release_gate":"HOLD"}),flush=True)
+        server.serve_forever()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        server.server_close()
+    return 0
+
+
+if __name__=="__main__":
+    raise SystemExit(main())
