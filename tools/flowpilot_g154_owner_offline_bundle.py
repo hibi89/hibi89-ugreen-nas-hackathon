@@ -33,6 +33,12 @@ PACKAGE_FILES = ("verify_g147.py", "candidate/" + PDF,
                  "candidate/" + ZIP, "candidate/" + MANIFEST,
                  "RUN_VERIFY_G147.cmd", "README.txt")
 BUNDLE_MANIFEST = "BUNDLE_INTEGRITY.json"
+# G155: public, independently pinned hashes for the *previously distributed* G154
+# runner, owner instructions and Windows launcher. Do NOT rely on the editable
+# BUNDLE_INTEGRITY.json alone for executable/operational-file trust.
+LEGACY_G154_VERIFIER_SHA256 = "9dc36fcaf425569dbe9d827c078babf6e0277daec9b5981526f45147a0e5d113"
+TRUSTED_WINDOWS_LAUNCHER_SHA256 = "4a63f53c989a7b21ef35e2db84c29798b7607cb2894f25bd458015ac4a118796"
+TRUSTED_OWNER_README_SHA256 = "61c949a4d9f7bccda439138f885c73bd7c2375a8ff0c45b14e9cc7cbb08001b8"
 
 
 class Refused(ValueError):
@@ -213,6 +219,22 @@ def verify_package(raw: bytes) -> dict:
     for name in PACKAGE_FILES:
         if recorded["sha256"][name] != digest(parts[name]):
             raise Refused("BUNDLE_INTEGRITY_MISMATCH")
+    # A forged bundle can rewrite both a malicious runner and the SHA map.
+    # Verify executable and instruction bytes against an external trust anchor:
+    # the already-approved G154 runner or THIS trusted checkout's source.
+    # Running this check from an untrusted, already-modified runner cannot
+    # authenticate itself; owners should run it from the trusted repo.
+    try:
+        checkout_verifier_sha = digest(Path(__file__).read_bytes())
+    except OSError as exc:
+        raise Refused("TRUSTED_CHECKOUT_SOURCE_UNAVAILABLE") from exc
+    if digest(parts["verify_g147.py"]) not in (
+            LEGACY_G154_VERIFIER_SHA256, checkout_verifier_sha):
+        raise Refused("BUNDLE_RUNNER_NOT_TRUSTED")
+    if digest(parts["RUN_VERIFY_G147.cmd"]) != TRUSTED_WINDOWS_LAUNCHER_SHA256:
+        raise Refused("BUNDLE_WINDOWS_LAUNCHER_NOT_TRUSTED")
+    if digest(parts["README.txt"]) != TRUSTED_OWNER_README_SHA256:
+        raise Refused("BUNDLE_INSTRUCTIONS_NOT_TRUSTED")
     pair = verify_bytes(parts["candidate/" + PDF], parts["candidate/" + ZIP],
                         parts["candidate/" + MANIFEST])
     return {"status": "G154_OWNER_OFFLINE_BUNDLE_VERIFIED_NOT_SUBMITTED",

@@ -150,6 +150,38 @@ class TestG154OfflineOwnerBundle(unittest.TestCase):
                           'node /vendor', 'docker run', 'http://', 'https://'):
             self.assertNotIn(forbidden, source)
 
+
+    def _forged_with_recomputed_manifest(self, name, extra):
+        """Attacker updates both the operational file and its self-declared hash."""
+        output = self.base / 'owner-to-tamper.zip'
+        g154.build(self.folder, output)
+        with ZipFile(output) as archive:
+            parts = {n: archive.read(n) for n in archive.namelist()}
+        parts[name] += extra
+        recorded = json.loads(parts[g154.BUNDLE_MANIFEST])
+        recorded['sha256'][name] = sha256(parts[name]).hexdigest()
+        parts[g154.BUNDLE_MANIFEST] = json.dumps(recorded, sort_keys=True).encode()
+        destination = BytesIO()
+        with ZipFile(destination, 'w', ZIP_DEFLATED) as archive:
+            for filename, blob in parts.items():
+                archive.writestr(filename, blob)
+        return destination.getvalue()
+
+    def test_g155_recomputed_manifest_cannot_authenticate_malicious_python(self):
+        forged = self._forged_with_recomputed_manifest('verify_g147.py', b'\\nprint("compromised")\\n')
+        with self.assertRaisesRegex(g154.Refused, 'BUNDLE_RUNNER_NOT_TRUSTED'):
+            g154.verify_package(forged)
+
+    def test_g155_recomputed_manifest_cannot_authenticate_malicious_cmd(self):
+        forged = self._forged_with_recomputed_manifest('RUN_VERIFY_G147.cmd', b'\\r\\necho injected\\r\\n')
+        with self.assertRaisesRegex(g154.Refused, 'BUNDLE_WINDOWS_LAUNCHER_NOT_TRUSTED'):
+            g154.verify_package(forged)
+
+    def test_g155_recomputed_manifest_cannot_authenticate_malicious_readme(self):
+        forged = self._forged_with_recomputed_manifest('README.txt', b'\\nrun-untrusted.exe\\n')
+        with self.assertRaisesRegex(g154.Refused, 'BUNDLE_INSTRUCTIONS_NOT_TRUSTED'):
+            g154.verify_package(forged)
+
     def test_package_refuses_bare_arbitrary_input(self):
         with self.assertRaises(g154.Refused): g154.verify_package(b'notzip')
 
