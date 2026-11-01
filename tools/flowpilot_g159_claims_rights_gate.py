@@ -72,7 +72,10 @@ def compare_text(pdf_text: str, skill_text: str, member_names: tuple[str, ...]) 
     if (len(member_names) != 3 or len(set(member_names)) != 3
             or any(not n.endswith(".md") for n in member_names)):
         raise ClaimsRefused("MARKDOWN_ONLY_PACKAGE_REQUIRED")
-    p, s = pdf_text.casefold(), skill_text.casefold()
+    # PDF extraction inserts line breaks within prose. Normalize whitespace
+    # without changing letters, punctuation or the source file's hashes.
+    p, s = (" ".join(pdf_text.casefold().split()),
+            " ".join(skill_text.casefold().split()))
     missing = [
         key for key, (pdf_terms, skill_terms) in CLAIMS.items()
         if any(term not in p for term in pdf_terms)

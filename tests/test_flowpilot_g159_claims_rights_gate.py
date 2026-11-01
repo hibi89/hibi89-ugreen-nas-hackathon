@@ -48,6 +48,14 @@ class G159ClaimsTests(TestCase):
         self.assertIn("authentic_ugreen_creation_tool_and_first_party_checker",
                       result["external_verification_pending"])
 
+    def test_wrapped_pdf_prose_keeps_unchanged_claims(self):
+        p,s,names=texts()
+        wrapped=p.replace("not Uliya", "not\nUliya").replace(
+            "Owner must confirm", "Owner must\nconfirm")
+        result=g159.compare_text(wrapped,s,names)
+        self.assertEqual(result["documentary_claims_cross_referenced"],7)
+        self.assertEqual(result["release_gate"],"HOLD")
+
     def test_missing_consent_proof_refused(self):
         p,s,names=texts()
         with self.assertRaisesRegex(g159.ClaimsRefused,"scope_and_consent"):
