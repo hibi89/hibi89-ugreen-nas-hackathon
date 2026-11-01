@@ -37,7 +37,7 @@ function Assert-PlainDbParent([string]$Target) {
     if (($entry.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
       throw "DB ancestor is a symlink/junction/reparse point; refusing."
     }
-    $next = [System.IO.Path]::GetDirectoryName($parent.TrimEnd('\\','/'))
+    $next = [System.IO.Path]::GetDirectoryName($parent)
     if ([string]::IsNullOrEmpty($next) -or
         $next.Equals($parent, [System.StringComparison]::OrdinalIgnoreCase)) {
       break
