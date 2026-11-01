@@ -14,10 +14,17 @@ if (!globalThis.crypto?.subtle) {
 }
 const nativeFetch = globalThis.fetch;
 let rejectOneMetadataApproval = false;
+let rejectOneMetadataCancel = false;
 globalThis.fetch = (route, init) => {
   if (route === "/v1/local-metadata/approve" && rejectOneMetadataApproval) {
     rejectOneMetadataApproval = false;
     return Promise.resolve(new Response(JSON.stringify({error:"SIMULATED_HTTP_503"}), {
+      status:503, headers:{"Content-Type":"application/json"}
+    }));
+  }
+  if (route === "/v1/local-metadata/cancel" && rejectOneMetadataCancel) {
+    rejectOneMetadataCancel = false;
+    return Promise.resolve(new Response(JSON.stringify({error:"SIMULATED_CANCEL_TIMEOUT"}), {
       status:503, headers:{"Content-Type":"application/json"}
     }));
   }
@@ -93,6 +100,19 @@ async function main(){
   assert.equal(elems["meta-approve"].disabled,true);
   await click("meta-cancel");
   assert.match(elems["metadata-summary"].textContent,/CANCELED/);
+  // G176: a failed cancel reply must not retain a usable ticket or consent.
+  elems.required.value="README.md\\nnot-here.pdf";
+  await click("meta-preview");
+  elems["metadata-consent"].checked=true;
+  elems["metadata-consent"].fire("change");
+  rejectOneMetadataCancel = true;
+  await click("meta-cancel");
+  assert.equal(elems["metadata-consent"].checked,false,"cancel error revokes consent");
+  assert.equal(elems.required.value,"","cancel error clears private input");
+  assert.equal(elems["meta-approve"].disabled,true,"cancel error forbids old approval");
+  assert.equal(elems["meta-cancel"].disabled,true,"cancel error forbids stale cancel");
+  assert.match(elems["metadata-summary"].textContent,/검토 세션 없음/);
+  assert.match(elems.notice.textContent,/요청 거부|연결 오류/);
   elems.required.value="README.md\nnot-here.pdf";
   await click("meta-preview");
   elems["metadata-consent"].checked=true; elems["metadata-consent"].fire("change");

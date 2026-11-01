@@ -150,6 +150,35 @@ def run_browser():
                 assert page.locator("#required").input_value()==""
                 expect(page.locator("#metadata-consent")).not_to_be_checked()
                 expect(page.locator("#meta-approve")).to_be_disabled()
+
+                # G176: real backend completes cancellation, but browser
+                # loses the response. Old ticket and consent must be revoked.
+                page.locator("#required").fill("README.md")
+                page.locator("#meta-preview").click()
+                expect(page.locator("#metadata-summary")).to_contain_text("WAITING_APPROVAL")
+                page.locator("#metadata-consent").check()
+                canceled = []
+                def obscure_consumed_cancel(route):
+                    upstream = route.fetch()
+                    payload = upstream.json()
+                    canceled.append((upstream.status, payload.get("status"),
+                                     payload.get("approved_local_metadata_access")))
+                    route.fulfill(status=200, content_type="application/json", body="{")
+                page.route("**/v1/local-metadata/cancel", obscure_consumed_cancel, times=1)
+                page.locator("#meta-cancel").click()
+                expect(page.locator("#notice")).to_contain_text("요청 거부 또는 연결 오류")
+                expect(page.locator("#metadata-summary")).to_have_text("검토 세션 없음")
+                assert canceled == [(200, "CANCELED", False)]
+                expect(page.locator("#metadata-consent")).not_to_be_checked()
+                expect(page.locator("#meta-approve")).to_be_disabled()
+                expect(page.locator("#meta-cancel")).to_be_disabled()
+                assert page.locator("#required").input_value() == ""
+                page.locator("#required").fill("README.md")
+                page.locator("#meta-preview").click()
+                expect(page.locator("#metadata-summary")).to_contain_text("WAITING_APPROVAL")
+                expect(page.locator("#meta-approve")).to_be_disabled()
+                page.locator("#meta-cancel").click()
+                expect(page.locator("#metadata-summary")).to_contain_text("CANCELED")
                 page.locator("#token").fill("short")
                 page.locator("#connect").click()
                 expect(page.locator("#create")).to_be_disabled()
@@ -163,7 +192,8 @@ def run_browser():
                               "AUDIT_EVIDENCE","CSV_SHA_DOWNLOAD","METADATA_CONSENT",
                               "INVALID_REAUTH_CLEARS_AUTH",
                               "METADATA_APPROVAL_REPLY_LOSS_FAIL_CLOSED",
-                              "METADATA_PREVIEW_FAILURE_REVOKES_CONSENT"],
+                              "METADATA_PREVIEW_FAILURE_REVOKES_CONSENT",
+                              "METADATA_CANCEL_REPLY_LOSS_FAIL_CLOSED"],
                     "real_nas_verified":False,"trial_started":False,"release_gate":"HOLD"
                 }
         finally:

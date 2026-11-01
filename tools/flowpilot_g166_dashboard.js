@@ -195,8 +195,18 @@ el("meta-approve").addEventListener("click", () => act(async () => {
 }));
 el("meta-cancel").addEventListener("click", () => act(async () => {
   if (!review || review.status !== "WAITING_APPROVAL") throw Error("취소 가능한 검토 없음");
-  review = await json("/v1/local-metadata/cancel", {review_id:review.review_id});
-  el("metadata-consent").checked = false; status("검토 취소 · 메타데이터 읽기 없음"); output(review);
+  // A cancel may be accepted server-side while the client loses the reply.
+  // Revoke the browser's ticket/consent before dispatch, even on HTTP failure.
+  const reviewId = review.review_id;
+  review = null;
+  el("metadata-consent").checked = false;
+  el("required").value = "";
+  const canceled = await json("/v1/local-metadata/cancel", {review_id:reviewId});
+  if (canceled.review_id !== reviewId || canceled.status !== "CANCELED" ||
+      canceled.approved_local_metadata_access !== false)
+    throw Error("취소 응답 검증 실패 · 새로운 검토가 필요합니다.");
+  review = canceled;
+  status("검토 취소 확인 · 메타데이터 읽기 없음"); output(review);
 }));
 el("meta-status").addEventListener("click", () => act(async () => {
   if (!review) throw Error("검토 세션 없음");
