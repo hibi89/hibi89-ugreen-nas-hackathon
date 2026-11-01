@@ -182,11 +182,15 @@ el("meta-preview").addEventListener("click", () => act(async () => {
 el("meta-approve").addEventListener("click", () => act(async () => {
   if (!review || review.status !== "WAITING_APPROVAL" || !el("metadata-consent").checked)
     throw Error("검토 및 별도 동의가 필요합니다.");
+  // Exact one-use approval can be consumed server-side even when the client
+  // never receives the reply. Never keep an actionable ticket after dispatch.
+  const ticket = review;
+  review = null;
+  el("metadata-consent").checked = false;
   review = await json("/v1/local-metadata/approve", {
-    review_id:review.review_id, scope_sha256:review.scope_sha256,
+    review_id:ticket.review_id, scope_sha256:ticket.scope_sha256,
     acknowledgement:"APPROVE_LOCAL_METADATA_READ_ONLY"
   });
-  el("metadata-consent").checked = false;
   status("로컬 메타데이터 1회 읽기 종료 · NAS 검증 아님"); output(review);
 }));
 el("meta-cancel").addEventListener("click", () => act(async () => {
