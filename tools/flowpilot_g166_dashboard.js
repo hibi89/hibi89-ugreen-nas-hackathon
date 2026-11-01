@@ -71,6 +71,8 @@ el("connect").addEventListener("click", () => act(async () => {
   // A new login attempt invalidates any previous authority even if input is bad.
   token = ""; workflow = null; verifiedPlan = null; review = null;
   el("synthetic-consent").checked = false; el("metadata-consent").checked = false;
+  el("required").value = "";
+  el("existing").replaceChildren(new Option("선택 안 함", ""));
   el("connection-status").textContent = "기존 세션 폐기 · 인증 확인 중";
   if (candidate.length < 32 || candidate.length > 256) throw Error("토큰 길이는 32–256자여야 합니다.");
   token = candidate;
@@ -86,6 +88,7 @@ el("connect").addEventListener("click", () => act(async () => {
 el("disconnect").addEventListener("click", () => {
   token = ""; workflow = null; verifiedPlan = null; review = null;
   el("token").value = ""; el("required").value = "";
+  el("existing").replaceChildren(new Option("선택 안 함", ""));
   el("synthetic-consent").checked = false; el("metadata-consent").checked = false;
   el("connection-status").textContent = "연결 해제 · 토큰 폐기";
   status("로컬 세션 연결 해제"); output("토큰은 저장되지 않습니다."); sync();
@@ -165,10 +168,15 @@ el("report").addEventListener("click", () => act(async () => {
   output({status:"LOCAL_SYNTHETIC_CSV_SHA_VERIFIED", sha256:computed, byte_length:bytes.byteLength, real_nas_verified:false});
 }));
 el("meta-preview").addEventListener("click", () => act(async () => {
-  const required = el("required").value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+  // Starting a NEW review must revoke old consent/review even when the new
+  // input is invalid or the HTTP preview is refused. Clear raw paths first.
+  const raw = el("required").value;
+  el("required").value = "";
+  review = null;
+  el("metadata-consent").checked = false;
+  const required = raw.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
   if (required.length < 1 || required.length > 20) throw Error("경로 1–20개가 필요합니다.");
   review = await json("/v1/local-metadata/preview", {goal:"check required files",required});
-  el("required").value = ""; el("metadata-consent").checked = false;
   status("로컬 메타데이터 읽기 전 미리보기 · 아직 파일 미조회"); output(review);
 }));
 el("meta-approve").addEventListener("click", () => act(async () => {
