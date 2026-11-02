@@ -1,3 +1,16 @@
+## 2026-11-03 KST — G210 FEATURE CI CONFIRMED, CREATOR STILL NOT RUN
+
+1. **Goal:** Correct Round1 evidence classification for a supported Uliya Creator-produced new FlowPilot candidate; Checker execution not explicitly mandatory in Round1, but true Creator and rights remain mandatory.
+2. **Code:** G53 splits mandatory Creator receipt from optional all-or-none Checker fields; G57 shows `operator_checker_report_status` without exposing source. No false Checker PASS or release, no existing full-receipt regression broken.
+3. **Actual CI:** Exact feature SHA `8e24ae78d5367d51168f0281f989d95a77f5a2a9`, Actions Linux+Windows full regression 41498719957 SUCCESS, offline readiness 41498719888 SUCCESS, master 41498720067 SUCCESS, closeout 41498720225 SUCCESS **4/4**. Five new tests included. Exact per-suite counts NOT_VERIFIED; Windows and Linux job statuses verified via GitHub. Docs-only closeout SHA/CI must be checked separately.
+4. **Current:** G210 code CI DONE; genuine official Creator run/new independent source/provenance NOT_EVIDENCED, first-party Checker NOT_RUN, owner AI/IP/license signoff/PDF-ZIP final release PENDING; NAS technical NO-GO, 3h trial untouched, Devpost NOT_SUBMITTED, RELEASE HOLD. Unmeasured subjective ~90% unchanged.
+5. **Issue/decision:** Previous G53 conflated Creator receipt with Checker fields and returned `INCOMPLETE_CREATOR_REPORT` when Round1 did not run Checker. Choose honest omission explicitly reported over fabricated successful Checker data; partial checker report fails closed.
+6. **Repo/SHA/paths:** `hibi89/hibi89-ugreen-nas-hackathon@lead/ugreen`, changed `tools/g53_flowpilot_creator_gate.py`, `tools/g57_flowpilot_creator_candidate_intake.py`, matching test files and status docs; rollback to pre-G210 `94215590169ab7e5d67c5526a4ba8b71881018f3` via normal Git no force.
+7. **Environment:** GitHub Actions offline only; production Vercel N/A. No Codex, Claude, WorkBuddy, official Checker, NAS or approved external API calls.
+8. **Originals:** Existing private G188 ZIP/G157 PDF/Kit 0.7.3 and G207 workspace untouched; no private bytes or credentials to public GitHub.
+9. **Next/approvals:** Actual official Creator from a supported environment after distinct owner-approved AI provider/brief transmission; collect independently reviewable genuine invocation/sha/new candidate, review AI/IP/source and separately owner-approve final PDF/ZIP and Devpost. Checker optional Round1 and requires separate permission if run, NAS trial held.
+10. **Time/scope:** 2026-11-03 KST, feature SHA 4/4 live CI verified; subsequent docs commit separately verified.
+
 ## 2026-11-03 KST — G210 CREATOR-ONLY ROUND1 EVIDENCE REPORTING, HOLD
 
 1. **Goal:** Truthfully report actual official Creator run evidence when Round1 Checker is omitted; comply with official Rule separation while retaining strict owner release.
