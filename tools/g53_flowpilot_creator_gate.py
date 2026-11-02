@@ -56,14 +56,25 @@ def review_creator_evidence(
     if header is None:
         return {**result, "status": "WRONG_SKILL_ID"}
     names = []
+    fields = []
+    descriptions = []
     for line in header.group(1).splitlines():
         if ":" not in line:
             return {**result, "status": "WRONG_SKILL_ID"}
         key, value = line.split(":", 1)
-        if key.strip() == "name":
-            names.append(value.strip().strip("'\""))
+        key, value = key.strip(), value.strip().strip("'\"")
+        fields.append(key)
+        if key == "name":
+            names.append(value)
+        elif key == "description":
+            descriptions.append(value)
     if len(names) != 1 or names[0] != expected_name:
         return {**result, "status": "WRONG_SKILL_ID"}
+    # G212: the pinned official Skill format permits exactly two keys.
+    # A permissive review here would misclassify an unsupported Skill header.
+    if (len(fields) != 2 or set(fields) != {"name", "description"}
+            or len(descriptions) != 1 or not 1 <= len(descriptions[0]) <= 1024):
+        return {**result, "status": "INVALID_SKILL_FRONTMATTER"}
     actual_hash = hashlib.sha256(source).hexdigest()
     result["actual_generated_sha256"] = actual_hash
     if not isinstance(declaration, Mapping):

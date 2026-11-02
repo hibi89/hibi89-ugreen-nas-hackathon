@@ -1,3 +1,16 @@
+## 2026-11-03 KST — G212 OFFICIAL TWO-KEY SKILL HEADER ENFORCEMENT, RELEASE HOLD
+
+1. **Goal:** Round1 FlowPilot Skill compliance with pinned 0.7.3 official standard: `SKILL.md` frontmatter has exactly `name` and `description`; preserve originals, genuine official Creator requirement and Nov 16 16:45 KST deadline.
+2. **Choice/implementation:** Validator warning-only vs deny unsupported fields; chose fail-closed minimal G53/G57 source change. Handles reordered/quoted keys, refuses extra key, missing and empty description. No release changes.
+3. **Tests:** Actual private G188 ZIP integrity and Markdown/reference/official two-field checks PASS (three files, 18,177B). Added three test methods with five invalid variants across original G53 and G57 test suites. Exact G212 Linux/Windows GitHub Actions **PENDING** until separately checked; G211 4/4 historical only.
+4. **Current:** Official Creator exact new FlowPilot run/provenance NOT_EVIDENCED; first-party Checker optional for Round1 but NOT_RUN; owner AI/IP/signoff and Devpost NOT_DONE. RELEASE HOLD; technical NAS NO-GO, 3h trial unspent; previous ~90% subjective.
+5. **Issue/pivot:** Official `skill-format.md`: only two frontmatter fields. G53 previously did not check the description and G57 accepted unknown metadata. Prevent false structurally acceptable inspection without fabricating Creator. Static checks still not genuine Creator provenance.
+6. **Repo:** `hibi89/hibi89-ugreen-nas-hackathon@lead/ugreen`, base `db12ac446acb3423f3c330d75309bbc45966c52b`, changed two validators, two existing test suites, STATUS/HANDOFF. Normal revert to base if regression; no force push or external public artifact.
+7. **Environment:** GitHub Linux/Windows offline-only tests, Vercel N/A. No Codex/Claude/WorkBuddy official Creator, JS Checker, NAS, expert API or Devpost run.
+8. **Originals:** Private G188/G157/Kit/G207 package unchanged and not pushed. Only synthetic fixtures and sanitized evidence in public GitHub.
+9. **Next:** Verify actual feature SHA and CI. Real official Creator after separate explicit consent for sanitized brief AI provider use; obtain new source/provenance; owner signoff exact final PDF+ZIP; Devpost separately authorized. Avoid repetitive non-functional packages.
+10. **Time:** 2026-11-03 KST; real source and official pinned Kit specification reviewed, CI pending.
+
 ## 2026-11-03 KST — G211 FEATURE CI 4/4 SUCCESS, REAL OFFICIAL CREATOR STILL NOT RUN
 
 1. **Goal:** Ensure G53/G57 consistently accept valid unordered Skill YAML frontmatter without accepting duplicate/missing/spoofed identity; Round1 newly generated official Creator output still required.

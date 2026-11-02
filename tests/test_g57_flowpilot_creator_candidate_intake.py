@@ -217,6 +217,23 @@ class CreatorCandidateIntakeTests(unittest.TestCase):
         self.assertFalse(r["creator_execution_independently_verified"])
         self.assertEqual(r["release_gate"], "HOLD")
 
+    def test_g212_additional_frontmatter_field_rejected(self):
+        self.skill.write_text(
+            GOOD.replace("description: New candidate\n",
+                         "description: New candidate\nallowed-tools: shell\n"),
+            encoding="utf-8",
+        )
+        with self.assertRaises(CandidateError):
+            self.check()
+
+    def test_g212_missing_description_rejected(self):
+        self.skill.write_text(
+            GOOD.replace("description: New candidate\n", ""),
+            encoding="utf-8",
+        )
+        with self.assertRaises(CandidateError):
+            self.check()
+
     def test_g210_creator_only_report_distinguishes_optional_checker(self):
         from g53_flowpilot_creator_gate import EXPECTED_KIT_SHA
         skill = self.skill.read_bytes()

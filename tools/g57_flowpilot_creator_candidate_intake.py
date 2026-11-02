@@ -128,6 +128,9 @@ def inspect_candidate(
         if key in metadata:
             raise CandidateError("Duplicate frontmatter field")
         metadata[key] = value
+    # G212: official Skill format allows only name and description.
+    if set(metadata) != {"name", "description"} or len(metadata) != 2:
+        raise CandidateError("Unsupported Skill frontmatter fields")
     if metadata.get("name") != folder.name:
         raise CandidateError("Generated Skill name must match its exact candidate directory")
     if not 1 <= len(metadata.get("description", "")) <= 1024:

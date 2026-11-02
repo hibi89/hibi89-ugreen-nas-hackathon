@@ -185,6 +185,23 @@ class CreatorGate(unittest.TestCase):
                 declared(generated_skill_sha256=sha, checker_skill_sha256=sha))
         self.assertEqual(r["status"], "WRONG_SKILL_ID")
 
+    def test_g212_official_two_field_frontmatter_required(self):
+        # Official Kit 0.7.3 skill-format.md allows only two keys.
+        for source in (
+            b"---\nname: flowpilot-nas\ndescription: OK\n"
+            b"allowed-tools: shell\n---\n# Extra key\n",
+            b"---\nname: flowpilot-nas\n---\n# Missing description\n",
+            b"---\nname: flowpilot-nas\ndescription: ''\n---\n# Empty description\n",
+        ):
+            with self.subTest(label=source.splitlines()[-1]):
+                sha = hashlib.sha256(source).hexdigest()
+                declaration = {k: v for k, v in
+                               declared(generated_skill_sha256=sha).items()
+                               if not k.startswith("checker_")}
+                r = review_creator_evidence(source, declaration)
+                self.assertEqual(r["status"], "INVALID_SKILL_FRONTMATTER")
+                self.assertEqual(r["release_gate"], "HOLD")
+
     def test_no_skill_source(self):
         self.assertEqual(review_creator_evidence(b"not a skill",declared())["status"],"WRONG_SKILL_ID")
 
