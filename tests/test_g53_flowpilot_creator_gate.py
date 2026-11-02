@@ -7,7 +7,7 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/"tools"))
 from g53_flowpilot_creator_gate import (
-    EXPECTED_KIT_SHA, EXPECTED_SKILL_SHA, review_creator_evidence
+    EXPECTED_KIT_SHA, EXPECTED_SKILL_SHA, G188_SKILL_SHA, review_creator_evidence
 )
 
 SKILL=(ROOT/"skill/flowpilot-nas/SKILL.md").read_bytes()
@@ -79,6 +79,25 @@ class CreatorGate(unittest.TestCase):
         self.assertEqual(review_creator_evidence(SKILL,{})["status"],"INCOMPLETE_CREATOR_REPORT")
         self.assertEqual(review_creator_evidence(SKILL,declared(generated_skill_sha256="??"))["status"],
                          "INVALID_SHA_FORMAT")
+
+    def test_g198_g188_profile_is_separate_and_never_release(self):
+        self.assertEqual(G188_SKILL_SHA,
+                         "4baf816e7deafa7dec544d93209f8ae3d1fb6400515212d2eb1d9b5fe0f6acca")
+        draft = b"---\nname: flowpilot-3\ndescription: Safe only\n---\n# Goal\n"
+        h = hashlib.sha256(draft).hexdigest()
+        evidence = declared(generated_skill_sha256=h, checker_skill_sha256=h)
+        self.assertEqual(review_creator_evidence(draft, evidence)["status"], "WRONG_SKILL_ID")
+        r = review_creator_evidence(draft, evidence, candidate_profile="g188")
+        self.assertEqual(r["candidate"], "flowpilot-3")
+        self.assertEqual(r["status"], "GENERATED_SOURCE_DIFFERS_REVIEW_REQUIRED")
+        self.assertEqual(r["release_gate"], "HOLD")
+        self.assertIs(r["official_creator_execution_independently_verified"], False)
+
+    def test_g198_wrong_profile_and_old_source_refused(self):
+        r = review_creator_evidence(SKILL, declared(), candidate_profile="g188")
+        self.assertEqual(r["status"], "WRONG_SKILL_ID")
+        self.assertEqual(review_creator_evidence(SKILL, declared(),
+                         candidate_profile="unsupported")["status"], "INVALID_CANDIDATE_PROFILE")
 
     def test_no_skill_source(self):
         self.assertEqual(review_creator_evidence(b"not a skill",declared())["status"],"WRONG_SKILL_ID")

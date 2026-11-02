@@ -16,15 +16,26 @@ from typing import Mapping, Any
 EXPECTED_SKILL_SHA = "47d119123387ec46133a62fdec58ef42ca3852491b132d32798951a6430c233b"
 EXPECTED_KIT_SHA = "cf557e5a022e4297892f39768132855154232efdedeb726b2845450ccd70e1b3"
 NAME = "flowpilot-nas"
+# G198: G188 uses a distinct name/SHA and remains unverified by Creator.
+G188_SKILL_SHA = "4baf816e7deafa7dec544d93209f8ae3d1fb6400515212d2eb1d9b5fe0f6acca"
+PROFILES = {"flowpilot-nas": (NAME, EXPECTED_SKILL_SHA), "g188": ("flowpilot-3", G188_SKILL_SHA)}
 MAX_BYTES = 1_000_000
 SHA = re.compile(r"^[0-9a-f]{64}$")
 
 
-def review_creator_evidence(source: bytes | None, declaration: Mapping[str, Any] | None) -> dict:
-    """Return a pure, non-releasing machine gate (no raw source/path disclosure)."""
+def review_creator_evidence(
+    source: bytes | None, declaration: Mapping[str, Any] | None,
+    *, candidate_profile: str = "flowpilot-nas",
+) -> dict:
+    """Review a selected exact-source profile; operator claims never prove Creator use."""
+    selected = PROFILES.get(candidate_profile)
+    if selected is None:
+        return {"status": "INVALID_CANDIDATE_PROFILE", "release_gate": "HOLD"}
+    expected_name, expected_sha = selected
     result = {
-        "candidate": NAME,
-        "current_reviewed_skill_sha256": EXPECTED_SKILL_SHA,
+        "candidate": expected_name,
+        "candidate_profile": candidate_profile,
+        "current_reviewed_skill_sha256": expected_sha,
         "official_creator_execution_independently_verified": False,
         "live_nas_verified": False,
         "owner_release_approved": False,
@@ -39,7 +50,7 @@ def review_creator_evidence(source: bytes | None, declaration: Mapping[str, Any]
         decoded = source.decode("utf-8")
     except UnicodeDecodeError:
         return {**result, "status": "INVALID_SOURCE"}
-    if re.match(r"\A---\r?\nname: flowpilot-nas\r?\n", decoded) is None:
+    if re.match(r"\A---\r?\nname: " + re.escape(expected_name) + r"\r?\n", decoded) is None:
         return {**result, "status": "WRONG_SKILL_ID"}
     actual_hash = hashlib.sha256(source).hexdigest()
     result["actual_generated_sha256"] = actual_hash
@@ -65,7 +76,7 @@ def review_creator_evidence(source: bytes | None, declaration: Mapping[str, Any]
         or any(type(declaration[k]) is not int or declaration[k] != 0
                for k in ("checker_errors", "checker_warnings", "checker_info"))):
         return {**result, "status": "CHECKER_RESULT_NOT_CLEAN"}
-    if actual_hash != EXPECTED_SKILL_SHA:
+    if actual_hash != expected_sha:
         return {**result, "status": "GENERATED_SOURCE_DIFFERS_REVIEW_REQUIRED"}
     # A source-matched self-attested local report cannot prove which tool
     # generated it, establish ownership, or authorize a Devpost submission.
@@ -76,11 +87,12 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Offline FlowPilot Creator evidence boundary")
     parser.add_argument("--generated-skill", type=Path)
     parser.add_argument("--operator-receipt", type=Path)
+    parser.add_argument("--candidate-profile", choices=tuple(PROFILES), default="flowpilot-nas")
     args = parser.parse_args()
     if (args.generated_skill is None) != (args.operator_receipt is None):
         parser.error("Both --generated-skill and --operator-receipt must be provided")
     if args.generated_skill is None:
-        report = review_creator_evidence(None, None)
+        report = review_creator_evidence(None, None, candidate_profile=args.candidate_profile)
     else:
         p, receipt = args.generated_skill, args.operator_receipt
         if p.is_symlink() or p.name != "SKILL.md" or not p.is_file() or p.stat().st_size > MAX_BYTES:
@@ -91,7 +103,7 @@ def main() -> int:
             data = json.loads(receipt.read_text(encoding="utf-8"))
         except (UnicodeError, json.JSONDecodeError):
             parser.error("Invalid receipt JSON")
-        report = review_creator_evidence(p.read_bytes(), data)
+        report = review_creator_evidence(p.read_bytes(), data, candidate_profile=args.candidate_profile)
     print(json.dumps(report, indent=2))
     # This command never emits a release PASS. Status 0 means report rendered,
     # not creator authorization.

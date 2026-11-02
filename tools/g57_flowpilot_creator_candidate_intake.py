@@ -22,7 +22,7 @@ MAX_FILE = 1_000_000
 MAX_TOTAL = 10_000_000
 MAX_FILES = 100
 FRONT = re.compile(r"\A---\r?\n(.*?)\r?\n---\r?\n", re.S)
-LINK = re.compile(r"\]\((references/[a-z0-9][a-z0-9._-]*\.md)\)")
+LINK = re.compile(r"\]\((references/[A-Za-z0-9][A-Za-z0-9._-]*\.md)\)")
 ALL_REFERENCE_LINKS = re.compile(r"\]\((references/[^)]*)\)")
 SECRET = re.compile(
     r"AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{20,}|"
@@ -69,7 +69,7 @@ def inspect_candidate(
             continue
         if not path.is_file():
             raise CandidateError("Nonregular generated member")
-        if relative != "SKILL.md" and not re.fullmatch(r"references/[a-z0-9][a-z0-9._-]*\.md", relative):
+        if relative != "SKILL.md" and not re.fullmatch(r"references/[A-Za-z0-9][A-Za-z0-9._-]*\.md", relative):
             raise CandidateError("Unsupported generated member: only Markdown references allowed")
         if path.stat().st_size > MAX_FILE:
             raise CandidateError("Generated member exceeds 1MB")
@@ -126,7 +126,8 @@ def inspect_candidate(
         if x.casefold() not in doc.casefold()
         and not any(x.casefold() in raw.decode("utf-8").casefold() for raw in payload.values())
     ]
-    declaration = review_creator_evidence(skill, receipt)
+    profile = "g188" if metadata["name"] == "flowpilot-3" else "flowpilot-nas"
+    declaration = review_creator_evidence(skill, receipt, candidate_profile=profile)
     canonical_identity = metadata["name"] == CANONICAL_NAME
     return {
         "status": ("SOURCE_DIFF_IDENTITY_REVIEW_REQUIRED" if not canonical_identity
@@ -137,7 +138,7 @@ def inspect_candidate(
         "canonical_candidate": CANONICAL_NAME,
         "canonical_identity_matches": canonical_identity,
         "candidate_adoption_approved": False,
-        "operator_receipt_gate_scope": "flowpilot-nas-only",
+        "operator_receipt_gate_scope": profile,
         "skill_sha256": digest(skill),
         "baseline_sha256": digest(baseline),
         "source_matches_baseline": skill == baseline,

@@ -117,8 +117,30 @@ class CreatorCandidateIntakeTests(unittest.TestCase):
         self.assertFalse(result["candidate_adoption_approved"])
         self.assertEqual(result["status"], "SOURCE_DIFF_IDENTITY_REVIEW_REQUIRED")
         self.assertEqual(result["operator_receipt_status"], "CREATOR_NOT_EVIDENCED")
-        self.assertEqual(result["operator_receipt_gate_scope"], "flowpilot-nas-only")
+        self.assertEqual(result["operator_receipt_gate_scope"], "g188")
         self.assertEqual(result["release_gate"], "HOLD")
+
+    def test_g198_g188_uppercase_references_and_reported_receipt_hold(self):
+        alternate = self.root / "flowpilot-3"
+        (alternate / "references").mkdir(parents=True)
+        source = GOOD.replace("name: flowpilot-nas", "name: flowpilot-3")
+        source += "\n[contract](references/CAPABILITY_AND_PLAN_CONTRACT.md)\n"
+        (alternate / "SKILL.md").write_text(source, encoding="utf-8")
+        (alternate / "references" / "CAPABILITY_AND_PLAN_CONTRACT.md").write_text(
+            "# Reference only\n", encoding="utf-8")
+        raw = (alternate / "SKILL.md").read_bytes()
+        sha = hashlib.sha256(raw).hexdigest()
+        receipt = {"kit_sha256": "cf557e5a022e4297892f39768132855154232efdedeb726b2845450ccd70e1b3",
+                   "generated_skill_sha256": sha, "checker_skill_sha256": sha,
+                   "generation_performed": True, "official_tool_loaded": True,
+                   "checker_status": "static-pass", "checker_errors": 0,
+                   "checker_warnings": 0, "checker_info": 0}
+        r = inspect_candidate(alternate, BASE, receipt)
+        self.assertEqual(r["reference_count"], 1)
+        self.assertEqual(r["operator_receipt_gate_scope"], "g188")
+        self.assertEqual(r["operator_receipt_status"], "GENERATED_SOURCE_DIFFERS_REVIEW_REQUIRED")
+        self.assertEqual(r["release_gate"], "HOLD")
+        self.assertFalse(r["creator_execution_independently_verified"])
 
     def test_alt_identity_directory_mismatch_rejected(self):
         alternate = self.root / "flowpilot-3"
