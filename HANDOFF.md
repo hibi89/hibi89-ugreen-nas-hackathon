@@ -1,3 +1,16 @@
+## 2026-11-03 KST — G212 TWO-FIELD SKILL FORMAT EXACT CI VERIFIED, HOLD
+
+1. **Goal:** Validate official Uliya 0.7.3 strict `name`/`description` Skill frontmatter while preserving G188 original and Round1/owner restrictions.
+2. **Code:** `G53` and `G57` forbid extra/missing/blank metadata, still accept G211 field order, keep optional Checker reporting and unconditional HOLD. Three new regression methods with five invalid examples; no product scope change.
+3. **Tests:** Exact source GitHub SHA `c00860ec1b6d0c58a834c0f0d995b15c614576a4`; Linux+Windows functional workflow 41503820917 SUCCESS, readiness 41503821011 SUCCESS, master 41503820861 SUCCESS, closeout 41503820879 SUCCESS: **4/4**. Exact full test count NOT_VERIFIED from raw logs; don't inherit previous totals. New docs-only commit check independently.
+4. **Current:** G212 code+CI DONE; authentic official Creator-generated distinct Skill/provenance NOT_EVIDENCED, first-party Checker NOT_RUN, applicant license/IP and final exact PDF+ZIP approval PENDING, registered Expert/NAS/Devpost NOT_RUN; RELEASE HOLD, NAS technical NO-GO, 3h trial unspent. Historic 90% subjective.
+5. **Cause/stop:** Official `skill-format.md` accepts exactly two keys, previous validators permitted unapproved frontmatter. Updated both with minimal behavior change, actual G188 still matches and originals unchanged. No independent official Creator proof inferred from static validation.
+6. **Repo/rollback:** `hibi89/hibi89-ugreen-nas-hackathon@lead/ugreen`, G212 code `c00860ec1b6d0c58a834c0f0d995b15c614576a4`, parent `db12ac446acb3423f3c330d75309bbc45966c52b`; code/tests and STATUS/HANDOFF, normal Git revert only. Docs closeout SHA separately verify.
+7. **Environment:** GitHub Actions offline-only Linux+Windows; no Vercel deployment. No supported Codex/Claude/WorkBuddy Creator runtime or official Checker calls, NAS or external data transmission.
+8. **Inputs/security:** Private original G188 SHA `568ad542d829b07ca910ca974ca39f2c29ed210558a40354b6518cabfc73ceef`, G157 and official Kit 0.7.3 unchanged, no raw owner files/vendor scripts committed public.
+9. **Next human-gated work:** Authorize selected external AI provider's access to only sanitized G207 design and an official Uliya Creator generation request; obtain actual new Skill source/receipt with verifiable chronology and independent review. Separate owner final package and Devpost permission. NAS trial not required Round1.
+10. **Time/scope:** 2026-11-03 KST, G212 code SHA full CI 4/4 verified. No official Creator/Checker/NAS/Devpost execution.
+
 ## 2026-11-03 KST — G212 OFFICIAL TWO-KEY SKILL HEADER ENFORCEMENT, RELEASE HOLD
 
 1. **Goal:** Round1 FlowPilot Skill compliance with pinned 0.7.3 official standard: `SKILL.md` frontmatter has exactly `name` and `description`; preserve originals, genuine official Creator requirement and Nov 16 16:45 KST deadline.
