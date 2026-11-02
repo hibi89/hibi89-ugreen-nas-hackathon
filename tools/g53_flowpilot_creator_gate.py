@@ -56,13 +56,16 @@ def review_creator_evidence(
     result["actual_generated_sha256"] = actual_hash
     if not isinstance(declaration, Mapping):
         return {**result, "status": "INVALID_DECLARATION"}
-    required = ("kit_sha256", "generated_skill_sha256", "checker_skill_sha256",
-                "generation_performed", "official_tool_loaded", "checker_status",
-                "checker_errors", "checker_warnings", "checker_info")
-    if any(key not in declaration for key in required):
+    # G210: a Round1 Creator receipt is reviewable without a first-party
+    # Checker run. Checker fields remain all-or-none and NEVER authorize release.
+    creator_fields = ("kit_sha256", "generated_skill_sha256",
+                      "generation_performed", "official_tool_loaded")
+    checker_fields = ("checker_skill_sha256", "checker_status",
+                      "checker_errors", "checker_warnings", "checker_info")
+    if any(key not in declaration for key in creator_fields):
         return {**result, "status": "INCOMPLETE_CREATOR_REPORT"}
-    digests = [declaration.get(k) for k in ("kit_sha256", "generated_skill_sha256", "checker_skill_sha256")]
-    if not all(isinstance(v, str) and SHA.fullmatch(v) for v in digests):
+    creator_hashes = [declaration.get(k) for k in ("kit_sha256", "generated_skill_sha256")]
+    if not all(isinstance(v, str) and SHA.fullmatch(v) for v in creator_hashes):
         return {**result, "status": "INVALID_SHA_FORMAT"}
     if declaration["kit_sha256"] != EXPECTED_KIT_SHA:
         return {**result, "status": "KIT_VERSION_REVIEW_REQUIRED"}
@@ -70,12 +73,27 @@ def review_creator_evidence(
         return {**result, "status": "CREATOR_NOT_EVIDENCED"}
     if declaration["generated_skill_sha256"] != actual_hash:
         return {**result, "status": "GENERATED_SOURCE_SHA_MISMATCH"}
-    if declaration["checker_skill_sha256"] != actual_hash:
-        return {**result, "status": "CHECKER_SOURCE_SHA_MISMATCH"}
-    if (declaration["checker_status"] != "static-pass"
-        or any(type(declaration[k]) is not int or declaration[k] != 0
-               for k in ("checker_errors", "checker_warnings", "checker_info"))):
-        return {**result, "status": "CHECKER_RESULT_NOT_CLEAN"}
+    checker_present = [key for key in checker_fields if key in declaration]
+    if checker_present:
+        if len(checker_present) != len(checker_fields):
+            return {**result, "status": "INCOMPLETE_CHECKER_REPORT",
+                    "checker_report_status": "INCOMPLETE_UNTRUSTED_OPERATOR_REPORT"}
+        checked_sha = declaration["checker_skill_sha256"]
+        if not isinstance(checked_sha, str) or SHA.fullmatch(checked_sha) is None:
+            return {**result, "status": "INVALID_SHA_FORMAT",
+                    "checker_report_status": "INVALID_UNTRUSTED_OPERATOR_REPORT"}
+        if checked_sha != actual_hash:
+            return {**result, "status": "CHECKER_SOURCE_SHA_MISMATCH",
+                    "checker_report_status": "SOURCE_MISMATCH"}
+        if (declaration["checker_status"] != "static-pass"
+            or any(type(declaration[k]) is not int or declaration[k] != 0
+                   for k in ("checker_errors", "checker_warnings", "checker_info"))):
+            return {**result, "status": "CHECKER_RESULT_NOT_CLEAN",
+                    "checker_report_status": "OPERATOR_REPORT_NOT_CLEAN"}
+        result["checker_report_status"] = "OPERATOR_ATTESTED_ONLY_NOT_INDEPENDENTLY_VERIFIED"
+    else:
+        result["checker_report_status"] = "NOT_REPORTED_OPTIONAL_ROUND1"
+    result["official_checker_execution_independently_verified"] = False
     if actual_hash != expected_sha:
         return {**result, "status": "GENERATED_SOURCE_DIFFERS_REVIEW_REQUIRED"}
     # A source-matched self-attested local report cannot prove which tool

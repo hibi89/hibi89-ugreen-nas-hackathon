@@ -199,6 +199,23 @@ class CreatorCandidateIntakeTests(unittest.TestCase):
         self.assertFalse(result["candidate_adoption_approved"])
         self.assertEqual(result["status"], "SOURCE_DIFF_HUMAN_REVIEW_REQUIRED")
 
+    def test_g210_creator_only_report_distinguishes_optional_checker(self):
+        from g53_flowpilot_creator_gate import EXPECTED_KIT_SHA
+        skill = self.skill.read_bytes()
+        receipt = {
+            "kit_sha256": EXPECTED_KIT_SHA,
+            "generated_skill_sha256": hashlib.sha256(skill).hexdigest(),
+            "generation_performed": True, "official_tool_loaded": True,
+        }
+        report = self.check(BASE, receipt)
+        self.assertEqual(report["operator_checker_report_status"],
+                         "NOT_REPORTED_OPTIONAL_ROUND1")
+        self.assertEqual(report["operator_receipt_status"],
+                         "GENERATED_SOURCE_DIFFERS_REVIEW_REQUIRED")
+        self.assertFalse(report["creator_execution_independently_verified"])
+        self.assertFalse(report["entrant_release_approved"])
+        self.assertEqual(report["release_gate"], "HOLD")
+
     def test_g209_symlinked_grandparent_is_refused(self):
         actual = self.root / "actual"
         nested = actual / "nested" / "flowpilot-nas"

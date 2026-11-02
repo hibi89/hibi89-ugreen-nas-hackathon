@@ -99,6 +99,43 @@ class CreatorGate(unittest.TestCase):
         self.assertEqual(review_creator_evidence(SKILL, declared(),
                          candidate_profile="unsupported")["status"], "INVALID_CANDIDATE_PROFILE")
 
+    def test_g210_round1_creator_only_report_is_reviewable_but_not_releasable(self):
+        creator_only = {k: v for k, v in declared().items()
+                        if not k.startswith("checker_")}
+        r = review_creator_evidence(SKILL, creator_only)
+        self.assertEqual(r["status"], "SOURCE_MATCHED_OPERATOR_ATTESTATION_ONLY")
+        self.assertEqual(r["checker_report_status"], "NOT_REPORTED_OPTIONAL_ROUND1")
+        self.assertFalse(r["official_creator_execution_independently_verified"])
+        self.assertFalse(r["official_checker_execution_independently_verified"])
+        self.assertEqual(r["release_gate"], "HOLD")
+
+    def test_g210_new_source_without_checker_remains_review_hold(self):
+        changed = SKILL + b"\n# independently created source\n"
+        sha = hashlib.sha256(changed).hexdigest()
+        creator_only = {k: v for k, v in
+                        declared(generated_skill_sha256=sha).items()
+                        if not k.startswith("checker_")}
+        r = review_creator_evidence(changed, creator_only)
+        self.assertEqual(r["status"], "GENERATED_SOURCE_DIFFERS_REVIEW_REQUIRED")
+        self.assertEqual(r["checker_report_status"], "NOT_REPORTED_OPTIONAL_ROUND1")
+        self.assertEqual(r["release_gate"], "HOLD")
+
+    def test_g210_partial_checker_evidence_refused_without_false_pass(self):
+        creator_only = {k: v for k, v in declared().items()
+                        if not k.startswith("checker_")}
+        creator_only["checker_status"] = "static-pass"
+        r = review_creator_evidence(SKILL, creator_only)
+        self.assertEqual(r["status"], "INCOMPLETE_CHECKER_REPORT")
+        self.assertEqual(r["release_gate"], "HOLD")
+
+    def test_g210_creator_sha_mismatch_without_checker_cannot_pass(self):
+        creator_only = {k: v for k, v in declared().items()
+                        if not k.startswith("checker_")}
+        creator_only["generated_skill_sha256"] = "f" * 64
+        r = review_creator_evidence(SKILL, creator_only)
+        self.assertEqual(r["status"], "GENERATED_SOURCE_SHA_MISMATCH")
+        self.assertEqual(r["release_gate"], "HOLD")
+
     def test_no_skill_source(self):
         self.assertEqual(review_creator_evidence(b"not a skill",declared())["status"],"WRONG_SKILL_ID")
 

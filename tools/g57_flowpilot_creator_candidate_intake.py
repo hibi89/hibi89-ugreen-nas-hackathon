@@ -180,6 +180,8 @@ def inspect_candidate(
         "missing_design_signals_for_owner_review": missing,
         "missing_disclosure_signals_for_owner_review": missing_disclosure,
         "operator_receipt_status": declaration["status"],
+        "operator_checker_report_status": declaration.get("checker_report_status",
+                                                          "NOT_REPORTED_OR_NOT_ASSESSED"),
         "creator_execution_independently_verified": False,
         "first_party_checker_independently_verified_on_generated_source": False,
         "actual_nas_verified": False,

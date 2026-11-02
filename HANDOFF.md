@@ -1,3 +1,16 @@
+## 2026-11-03 KST — G210 CREATOR-ONLY ROUND1 EVIDENCE REPORTING, HOLD
+
+1. **Goal:** Truthfully report actual official Creator run evidence when Round1 Checker is omitted; comply with official Rule separation while retaining strict owner release.
+2. **Design/implementation:** Rejected inventing self-attested dummy Checker PASS. G53 now distinguishes mandatory Creator fields from optional all-or-none first-party Checker fields; G57 propagates explicit checker receipt state. Existing self-attested/full-checker behavior kept; no automatic adoption/release. 5 focused tests.
+3. **Verification:** Code source/behavior reviewed, Linux+Windows G210 exact code CI PENDING until GitHub Actions. Prior G209 SHA `08547a828b80fb9bd45fcab23b0513c07737a7a0` 4/4 SUCCESS historical. Original source/Kit/private ZIP untouched. Actual genuine Creator and Checker not executed.
+4. **Completion:** G210 patch staged; Creator execution/provenance independent evidence remains NOT_EVIDENCED; Checker optional for Round1 but still separately authorized if used; final owner IP/AI signoff/PDF/ZIP, Devpost pending. RELEASE HOLD, NAS NO-GO, 3h trial unused; ~90% is old unmeasured approximation.
+5. **Cause/alternative:** G53 mandated Checker result even when absent, which hid a distinct official Creator evidence status. New minimal truthful claim reports optional omission without faking clean checker or independent generation proof; partial Checker fields always fail closed.
+6. **Repo and rollback:** `hibi89/hibi89-ugreen-nas-hackathon@lead/ugreen`; base `94215590169ab7e5d67c5526a4ba8b71881018f3`; changed G53/G57 source + tests + STATUS/HANDOFF. Revert via normal Git, no force.
+7. **Production:** Vercel N/A; GitHub Actions offline tests only. Actual Codex/Claude/WorkBuddy, registered Expert, NAS and Devpost not run.
+8. **Originals/privacy:** G188 owner ZIP, G157 original PDF, Kit 0.7.3, G207 workspace unchanged; no private bytes/vendor JS or tokens committed to public GitHub.
+9. **Next:** Verify new SHA and Linux/Windows CI, then obtain owner-authorized real official Creator-generated output with truthful source hashes and optional Checker receipt; owner IP/AI and final submit consent still separate.
+10. **Time:** 2026-11-03 KST, G210 source/contract fixes and tests; CI verification after commit.
+
 ## 2026-11-03 KST — G209 FEATURE CI 4/4 SUCCESS, DOCS CLOSEOUT
 
 1. **Goal:** Make local generated-Skill inspection fail closed for all symlink ancestors, nested members and Windows reparse points without changing the official Creator/NAS/Devpost approval boundary.
