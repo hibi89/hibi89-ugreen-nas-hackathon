@@ -38,6 +38,16 @@ FEATURE_SIGNALS = (
     "file-agent", "document-agent", "NOT_CHECKED", "VERSION_REVIEW",
 )
 
+# G201: diagnose each independently reviewed candidate against its own intents.
+# These are lexical owner-review hints, not proof of runtime semantics or release.
+G188_FEATURE_SIGNALS = (
+    "DELIVERY_CHECK", "VERSION_REVIEW", "DOCUMENT_REVIEW", "DESIGN_ONLY",
+    "file-agent", "document-agent", "NOT_CHECKED",
+)
+G188_DATA_LOCATION_CUES = (
+    "data flow", "processing location", "processing destination", "data-location",
+)
+
 
 class CandidateError(ValueError):
     """Unsafe or structurally unreviewable candidate; no source included."""
@@ -120,13 +130,16 @@ def inspect_candidate(
             added += b1 - b0
         if tag in ("replace", "delete"):
             removed += a1 - a0
-    missing = [signal for signal in FEATURE_SIGNALS if signal.casefold() not in doc.casefold()]
-    missing_disclosure = [
-        x for x in ("third-party", "AI", "data flow")
-        if x.casefold() not in doc.casefold()
-        and not any(x.casefold() in raw.decode("utf-8").casefold() for raw in payload.values())
-    ]
     profile = "g188" if metadata["name"] == "flowpilot-3" else "flowpilot-nas"
+    required_signals = G188_FEATURE_SIGNALS if profile == "g188" else FEATURE_SIGNALS
+    missing = [signal for signal in required_signals if signal.casefold() not in doc.casefold()]
+    candidate_text = "\n".join(raw.decode("utf-8") for raw in payload.values()).casefold()
+    missing_disclosure = [
+        x for x in ("third-party", "AI") if x.casefold() not in candidate_text
+    ]
+    data_location_cues = G188_DATA_LOCATION_CUES if profile == "g188" else ("data flow",)
+    if not any(cue.casefold() in candidate_text for cue in data_location_cues):
+        missing_disclosure.append("data flow")
     declaration = review_creator_evidence(skill, receipt, candidate_profile=profile)
     canonical_identity = metadata["name"] == CANONICAL_NAME
     return {

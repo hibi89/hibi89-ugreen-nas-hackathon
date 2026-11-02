@@ -142,6 +142,37 @@ class CreatorCandidateIntakeTests(unittest.TestCase):
         self.assertEqual(r["release_gate"], "HOLD")
         self.assertFalse(r["creator_execution_independently_verified"])
 
+
+    def test_g201_g188_uses_profile_modes_and_processing_location_cues(self):
+        alternate = self.root / "flowpilot-3"
+        alternate.mkdir()
+        (alternate / "SKILL.md").write_text(
+            "---\nname: flowpilot-3\ndescription: Bounded review\n---\n"
+            "# Goal\nDELIVERY_CHECK VERSION_REVIEW DOCUMENT_REVIEW DESIGN_ONLY\n"
+            "file-agent document-agent NOT_CHECKED\n"
+            "third-party AI processing location unknown\n",
+            encoding="utf-8",
+        )
+        report = inspect_candidate(alternate, BASE)
+        self.assertEqual(report["missing_design_signals_for_owner_review"], [])
+        self.assertEqual(report["missing_disclosure_signals_for_owner_review"], [])
+        self.assertEqual(report["status"], "SOURCE_DIFF_IDENTITY_REVIEW_REQUIRED")
+        self.assertEqual(report["operator_receipt_status"], "CREATOR_NOT_EVIDENCED")
+        self.assertEqual(report["release_gate"], "HOLD")
+
+    def test_g201_g188_still_flags_missing_mode_and_location(self):
+        alternate = self.root / "flowpilot-3"
+        alternate.mkdir()
+        (alternate / "SKILL.md").write_text(
+            "---\nname: flowpilot-3\ndescription: Thin candidate\n---\n"
+            "# Goal\nDELIVERY_CHECK third-party AI\n",
+            encoding="utf-8",
+        )
+        report = inspect_candidate(alternate, BASE)
+        self.assertIn("VERSION_REVIEW", report["missing_design_signals_for_owner_review"])
+        self.assertIn("data flow", report["missing_disclosure_signals_for_owner_review"])
+        self.assertEqual(report["release_gate"], "HOLD")
+
     def test_alt_identity_directory_mismatch_rejected(self):
         alternate = self.root / "flowpilot-3"
         alternate.mkdir()
