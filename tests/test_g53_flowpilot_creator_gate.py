@@ -136,6 +136,55 @@ class CreatorGate(unittest.TestCase):
         self.assertEqual(r["status"], "GENERATED_SOURCE_SHA_MISMATCH")
         self.assertEqual(r["release_gate"], "HOLD")
 
+    def test_g211_name_after_description_is_reviewed_not_wrong_identity(self):
+        content = (b"---\ndescription: Bounded read-only Skill\n"
+                   b"name: flowpilot-nas\n---\n# New source\n")
+        sha = hashlib.sha256(content).hexdigest()
+        creator_only = {k: v for k, v in
+                        declared(generated_skill_sha256=sha).items()
+                        if not k.startswith("checker_")}
+        r = review_creator_evidence(content, creator_only)
+        self.assertEqual(r["status"], "GENERATED_SOURCE_DIFFERS_REVIEW_REQUIRED")
+        self.assertEqual(r["checker_report_status"], "NOT_REPORTED_OPTIONAL_ROUND1")
+        self.assertFalse(r["official_creator_execution_independently_verified"])
+        self.assertEqual(r["release_gate"], "HOLD")
+
+    def test_g211_quoted_name_crlf_alternate_profile(self):
+        content = (b"---\r\ndescription: Document workflow\n"
+                   b"name: 'flowpilot-3'\r\n---\r\n# New Skill\n")
+        sha = hashlib.sha256(content).hexdigest()
+        creator_only = {k: v for k, v in
+                        declared(generated_skill_sha256=sha).items()
+                        if not k.startswith("checker_")}
+        r = review_creator_evidence(content, creator_only,
+                                    candidate_profile="g188")
+        self.assertEqual(r["status"], "GENERATED_SOURCE_DIFFERS_REVIEW_REQUIRED")
+        self.assertEqual(r["release_gate"], "HOLD")
+
+    def test_g211_duplicate_name_refused(self):
+        content = (b"---\ndescription: Review\nname: flowpilot-nas\n"
+                   b"name: flowpilot-nas\n---\n# Duplicate\n")
+        sha = hashlib.sha256(content).hexdigest()
+        r = review_creator_evidence(content,
+                declared(generated_skill_sha256=sha, checker_skill_sha256=sha))
+        self.assertEqual(r["status"], "WRONG_SKILL_ID")
+
+    def test_g211_body_name_cannot_replace_missing_metadata(self):
+        content = (b"---\ndescription: Missing name\n---\n"
+                   b"# Body\nname: flowpilot-nas\n")
+        sha = hashlib.sha256(content).hexdigest()
+        r = review_creator_evidence(content,
+                declared(generated_skill_sha256=sha, checker_skill_sha256=sha))
+        self.assertEqual(r["status"], "WRONG_SKILL_ID")
+
+    def test_g211_wrong_profile_still_refused_after_reorder(self):
+        content = (b"---\ndescription: Wrong profile\n"
+                   b"name: flowpilot-3\n---\n# Body\n")
+        sha = hashlib.sha256(content).hexdigest()
+        r = review_creator_evidence(content,
+                declared(generated_skill_sha256=sha, checker_skill_sha256=sha))
+        self.assertEqual(r["status"], "WRONG_SKILL_ID")
+
     def test_no_skill_source(self):
         self.assertEqual(review_creator_evidence(b"not a skill",declared())["status"],"WRONG_SKILL_ID")
 

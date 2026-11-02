@@ -1,3 +1,16 @@
+## 2026-11-03 KST — G211 G53/G57 ORDER-INDEPENDENT FRONTMATTER IDENTITY, RELEASE HOLD
+
+1. **Goal/requirements:** Safely accept legitimately generated FlowPilot Skill YAML metadata in either name/description order without confusing text-body spoofing, keeping official Creator and owner release proof gates.
+2. **Change/decision:** Evaluated forcing the Creator to emit name first (brittle) versus changing G53's anchored first-line regex into bounded header lookup matching G57. Selected minimal G53 fix plus 6 regression tests for both profiles, quoted CRLF, spoof/duplicates and integration. Original G188/G157/Kit unchanged.
+3. **Tests:** G211 SHA/Linux/Windows CI verify after code push. Historical G210 4/4 SUCCESS only; no official vendor execution, provider or NAS call.
+4. **Status:** Source compatibility repair staged, real official Creator-new Skill/provenance NOT_EVIDENCED, optional Checker NOT_RUN, owner rights/IP/final submission PENDING, Devpost NOT_SUBMITTED, RELEASE HOLD and NAS NO-GO/trial unused, overall ~90% old subjective estimate.
+5. **Defect/pivot:** Two project validators disagreed on valid YAML metadata order. Bounded parsing refuses wrong/duplicate name and leaves release HOLD; avoids fake external Creator evidence.
+6. **Repo/rollback:** hibi89/hibi89-ugreen-nas-hackathon@lead/ugreen base 6be53bc508dbcd1354ec50c8fb1282a9661335ba; changed G53 and two test suites plus STATUS/HANDOFF. Normal Git revert to base if needed, never force.
+7. **Environment:** GitHub Actions local-only Linux/Windows, Vercel N/A. No real Codex/Claude/UGOS/NAS runtime.
+8. **Originals/security:** Public branch contains no owner-private G188 ZIP/G157 PDF/Kit source, only code and synthetic test source. Existing G207 source-isolated package unchanged.
+9. **Next:** Independently verify exact code SHA and Actions. Genuine Creator on separately authorized supported AI provider, new Skill SHA/receipt, final owner signoff and Devpost approval remain required.
+10. **Time:** 2026-11-03 KST; source fix vs real Creator/Checker/NAS explicitly distinguished.
+
 ## 2026-11-03 KST — G210 FEATURE CI CONFIRMED, CREATOR STILL NOT RUN
 
 1. **Goal:** Correct Round1 evidence classification for a supported Uliya Creator-produced new FlowPilot candidate; Checker execution not explicitly mandatory in Round1, but true Creator and rights remain mandatory.

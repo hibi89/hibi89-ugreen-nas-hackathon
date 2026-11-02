@@ -1,3 +1,9 @@
+## 2026-11-03 KST — G211 G53/G57 YAML name order consistency regression (code CI pending)
+
+- **Observed defect:** G57's bounded Markdown Skill intake recognizes YAML frontmatter keys in any order but G53's G210 receipt gate assumed name was the first line. A valid Creator-generated frontmatter with description before name was misclassified WRONG_SKILL_ID; original G188 ZIP checksum and 3 member CRC still PASS, left unchanged.
+- **Actual change:** G53 now reads bounded YAML frontmatter and matches the unique name key in any field position, accepting quoted names/CRLF, refusing duplicate, missing and wrong-profile identities or a fake body name. Added 5 G53 tests + 1 integration G57 test. No change to canonical Skill, operator receipt security, release HOLD or private owners' sources.
+- **Verification scope:** Exact G211 GitHub Linux/Windows CI must be independently confirmed. G210 SHA 8e24ae78d5367d51168f0281f989d95a77f5a2a9 4/4 SUCCESS historical only. Authentic official Creator, first-party Checker, NAS and Devpost NOT_RUN; trial unused. Historical 90% subjective/unmeasured. Provider access/real Creator requires distinct owner approval.
+
 ## 2026-11-03 KST — G210 exact source CI 4/4 SUCCESS; Round1 truthful Creator-only receipt review, HOLD
 
 - G210 source commit `8e24ae78d5367d51168f0281f989d95a77f5a2a9`. GitHub Actions exact source **4/4 SUCCESS**: [Linux + Windows full regressions 41498719957](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/41498719957), [offline readiness 41498719888](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/41498719888), [master progress 41498720067](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/41498720067), [closeout 41498720225](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/41498720225). Five focused new regression tests added; exact full unittest totals NOT_VERIFIED from log, no invented count.

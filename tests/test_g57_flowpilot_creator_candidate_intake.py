@@ -199,6 +199,24 @@ class CreatorCandidateIntakeTests(unittest.TestCase):
         self.assertFalse(result["candidate_adoption_approved"])
         self.assertEqual(result["status"], "SOURCE_DIFF_HUMAN_REVIEW_REQUIRED")
 
+    def test_g211_g57_g53_agree_on_reordered_frontmatter(self):
+        from g53_flowpilot_creator_gate import EXPECTED_KIT_SHA
+        source = (b"---\ndescription: Bounded reviewer\n"
+                  b"name: flowpilot-nas\n---\n# Goal\n"
+                  b"HANDOFF_AUDIT CHECK_REQUIRED REVIEW_VERSIONS SUMMARIZE_SELECTED\n"
+                  b"file-agent document-agent NOT_CHECKED VERSION_REVIEW\n"
+                  b"third-party AI data flow described\n")
+        self.skill.write_bytes(source)
+        receipt = {"kit_sha256": EXPECTED_KIT_SHA,
+                   "generated_skill_sha256": hashlib.sha256(source).hexdigest(),
+                   "generation_performed": True, "official_tool_loaded": True}
+        r = self.check(BASE, receipt)
+        self.assertEqual(r["operator_receipt_status"],
+                         "GENERATED_SOURCE_DIFFERS_REVIEW_REQUIRED")
+        self.assertEqual(r["candidate"], "flowpilot-nas")
+        self.assertFalse(r["creator_execution_independently_verified"])
+        self.assertEqual(r["release_gate"], "HOLD")
+
     def test_g210_creator_only_report_distinguishes_optional_checker(self):
         from g53_flowpilot_creator_gate import EXPECTED_KIT_SHA
         skill = self.skill.read_bytes()

@@ -50,7 +50,19 @@ def review_creator_evidence(
         decoded = source.decode("utf-8")
     except UnicodeDecodeError:
         return {**result, "status": "INVALID_SOURCE"}
-    if re.match(r"\A---\r?\nname: " + re.escape(expected_name) + r"\r?\n", decoded) is None:
+    # G211: Skill YAML frontmatter keys are unordered. Align the G53
+    # identity reader with G57 without confusing body text with metadata.
+    header = re.match(r"\A---\r?\n(.*?)\r?\n---\r?\n", decoded, re.S)
+    if header is None:
+        return {**result, "status": "WRONG_SKILL_ID"}
+    names = []
+    for line in header.group(1).splitlines():
+        if ":" not in line:
+            return {**result, "status": "WRONG_SKILL_ID"}
+        key, value = line.split(":", 1)
+        if key.strip() == "name":
+            names.append(value.strip().strip("'\""))
+    if len(names) != 1 or names[0] != expected_name:
         return {**result, "status": "WRONG_SKILL_ID"}
     actual_hash = hashlib.sha256(source).hexdigest()
     result["actual_generated_sha256"] = actual_hash
