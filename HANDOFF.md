@@ -1,3 +1,16 @@
+## 2026-11-03 KST — G209 G57 SYMLINK ANCESTOR AND WINDOWS REPARSE HARDENING, RELEASE HOLD
+
+1. **Goal:** Secure local intake of a genuinely Creator-produced FlowPilot Markdown Skill; first-party Creator required for Round1, unchanged G188/G157 owner originals and Nov 16 16:45 KST deadline.
+2. **Change/choice:** Corrected actual G57 source (grandparent alias bypass) rather than generating another preparation ZIP. Compare parent-only guard vs `lstat` of all ancestors/descendants + Windows junction flag; chose second conservative option. No changes to release decision.
+3. **Tests:** Two new G57 regression cases: actual symlinked grandparent path and simulated reparse flag. Exact G209 feature CI Linux/Windows results and new SHA **verify after push**; previous G201 code `dc05fe8f60cff055a261f7e3536ab6576951065a` Linux 1440 PASS/0 FAIL/16 SKIP and Windows SUCCESS historical only. No live Creator/Checker/NAS/Devpost.
+4. **State:** Code containment fix staged; release HOLD, NAS technical NO-GO, 3h quota unused, entrant AI/IP rights/final PDF/ZIP signoff pending. Official exact newly generated Skill/provenance NOT_EVIDENCED; legacy completion ~90% unmeasured.
+5. **Failure/pivot:** Path.name and immediate parent is_symlink cannot exclude symlink grandparent or Windows junction. New `lstat` stops static path bypass, but not adversarial file races or compromised host. Do not claim runtime or tool provenance.
+6. **Repository:** `hibi89/hibi89-ugreen-nas-hackathon@lead/ugreen`, baseline `2a07d5cca90231b529acac89a429c9037abea0c0`. Changed two public functional files plus STATUS/HANDOFF. New exact SHA/actions independently verify. Standard Git revert to previous commit; no force or other branches.
+7. **Execution:** GitHub Actions Linux/Windows offline only, Vercel not applicable; no external model, registered Expert, vendor Checker, NAS, Devpost or payment.
+8. **Private inputs:** User G188 ZIP/G157 PDF official Kit and G207 ZIP untouched. No raw owner text, credentials or private files in public code/tests.
+9. **Next:** Verify feature SHA and regression CI. Obtain user-authorized supported official Creator invocation from a separate private/sanitized workspace, independently inspect true generated Skill, provenance and license; only separately approved Checker/Devpost.
+10. **Time:** 2026-11-03 KST. Local source review + GitHub regression planned; do not claim feature green before Actions and HEAD verification.
+
 ## 2026-11-03 KST — G207 FAIL-CLOSED CREATOR WORKSPACE PRIVACY DEFECT FIX, RELEASE HOLD
 
 1. **Goal/requirements:** UGREEN FlowPilot Round1 real official Creator Skill and 10-answer G157 PDF, final owner signoff by 2026-11-16 16:45 KST; preserve private originals, no automatic third-party source transfer, no NAS needed Round1.

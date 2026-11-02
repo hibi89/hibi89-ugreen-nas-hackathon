@@ -12,6 +12,7 @@ import json
 import re
 from pathlib import Path
 from typing import Mapping, Any
+import stat
 
 from g53_flowpilot_creator_gate import review_creator_evidence
 
@@ -57,21 +58,37 @@ def digest(raw: bytes) -> str:
     return hashlib.sha256(raw).hexdigest()
 
 
+def _is_link_or_reparse(path: Path) -> bool:
+    """Reject symlinks and Windows junctions/reparse points without following them."""
+    try:
+        meta = path.lstat()
+    except (OSError, ValueError) as exc:
+        raise CandidateError("Unverifiable Skill path or ancestor") from exc
+    return stat.S_ISLNK(meta.st_mode) or bool(
+        getattr(meta, "st_file_attributes", 0) & 0x400
+    )
+
+
 def inspect_candidate(
     directory: Path, baseline: bytes, receipt: Mapping[str, Any] | None = None
 ) -> dict:
     """Return a sanitized local structure/source-diff report, always HOLD."""
     folder = Path(directory)
-    if folder.name not in SUPPORTED_CANDIDATE_NAMES or folder.is_symlink() or not folder.is_dir():
-        raise CandidateError("Use a real, explicitly supported FlowPilot candidate folder without symlinks")
-    if folder.parent.is_symlink():
-        raise CandidateError("Parent path is a symlink")
+    if folder.name not in SUPPORTED_CANDIDATE_NAMES:
+        raise CandidateError("Use an explicitly supported FlowPilot candidate identity")
+    # G209: an ancestor junction/symlink can bypass parent-only checks and
+    # redirect reads outside the explicitly selected generated Skill folder.
+    for ancestor in (folder, *folder.parents):
+        if _is_link_or_reparse(ancestor):
+            raise CandidateError("Symlink or reparse point in candidate path")
+    if not folder.is_dir():
+        raise CandidateError("Generated Skill candidate must be a real directory")
     if not isinstance(baseline, bytes) or not baseline:
         raise CandidateError("Missing reviewed baseline source")
     payload: dict[str, bytes] = {}
     for path in folder.rglob("*"):
-        if path.is_symlink():
-            raise CandidateError("Symlink in generated Skill directory")
+        if _is_link_or_reparse(path):
+            raise CandidateError("Symlink or reparse point in generated Skill directory")
         relative = path.relative_to(folder).as_posix()
         if path.is_dir():
             if relative != "references":

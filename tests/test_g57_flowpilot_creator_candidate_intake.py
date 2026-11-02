@@ -4,6 +4,8 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
@@ -196,6 +198,36 @@ class CreatorCandidateIntakeTests(unittest.TestCase):
         self.assertTrue(result["canonical_identity_matches"])
         self.assertFalse(result["candidate_adoption_approved"])
         self.assertEqual(result["status"], "SOURCE_DIFF_HUMAN_REVIEW_REQUIRED")
+
+    def test_g209_symlinked_grandparent_is_refused(self):
+        actual = self.root / "actual"
+        nested = actual / "nested" / "flowpilot-nas"
+        nested.mkdir(parents=True)
+        (nested / "SKILL.md").write_text(GOOD, encoding="utf-8")
+        alias = self.root / "alias"
+        try:
+            alias.symlink_to(actual, target_is_directory=True)
+        except (OSError, NotImplementedError):
+            self.skipTest("Directory symlinks unavailable")
+        # The immediate parent (alias/nested) isn't itself a symlink;
+        # G207's old parent-only check would accept this redirected tree.
+        with self.assertRaises(CandidateError):
+            inspect_candidate(alias / "nested" / "flowpilot-nas", BASE)
+
+    def test_g209_windows_reparse_attribute_refused(self):
+        original_lstat = Path.lstat
+        target = self.folder
+        def with_reparse_flag(path, *args, **kwargs):
+            result = original_lstat(path, *args, **kwargs)
+            if Path(path) == target:
+                return SimpleNamespace(
+                    st_mode=result.st_mode,
+                    st_file_attributes=getattr(result, "st_file_attributes", 0) | 0x400,
+                )
+            return result
+        with patch.object(Path, "lstat", autospec=True, side_effect=with_reparse_flag):
+            with self.assertRaises(CandidateError):
+                self.check()
 
     def test_symlink_to_external_file_rejected(self):
         outside = self.root / "outside"
