@@ -94,6 +94,23 @@ class EvidenceTests(unittest.TestCase):
             with self.subTest(p=p), self.assertRaises(ValueError):
                 safe_path(p)
 
+    def test_g213_windows_device_names_refused_cross_platform(self):
+        for path in ("NUL.txt", "con", "AUX.PDF", "nested/COM1.log",
+                     "LPT9", "PRN", "files/NUL.tar.gz", "Com3"):
+            with self.subTest(path=path), self.assertRaises(ValueError):
+                safe_path(path)
+        # Similar-looking legitimate file names must remain accepted.
+        for path in ("docs/console.md", "docs/auxiliary.pdf", "COM10.log",
+                     "notes/prntest.csv", "normal/NULproof.txt"):
+            with self.subTest(path=path):
+                self.assertEqual(safe_path(path), path)
+
+    def test_g213_windows_invalid_filename_characters_refused(self):
+        for path in ('doc<draft>.pdf', 'files/report?.md', 'notes/2026*.txt',
+                     'bad|pipe.csv', 'name"quote.md'):
+            with self.subTest(path=path), self.assertRaises(ValueError):
+                safe_path(path)
+
     def test_traversal_refused(self):
         for p in ("../a", "a/../b", "a\\b", "/root", "a//b", "a/./b", "a\x00b"):
             with self.subTest(p=p), self.assertRaises(ValueError):

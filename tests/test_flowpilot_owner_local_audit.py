@@ -79,6 +79,27 @@ class G62OwnerLocalAudit(unittest.TestCase):
                 with self.subTest(path=path), self.assertRaises(OwnerAuditError):
                     self.audit((path,))
 
+    def test_g213_windows_reserved_name_refused_before_owner_root_touch(self):
+        with patch("flowpilot_owner_local_audit._valid_root",
+                   side_effect=AssertionError("UNEXPECTED METADATA ACCESS")):
+            for unsafe in ("NUL.txt", "release/CON", "COM1.log",
+                           "release/draft?.md"):
+                with self.subTest(path=unsafe), self.assertRaises(OwnerAuditError):
+                    self.audit((unsafe,), approval=True)
+        # Benign owner-specified metadata remains readable and redacted.
+        r = self.audit(("release/final.pdf",))
+        self.assertEqual(r["items"][0]["state"], "PRESENT")
+        self.assertFalse(r["file_contents_opened"])
+
+    def test_g213_cli_device_name_fails_closed_without_leak(self):
+        cmd = [sys.executable, str(ROOT / "tools/flowpilot_owner_local_audit.py"),
+               "--root", str(self.root), "--required", "NUL.txt",
+               "--approve-local-metadata"]
+        res = subprocess.run(cmd, capture_output=True, text=True, timeout=15)
+        self.assertEqual(res.returncode, 2)
+        self.assertEqual(json.loads(res.stdout)["status"], "LOCAL_AUDIT_REFUSED")
+        self.assertNotIn(str(self.root), res.stdout)
+
     def test_symlink_file_is_not_read(self):
         dest = self.root / "outside.txt"
         dest.write_bytes(b"synthetic restricted data")

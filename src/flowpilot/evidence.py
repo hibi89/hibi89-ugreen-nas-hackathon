@@ -67,6 +67,13 @@ _RESTRICTED = re.compile(
 )
 
 
+# G213: reject Windows special device names even when running on Linux.
+# A file with a suffix like NUL.txt still addresses the NUL device on Windows.
+_WINDOWS_DEVICE = re.compile(
+    r"^(?:CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(?:[.]|$)", re.IGNORECASE
+)
+
+
 def safe_path(path: str) -> str:
     """Reject traversal, restricted filenames and noncanonical input.
 
@@ -77,11 +84,15 @@ def safe_path(path: str) -> str:
         raise ValueError("Invalid scoped path")
     if unicodedata.normalize("NFKC", path) != path or path.startswith(("/", "~")):
         raise ValueError("Not a canonical relative path")
-    if ":" in path or "%" in path or "\\" in path or any(ord(ch) < 32 or ord(ch) == 127 or unicodedata.category(ch) == "Cf" for ch in path):
+    if (":" in path or "%" in path or "\\" in path
+            or any(ch in '<>"|?*' for ch in path)
+            or any(ord(ch) < 32 or ord(ch) == 127 or unicodedata.category(ch) == "Cf" for ch in path)):
         raise ValueError("Ambiguous separator or control character")
     pieces = path.split("/")
     if any(not part or part in (".", "..") or part.endswith((".", " ")) for part in pieces):
         raise ValueError("Traversal or noncanonical path")
+    if any(_WINDOWS_DEVICE.match(part) for part in pieces):
+        raise ValueError("Windows reserved device name")
     if any(_RESTRICTED.search(part) for part in pieces):
         raise ValueError("Restricted file or folder")
     return path

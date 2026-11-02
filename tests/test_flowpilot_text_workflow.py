@@ -55,6 +55,15 @@ class G64TextWorkflowTests(unittest.TestCase):
         self.assertEqual(row["status"], "WAITING_APPROVAL")
         self.assertEqual(row["executed_steps"], 0)
 
+    def test_g213_text_workflow_rejects_windows_device_names_before_root_touch(self):
+        with patch("flowpilot_owner_local_audit._valid_root",
+                   side_effect=AssertionError("UNEXPECTED METADATA ACCESS")):
+            for instruction in ("파일 확인: NUL.txt",
+                                "check files: release/COM1.log",
+                                "check files: x?.md"):
+                with self.subTest(instruction=instruction), self.assertRaises(WorkflowRefused):
+                    run_text_workflow(self.root, instruction, metadata_consent=True)
+
     def test_unknown_second_stage_refused_before_read(self):
         with patch("flowpilot_owner_local_audit._valid_root", side_effect=AssertionError("TOUCHED")):
             with self.assertRaises(WorkflowRefused):

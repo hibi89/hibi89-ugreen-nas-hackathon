@@ -1,3 +1,16 @@
+## 2026-11-03 KST — G213 PORTABLE SAFE PATH WINDOWS DEVICE/METACHAR GUARD, RELEASE HOLD
+
+1. **Goal/requirements:** Prevent invalid/device-backed Win32 paths from being treated as ordinary owner-selected files by the reusable FlowPilot evidence, metadata pilot and text workflow contracts.
+2. **Choice/change:** Prefer deterministic cross-platform validation before folder access over OS-only errors from `Path.lstat`. `src/flowpilot/evidence.py` rejects `CON`, `PRN`, `AUX`, `NUL`, `COM1–9`, `LPT1–9`, including extensions, and `< > " | ? *`; existing traversal/restricted path guards retained. Five unit/integration/CLI test methods. Official reference: Microsoft Learn naming a file.
+3. **Tests:** Actual old `safe_path` reproduction accepted reserved names; added five focused test methods including local consented metadata and text parser pre-root-access refusal. New exact SHA/Linux+Windows CI verify after push; previous G212 CI 4/4 is historical and cannot be inherited.
+4. **Status:** G213 code/source staged, release HOLD, real supported official Uliya Creator/new Skill provenance NOT_EVIDENCED, optional first-party Checker NOT_RUN, registered Expert/NAS/Devpost NOT_RUN, NAS technical NO-GO, 3-hour trial untouched. Completion ~90% is subjective.
+5. **Error/pivot:** Missing Win32 reserved-name and wildcard guard in OS-independent safe_path; correct at single shared contract rather than adding repeated wrappers. No actual NAS security incident; real Windows device-path behavior not verified by live NAS.
+6. **Repo/rollback:** `hibi89/hibi89-ugreen-nas-hackathon@lead/ugreen`, base `df6f61e3114ecccd72ea2d69ae6ae283878378e6`, changed `src/flowpilot/evidence.py`, `tests/test_flowpilot_evidence.py`, `tests/test_flowpilot_owner_local_audit.py`, `tests/test_flowpilot_text_workflow.py`, STATUS/HANDOFF; normal Git revert only.
+7. **Environment:** GitHub Linux/Windows offline CI; no Vercel deployment, vendor/paid API, official Creator/Checker/NAS.
+8. **Originals:** Canonical `skill/flowpilot-nas/SKILL.md` and user private G188/G157/official Kit/G207 untouched; no private inputs/secrets in public commit.
+9. **Next:** Verify exact G213 SHA and CI then resume only actual owner-approved official Creator with sanitized brief, new source SHA/provenance and final entrant review; keep 3h NAS trial unused in Round1.
+10. **Timestamp:** 2026-11-03 KST, source defect confirmed and focused regression staged, full CI pending.
+
 ## 2026-11-03 KST — G212 TWO-FIELD SKILL FORMAT EXACT CI VERIFIED, HOLD
 
 1. **Goal:** Validate official Uliya 0.7.3 strict `name`/`description` Skill frontmatter while preserving G188 original and Round1/owner restrictions.
