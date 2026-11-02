@@ -1,3 +1,16 @@
+## 2026-11-03 KST — G209 FEATURE CI 4/4 SUCCESS, DOCS CLOSEOUT
+
+1. **Goal:** Make local generated-Skill inspection fail closed for all symlink ancestors, nested members and Windows reparse points without changing the official Creator/NAS/Devpost approval boundary.
+2. **Change:** `tools/g57_flowpilot_creator_candidate_intake.py` `lstat()` checks each ancestor/member and refuses `st_file_attributes & 0x400`; 2 regression tests added in `tests/test_g57_flowpilot_creator_candidate_intake.py`. Revert by normal Git checkout of parent `2a07d5cca90231b529acac89a429c9037abea0c0` (no force).
+3. **Verified:** Functional SHA `08547a828b80fb9bd45fcab23b0513c07737a7a0`, four workflow runs **SUCCESS**: Linux + Windows full `41495298190`, readiness `41495298139`, master `41495298208`, closeout `41495298021`. Raw logs returned GitHub BlobNotFound, so exact test totals not asserted; no functionality failure inferred from a log-download error. Documentation-only closeout CI after this additional commit verify independently.
+4. **Current state:** G209 code+CI DONE. Actual genuine Uliya Creator-new FlowPilot output and verified origin NOT_EVIDENCED; first-party Checker NOT_RUN (Round1 optional); owner original/rights/release PENDING; registered Expert/live NAS/Devpost NOT_RUN; RELEASE HOLD; NAS technical NO-GO; old 90% is unmeasured.
+5. **Cause/stop:** Prior G57 only checked candidate and immediate parent with `is_symlink()`; real grandparent symlink/Windows junction bypass possible; replaced with broader `lstat` guard. Remaining concurrent mutation/host compromise not solved, no claim to full adversarial FS safety.
+6. **Repo:** `hibi89/hibi89-ugreen-nas-hackathon@lead/ugreen`, G209 feature SHA above; latest docs HEAD is a later commit. Paths `tools/g57_flowpilot_creator_candidate_intake.py`, `tests/test_g57_flowpilot_creator_candidate_intake.py`, `STATUS.md`, `HANDOFF.md`.
+7. **Environment:** GitHub Actions local-only Python Linux and Windows PowerShell 5.1 success; Vercel N/A. No NAS/UGOS live environment or approved third-party official Creator access.
+8. **Originals:** Private G188 ZIP, G157 PDF, authentic official 0.7.3 Kit and G207 sanitized workspace package all preserved; public repo contains no proprietary inputs/credentials.
+9. **Next:** Obtain separately approved actual supported Codex/Claude/WorkBuddy official Creator-generated independent source from sanitized requirements; inspect true generation evidence, compare rights/AI, owner approves final PDF/ZIP then Devpost. No NAS trial in Round1. Avoid more synthetic-only packages.
+10. **KST/scope:** 2026-11-03, feature GitHub 4/4 successful at `08547a82`; docs closeout commit must be checked on its exact HEAD.
+
 ## 2026-11-03 KST — G209 G57 SYMLINK ANCESTOR AND WINDOWS REPARSE HARDENING, RELEASE HOLD
 
 1. **Goal:** Secure local intake of a genuinely Creator-produced FlowPilot Markdown Skill; first-party Creator required for Round1, unchanged G188/G157 owner originals and Nov 16 16:45 KST deadline.
