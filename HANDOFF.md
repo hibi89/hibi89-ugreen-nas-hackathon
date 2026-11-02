@@ -1,3 +1,16 @@
+## 2026-11-03 KST — G213 ACTUAL LINUX/WINDOWS CI PASS, CREATOR STILL GATED
+
+1. **Goal:** Block Win32 reserved device/file-metacharacter paths in FlowPilot's real reusable owner-local path guard, preserving read-only consent.
+2. **Change:** Shared `src/flowpilot/evidence.py` validates portable relative names before filesystem metadata; five new evidence/audit/CLI/text-flow regression methods. Compare OS-dependent failures vs consistent pre-access guard, selected latter.
+3. **Verified:** Source SHA `fd43a5acbd63a794e55b8622fa364a7ea44f7980`, full Linux+Windows run 41505211630 SUCCESS (both jobs), readiness 41505211437 SUCCESS, master 41505211408 SUCCESS, closeout 41505211430 SUCCESS: **4/4**. Exact full test counts NOT_VERIFIED. No Uliya/UGOS/NAS/Devpost or model API executed. New docs SHA/CI verify independently.
+4. **State:** G213 code/test DONE; genuine first-party Creator-generated new FlowPilot Skill and provenance NOT_EVIDENCED, entrant IP/AI/license and exact ZIP/PDF release PENDING, optional Round1 Checker NOT_RUN. RELEASE HOLD, NAS technical NO-GO, 3h quota unused, historic unmeasured ~90% estimate.
+5. **Root cause:** Existing safe_path accepted Windows device names `NUL.txt`, `COM1.log`, etc. and wildcard chars, potentially confusing real Windows metadata. Prevention verified with offline regression, not an observed live exploit; OS and filesystem races remain out of scope.
+6. **Repo/rollback:** `hibi89/hibi89-ugreen-nas-hackathon@lead/ugreen`; code `fd43a5acbd63a794e55b8622fa364a7ea44f7980`, parent `df6f61e3114ecccd72ea2d69ae6ae283878378e6`. Paths `src/flowpilot/evidence.py`, three test files, status docs. Revert normally, no force.
+7. **Production/environment:** GitHub Actions offline Linux/Windows only; Vercel N/A. Official Creator/registered Experts/NAS/Devpost not run; no external model or cost.
+8. **Originals/security:** Canonical `skill/flowpilot-nas/SKILL.md`, G188/G157, official Kit and G207 private bundle preserved; no raw private material on public GitHub.
+9. **Next and approvals:** Stop low-value validator loops. Owner separately approves sanitized-design transmission and authentic supported official Skill Creator execution; independently review new source, tool evidence, licenses, then separate final release/Devpost approval. NAS trial not needed in Round1.
+10. **KST/verification scope:** 2026-11-03; exact G213 feature CI 4/4 success, docs-closeout SHA/CI separate.
+
 ## 2026-11-03 KST — G213 PORTABLE SAFE PATH WINDOWS DEVICE/METACHAR GUARD, RELEASE HOLD
 
 1. **Goal/requirements:** Prevent invalid/device-backed Win32 paths from being treated as ordinary owner-selected files by the reusable FlowPilot evidence, metadata pilot and text workflow contracts.
