@@ -56,7 +56,7 @@ globalThis.fetch = (route, init) => {
 const ids = ["token","connect","disconnect","clear","connection-status","notice","output",
   "workflow-id","workflow-state","plan-hash","metadata-summary","goal","existing","create",
   "list","load","plan","guide","test","approve","run","refresh","audit","evidence","report","recover",
-  "synthetic-consent","metadata-consent","required","meta-preview","meta-approve",
+  "synthetic-consent","metadata-consent","required","version-candidates","meta-preview","meta-approve",
   "meta-cancel","meta-status","meta-save","meta-readback","meta-council","meta-report","meta-export","local-council-state","meta-save-consent","advice-disk","advice-errors","advice-backup",
   "advice-consent","advice-submit","advice-summary"];
 const buttonIds = ["connect","disconnect","clear","create","list","load","plan","guide",
@@ -265,6 +265,18 @@ async function main(){
   await click("meta-export");
   assert.equal(globalThis.__downloads,2,"one synthetic CSV and one redacted local report");
   assert.match(elems["local-council-state"].textContent,/NAS 미검증/);
+  // G231 owner-selected candidate exists, exact item does not: review required.
+  elems.required.value="README-v1.md";
+  elems["version-candidates"].value="README-v1.md=README.md";
+  await click("meta-preview");
+  assert.equal(elems.required.value,"");
+  assert.equal(elems["version-candidates"].value,"");
+  assert.equal(elems["meta-export"].disabled,true,"new inspection revokes stale report export");
+  assert.equal(JSON.parse(elems.output.textContent).version_candidate_count,1);
+  elems["metadata-consent"].checked=true;elems["metadata-consent"].fire("change");
+  await click("meta-approve");
+  assert.match(elems.output.textContent,/VERSION_REVIEW/);
+  assert.doesNotMatch(elems.output.textContent,/README-v1.md|README.md/);
   elems.required.value="private-raw-path.txt";
   elems["advice-disk"].value="97";
   elems["advice-consent"].checked=true;
@@ -272,6 +284,7 @@ async function main(){
   elems.token.value="short";
   await click("connect");  // refusal must discard the PREVIOUS valid bearer
   assert.equal(elems.required.value,"","reauth must scrub private textarea");
+  assert.equal(elems["version-candidates"].value,"","reauth must scrub version paths");
   assert.equal(elems["advice-disk"].value,"","reauth scrubs manual samples");
   assert.equal(elems["advice-consent"].checked,false,"reauth revokes advice consent");
   assert.equal(elems.existing.value,"","reauth must clear previous workflow selection");

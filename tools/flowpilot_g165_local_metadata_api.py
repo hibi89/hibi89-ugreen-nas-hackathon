@@ -18,6 +18,7 @@ from flowpilot_owner_local_audit import inspect_owner_folder, OwnerAuditError, _
 SCHEMA = "flowpilot-owner-local-metadata-session-v1"
 MAX_REVIEWS = 32
 MAX_PATHS = 20
+MAX_VERSION_CANDIDATES = 20
 EXPIRY_SECONDS = 600
 
 
@@ -52,6 +53,7 @@ class MetadataGate:
         return {
             "schema": SCHEMA, "review_id": token, "status": item["status"],
             "scope_sha256": item["digest"], "required_count": item["required_count"],
+            "version_candidate_count": item["version_count"],
             "approved_local_metadata_access": item["status"] in
                 ("LOCAL_METADATA_FINDINGS_READY", "LOCAL_METADATA_BLOCKED"),
             "inspection_result": item["result"],
@@ -60,7 +62,7 @@ class MetadataGate:
             "registered_expert_invoked": False, "release_gate": "HOLD",
         }
 
-    def begin(self, goal: object, required: object) -> dict:
+    def begin(self, goal: object, required: object, *, versions: object = None) -> dict:
         with self._lock:
             self._prune()
             if self._root is None:
@@ -76,9 +78,32 @@ class MetadataGate:
                 raise MetadataRefused("INVALID_METADATA_CHECKLIST", 400) from exc
             if len(set(items)) != len(items):
                 raise MetadataRefused("DUPLICATE_METADATA_CHECKLIST", 400)
+            # Exact owner-supplied alternative names only; no implicit directory scan.
+            if versions is None:
+                versions = {}
+            if type(versions) is not dict or len(versions) > MAX_PATHS:
+                raise MetadataRefused("INVALID_VERSION_CANDIDATES", 400)
+            mapped = {}
+            seen = set(items)
+            for wanted, alternatives in versions.items():
+                if (type(wanted) is not str or wanted not in items or
+                        type(alternatives) is not list or
+                        not 1 <= len(alternatives) <= 5):
+                    raise MetadataRefused("INVALID_VERSION_MAPPING", 400)
+                try:
+                    normalized = tuple(_valid_relative(x) for x in alternatives)
+                except (OwnerAuditError, ValueError, TypeError) as exc:
+                    raise MetadataRefused("INVALID_VERSION_MAPPING", 400) from exc
+                if any(p in seen for p in normalized):
+                    raise MetadataRefused("DUPLICATE_VERSION_CANDIDATE", 400)
+                seen.update(normalized)
+                mapped[wanted] = normalized
+            if len(seen) - len(items) > MAX_VERSION_CANDIDATES:
+                raise MetadataRefused("TOO_MANY_VERSION_CANDIDATES", 400)
             try:
-                preflight = inspect_owner_folder(self._root, list(items), goal=goal,
-                                                 metadata_consent=False)
+                preflight = inspect_owner_folder(
+                    self._root, list(items), goal=goal,
+                    version_candidates=mapped, metadata_consent=False)
             except (OwnerAuditError, OSError, TypeError, ValueError) as exc:
                 raise MetadataRefused("METADATA_PREFLIGHT_REFUSED", 400) from exc
             if (preflight.get("status") != "WAITING_APPROVAL"
@@ -89,11 +114,12 @@ class MetadataGate:
             token = "rev_" + secrets.token_hex(16)
             nonce = secrets.token_hex(16)
             # Salt prevents easy guesses of private required relative filenames.
-            raw = json.dumps({"goal": goal, "required": items, "root": str(self._root),
-                              "nonce": nonce}, ensure_ascii=True,
+            raw = json.dumps({"goal": goal, "required": items, "versions": mapped,
+                              "root": str(self._root), "nonce": nonce}, ensure_ascii=True,
                              sort_keys=True, separators=(",", ":")).encode("ascii")
             digest = sha256(raw).hexdigest()
             item = {"created": time.monotonic(), "goal": goal, "required": items,
+                    "versions": mapped, "version_count": len(seen)-len(items),
                     "required_count": len(items),
                     "digest": digest, "status": "WAITING_APPROVAL", "result": None}
             self._reviews[token] = item
@@ -121,6 +147,7 @@ class MetadataGate:
                 raise MetadataRefused("REVIEW_ALREADY_CONSUMED")
             item["status"] = "CANCELED"
             item["required"] = tuple()  # no need to retain unapproved filenames
+            item["versions"] = {}
             return self._public(token, item)
 
     def approve(self, token: str, digest: str, acknowledgement: str) -> dict:
@@ -137,6 +164,7 @@ class MetadataGate:
             try:
                 outcome = inspect_owner_folder(
                     self._root, list(item["required"]),
+                    version_candidates=item["versions"],
                     goal=item["goal"], metadata_consent=True)
                 if (outcome.get("file_contents_opened") is not False
                         or outcome.get("raw_paths_or_file_names_in_output") is not False
@@ -160,4 +188,5 @@ class MetadataGate:
                 item["result"] = None
             finally:
                 item["required"] = tuple()  # discard file names, keep count separately
+                item["versions"] = {}
             return self._public(token, item)

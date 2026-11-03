@@ -865,9 +865,11 @@ def create_server(backend: Backend, token: str, *, port: int=0):
                             raise BackendRefused("UNEXPECTED_KEYS",400)
                         data=backend.create(body["goal"],body["request_id"])
                     elif path=="/v1/local-metadata/preview":
-                        if set(body)!={"goal","required"}:
+                        if set(body) not in ({"goal","required"},
+                                             {"goal","required","versions"}):
                             raise BackendRefused("UNEXPECTED_KEYS",400)
-                        data=backend.metadata.begin(body["goal"],body["required"])
+                        data=backend.metadata.begin(
+                            body["goal"],body["required"],versions=body.get("versions"))
                     elif path=="/v1/local-metadata/approve":
                         if set(body)!={"review_id","scope_sha256","acknowledgement"}:
                             raise BackendRefused("UNEXPECTED_KEYS",400)

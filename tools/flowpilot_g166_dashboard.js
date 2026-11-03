@@ -100,7 +100,7 @@ el("connect").addEventListener("click", () => act(async () => {
   // A new login attempt invalidates any previous authority even if input is bad.
   token = ""; workflow = null; verifiedPlan = null; review = null; lastLocalReport = null;
   el("synthetic-consent").checked = false; el("metadata-consent").checked = false; el("meta-save-consent").checked = false;
-  el("required").value = ""; clearAdvice();
+  el("required").value = ""; el("version-candidates").value = ""; clearAdvice();
   el("existing").replaceChildren(new Option("선택 안 함", ""));
   el("connection-status").textContent = "기존 세션 폐기 · 인증 확인 중";
   if (candidate.length < 32 || candidate.length > 256) throw Error("토큰 길이는 32–256자여야 합니다.");
@@ -116,7 +116,7 @@ el("connect").addEventListener("click", () => act(async () => {
 }));
 el("disconnect").addEventListener("click", () => {
   token = ""; workflow = null; verifiedPlan = null; review = null; lastLocalReport = null;
-  el("token").value = ""; el("required").value = ""; clearAdvice();
+  el("token").value = ""; el("required").value = ""; el("version-candidates").value = ""; clearAdvice();
   el("existing").replaceChildren(new Option("선택 안 함", ""));
   el("synthetic-consent").checked = false; el("metadata-consent").checked = false; el("meta-save-consent").checked = false;
   el("connection-status").textContent = "연결 해제 · 토큰 폐기";
@@ -317,13 +317,31 @@ el("meta-preview").addEventListener("click", () => act(async () => {
   // Starting a NEW review must revoke old consent/review even when the new
   // input is invalid or the HTTP preview is refused. Clear raw paths first.
   const raw = el("required").value;
+  const rawVersions = el("version-candidates").value;
   el("required").value = "";
+  el("version-candidates").value = "";
+  lastLocalReport = null;
   review = null;
   el("metadata-consent").checked = false;
   el("meta-save-consent").checked = false;
   const required = raw.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
   if (required.length < 1 || required.length > 20) throw Error("경로 1–20개가 필요합니다.");
-  review = await json("/v1/local-metadata/preview", {goal:"check required files",required});
+  const lines = rawVersions.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+  if (lines.length > 20) throw Error("버전 후보는 최대 20개입니다.");
+  const versions = Object.create(null);
+  for (const line of lines) {
+    const parts = line.split("=");
+    if (parts.length !== 2 || !parts[0].trim() || !parts[1].trim())
+      throw Error("버전 후보는 필수경로=후보경로 형식이어야 합니다.");
+    const key = parts[0].trim(), value = parts[1].trim();
+    if (!required.includes(key)) throw Error("버전 후보는 선택한 필수경로에만 연결할 수 있습니다.");
+    if (!Object.prototype.hasOwnProperty.call(versions,key)) versions[key] = [];
+    versions[key].push(value);
+    if (versions[key].length > 5) throw Error("한 필수경로당 후보 5개 이내입니다.");
+  }
+  const args = {goal:"check required files",required};
+  if (lines.length) args.versions = versions;
+  review = await json("/v1/local-metadata/preview", args);
   status("로컬 메타데이터 읽기 전 미리보기 · 아직 파일 미조회"); output(review);
 }));
 el("meta-approve").addEventListener("click", () => act(async () => {
@@ -348,6 +366,7 @@ el("meta-cancel").addEventListener("click", () => act(async () => {
   review = null;
   el("metadata-consent").checked = false;
   el("required").value = "";
+  el("version-candidates").value = "";
   const canceled = await json("/v1/local-metadata/cancel", {review_id:reviewId});
   if (canceled.review_id !== reviewId || canceled.status !== "CANCELED" ||
       canceled.approved_local_metadata_access !== false)
