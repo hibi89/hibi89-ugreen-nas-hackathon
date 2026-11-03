@@ -99,7 +99,11 @@ def checked_run(argv: list[str], *, timeout: int = 45) -> str:
         raise SmokeRefused("LOCAL_PROCESS_REFUSED_OR_FAILED")
     return p.stdout.strip()
 
-def verify_host_config(payload: dict, *, started: bool) -> None:
+def verify_host_config(payload: dict, *, started: bool,
+                       expected_exit_code: int = 0) -> None:
+    if (type(expected_exit_code) is not int
+            or expected_exit_code not in (0, 17)):
+        raise SmokeRefused("UNSUPPORTED_EXPECTED_CONTAINER_EXIT")
     if type(payload) is not dict:
         raise SmokeRefused("INSPECT_NOT_OBJECT")
     host = payload.get("HostConfig")
@@ -129,13 +133,16 @@ def verify_host_config(payload: dict, *, started: bool) -> None:
     if type(image) is not str or not image.startswith("sha256:") or len(image) != 71:
         raise SmokeRefused("IMAGE_ID_NOT_A_LOCAL_DIGEST")
     if started:
-        if state.get("Running") is not False or state.get("ExitCode") != 0:
+        if (state.get("Running") is not False
+                or state.get("Status") != "exited"
+                or type(state.get("ExitCode")) is not int
+                or state.get("ExitCode") != expected_exit_code):
             raise SmokeRefused("CONTAINER_EXECUTION_DID_NOT_PASS")
     elif state.get("Running") is not False or state.get("Status") != "created":
         raise SmokeRefused("CONTAINER_ALREADY_EXECUTING_BEFORE_VALIDATION")
 
 
-def inspect(cid: str, *, started: bool) -> None:
+def inspect(cid: str, *, started: bool, expected_exit_code: int = 0) -> None:
     raw = checked_run(["docker", "inspect", cid], timeout=15)
     try:
         rows = json.loads(raw)
@@ -143,7 +150,8 @@ def inspect(cid: str, *, started: bool) -> None:
             raise SmokeRefused("INVALID_INSPECT_LIST")
     except (ValueError, TypeError) as exc:
         raise SmokeRefused("INVALID_INSPECT_JSON") from exc
-    verify_host_config(rows[0], started=started)
+    verify_host_config(rows[0], started=started,
+                       expected_exit_code=expected_exit_code)
 
 
 def verify_fixture_output(raw: str, stage: str) -> None:

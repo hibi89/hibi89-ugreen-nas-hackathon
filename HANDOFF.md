@@ -1,3 +1,16 @@
+## 2026-11-03 KST — G237 actual failed Docker DAG → bounded synthetic copy repair → retest (CI PENDING)
+
+1. **Goal/tech:** FlowPilot3 full product real failure diagnosis/repair/test, not Round1 paperwork. Python3.11, static C fixed typed CSV engine from G235, Docker 24.04 Ubuntu CI, readonly scratch images.
+2. **Decision & changes:** Reject hard-coded “before/after without runtime error” and unverified live NAS self-healing. Build genuine broken synthetic CSV, execute fixed DAG in isolated Docker; require inspected container exit exactly 17; repair ONLY one code-owned malformed decimal in ephemeral copy after explicit synthetic CI flag; rebuild separate scratch image, rerun and verify G235 canonical receipt + all SHA/source invariants. Modify G233 inspector only to support exact verified exit 17 in addition to previous 0. New G237 script/test + existing real Docker CI workflow.
+3. **Tests:** Ten focused security/repair/no-approval/cross-platform no-Docker tests; G237 actual Docker/Windows/Linux CI **NOT VERIFIED yet**. G236 source SHA `c4ad82fea3881b71aee47cedfb0386e9e73c46f9` prior Linux 1528 PASS, Windows/Chromium PASS.
+4. **State:** G237 code ready for CI; no general autonomous repair, customer-data input, independent LLM agent, official registered Expert, or NAS live readback. RELEASE HOLD, NAS NO-GO, Devpost NOT_SUBMITTED, 3hr trial UNUSED.
+5. **Risks & recovery:** Never claim self-healing on customer NAS. No Docker socket mount or network, no image pull, only random per-job images/containers cleanup; use ordinary Git revert if unexpected CI. No retry on native/NAS boundary.
+6. **Repo:** `hibi89/hibi89-ugreen-nas-hackathon@lead/ugreen`; baseline `bda0931d4fb86c3d5dbcc61b76ab80b14c8d27d2`; code `tools/flowpilot_g233_real_docker_smoke.py`, new `tools/flowpilot_g237_bounded_docker_repair.py`, new `tests/test_flowpilot_g237_bounded_docker_repair.py`, `.github/workflows/g233-local-docker-smoke.yml`.
+7. **Environment:** GitHub hosted Ubuntu real Docker + Linux/Windows Python regression, local Unix Docker socket only, no Vercel or NAS production applicable.
+8. **Originals/privacy:** Uliya canonical Skill and Kit, private PDF+ZIP and local SQLite original unchanged. All data in Docker image code-owned synthetic and ephemeral; no remote Docker registry, credentials, uploaded user data.
+9. **Next/criteria:** Exact G237 SHA real Docker logs failed exit 17 then successful rerun 0, original image remains unchanged, combined Linux/Windows PASS, provenance and fail-closed tests PASS; then tackle policy-checked configurable typed workflow engine and verified native Expert permissions separately before any NAS.
+10. **KST checkpoint:** 2026-11-03, no G237 CI evidence at time of initial push. Verify current source SHA and update this handoff after testing.
+
 ## 2026-11-03 KST — G236 native Expert NON-EXECUTABLE handoff integration (4/4 CI verified)
 
 1. **Goal/tech:** FlowPilot 3.0 local evidence to future Uliya Expert operator review. Python 3.11 stdlib/SQLite + localhost authenticated API + vanilla JS. Actual native invocation NOT implemented because vendor's registered runtime signature/permissions remain unknown.

@@ -7,6 +7,8 @@ on:
       - .github/workflows/g233-local-docker-smoke.yml
       - tools/flowpilot_g235_typed_dag_docker.py
       - tests/test_flowpilot_g235_typed_dag_docker.py
+      - tools/flowpilot_g237_bounded_docker_repair.py
+      - tests/test_flowpilot_g237_bounded_docker_repair.py
   workflow_dispatch:
 
 permissions:
@@ -28,3 +30,8 @@ jobs:
         run: |
           set -euo pipefail
           python3 tools/flowpilot_g235_typed_dag_docker.py --approve-synthetic-typed-docker
+      - name: G237 actual failed Docker typed DAG, bounded synthetic repair and retest
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/flowpilot_g237_bounded_docker_repair.py --approve-synthetic-only-auto-repair
