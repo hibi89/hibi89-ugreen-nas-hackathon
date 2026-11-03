@@ -1,3 +1,16 @@
+## 2026-11-03 KST — G236 native Expert NON-EXECUTABLE handoff integration (CI pending)
+
+1. **Goal/tech:** FlowPilot 3.0 local evidence to future Uliya Expert operator review. Python 3.11 stdlib/SQLite + localhost authenticated API + vanilla JS. Actual native invocation NOT implemented because vendor's registered runtime signature/permissions remain unknown.
+2. **Choice/implementation:** Reject guessed Uliya payload and remote API; reuse G227 receipt→G230 council, verify stage index/count/verdict, prevent forged proof, build redacted SHA-bound catalog-label checklist (find/stat) plus six explicit unresolved live gates. GET route and dashboard button use no filesystem read or vendor call.
+3. **Tests:** Added `tests/test_flowpilot_g236_native_handoff.py` for real disposable local metadata→SQLite→HTTP, restart, missing/corrupt evidence, redaction, no double-read and forged-state refusal; extended simulated browser smoke. G235 Linux/Windows/Docker exact source CI PASS, G236 new source CI PENDING at writing.
+4. **State:** Stage-bound read-only operator handoff implemented, no registered Expert/real NAS/Docker auto-repair/independent AI council/production. Release HOLD, NAS NO-GO, Devpost NOT_SUBMITTED, trial UNUSED.
+5. **Failure prevention:** No path/contents returned, no untrusted self-assertion accepted as live provenance; SHA is local integrity hint, not signed Uliya attestation. No repeat of earlier G235 Windows C .exe test issue.
+6. **Source paths:** `hibi89/hibi89-ugreen-nas-hackathon@lead/ugreen`; baseline G235 docs `90d16a3d2e5d464c3d70ff1e0cc8875c35d1d510`. New G236 handoff code/test, `tools/flowpilot_local_backend.py`, `tools/flowpilot_g166_dashboard.{html,js}`, `tests/g166_browser_client_smoke.cjs`. Normal Git revert.
+7. **Environment:** GitHub Actions Ubuntu+Windows Python/Node, localhost HTTP/browser; Vercel production N/A, no NAS/official Uliya runtime or token use.
+8. **Originals/access:** Canonical Skill, first-party Kit, private contest ZIP/PDF, old SQLite tables and synthetic functions untouched. No private data/code/vendor files sent to public GitHub.
+9. **Next criteria:** Verify exact G236 SHA CI Linux+Windows/Chromium and code boundaries. Only after registered official Uliya Expert verified and explicit owner authorization: actual file metadata action with response/readback and permission denial handling. No unauthorized NAS activation.
+10. **KST time/evidence:** 2026-11-03 KST, G236 CI pending; handoff updated as part of feature commit, exact SHA to confirm after push.
+
 ## 2026-11-03 KST — G235 typed four-stage real Docker synthetic workflow (5/5 CI SUCCESS)
 
 1. **Goal/tech:** Advance full FlowPilot 3.0 beyond G233 inventory demo; Python3/C static scratch Docker, fixed synthetic typed DAG and host-verified SHA receipt. No real NAS or customer sources.

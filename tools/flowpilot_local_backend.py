@@ -31,6 +31,7 @@ from flowpilot_g227_metadata_receipts import (
     from_completed_review, save_receipt, read_receipt,
 )
 from flowpilot_g230_local_council import evaluate_local_receipt, owner_report, CouncilRefused
+from flowpilot_g236_native_handoff import build_native_handoff, NativeHandoffRefused
 
 SCHEMA = "flowpilot-backend-local-v1"
 IDENTITY = "flowpilot-g161-owner-created-backend-v1"
@@ -235,6 +236,10 @@ class Backend:
     def local_operator_report(self, wf_id):
         """Generate bounded, redacted operator instructions; no disk scan."""
         return owner_report(self.local_council(wf_id))
+
+    def native_handoff(self, wf_id):
+        """Read-only local receipt -> redacted Expert checklist, no NAS action."""
+        return build_native_handoff(self.local_council(wf_id))
 
     def create(self, goal, request_id):
         if type(goal) is not str or type(request_id) is not str or not REQ.fullmatch(request_id):
@@ -829,10 +834,11 @@ def create_server(backend: Backend, token: str, *, port: int=0):
                         data=backend.metadata.get(path.rsplit("/",1)[-1])
                     elif re.fullmatch(r"/v1/workflows/wf_[0-9a-f]{32}/local-metadata",path):
                         data=backend.metadata_receipt(path.rsplit("/",2)[-2])
-                    elif re.fullmatch(r"/v1/workflows/wf_[0-9a-f]{32}/(local-council|local-report)",path):
+                    elif re.fullmatch(r"/v1/workflows/wf_[0-9a-f]{32}/(local-council|local-report|native-handoff)",path):
                         wf,kind=path.rsplit("/",2)[-2:]
                         data=(backend.local_council(wf) if kind=="local-council"
-                              else backend.local_operator_report(wf))
+                              else backend.local_operator_report(wf) if kind=="local-report"
+                              else backend.native_handoff(wf))
                     elif re.fullmatch(r"/v1/workflows/wf_[0-9a-f]{32}",path):
                         # G185: an uncertain POST must never be reconciled from
                         # a forged mutable state without validating event order.
@@ -915,7 +921,7 @@ def create_server(backend: Backend, token: str, *, port: int=0):
                                 raise BackendRefused("UNEXPECTED_KEYS",400)
                             data=getattr(backend,action)(wf)
                 self.send(200,data)
-            except (BackendRefused, MetadataRefused, MetadataReceiptRefused, CouncilRefused) as exc:
+            except (BackendRefused, MetadataRefused, MetadataReceiptRefused, CouncilRefused, NativeHandoffRefused) as exc:
                 self.send(exc.status,{"error":exc.code,"release_gate":"HOLD"})
             except (OSError,sqlite3.Error,AssertionError,ValueError):
                 self.send(409,{"error":"LOCAL_BACKEND_REFUSED","release_gate":"HOLD"})

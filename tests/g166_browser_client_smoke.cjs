@@ -57,11 +57,11 @@ const ids = ["token","connect","disconnect","clear","connection-status","notice"
   "workflow-id","workflow-state","plan-hash","metadata-summary","goal","existing","create",
   "list","load","plan","guide","test","approve","run","refresh","audit","evidence","report","recover",
   "synthetic-consent","metadata-consent","required","version-candidates","text-workflow","text-preview","meta-preview","meta-approve",
-  "meta-cancel","meta-status","meta-save","meta-readback","meta-council","meta-report","meta-export","local-council-state","meta-save-consent","advice-disk","advice-errors","advice-backup",
+  "meta-cancel","meta-status","meta-save","meta-readback","meta-council","meta-report","meta-export","native-handoff","local-council-state","meta-save-consent","advice-disk","advice-errors","advice-backup",
   "advice-consent","advice-submit","advice-summary"];
 const buttonIds = ["connect","disconnect","clear","create","list","load","plan","guide",
   "test","approve","run","refresh","audit","evidence","report","recover","text-preview","meta-preview",
-  "meta-approve","meta-cancel","meta-status","meta-save","meta-readback","meta-council","meta-report","meta-export","advice-submit"];
+  "meta-approve","meta-cancel","meta-status","meta-save","meta-readback","meta-council","meta-report","meta-export","native-handoff","advice-submit"];
 class FakeElement {
   constructor(id) {this.id=id;this.value="";this.checked=false;this.disabled=false;
     this.textContent="";this.handlers={};this.options=[];}
@@ -261,6 +261,10 @@ async function main(){
   assert.match(elems.output.textContent,/QA/);
   await click("meta-report");
   assert.match(elems.output.textContent,/OWNER_LOCAL_REPORT_READY_NOT_NAS/);
+  await click("native-handoff");
+  assert.match(elems.output.textContent,/NATIVE_EXECUTION_BLOCKED_PENDING_RUNTIME_EVIDENCE/);
+  assert.doesNotMatch(elems.output.textContent,/not-here\\.pdf|README\\.md/);
+  assert.equal(JSON.parse(elems.output.textContent).nas_verified,false);
   assert.equal(elems["meta-export"].disabled,false);
   await click("meta-export");
   assert.equal(globalThis.__downloads,2,"one synthetic CSV and one redacted local report");

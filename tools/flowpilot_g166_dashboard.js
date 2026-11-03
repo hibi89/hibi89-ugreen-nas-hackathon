@@ -53,6 +53,7 @@ function sync() {
       "text-preview": workflow?.template === "required_file_metadata_v1",
       "meta-council": workflow?.template === "required_file_metadata_v1",
       "meta-report": workflow?.template === "required_file_metadata_v1",
+      "native-handoff": workflow?.template === "required_file_metadata_v1",
       "meta-export": !!lastLocalReport && workflow?.template === "required_file_metadata_v1"
     };
     button.disabled = Object.prototype.hasOwnProperty.call(rules, button.id) && !rules[button.id];
@@ -459,6 +460,21 @@ el("meta-report").addEventListener("click", () => act(async () => {
     throw Error("로컬 보고서 응답 검증 실패");
   lastLocalReport = result;
   status("실측 로컬 메타데이터 기반 보고서 · NAS 검증 아님");
+  output(result);
+}));
+el("native-handoff").addEventListener("click", () => act(async () => {
+  if (!workflow || workflow.template !== "required_file_metadata_v1")
+    throw Error("필수 파일 워크플로의 저장 증거가 필요합니다.");
+  const result = await json("/v1/workflows/" + workflow.workflow_id + "/native-handoff");
+  if (result.schema !== "flowpilot-g236-redacted-native-handoff-v1" ||
+      result.status !== "NATIVE_EXECUTION_BLOCKED_PENDING_RUNTIME_EVIDENCE" ||
+      result.workflow_id !== workflow.workflow_id ||
+      result.release_gate !== "HOLD" || result.nas_verified !== false ||
+      result.actual_registered_expert_invoked !== false ||
+      result.live_nas_readback_verified !== false ||
+      !Array.isArray(result.stages) || result.stages.length > 8)
+    throw Error("Expert 연동 검토 응답 검증 실패");
+  status("실제 로컬 증거 기반 Expert 연동 전 검토 · 실행 및 NAS 검증 없음");
   output(result);
 }));
 el("meta-export").addEventListener("click", () => act(async () => {
