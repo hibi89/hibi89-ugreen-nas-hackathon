@@ -1,3 +1,16 @@
+## 2026-11-03 KST — G235 typed four-stage real Docker synthetic workflow (pending CI)
+
+1. **Goal/tech:** Advance full FlowPilot 3.0 beyond G233 inventory demo; Python3/C static scratch Docker, fixed synthetic typed DAG and host-verified SHA receipt. No real NAS or customer sources.
+2. **Decision:** Reject arbitrary generated code/mounts; choose code-owned four-stage typed DAG and true Docker execution. G234 local socket and client trust boundary reused. No new external services.
+3. **Implementation/tests:** New C-based synthetic `csv_read→validate_decimal→group_sum→report`, strict input/plan validation, sums Alice/Bob cents, exact JSON receipt and source/image/output hashes, 8 unit tests, existing G233 job extended to actually execute G235. **New source CI pending**. Prior G234 all 5/5 source CI success, Linux 1511 PASS, Windows full PASS.
+4. **State:** Real scratch Docker typed workflow feature staged, not yet CI validated. Existing G232 consented local metadata/SQLite/UI intact. No general workflow engine, LLM or native Expert. Release HOLD, NAS NO-GO, Devpost NOT_SUBMITTED, 3h trial UNUSED.
+5. **Failures/risk:** No new failure yet observed. Only code-owned fixture inside image, no owner data, mounts, remote daemon or network. Do not promote output to NAS-ready. Normal revert if CI fails.
+6. **Repo/branch:** `hibi89/hibi89-ugreen-nas-hackathon@lead/ugreen`, G234 source baseline `986e3af7714c84e6891666f360e5836485a6f8f4`; current base `e44bf90fd22de6e4661da22a78918e0a05b8b521`. Changed `tools/flowpilot_g235_typed_dag_docker.py`, `tests/test_flowpilot_g235_typed_dag_docker.py`, `.github/workflows/g233-local-docker-smoke.yml`, STATUS/HANDOFF.
+7. **Environment:** GitHub Ubuntu-24.04 actual Docker runner and Linux/Windows CI, Python3.11/C compiler, local Unix socket, no Vercel Production (N/A). No NAS runtime executed.
+8. **Originals/security:** Canonical Uliya Skill/official Kit and original private PDF/ZIP, G232 local SQLite schema, all previous code/data unchanged. No private data in public commit. Local Docker client ephemeral config, strict inspect, rootfs readonly, cap-drop ALL, no network/mounts/pull.
+9. **Next & criteria:** Verify exact G235 SHA real Docker/Windows/Linux, report any failure, minimize fix; then verify registered Expert signature/rights/schema only on explicitly authorized runtime, followed by real NAS readback with distinct owner consent.
+10. **Timestamp:** 2026-11-03 KST; no code validation beyond predecessor G234 yet; source commit and CI to be recorded once observed.
+
 ## 2026-11-03 KST — G234 local Docker endpoint + image-collision security follow-up (verified 5/5 CI)
 
 1. **Goal & tech:** Harden G233 real synthetic Docker fixture while preserving FlowPilot 3.0 full local workflow and official NAS gates. Python stdlib + local Unix socket + GitHub Actions.

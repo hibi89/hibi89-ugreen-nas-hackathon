@@ -5,6 +5,8 @@ on:
     paths:
       - tools/flowpilot_g233_real_docker_smoke.py
       - .github/workflows/g233-local-docker-smoke.yml
+      - tools/flowpilot_g235_typed_dag_docker.py
+      - tests/test_flowpilot_g235_typed_dag_docker.py
   workflow_dispatch:
 
 permissions:
@@ -21,3 +23,8 @@ jobs:
         run: |
           set -euo pipefail
           python3 tools/flowpilot_g233_real_docker_smoke.py --approve-disconnected-synthetic-docker
+      - name: G235 real trusted fixed typed DAG (synthetic only, NO NAS)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/flowpilot_g235_typed_dag_docker.py --approve-synthetic-typed-docker
