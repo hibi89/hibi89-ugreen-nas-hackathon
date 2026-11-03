@@ -79,6 +79,7 @@ function resetWorkflow(result) {
   workflow = result;
   verifiedPlan = null;
   el("synthetic-consent").checked = false;
+  el("meta-save-consent").checked = false;
   sync();
 }
 function randomRequestId() {
@@ -91,7 +92,7 @@ el("connect").addEventListener("click", () => act(async () => {
   input.value = "";
   // A new login attempt invalidates any previous authority even if input is bad.
   token = ""; workflow = null; verifiedPlan = null; review = null;
-  el("synthetic-consent").checked = false; el("metadata-consent").checked = false;
+  el("synthetic-consent").checked = false; el("metadata-consent").checked = false; el("meta-save-consent").checked = false;
   el("required").value = ""; clearAdvice();
   el("existing").replaceChildren(new Option("선택 안 함", ""));
   el("connection-status").textContent = "기존 세션 폐기 · 인증 확인 중";
@@ -110,7 +111,7 @@ el("disconnect").addEventListener("click", () => {
   token = ""; workflow = null; verifiedPlan = null; review = null;
   el("token").value = ""; el("required").value = ""; clearAdvice();
   el("existing").replaceChildren(new Option("선택 안 함", ""));
-  el("synthetic-consent").checked = false; el("metadata-consent").checked = false;
+  el("synthetic-consent").checked = false; el("metadata-consent").checked = false; el("meta-save-consent").checked = false;
   el("connection-status").textContent = "연결 해제 · 토큰 폐기";
   status("로컬 세션 연결 해제"); output("토큰은 저장되지 않습니다."); sync();
 });

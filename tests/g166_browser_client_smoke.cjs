@@ -57,11 +57,11 @@ const ids = ["token","connect","disconnect","clear","connection-status","notice"
   "workflow-id","workflow-state","plan-hash","metadata-summary","goal","existing","create",
   "list","load","plan","guide","test","approve","run","refresh","audit","evidence","report","recover",
   "synthetic-consent","metadata-consent","required","meta-preview","meta-approve",
-  "meta-cancel","meta-status","advice-disk","advice-errors","advice-backup",
+  "meta-cancel","meta-status","meta-save","meta-readback","meta-save-consent","advice-disk","advice-errors","advice-backup",
   "advice-consent","advice-submit","advice-summary"];
 const buttonIds = ["connect","disconnect","clear","create","list","load","plan","guide",
   "test","approve","run","refresh","audit","evidence","report","recover","meta-preview",
-  "meta-approve","meta-cancel","meta-status","advice-submit"];
+  "meta-approve","meta-cancel","meta-status","meta-save","meta-readback","advice-submit"];
 class FakeElement {
   constructor(id) {this.id=id;this.value="";this.checked=false;this.disabled=false;
     this.textContent="";this.handlers={};this.options=[];}
@@ -242,6 +242,18 @@ async function main(){
   assert.match(elems["metadata-summary"].textContent,/LOCAL_METADATA_BLOCKED/);
   assert.doesNotMatch(elems.output.textContent,/not-here\.pdf|README\.md/);
   await click("meta-status");
+  assert.equal(elems["meta-save"].disabled,true,"redacted SQLite requires a second consent");
+  elems["meta-save-consent"].checked=true;
+  elems["meta-save-consent"].fire("change");
+  assert.equal(elems["meta-save"].disabled,false,"explicit receipt consent allows save");
+  await click("meta-save");
+  assert.equal(elems["meta-save-consent"].checked,false,"one-use save consent must be cleared");
+  assert.equal(elems["meta-save"].disabled,true,"the consumed review cannot be resent");
+  assert.match(elems.output.textContent,/REDACTED_LOCAL_METADATA_EVIDENCE_STORED_NOT_NAS/);
+  assert.doesNotMatch(elems.output.textContent,/not-here\.pdf|README\.md/);
+  await click("meta-readback");
+  assert.match(elems.output.textContent,/REDACTED_LOCAL_METADATA_EVIDENCE_STORED_NOT_NAS/);
+  assert.match(elems.output.textContent,/"state": "MISSING"/);
   elems.required.value="private-raw-path.txt";
   elems["advice-disk"].value="97";
   elems["advice-consent"].checked=true;

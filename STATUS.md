@@ -1,3 +1,8 @@
+## 2026-11-03 KST — G228 fix G227 browser fixture regression; full product priority
+
+- G227 code SHA `cf0f4caa83e9ffd001e3d0ee1145a6573283a070`: offline readiness run 41624094297 failed 1 of 1492 tests (16 SKIP), specifically G166 Node DOM fake missed new `meta-save` button; actual new backend receipt tests and real G172 Chromium passed. No false success claim. Updated browser smoke fake DOM and added actual HTTP save→SQLite readback and second-consent tests. Dashboard clears persistent consent checkbox on reauth/disconnect and workflow reset.
+- Not an additional PDF/Skill round. Full-product integration only. CI exact G228 SHA pending; if failure remains, diagnose logs. Real NAS/registered Uliya still unverified, release HOLD.
+
 ## 2026-11-03 KST — G227 product implementation: owner-consented real local metadata persisted and read back
 
 - Owner explicitly reprioritized **full FlowPilot 3.0 product completion**, not Round1 proposal drafting. Halted PDF/ZIP revisions. Compared altering the existing synthetic workflow/event tables (high regression risk) against an additive redacted-evidence table (low risk). Chose new additive evidence table written ONLY after separate second consent; original workflow schema, synthetic events, canonical Skill and private artifacts untouched.

@@ -1,3 +1,16 @@
+## 2026-11-03 KST — G228 browser integration corrective commit
+
+1. Goal: user-requested full product completion; make real consented LOCAL metadata→SQLite evidence persist through the browser.
+2. Changed DOM smoke to include new controls, exercise secondary approval and actual HTTP POST/GET persisted report. Clear separate save consent during auth and workflow reset. Existing G227 backend and receipt module left unchanged.
+3. G227 base `cf0f4caa83e9ffd001e3d0ee1145a6573283a070` offline readiness run 41624094297: 1492 tests/1 FAIL/16 SKIP, error `Missing DOM element meta-save` in G166 test; other G172 real Chromium and master/closeout PASS. Exact new CI pending.
+4. Status: corrective feature/test code committed; NAS/registered Expert/real production and Devpost NOT_RUN; release HOLD.
+5. Failure diagnosed from actual job log, one targeted source/test fix, not blind retry.
+6. Repo/branch: hibi89/hibi89-ugreen-nas-hackathon lead/ugreen; changed tests/g166_browser_client_smoke.cjs, tools/flowpilot_g166_dashboard.js, STATUS/HANDOFF. Normal revert only.
+7. Runtime: real HTTP localhost+SQLite and Node simulated DOM; browser CI plus Linux/Windows full Python; no Vercel.
+8. Originals: official Kit, canonical Skill, G157–G226 private artifacts unchanged; no customer data.
+9. Next: verify CI and then continue genuine full-stack NAS-safe local implementation, before optional real NAS authorization.
+10. KST 2026-11-03; exact new SHA/CI to be read.
+
 ## 2026-11-03 KST — G227 functional real local metadata → workflow SQLite receipt
 
 1. **Goal:** User reprioritized FULL FlowPilot 3.0, not Round1. Restore working offline/real-local business function while keeping G117 trust boundaries and separate real NAS gate.
