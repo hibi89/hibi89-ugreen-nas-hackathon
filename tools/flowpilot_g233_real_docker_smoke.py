@@ -8,6 +8,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import secrets
+import stat
 from pathlib import Path
 import shutil
 import subprocess
@@ -15,6 +18,7 @@ import tempfile
 
 SMOKE_SCHEMA = "flowpilot-g233-real-local-docker-fixture-v1"
 APPROVAL = "--approve-disconnected-synthetic-docker"
+_LOCAL_DOCKER_HOST = "unix:///var/run/docker.sock"
 C_SOURCE = r"""
 #include <stdio.h>
 #include <string.h>
@@ -59,18 +63,41 @@ class SmokeRefused(RuntimeError):
     pass
 
 
-def checked_run(argv: list[str], *, timeout: int = 45) -> str:
-    """Never shell=True; never include private file content in user-facing errors."""
+def _local_docker_socket_ready() -> bool:
+    """Fail closed: a configured remote Docker context is never sufficient."""
     try:
-        p = subprocess.run(argv, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                           text=True, encoding="utf-8", errors="replace",
-                           timeout=timeout, check=False)
-    except (OSError, subprocess.TimeoutExpired) as exc:
-        raise SmokeRefused("LOCAL_PROCESS_UNAVAILABLE_OR_TIMED_OUT") from exc
+        path = "/var/run/docker.sock"
+        return (os.name == "posix" and not os.path.islink(path)
+                and stat.S_ISSOCK(os.stat(path).st_mode))
+    except (OSError, ValueError):
+        return False
+
+
+def checked_run(argv: list[str], *, timeout: int = 45) -> str:
+    """Run only fixed local tools; strip remote contexts and credential config."""
+    if type(argv) is not list or not argv or argv[0] not in ("docker", "cc"):
+        raise SmokeRefused("UNSUPPORTED_LOCAL_PROCESS")
+    if argv[0] == "docker" and not _local_docker_socket_ready():
+        raise SmokeRefused("LOCAL_DOCKER_SOCKET_NOT_VERIFIED")
+    with tempfile.TemporaryDirectory(prefix="flowpilot-g233-client-") as config:
+        env = {
+            "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
+            "HOME": config, "DOCKER_CONFIG": config,
+            "DOCKER_HOST": _LOCAL_DOCKER_HOST,
+        }
+        cmd = ([argv[0], "--host=" + _LOCAL_DOCKER_HOST, *argv[1:]]
+               if argv[0] == "docker" else argv)
+        try:
+            p = subprocess.run(
+                cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                text=True, encoding="utf-8", errors="replace",
+                timeout=timeout, check=False, env=env, shell=False,
+            )
+        except (OSError, subprocess.TimeoutExpired) as exc:
+            raise SmokeRefused("LOCAL_PROCESS_UNAVAILABLE_OR_TIMED_OUT") from exc
     if p.returncode != 0:
         raise SmokeRefused("LOCAL_PROCESS_REFUSED_OR_FAILED")
     return p.stdout.strip()
-
 
 def verify_host_config(payload: dict, *, started: bool) -> None:
     if type(payload) is not dict:
@@ -123,7 +150,14 @@ def verify_fixture_output(raw: str, stage: str) -> None:
     if len(raw) > 1024:
         raise SmokeRefused("OVERSIZE_FIXTURE_OUTPUT")
     try:
-        data = json.loads(raw)
+        def reject_duplicate_keys(pairs):
+            item = {}
+            for key, value in pairs:
+                if key in item:
+                    raise SmokeRefused("DUPLICATE_CONTAINER_RESPONSE_KEY")
+                item[key] = value
+            return item
+        data = json.loads(raw, object_pairs_hook=reject_duplicate_keys)
     except (ValueError, TypeError) as exc:
         raise SmokeRefused("UNEXPECTED_CONTAINER_RESPONSE") from exc
     state, present, missing = EXPECTED[stage]
@@ -143,6 +177,8 @@ def test_synthetic_docker() -> dict:
     if shutil.which("cc") is None or shutil.which("docker") is None:
         raise SmokeRefused("APPROVED_LOCAL_CC_OR_DOCKER_UNAVAILABLE")
     checked_run(["docker", "info", "--format", "{{.ServerVersion}}"], timeout=15)
+    # Per-invocation unique image names: never overwrite or prune an owner's tag.
+    run_tag = secrets.token_hex(12)
     images: list[str] = []
     containers: list[str] = []
     try:
@@ -166,7 +202,13 @@ def test_synthetic_docker() -> dict:
                     "README.md=PRESENT\nrelease/final.pdf=" + last + "\n",
                     encoding="ascii")
                 (directory / "Dockerfile").write_text(DOCKERFILE, encoding="ascii")
-                image = "flowpilot-g233-" + stage + ":local"
+                image = "flowpilot-g233-" + run_tag + "-" + stage + ":local"
+                existing_tags = checked_run([
+                    "docker", "image", "ls", "--filter", "reference=" + image,
+                    "--format", "{{.Repository}}:{{.Tag}}",
+                ], timeout=15)
+                if image in existing_tags.splitlines():
+                    raise SmokeRefused("IMAGE_TAG_ALREADY_PRESENT")
                 checked_run(["docker", "build", "--pull=false", "--network=none",
                              "--no-cache", "--tag", image, str(directory)], timeout=75)
                 images.append(image)

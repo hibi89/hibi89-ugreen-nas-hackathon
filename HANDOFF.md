@@ -1,3 +1,16 @@
+## 2026-11-03 KST — G234 local Docker endpoint + image-collision security follow-up
+
+1. **Goal & tech:** Harden G233 real synthetic Docker fixture while preserving FlowPilot 3.0 full local workflow and official NAS gates. Python stdlib + local Unix socket + GitHub Actions.
+2. **Change/selection:** Compared inherited Docker context (remote target hazard), isolated explicit Unix daemon (selected), and remote Docker (unapproved). Every Docker command pins local host, ephemeral config/credentials; per-run cryptorandom tag prevents clobber; collision guard and duplicate-JSON refusal. Existing scratch check unchanged.
+3. **Validation:** G233 predecessor `40503d1ff194bba4c42b60b6cedf0a4aaab560a2` SUCCESS real Docker+full Linux/Windows. New G234 eight isolated tests added; exact new source SHA/CI PENDING until inspected. No owner machine/NAS execution.
+4. **State:** G234 source staged for CI, not RELEASE. All earlier G232 typed local evidence/council/report remains, registered Uliya Expert and real NAS PENDING, 3h NAS trial UNUSED, Devpost NOT_SUBMITTED, RELEASE HOLD.
+5. **Cause/attempt:** inherited DOCKER_HOST/CONTEXT and fixed tags might touch unapproved remote/local state despite fixed fixture. Restricted daemon and changed tag isolation; no retries of blocked platform operations. Invalid evidence fails closed.
+6. **Repo/branch/paths:** `hibi89/hibi89-ugreen-nas-hackathon@lead/ugreen`, G233 base `40503d1ff194bba4c42b60b6cedf0a4aaab560a2`, G234 commit to be identified. Code `tools/flowpilot_g233_real_docker_smoke.py`, tests `tests/test_flowpilot_g234_docker_boundaries.py`, STATUS/HANDOFF. Normal Git revert; never force.
+7. **Execution:** Real Docker only on GitHub Actions runner with synthetic image built FROM scratch and no network or mounts; no Vercel deployment. No owner Docker/NAS executed.
+8. **Originals/security:** Existing canonical Uliya Skill, official Kit, G157-G226 private ZIP/PDF and SQLite untouched. No files/paths/secrets copied to repo; local Docker credentials/context excluded; no external transfer.
+9. **Next/criteria:** Verify exact G234 SHA Docker, Linux/Windows and browser-related CI. Then owner-authorized registered Uliya Expert capability + true NAS readback; release never inferred from synthetic PASS.
+10. **KST & evidence:** 2026-11-03 KST; confirmed G233 CI before patch, G234 pending at writing. No production or NAS validation.
+
 ## 2026-11-03 KST — G232+G233 actual product engineering, safe Docker real execution verified, 10-field handoff
 
 1. **Goal/approved requirements/tech:** FlowPilot 3.0 full natural-language workflow maker with bounded typed DAG, capability review, consent, sandbox QA, limited repair and audit; USER explicitly prioritizes full product instead of Round1 artifact prep. Python 3.11 stdlib/SQLite/loopback HTTP/JS, existing G64 Korean/English strict DSL, G165 read-only local metadata, G227 persisted receipt, G230 4 deterministic policy perspectives, GitHub Ubuntu/Windows Actions. Release HOLD and NAS NO-GO.
