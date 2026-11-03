@@ -1,3 +1,8 @@
+## 2026-11-03 KST — G229 targeted Windows SQLite handle cleanup regression repair
+
+- G228 exact functional SHA `76f84495bdce7b45ab31be5bd2b7bbf71675c88b`: Linux Python 1492 tests/0 FAIL/16 SKIP and Chromium G172 PASS; master/handoff checks PASS. Full Windows owner-equivalent regression FAILED **1 error** despite no failing assertions: new G227 test `test_corruption_refused_on_readback` used `with sqlite3.connect(self.db)` which commits but **does not close** the connection, leaving a Win32 handle while `TemporaryDirectory.cleanup()` removes the DB (`WinError 32`). Exact Windows run 41624537143.
+- Repair is strictly scoped to `tests/test_flowpilot_g227_metadata_receipts.py`: `contextlib.closing(sqlite3.connect(...))` plus explicit `db.commit()`; keeps actual corruption/readback test semantics and production code unchanged. Need verify fresh Linux+Windows source CI before DONE; release HOLD and all NAS/official data boundaries unchanged.
+
 ## 2026-11-03 KST — G228 fix G227 browser fixture regression; full product priority
 
 - G227 code SHA `cf0f4caa83e9ffd001e3d0ee1145a6573283a070`: offline readiness run 41624094297 failed 1 of 1492 tests (16 SKIP), specifically G166 Node DOM fake missed new `meta-save` button; actual new backend receipt tests and real G172 Chromium passed. No false success claim. Updated browser smoke fake DOM and added actual HTTP save→SQLite readback and second-consent tests. Dashboard clears persistent consent checkbox on reauth/disconnect and workflow reset.

@@ -2,6 +2,7 @@
 from __future__ import annotations
 import http.client
 import json
+from contextlib import closing
 from pathlib import Path
 import sqlite3
 import sys
@@ -81,8 +82,11 @@ class G227Tests(unittest.TestCase):
     def test_corruption_refused_on_readback(self):
         r = self.approved(["README.md"])
         self.backend.save_metadata_receipt(self.file_wf, r["review_id"], r["scope_sha256"], ACK)
-        with sqlite3.connect(self.db) as db:
+        # sqlite3.Connection's context manager COMMITs, but does NOT CLOSE.
+        # On Windows an unclosed handle prevents TemporaryDirectory cleanup.
+        with closing(sqlite3.connect(self.db)) as db:
             db.execute("UPDATE fp_backend_local_metadata_evidence SET payload_sha=?", ("0"*64,))
+            db.commit()
         with self.assertRaisesRegex(MetadataReceiptRefused, "METADATA_EVIDENCE_HASH_MISMATCH"):
             self.backend.metadata_receipt(self.file_wf)
 

@@ -1,3 +1,16 @@
+## 2026-11-03 KST — G229 Windows cleanup fix, full product offline integration
+
+1. Goal: restore Linux/Windows complete feature verification for G227 real LOCAL metadata persistence and browser API.
+2. Decision: preserve prod code; change new corruption fixture test only to close SQLite connection explicitly; sqlite3 context manager alone doesn't close on Windows.
+3. Evidence: G228 SHA `76f84495bdce7b45ab31be5bd2b7bbf71675c88b`: Linux 1492 tests, 0 FAIL, 16 SKIP; G172 actual Chromium PASS, master/handoff PASS; Windows full run 41624537143 FAIL 1 error `WinError 32` while deleting temporary `new.sqlite`, not a feature assertion failure.
+4. State: targeted fix applied, exact new CI pending, RELEASE HOLD, NAS Uliya/Expert NOT_RUN, 3h unused.
+5. Cause/attempt: leaked handle in test, not product DB mutation. One direct patch, no unnecessary full feature rewrite.
+6. Repo: hibi89/hibi89-ugreen-nas-hackathon lead/ugreen; base `76f84495bdce7b45ab31be5bd2b7bbf71675c88b`; touched one regression test and status/handoff. Normal git revert rollback.
+7. Environment: GitHub Actions Python 3.11 on Ubuntu and Windows, Node Chromium; Vercel N/A.
+8. Originals: old Skill, official Kit, G157–G226 private artifacts and production source unchanged. No credentials/private data leaked.
+9. Next: await exact new Linux/Windows CI, then advance real-local council/report, and live NAS only with separate approved access.
+10. Date: 2026-11-03 KST, verification scope CI per same source SHA once complete.
+
 ## 2026-11-03 KST — G228 browser integration corrective commit
 
 1. Goal: user-requested full product completion; make real consented LOCAL metadata→SQLite evidence persist through the browser.
