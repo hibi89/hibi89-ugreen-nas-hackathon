@@ -1,3 +1,15 @@
+## 2026-11-03 KST — G223 exact-SHA Linux/Windows CI independently confirmed
+
+1. Scope: source validation of G223 exact pair drift guard, not official NAS/Creator/Checker.
+2. Feature commit: c12412ee1f5693088edd29f1853d3fa8757b8d97 (lead/ugreen).
+3. Exact GitHub Actions: functional Linux+Windows 41609114168 SUCCESS (2 jobs), readiness 41609114250 SUCCESS, master 41609114253 SUCCESS, handoff 41609114049 SUCCESS; 4/4 workflows. Targeted synthetic tests 9 PASS locally; full CI exact Python test count NOT_EXTRACTED.
+4. State: G223 code + CI DONE; still RELEASE HOLD, Creator provenance, first-party Checker, actual NAS/Devpost NOT_RUN. Provider terms/rights not independently confirmed.
+5. Old G222 report hash drift was resolved by fail-closed verification of the current 73,930B PDF copy, not by mutating the old report or source. Any mismatched old report is intentionally refused; do not re-label it as current.
+6. Repo SHA c12412ee..., branch lead/ugreen. This documentation closeout preserves all source/owner private bytes; ordinary Git revert if needed, no force push.
+7. Production Vercel N/A. CI is Linux/Windows offline-only; no external agent/API calls.
+8. Originals G157/G188/G219/G220/G221/G222 and official Kit preserved. Public repo has only code/tests/status, not private PDF/ZIP.
+9. Next: actual supported Creator use or organizer answer; provider controls; separately approved official Checker; owner rights and final release/Devpost approval. Keep NAS 3h trial unused for Round1.
+10. Checked 2026-11-03 KST, exact source run IDs above. Document-only closeout SHA requires its own lightweight CI confirmation.
 ## 2026-11-03 KST — G223 exact pair byte integrity handoff (10 required fields)
 
 1. Goal: tie the exact G221 skill ZIP to the currently obtainable G222 proposal PDF, rejecting stale QA manifests.

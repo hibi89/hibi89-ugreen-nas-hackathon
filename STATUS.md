@@ -1,3 +1,7 @@
+## 2026-11-03 KST — G223 exact-source CI FINAL: 4/4 SUCCESS; still HOLD
+
+- Independently checked GitHub Actions on functional SHA c12412ee1f5693088edd29f1853d3fa8757b8d97: full Linux+Windows regression run 41609114168 SUCCESS (both jobs); offline readiness run 41609114250 SUCCESS; master progress run 41609114253 SUCCESS; live handoff run 41609114049 SUCCESS. Exact new test total in full jobs NOT_EXTRACTED; targeted G223 synthetic tests locally 9/9 PASS.
+- Source code and owner-private candidate bytes remain unchanged by this closeout. New G223 verified PDF copy: SHA256 375a3e5400f767f14866e3eb4acb7637aa43e12baacf4bed5d57033ac8ede59a; ZIP G221: fecc138e34f5fa88c8119baefdb70acec22ad92bf324305d7f5fe179fd1cc4a9. Historical G222 report 57b017... is stale. No official Creator/Checker/NAS or Devpost run; release HOLD.
 ## 2026-11-03 KST — G223 real G222 PDF hash drift repaired by pinned offline verifier
 
 - Discovered detached G222 report claims 48,961B and PDF SHA256 57b017f9..., while independently re-read G222 PDF is 73,930B and SHA256 375a3e54.... Cause NOT_DETERMINED. Old report is STALE and not an exact-byte receipt.
