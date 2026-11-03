@@ -50,6 +50,7 @@ function sync() {
         ["LOCAL_METADATA_FINDINGS_READY", "LOCAL_METADATA_BLOCKED"].includes(review?.status) &&
         el("meta-save-consent").checked,
       "meta-readback": workflow?.template === "required_file_metadata_v1",
+      "text-preview": workflow?.template === "required_file_metadata_v1",
       "meta-council": workflow?.template === "required_file_metadata_v1",
       "meta-report": workflow?.template === "required_file_metadata_v1",
       "meta-export": !!lastLocalReport && workflow?.template === "required_file_metadata_v1"
@@ -84,6 +85,9 @@ async function act(fn) {
 function resetWorkflow(result) {
   workflow = result;
   verifiedPlan = null;
+  review = null;
+  el("metadata-consent").checked = false;
+  el("meta-save-consent").checked = false;
   lastLocalReport = null;
   el("synthetic-consent").checked = false;
   el("meta-save-consent").checked = false;
@@ -100,7 +104,7 @@ el("connect").addEventListener("click", () => act(async () => {
   // A new login attempt invalidates any previous authority even if input is bad.
   token = ""; workflow = null; verifiedPlan = null; review = null; lastLocalReport = null;
   el("synthetic-consent").checked = false; el("metadata-consent").checked = false; el("meta-save-consent").checked = false;
-  el("required").value = ""; el("version-candidates").value = ""; clearAdvice();
+  el("required").value = ""; el("version-candidates").value = ""; el("text-workflow").value = ""; clearAdvice();
   el("existing").replaceChildren(new Option("선택 안 함", ""));
   el("connection-status").textContent = "기존 세션 폐기 · 인증 확인 중";
   if (candidate.length < 32 || candidate.length > 256) throw Error("토큰 길이는 32–256자여야 합니다.");
@@ -116,7 +120,7 @@ el("connect").addEventListener("click", () => act(async () => {
 }));
 el("disconnect").addEventListener("click", () => {
   token = ""; workflow = null; verifiedPlan = null; review = null; lastLocalReport = null;
-  el("token").value = ""; el("required").value = ""; el("version-candidates").value = ""; clearAdvice();
+  el("token").value = ""; el("required").value = ""; el("version-candidates").value = ""; el("text-workflow").value = ""; clearAdvice();
   el("existing").replaceChildren(new Option("선택 안 함", ""));
   el("synthetic-consent").checked = false; el("metadata-consent").checked = false; el("meta-save-consent").checked = false;
   el("connection-status").textContent = "연결 해제 · 토큰 폐기";
@@ -320,6 +324,7 @@ el("meta-preview").addEventListener("click", () => act(async () => {
   const rawVersions = el("version-candidates").value;
   el("required").value = "";
   el("version-candidates").value = "";
+  el("text-workflow").value = "";
   lastLocalReport = null;
   review = null;
   el("metadata-consent").checked = false;
@@ -344,6 +349,27 @@ el("meta-preview").addEventListener("click", () => act(async () => {
   review = await json("/v1/local-metadata/preview", args);
   status("로컬 메타데이터 읽기 전 미리보기 · 아직 파일 미조회"); output(review);
 }));
+el("text-preview").addEventListener("click", () => act(async () => {
+  const raw = el("text-workflow").value;
+  el("text-workflow").value = "";
+  el("required").value = "";
+  el("version-candidates").value = "";
+  review = null;
+  lastLocalReport = null;
+  el("metadata-consent").checked = false;
+  el("meta-save-consent").checked = false;
+  if (!workflow || workflow.template !== "required_file_metadata_v1")
+    throw Error("먼저 필수 파일 워크플로를 생성하거나 불러오세요.");
+  if (!raw || raw.length > 1100) throw Error("다단계 명령 1–1100자가 필요합니다.");
+  review = await json("/v1/local-metadata/text-preview",
+                      {workflow_id:workflow.workflow_id,instructions:raw});
+  if (review.status !== "WAITING_APPROVAL" ||
+      review.bound_workflow_id !== workflow.workflow_id ||
+      !(review.parsed_actions_count >= 1 && review.parsed_actions_count <= 8))
+    throw Error("다단계 검토 응답이 유효하지 않습니다.");
+  status("다단계 요구사항 구조화 · 원본 파일 미조회 · 별도 1회 승인 필요");
+  output(review);
+}));
 el("meta-approve").addEventListener("click", () => act(async () => {
   if (!review || review.status !== "WAITING_APPROVAL" || !el("metadata-consent").checked)
     throw Error("검토 및 별도 동의가 필요합니다.");
@@ -367,6 +393,7 @@ el("meta-cancel").addEventListener("click", () => act(async () => {
   el("metadata-consent").checked = false;
   el("required").value = "";
   el("version-candidates").value = "";
+  el("text-workflow").value = "";
   const canceled = await json("/v1/local-metadata/cancel", {review_id:reviewId});
   if (canceled.review_id !== reviewId || canceled.status !== "CANCELED" ||
       canceled.approved_local_metadata_access !== false)

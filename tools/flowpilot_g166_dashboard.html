@@ -24,6 +24,11 @@
 <p id="plan-hash" class="mono">계획 SHA-256: 미확인</p></section>
 <section class="panel" aria-labelledby="metadata-title"><h2 id="metadata-title">3 · 선택적 로컬 메타데이터 점검</h2>
 <p>서버 시작 시 지정한 비 NAS 로컬 폴더에 한정합니다. 미리보기에서는 파일 시스템을 조회하지 않으며, 승인 후 lstat만 수행합니다.</p>
+<label for="text-workflow">다단계 텍스트 업무 설계 (한글·영어, 코드 소유 명령만)</label>
+<textarea id="text-workflow" rows="3" maxlength="1100" spellcheck="false"
+  placeholder="파일 확인: README.md; 버전 비교: final.pdf =&gt; final_v2.pdf"></textarea>
+<p>지원되는 명령 예시: <code>파일 확인:</code>, <code>버전 비교:</code>, <code>납품 확인:</code>. 세미콜론으로 1–8단계 연결합니다. 자유형 AI 추측 없이 정확한 문법을 사용하며 NAS를 실행하지 않습니다.</p>
+<div class="actions"><button id="text-preview" type="button" class="quiet">다단계 읽기 전 검토</button></div>
 <label for="required">필수 상대 경로 (한 줄당 하나, 1–20개)</label><textarea id="required" rows="3" spellcheck="false" placeholder="README.md&#10;release/final.pdf"></textarea>
 <label for="version-candidates">선택적 버전 후보 관계 (필수경로=후보경로, 줄당 하나, 전체 최대 20개)</label>
 <textarea id="version-candidates" rows="2" spellcheck="false" placeholder="release/design.pdf=release/design_v2.pdf"></textarea>

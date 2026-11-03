@@ -206,6 +206,13 @@ class Backend:
             with closing(self._connect()) as db:
                 return save_receipt(db, review_id, record)
 
+    def begin_text_preview(self, wf_id, instructions):
+        """Bind one private bounded multi-stage text scope to a typed workflow."""
+        workflow = self.verified_get(wf_id)
+        if workflow["template"] != "required_file_metadata_v1":
+            raise BackendRefused("METADATA_TEMPLATE_REQUIRED", 422)
+        return self.metadata.begin_text(wf_id, instructions)
+
     def metadata_receipt(self, wf_id):
         """Read persisted LOCAL metadata without reading the owner folder."""
         with self.lock:
@@ -870,6 +877,11 @@ def create_server(backend: Backend, token: str, *, port: int=0):
                             raise BackendRefused("UNEXPECTED_KEYS",400)
                         data=backend.metadata.begin(
                             body["goal"],body["required"],versions=body.get("versions"))
+                    elif path=="/v1/local-metadata/text-preview":
+                        if set(body)!={"workflow_id","instructions"}:
+                            raise BackendRefused("UNEXPECTED_KEYS",400)
+                        data=backend.begin_text_preview(
+                            body["workflow_id"],body["instructions"])
                     elif path=="/v1/local-metadata/approve":
                         if set(body)!={"review_id","scope_sha256","acknowledgement"}:
                             raise BackendRefused("UNEXPECTED_KEYS",400)

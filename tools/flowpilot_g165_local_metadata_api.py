@@ -14,6 +14,7 @@ import threading
 import time
 
 from flowpilot_owner_local_audit import inspect_owner_folder, OwnerAuditError, _valid_relative
+from flowpilot_text_workflow import parse_instructions, WorkflowRefused
 
 SCHEMA = "flowpilot-owner-local-metadata-session-v1"
 MAX_REVIEWS = 32
@@ -50,6 +51,11 @@ class MetadataGate:
 
     @staticmethod
     def _public(token: str, item: dict) -> dict:
+        extra = {}
+        if "stage_layout" in item:
+            extra = {"stage_layout": [dict(x) for x in item["stage_layout"]],
+                     "parsed_actions_count": len(item["stage_layout"]),
+                     "bound_workflow_id": item["bound_workflow_id"]}
         return {
             "schema": SCHEMA, "review_id": token, "status": item["status"],
             "scope_sha256": item["digest"], "required_count": item["required_count"],
@@ -60,6 +66,7 @@ class MetadataGate:
             "owner_root_returned": False, "raw_filenames_returned": False,
             "file_contents_opened": False, "nas_verified": False,
             "registered_expert_invoked": False, "release_gate": "HOLD",
+            **extra,
         }
 
     def begin(self, goal: object, required: object, *, versions: object = None) -> dict:
@@ -124,6 +131,56 @@ class MetadataGate:
                     "digest": digest, "status": "WAITING_APPROVAL", "result": None}
             self._reviews[token] = item
             return self._public(token, item)
+
+    def begin_text(self, workflow_id: object, instructions: object) -> dict:
+        """One review/consent for a bounded multi-stage Korean/English recipe.
+
+        G64's parser accepts ONLY exact colon-delimited, allowlisted stages.
+        All paths pass the existing G165 owner-local preflight and approved
+        lstat scanner, never the G64 raw-file execution entrypoint.
+        """
+        with self._lock:
+            if (type(workflow_id) is not str or len(workflow_id) != 35
+                    or not workflow_id.startswith("wf_")
+                    or any(ch not in "0123456789abcdef" for ch in workflow_id[3:])):
+                raise MetadataRefused("INVALID_TEXT_WORKFLOW_ID", 400)
+            if (type(instructions) is not str or
+                    not 0 < len(instructions.encode("utf-8")) <= 1500):
+                raise MetadataRefused("INVALID_BOUNDED_TEXT_INSTRUCTIONS", 400)
+            try:
+                recipe = parse_instructions(instructions)
+            except (WorkflowRefused, ValueError, TypeError) as exc:
+                raise MetadataRefused("UNSUPPORTED_OR_UNSAFE_TEXT_WORKFLOW", 422) from exc
+            required: list[str] = []
+            versions: dict[str, list[str]] = {}
+            layout: list[dict] = []
+            for index, stage in enumerate(recipe["steps"], 1):
+                kind = {
+                    "check required files": "REQUIRED_FILES",
+                    "compare versions": "REVIEW_VERSIONS",
+                    "check handoff deliverables": "HANDOFF_CHECKLIST",
+                }.get(stage.get("goal"))
+                names = stage.get("required")
+                if kind is None or type(names) is not list or not names:
+                    raise MetadataRefused("TEXT_STAGE_UNSUPPORTED", 422)
+                layout.append({
+                    "stage_index": index, "kind": kind,
+                    "start_index": len(required) + 1, "item_count": len(names),
+                })
+                required.extend(names)
+                if kind == "REVIEW_VERSIONS":
+                    if type(stage.get("candidates")) is not dict:
+                        raise MetadataRefused("TEXT_VERSION_MAPPING_INVALID", 422)
+                    versions.update(stage["candidates"])
+            if (not 1 <= len(required) <= MAX_PATHS or
+                    len(set(required)) != len(required)):
+                raise MetadataRefused("TEXT_STAGE_SCOPE_EXCEEDS_LIMIT", 400)
+            pre = self.begin("check required files", required, versions=versions)
+            item = self._reviews[pre["review_id"]]
+            # Only code-defined kinds/indexes enter public/SQLite evidence.
+            item["stage_layout"] = layout
+            item["bound_workflow_id"] = workflow_id
+            return self._public(pre["review_id"], item)
 
     def _lookup(self, token: str):
         self._prune()

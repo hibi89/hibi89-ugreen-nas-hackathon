@@ -37,11 +37,13 @@ def _sha(payload: dict) -> str:
 
 
 def _validate(payload: object) -> dict:
-    if type(payload) is not dict or set(payload) != {
+    mandatory = {
         "schema", "workflow_id", "scope_sha256", "inspection_status",
         "item_count", "findings", "local_metadata_only", "file_contents_opened",
         "registered_expert_invoked", "nas_verified", "release_gate",
-    }:
+    }
+    if (type(payload) is not dict or
+            set(payload) not in (mandatory, mandatory | {"stage_layout"})):
         raise MetadataReceiptRefused("METADATA_EVIDENCE_SHAPE_INVALID")
     if (payload["schema"] != SCHEMA or
             type(payload["workflow_id"]) is not str or
@@ -67,6 +69,23 @@ def _validate(payload: object) -> dict:
     all_present = all(row["state"] == "PRESENT" for row in rows)
     if all_present != (payload["inspection_status"] == "LOCAL_METADATA_FINDINGS_READY"):
         raise MetadataReceiptRefused("METADATA_EVIDENCE_STATUS_CONFLICT")
+    if "stage_layout" in payload:
+        stages = payload["stage_layout"]
+        if type(stages) is not list or not 1 <= len(stages) <= 8:
+            raise MetadataReceiptRefused("METADATA_STAGE_LAYOUT_INVALID")
+        start = 1
+        for i, stage in enumerate(stages, 1):
+            if (type(stage) is not dict or
+                    set(stage) != {"stage_index", "kind", "start_index", "item_count"} or
+                    type(stage["stage_index"]) is not int or stage["stage_index"] != i or
+                    type(stage["start_index"]) is not int or stage["start_index"] != start or
+                    type(stage["item_count"]) is not int or stage["item_count"] < 1 or
+                    type(stage["kind"]) is not str or
+                    stage["kind"] not in ("REQUIRED_FILES", "REVIEW_VERSIONS", "HANDOFF_CHECKLIST")):
+                raise MetadataReceiptRefused("METADATA_STAGE_LAYOUT_INVALID")
+            start += stage["item_count"]
+        if start != payload["item_count"] + 1:
+            raise MetadataReceiptRefused("METADATA_STAGE_PARTITION_INVALID")
     if len(_serialize(payload)) > 8192:
         raise MetadataReceiptRefused("METADATA_EVIDENCE_OVERSIZED")
     return payload
@@ -88,6 +107,9 @@ def from_completed_review(workflow_id: object, scope: object, review: object) ->
             review.get("nas_verified") is not False or
             review.get("registered_expert_invoked") is not False):
         raise MetadataReceiptRefused("COMPLETED_LOCAL_REVIEW_REQUIRED", 403)
+    bound = review.get("bound_workflow_id")
+    if bound is not None and bound != workflow_id:
+        raise MetadataReceiptRefused("TEXT_WORKFLOW_BINDING_MISMATCH", 403)
     result = review.get("inspection_result")
     if type(result) is not list or type(review.get("required_count")) is not int:
         raise MetadataReceiptRefused("INVALID_LOCAL_REVIEW")
@@ -102,6 +124,8 @@ def from_completed_review(workflow_id: object, scope: object, review: object) ->
         "registered_expert_invoked": False, "nas_verified": False,
         "release_gate": "HOLD",
     }
+    if "stage_layout" in review:
+        payload["stage_layout"] = review["stage_layout"]
     return _validate(payload)
 
 

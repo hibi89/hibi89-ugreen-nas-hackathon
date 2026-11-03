@@ -54,6 +54,20 @@ def evaluate_local_receipt(receipt: object, *, workflow_id: object,
                 for idx, row in enumerate(rows, 1))):
         raise CouncilRefused("UNTRUSTED_LOCAL_FINDINGS")
     counts = {s: sum(row["state"] == s for row in rows) for s in STATES}
+    stage_reviews = []
+    for step in record.get("stage_layout", []):
+        selected = rows[step["start_index"] - 1:
+                        step["start_index"] - 1 + step["item_count"]]
+        missing_in_step = sum(x["state"] == "MISSING" for x in selected)
+        review_in_step = sum(
+            x["state"] in ("NOT_CHECKED", "VERSION_REVIEW") for x in selected)
+        stage_reviews.append({
+            "stage_index": step["stage_index"], "kind": step["kind"],
+            "item_count": step["item_count"],
+            "verdict": ("BLOCKED" if missing_in_step else
+                        "REVIEW" if review_in_step else "PASS_LOCAL"),
+            "real_nas_verified": False,
+        })
     unknown = counts["NOT_CHECKED"] + counts["VERSION_REVIEW"]
     missing = counts["MISSING"]
     if record.get("inspection_status") != (
@@ -90,7 +104,7 @@ def evaluate_local_receipt(receipt: object, *, workflow_id: object,
     return {
         "schema": SCHEMA, "status": verdict, "workflow_id": workflow_id,
         "plan_sha256": plan_sha256, "local_receipt_sha256": fingerprint,
-        "item_count": len(rows), "counts": counts, "findings": [
+        "item_count": len(rows), "counts": counts, "stage_reviews": stage_reviews, "findings": [
             {"index": row["index"], "state": row["state"]} for row in rows],
         "roles": roles, "proposed_correction": proposed,
         "policy_engine": "FOUR_DETERMINISTIC_LOCAL_PERSPECTIVES_NOT_AI_AGENTS",
@@ -138,6 +152,10 @@ def owner_report(review: object) -> dict:
         "## Four deterministic review perspectives",
         *[f"- {r['role']}: {r['status']} ({r['reason']})"
           for r in review["roles"]],
+        "",
+        "## Parsed bounded local stages",
+        *[f"- Stage {s['stage_index']} ({s['kind']}): {s['verdict']} ({s['item_count']} items)"
+          for s in review.get("stage_reviews", [])],
         "",
         "## Owner follow-up",
         summary,

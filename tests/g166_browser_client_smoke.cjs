@@ -56,11 +56,11 @@ globalThis.fetch = (route, init) => {
 const ids = ["token","connect","disconnect","clear","connection-status","notice","output",
   "workflow-id","workflow-state","plan-hash","metadata-summary","goal","existing","create",
   "list","load","plan","guide","test","approve","run","refresh","audit","evidence","report","recover",
-  "synthetic-consent","metadata-consent","required","version-candidates","meta-preview","meta-approve",
+  "synthetic-consent","metadata-consent","required","version-candidates","text-workflow","text-preview","meta-preview","meta-approve",
   "meta-cancel","meta-status","meta-save","meta-readback","meta-council","meta-report","meta-export","local-council-state","meta-save-consent","advice-disk","advice-errors","advice-backup",
   "advice-consent","advice-submit","advice-summary"];
 const buttonIds = ["connect","disconnect","clear","create","list","load","plan","guide",
-  "test","approve","run","refresh","audit","evidence","report","recover","meta-preview",
+  "test","approve","run","refresh","audit","evidence","report","recover","text-preview","meta-preview",
   "meta-approve","meta-cancel","meta-status","meta-save","meta-readback","meta-council","meta-report","meta-export","advice-submit"];
 class FakeElement {
   constructor(id) {this.id=id;this.value="";this.checked=false;this.disabled=false;
@@ -277,6 +277,28 @@ async function main(){
   await click("meta-approve");
   assert.match(elems.output.textContent,/VERSION_REVIEW/);
   assert.doesNotMatch(elems.output.textContent,/README-v1.md|README.md/);
+  // G232: actual two-stage local pipeline, same one-use read/save consent.
+  await click("create");
+  elems["text-workflow"].value =
+    "파일 확인: README.md; 버전 비교: delivery.pdf => README-other.md";
+  await click("text-preview");
+  assert.equal(elems["text-workflow"].value,"","raw private instructions scrubbed");
+  assert.equal(elems["metadata-consent"].checked,false);
+  assert.match(elems.output.textContent,/"parsed_actions_count": 2/);
+  assert.match(elems.output.textContent,/HANDOFF_CHECKLIST|REVIEW_VERSIONS/);
+  assert.doesNotMatch(elems.output.textContent,/README.md|delivery.pdf|README-other.md/);
+  elems["metadata-consent"].checked=true;elems["metadata-consent"].fire("change");
+  await click("meta-approve");
+  assert.match(elems.output.textContent,/LOCAL_METADATA_BLOCKED/);
+  elems["meta-save-consent"].checked=true;elems["meta-save-consent"].fire("change");
+  await click("meta-save");
+  assert.match(elems.output.textContent,/"stage_layout"/);
+  await click("meta-council");
+  assert.match(elems.output.textContent,/"stage_reviews"/);
+  await click("meta-report");
+  assert.match(elems.output.textContent,/Stage 1/);
+  assert.match(elems.output.textContent,/Stage 2/);
+  assert.doesNotMatch(elems.output.textContent,/README.md|delivery.pdf|README-other.md/);
   elems.required.value="private-raw-path.txt";
   elems["advice-disk"].value="97";
   elems["advice-consent"].checked=true;
