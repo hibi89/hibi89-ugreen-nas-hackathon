@@ -61,7 +61,7 @@ class G235TypedDockerTests(unittest.TestCase):
             self.skipTest("C compiler not installed")
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
-            program = root / "check"
+            program = root / ("check.exe" if sys.platform == "win32" else "check")
             src = root / "check.c"
             src.write_text(g235.C_SOURCE, encoding="ascii")
             cc = subprocess.run(["cc", "-O2", "-static", "-Wall", "-Wextra",
