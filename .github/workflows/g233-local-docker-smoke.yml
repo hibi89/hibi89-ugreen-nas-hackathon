@@ -1,0 +1,23 @@
+name: G233 real disconnected Docker fixture (NO NAS)
+on:
+  push:
+    branches: [lead/ugreen]
+    paths:
+      - tools/flowpilot_g233_real_docker_smoke.py
+      - .github/workflows/g233-local-docker-smoke.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test real Docker sandbox without network, pulls, mounts or NAS
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/flowpilot_g233_real_docker_smoke.py --approve-disconnected-synthetic-docker
