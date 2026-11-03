@@ -1,3 +1,16 @@
+## 2026-11-03 KST — G217 OWNER-REPORTED G207 OFFLINE PASS, CREATOR APPROVAL PENDING
+
+1. **Goal:** Resume Round1 FlowPilot genuine Uliya Skill Creator path, fix earlier Windows launch blocker without bypassing actual G207 doctor.
+2. **Observed change:** Owner relayed Python 3.11.9 direct `python -B tools/g207_offline_doctor.py`: `offline_integrity=PASS`, privacy `PASS_AT_TIME_OF_CHECK_NO_EXTRA_FILES`, exit **0**, Kit **0.7.3 / 26 files**. Earlier CMD wrapper `py -3` exited **112** and was not itself repaired on the owner's original folder. No files modified. Full raw local console log not independently captured.
+3. **Tests:** Local doctor PASS is **operator-reported**, not remote-reproduced. GitHub last original feature G213 SHA `fd43a5acbd63a794e55b8622fa364a7ea44f7980` Linux/Windows CI **4/4 SUCCESS**; G214 docs CI **3/3 SUCCESS** at `408ca1abd434f4708f71d0850a01eec53563f731`. New G217 docs-only CI verify after HEAD. Official Creator/Checker/NAS NOT_RUN.
+4. **State:** G207 local preflight error resolved by directly invoking unchanged official-package integrity doctor; new project auto discovery **NOT_VERIFIED**; actual new FlowPilot Creator skill/provenance NOT_EVIDENCED; final owner rights/AI/IP release/Devpost pending. NAS technical NO-GO, 3h trial untouched, RELEASE HOLD; historic ~90% subjective.
+5. **Error/pivot:** Windows `py.exe` launcher printed `No installed Python found!` exit 112 despite available Python 3.11.9. Direct `python -B` validated real doctor, no fake bypass. No unsupported remote Python installer / forced changes.
+6. **Repo/branch:** `hibi89/hibi89-ugreen-nas-hackathon@lead/ugreen`, predecessor `408ca1abd434f4708f71d0850a01eec53563f731`. G217 modifies only STATUS/HANDOFF. Normal Git revert if needed; no force.
+7. **Environment:** Owner-local Windows Codex session (only owner report); GitHub Actions offline CI. Vercel N/A; no approved vendor/model remote calls made by assistant.
+8. **Originals:** G188 Skill ZIP, G157 PDF, Uliya Kit 0.7.3, G207 workspace unchanged; no customer or operator local file content, secrets or personally identifying paths published.
+9. **Next action requiring approval:** In a fresh Codex project opened on G207 workspace, confirm real `uliya-skill-kit` automatic discovery and request the official Creator to generate new `output/flowpilot-3/SKILL.md` from only the sanitized G207 request. Owner must expressly approve sanitized brief transmission and official Creator model invocation after provider terms; collect resulting source + honest run chronology and hashes. Checker/NAS/uploads/final Devpost submission each remain separate consent decisions.
+10. **Date/scope:** 2026-11-03 KST; operator-provided local report, repo docs update; no new live vendor/Windows test performed by assistant, no production claim.
+
 ## 2026-11-03 KST — G214 EXACT OWNER ROUND1 SUBMISSION-PAIR TRIAGE (READ-ONLY, RELEASE HOLD)
 
 1. **Objective:** Verify actual unchanged G188 PDF partner G157 against currently published Round1 PDF/ZIP limits, claimed functionality, licensing and true Creator provenance; deadline Nov 16 16:45 KST.
