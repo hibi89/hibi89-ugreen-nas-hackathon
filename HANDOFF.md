@@ -1,3 +1,16 @@
+## 2026-11-03 KST — G238 LOCAL operator-selected CSV real-data typed engine (CI pending)
+
+1. **Goal/tech:** Full FlowPilot3; unlock real locally approved CSV processing, instead of repeated code-owned fixtures. Python3.11 stdlib CSV/OS, SHA256 receipts and optional create-only local CSV/JSON artifacts.
+2. **Design/implementation:** Compare Docker image with owner CSV (unsafe persistence), native NAS invocation (unverified signature/rights) and narrow single-file read-only Python engine (selected). New deterministic no-file-touch preview returns plan hash. Exact SHA-bound one-time read approval; four fixed typed stages on actual bounded CSV (1–256 rows, <=32 safe ASCII groups), aggregate totals and counts with no raw names in JSON; independent local-only export or redacted audit creation, never overwrite, no dual writes. Separate user approval required before any owner file access; only disposable tests currently.
+3. **Tests:** New unit/CLI tests for actual grouping of different input bytes, mismatched consent, symlink/hardlink, malicious CSV, traversal, no implicit write, local export/audit create/readback. Dedicated G238 GitHub CI and Linux/Windows full regression **PENDING**; G237 prior source SHA 494389b72a5562cb2d4090990ddabde564655b72 5/5 CI PASS.
+4. **Current state:** New real-data-capable local engine committed, no actual customer file read/approved in CI, no native Expert/NAS/LLM/production, no live on-NAS self-healing. RELEASE HOLD, NAS NO-GO, Devpost NOT_SUBMITTED, 3-hour NAS trial UNUSED.
+5. **Risks/error protocol:** For any unexpected test fail, inspect exact log, fix once, repeat only needed CI; no private path/contents in errors. No side effects without exact approval. Create-only report uses owner-selected local path; no upload. File snapshot check is best-effort; do not claim OS-wide file locking or tamper-proof audit.
+6. **Repo/source:** `hibi89/hibi89-ugreen-nas-hackathon@lead/ugreen`, baseline G237 docs HEAD `6ea9ed627363d237fe204afa072721f6b0133801`; new `tools/flowpilot_g238_local_csv_engine.py`, `tests/test_flowpilot_g238_local_csv_engine.py`, `.github/workflows/g238-local-typed-csv.yml`, and STATUS/HANDOFF.
+7. **Environment:** GitHub Actions Ubuntu/Windows Python3.11, local paths only; Vercel N/A, no live NAS/Expert or network processing.
+8. **Original data/backups:** G232 local SQLite, G236 native nonexecutable handoff, G237 real Docker, Skill/official Kit, private Round1 PDF/ZIP all preserved unchanged. New unit tests own ephemeral files and remove them.
+9. **Next:** Check G238 actual new SHA's CI; fix blockers. Then authenticated UI to operator-bound local CSV engine and durably persisted create-only audit/idempotency. NAS native signature/permissions/real readback need distinct approval.
+10. **Timestamp & provenance:** 2026-11-03 KST, G238 initial CI PENDING. Update validated SHA/tests and source boundaries after runs.
+
 ## 2026-11-03 KST — G237 actual failed Docker DAG → bounded synthetic copy repair → retest (5/5 CI SUCCESS)
 
 1. **Goal/tech:** FlowPilot3 full product real failure diagnosis/repair/test, not Round1 paperwork. Python3.11, static C fixed typed CSV engine from G235, Docker 24.04 Ubuntu CI, readonly scratch images.

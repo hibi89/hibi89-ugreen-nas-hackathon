@@ -1,0 +1,26 @@
+name: G238 approved LOCAL typed CSV operator workflow (NO NAS)
+on:
+  push:
+    branches: [lead/ugreen]
+    paths:
+      - tools/flowpilot_g238_local_csv_engine.py
+      - tests/test_flowpilot_g238_local_csv_engine.py
+      - .github/workflows/g238-local-typed-csv.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  local-typed-csv:
+    name: no-NAS local data contract
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Actual local operator-scoped CSV and consent regression (disposable only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s tests -p 'test_flowpilot_g238_local_csv_engine.py' -v
+          echo 'G238_NO_REAL_NAS_OR_CUSTOMER_DATA; local consented read + optional create-only export/audit tested'
