@@ -2,7 +2,7 @@
 // G166: browser state is intentionally ephemeral. No cookies, storage or token in URLs.
 const el = id => document.getElementById(id);
 const controls = [...document.querySelectorAll("button")];
-let token = "", workflow = null, verifiedPlan = null, review = null, busy = false;
+let token = "", workflow = null, verifiedPlan = null, review = null, lastLocalReport = null, busy = false;
 function status(message) { el("notice").textContent = message; }
 function output(data) { el("output").textContent = typeof data === "string" ? data : JSON.stringify(data, null, 2); }
 const adviceFields = [
@@ -21,6 +21,9 @@ function sync() {
     "결과 미확인 · 조회 필요" : workflow?.status || "미생성";
   el("plan-hash").textContent = verifiedPlan ? "검증한 계획 SHA-256: " + verifiedPlan :
     "계획 SHA-256: 미확인";
+  el("local-council-state").textContent = lastLocalReport ?
+    "실제 로컬 보고서 " + lastLocalReport.verdict + " · NAS 미검증" :
+    "실제 로컬 증거 미검토 · NAS 미검증";
   el("metadata-summary").textContent = review ? "검토 ID: " + review.review_id +
     " | 상태: " + review.status + " | 항목: " + review.required_count +
     " | 범위 SHA-256: " + review.scope_sha256 : "검토 세션 없음";
@@ -46,7 +49,10 @@ function sync() {
       "meta-save": workflow?.template === "required_file_metadata_v1" &&
         ["LOCAL_METADATA_FINDINGS_READY", "LOCAL_METADATA_BLOCKED"].includes(review?.status) &&
         el("meta-save-consent").checked,
-      "meta-readback": workflow?.template === "required_file_metadata_v1"
+      "meta-readback": workflow?.template === "required_file_metadata_v1",
+      "meta-council": workflow?.template === "required_file_metadata_v1",
+      "meta-report": workflow?.template === "required_file_metadata_v1",
+      "meta-export": !!lastLocalReport && workflow?.template === "required_file_metadata_v1"
     };
     button.disabled = Object.prototype.hasOwnProperty.call(rules, button.id) && !rules[button.id];
   }
@@ -78,6 +84,7 @@ async function act(fn) {
 function resetWorkflow(result) {
   workflow = result;
   verifiedPlan = null;
+  lastLocalReport = null;
   el("synthetic-consent").checked = false;
   el("meta-save-consent").checked = false;
   sync();
@@ -91,7 +98,7 @@ el("connect").addEventListener("click", () => act(async () => {
   const candidate = input.value;
   input.value = "";
   // A new login attempt invalidates any previous authority even if input is bad.
-  token = ""; workflow = null; verifiedPlan = null; review = null;
+  token = ""; workflow = null; verifiedPlan = null; review = null; lastLocalReport = null;
   el("synthetic-consent").checked = false; el("metadata-consent").checked = false; el("meta-save-consent").checked = false;
   el("required").value = ""; clearAdvice();
   el("existing").replaceChildren(new Option("선택 안 함", ""));
@@ -108,7 +115,7 @@ el("connect").addEventListener("click", () => act(async () => {
   } catch (error) { token = ""; el("connection-status").textContent = "연결 실패 · 토큰 폐기"; throw error; }
 }));
 el("disconnect").addEventListener("click", () => {
-  token = ""; workflow = null; verifiedPlan = null; review = null;
+  token = ""; workflow = null; verifiedPlan = null; review = null; lastLocalReport = null;
   el("token").value = ""; el("required").value = ""; clearAdvice();
   el("existing").replaceChildren(new Option("선택 안 함", ""));
   el("synthetic-consent").checked = false; el("metadata-consent").checked = false; el("meta-save-consent").checked = false;
@@ -359,6 +366,7 @@ el("meta-save").addEventListener("click", () => act(async () => {
       !el("meta-save-consent").checked)
     throw Error("완료된 실제 로컬 점검·필수파일 계획·별도 저장 동의가 필요합니다.");
   const ticket = review;
+  lastLocalReport = null;
   const wf = workflow.workflow_id;
   el("meta-save-consent").checked = false;
   review = null;  // Never replay a consent ticket after a lost reply.
@@ -379,6 +387,45 @@ el("meta-readback").addEventListener("click", () => act(async () => {
     throw Error("증거 검증 실패");
   status("SQLite 저장 증거 재조회 · 로컬 원본 재검사 없음");
   output(saved);
+}));
+el("meta-council").addEventListener("click", () => act(async () => {
+  if (!workflow || workflow.template !== "required_file_metadata_v1")
+    throw Error("필수 파일 워크플로만 검토할 수 있습니다.");
+  const result = await json("/v1/workflows/" + workflow.workflow_id + "/local-council");
+  if (result.schema !== "flowpilot-local-council-g230-v1" ||
+      result.release_gate !== "HOLD" || result.real_nas_verified !== false ||
+      result.independent_ai_council_invoked !== false)
+    throw Error("로컬 검토 응답 검증 실패");
+  lastLocalReport = null;
+  status("기존 실측 로컬 메타데이터 4관점 정책 검토 · NAS 실행 없음");
+  output(result);
+}));
+el("meta-report").addEventListener("click", () => act(async () => {
+  if (!workflow || workflow.template !== "required_file_metadata_v1")
+    throw Error("필수 파일 워크플로만 보고할 수 있습니다.");
+  lastLocalReport = null;
+  const result = await json("/v1/workflows/" + workflow.workflow_id + "/local-report");
+  if (result.schema !== "flowpilot-local-operator-report-g230-v1" ||
+      result.status !== "OWNER_LOCAL_REPORT_READY_NOT_NAS" ||
+      result.release_gate !== "HOLD" || result.real_nas_verified !== false ||
+      result.report_data_is_redacted !== true ||
+      typeof result.report_markdown !== "string" || result.report_markdown.length > 6000)
+    throw Error("로컬 보고서 응답 검증 실패");
+  lastLocalReport = result;
+  status("실측 로컬 메타데이터 기반 보고서 · NAS 검증 아님");
+  output(result);
+}));
+el("meta-export").addEventListener("click", () => act(async () => {
+  if (!lastLocalReport || !workflow ||
+      workflow.workflow_id !== lastLocalReport.workflow_id)
+    throw Error("현재 워크플로의 확인된 로컬 보고서가 필요합니다.");
+  const blob = new Blob([lastLocalReport.report_markdown], {type:"text/markdown;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url; anchor.download = "flowpilot-local-evidence-not-nas.md";
+  document.body.append(anchor); anchor.click(); anchor.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  status("로컬 증거 보고서 저장 요청 완료 · 개인 파일명 포함 안 함");
 }));
 // Existing G117 advisor: only user-provided numeric samples, never a NAS watcher.
 el("advice-submit").addEventListener("click", () => act(async () => {
