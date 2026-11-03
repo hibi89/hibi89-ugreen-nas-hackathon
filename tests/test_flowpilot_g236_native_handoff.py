@@ -158,8 +158,16 @@ class NativeHandoffTests(unittest.TestCase):
 
     def test_council_get_does_not_read_owner_folder_again(self):
         self.store()
-        with patch.object(Path, "lstat", side_effect=AssertionError("owner scan repeated")):
-            handoff=self.backend.native_handoff(self.workflow)
+        original_lstat = Path.lstat
+        def guard(path, *args, **kwargs):
+            # Protect ONLY the owner-selected input root, never normal SQLite
+            # path/symlink integrity checks performed by Backend._path_gate.
+            current = Path(path)
+            if current == self.root or self.root in current.parents:
+                raise AssertionError("owner scan repeated")
+            return original_lstat(path, *args, **kwargs)
+        with patch.object(Path, "lstat", autospec=True, side_effect=guard):
+            handoff = self.backend.native_handoff(self.workflow)
         self.assertFalse(handoff["owner_folder_rechecked"])
 
 
