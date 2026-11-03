@@ -1,3 +1,15 @@
+## 2026-11-03 KST — G223 exact pair byte integrity handoff (10 required fields)
+
+1. Goal: tie the exact G221 skill ZIP to the currently obtainable G222 proposal PDF, rejecting stale QA manifests.
+2. Decision: reject inherited G222 48,961B SHA 57b017f9 report; observed current 73,930B SHA 375a3e54 PDF, actual ZIP 6,995B SHA fecc138e. Origin of PDF byte change unknown. No PDF/Skill original overwritten.
+3. Tests: new offline pinned file verification 9 synthetic PASS / 0 FAIL; actual G221+G222 byte check PASS; stale original report intentionally refused with exit 2. One PDF page with 10 answers, full-page text 482 whitespace words; rendered/visually inspected. GitHub CI verify separately.
+4. State: integrity review prepared, NOT official first-party Checker or supported Creator provenance. Release HOLD, rights pending, NAS NO-GO, 3h trial unused, Devpost NOT_SUBMITTED.
+5. Error/attempt/pivot: old detached PDF QA hash no longer matches download. No silent trust; new fail-closed verifier and frozen byte-identical G223 private PDF copy. Avoid repeated synthetic cosmetic revisions.
+6. Repo/branch: hibi89/hibi89-ugreen-nas-hackathon lead/ugreen, previous SHA 4370c3f4edc15f78e805080dda6daf32db47cefb. Changed tools/g223_round1_exact_pair.py, tests/test_g223_round1_exact_pair.py, STATUS.md, HANDOFF.md. Ordinary non-force Git revert restores prior version.
+7. Deployment: Vercel N/A. Local Python stdlib plus PDF text/render inspection. Full GitHub Actions on new SHA to verify; no real Uliya/NAS calls.
+8. Original/backups: owner G157/G188/G219/G220/G221/G222 originals and Kit remain unchanged; G223 copy/JSON ephemeral ChatGPT downloads, no raw customer files or private ZIP in public GitHub.
+9. Next: official supported Creator discovery / organizer decision and provider retention confirmation, separately authorize official Checker, entrant rights/IP/AI signoff and final exact PDF+ZIP, then separate Devpost upload approval. No NAS trial in Round1.
+10. Updated 2026-11-03 KST; actual file identity and local synthetic tests only. Code SHA and CI checked separately after commit.
 ## 2026-11-03 KST — G222 G221-aligned separate Round1 PDF draft (read-only originals)
 
 1. **Objective/official rules:** Reconcile the exact new G221 Skill with Round1 10-item PDF, <=500 English substantive words, <=1MB, while keeping the owner-approved FlowPilot 3.0 vision and actual implemented Skill behavior distinct. Official deadline 2026-11-16 16:45 KST; Round1 NAS/video/repo link not required.

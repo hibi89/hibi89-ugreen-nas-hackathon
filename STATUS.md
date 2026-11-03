@@ -1,3 +1,9 @@
+## 2026-11-03 KST — G223 real G222 PDF hash drift repaired by pinned offline verifier
+
+- Discovered detached G222 report claims 48,961B and PDF SHA256 57b017f9..., while independently re-read G222 PDF is 73,930B and SHA256 375a3e54.... Cause NOT_DETERMINED. Old report is STALE and not an exact-byte receipt.
+- Current PDF opens: 1 A4 page, 10 numbered answers, 482 whole-page whitespace words including heading/disclosure (under 500); 110dpi visual render has no observed clipping. Exact G221 Skill ZIP remains 6,995B / SHA256 fecc138e...; original files not modified.
+- Added tools/g223_round1_exact_pair.py and tests/test_g223_round1_exact_pair.py. 9 focused local synthetic PASS, 0 FAIL. Direct current owner-private pair PASS; deliberately passing old report returns STALE_OR_DIFFERENT_PAIR_REPORT (expected refusal). GitHub source/tests only; no PDF/ZIP/vendor bytes uploaded.
+- Separate G223 byte-identical private PDF copy and JSON receipt made for user download only. RELEASE HOLD; first-party Creator/Checker, registered expert, NAS, 3h trial, Devpost NOT_RUN. New source CI pending at exact commit.
 ## 2026-11-03 KST — G222 exact G221 PDF parity repaired; private DRAFT, release HOLD
 
 - Official [UGREEN Round 1 rules](https://ugreenhackathon.devpost.com/rules) re-read: English PDF answers 1-10 total <=500 substantive words, PDF <=1MB; separately one Markdown-only Skill ZIP. Round1 does not require real NAS/video/repo link. 2026-11-16 16:45 KST deadline.
