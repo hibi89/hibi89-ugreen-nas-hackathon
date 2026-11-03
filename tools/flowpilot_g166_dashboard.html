@@ -37,8 +37,19 @@
 <div class="consent"><input id="metadata-consent" type="checkbox"><label for="metadata-consent">선택한 비 NAS 로컬 폴더의 메타데이터를 한 번 읽는 데 동의합니다. 파일 내용·NAS 공유는 포함하지 않습니다.</label></div>
 <div class="consent"><input id="meta-save-consent" type="checkbox"><label for="meta-save-consent">검토 결과의 인덱스·PRESENT/MISSING 상태만 현재 필수 파일 워크플로의 SQLite에 저장하는 데 별도로 동의합니다. 경로명·파일 내용은 저장하지 않습니다.</label></div>
 <p id="metadata-summary" class="mono">검토 세션 없음</p><p id="local-council-state" class="mono" role="status" aria-live="polite">실제 로컬 증거 미검토 · NAS 미검증</p></section>
+<section class="panel" aria-labelledby="csv-local-title">
+<h2 id="csv-local-title">4 · 로컬 CSV 실데이터 워크플로 (NAS 아님)</h2>
+<p>선택한 로컬 CSV는 미리보기에서 읽지 않습니다. 실행 승인 시에만 1회 읽고, 경로·그룹명은 저장하지 않으며 별도 로컬 SQLite에 집계 결과·해시를 기록합니다. 원본 수정·외부 업로드·실패 자동 재시도는 없습니다.</p>
+<label for="csv-local-path">로컬 CSV 절대경로 (서버와 같은 PC)</label>
+<input id="csv-local-path" type="text" maxlength="1024" spellcheck="false" autocomplete="off" placeholder="승인할 로컬 CSV의 절대경로">
+<label for="csv-group-column">그룹 열</label>
+<select id="csv-group-column"><option value="customer">customer</option><option value="department">department</option><option value="project">project</option></select>
+<div class="actions"><button id="csv-preview" type="button">CSV 읽기 전 계획 확인</button><button id="csv-run" type="button" class="approval">로컬 CSV 1회 실행</button><button id="csv-readback" type="button" class="quiet">실행 영수증 재조회</button></div>
+<div class="consent"><input id="csv-consent" type="checkbox"><label for="csv-consent">현재 선택한 CSV의 메타데이터/내용을 한 번 읽어 집계하고, 경로·그룹명을 제외한 결과와 해시를 별도 로컬 SQLite에 저장하는 데 동의합니다. NAS 사용·보고서 파일 저장·재실행은 승인하지 않습니다.</label></div>
+<p id="csv-job-status" class="mono" role="status" aria-live="polite">CSV 계획 미확인 · 입력 경로 미저장 · NAS 미검증</p>
+</section>
 <section class="panel" aria-labelledby="advisor-title">
-<h2 id="advisor-title">4 · 선택적 상태 제안 (수동 입력)</h2>
+<h2 id="advisor-title">5 · 선택적 상태 제안 (수동 입력)</h2>
 <p>사용자가 직접 입력한 수치만 일회성으로 분석합니다. 실제 NAS에서 수집하지 않으며, 자동 감시·수정·알림은 없습니다. 미입력 항목은 확인하지 않은 것으로 표시합니다.</p>
 <div class="telemetry-fields">
 <label for="advice-disk">디스크 사용률 (%)<input id="advice-disk" type="text" inputmode="numeric" maxlength="3" autocomplete="off" spellcheck="false" placeholder="0–100 (선택)"></label>
@@ -49,7 +60,7 @@
 <div class="actions"><button id="advice-submit" type="button">일회성 제안 확인</button></div>
 <p id="advice-summary" class="mono" role="status" aria-live="polite">동의 전 · 수치 미전송 · 자동 감시 없음</p>
 </section>
-<section class="panel" aria-labelledby="output-title"><div class="line"><h2 id="output-title">5 · 응답 및 감사 로그</h2><button id="clear" class="quiet" type="button">화면 지우기</button></div>
+<section class="panel" aria-labelledby="output-title"><div class="line"><h2 id="output-title">6 · 응답 및 감사 로그</h2><button id="clear" class="quiet" type="button">화면 지우기</button></div>
 <p id="notice" role="status" aria-live="polite">로컬 대시보드 준비 · 연결 전 실행 불가</p>
 <pre id="output" tabindex="0">실행 결과는 이 영역에 표시됩니다. 토큰과 로컬 파일 이름을 로그에 복사하지 마세요.</pre></section>
 </main><footer>G166 · Python stdlib / SQLite · Bearer token · 127.0.0.1 only · Devpost NOT SUBMITTED · UGOS 3시간 체험 NOT STARTED</footer>

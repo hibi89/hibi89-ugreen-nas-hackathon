@@ -2,6 +2,7 @@
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
+const os = require("node:os");
 const {webcrypto} = require("node:crypto");
 const base = process.argv[2];
 const auth = process.argv[3];
@@ -58,10 +59,10 @@ const ids = ["token","connect","disconnect","clear","connection-status","notice"
   "list","load","plan","guide","test","approve","run","refresh","audit","evidence","report","recover",
   "synthetic-consent","metadata-consent","required","version-candidates","text-workflow","text-preview","meta-preview","meta-approve",
   "meta-cancel","meta-status","meta-save","meta-readback","meta-council","meta-report","meta-export","native-handoff","local-council-state","meta-save-consent","advice-disk","advice-errors","advice-backup",
-  "advice-consent","advice-submit","advice-summary"];
+  "advice-consent","advice-submit","advice-summary","csv-local-path","csv-group-column","csv-preview","csv-run","csv-readback","csv-consent","csv-job-status"];
 const buttonIds = ["connect","disconnect","clear","create","list","load","plan","guide",
   "test","approve","run","refresh","audit","evidence","report","recover","text-preview","meta-preview",
-  "meta-approve","meta-cancel","meta-status","meta-save","meta-readback","meta-council","meta-report","meta-export","native-handoff","advice-submit"];
+  "meta-approve","meta-cancel","meta-status","meta-save","meta-readback","meta-council","meta-report","meta-export","native-handoff","advice-submit","csv-preview","csv-run","csv-readback"];
 class FakeElement {
   constructor(id) {this.id=id;this.value="";this.checked=false;this.disabled=false;
     this.textContent="";this.handlers={};this.options=[];}
@@ -88,6 +89,7 @@ require("node:vm").runInThisContext(source,{filename:"flowpilot_g166_dashboard.j
 async function click(id) {await elems[id].fire();}
 async function main(){
   assert.equal(elems.create.disabled,true,"must not create without local auth");
+  assert.equal(elems["csv-preview"].disabled,true,"CSV plan needs local authentication");
   elems.token.value=auth;
   await click("connect");
   assert.equal(elems.token.value,"","token must clear from password DOM");
@@ -319,7 +321,33 @@ async function main(){
   elems.token.value=auth;
   await click("connect");  // fresh auth required after bad attempt
   assert.equal(elems.create.disabled,false);
+  // Use a disposable local CSV fixture; never owner/NAS data.
+  const owned = fs.mkdtempSync(path.join(os.tmpdir(), "flowpilot-g239-node-"));
+  try {
+    const csvFile = path.join(owned, "test-owned.csv");
+    fs.writeFileSync(csvFile,
+      "customer,amount_cents\nalice,125\nbob,300\nalice,275\n");
+    elems["csv-local-path"].value = csvFile;
+    elems["csv-group-column"].value = "customer";
+    assert.equal(elems["csv-run"].disabled,true,"read must require separate consent");
+    await click("csv-preview");
+    assert.equal(elems["csv-local-path"].value,"","path cleared before run");
+    assert.match(elems.output.textContent,/WAITING_EXPLICIT_LOCAL_CSV_JOB_APPROVAL/);
+    assert.equal(elems["csv-run"].disabled,true,"preview is not execution consent");
+    elems["csv-consent"].checked=true; elems["csv-consent"].fire("change");
+    await click("csv-run");
+    assert.match(elems.output.textContent,/COMPLETE_LOCAL_TYPED_CSV_NOT_NAS/);
+    assert.doesNotMatch(elems.output.textContent,/alice|bob|test-owned\.csv/);
+    assert.equal(elems["csv-consent"].checked,false);
+    assert.equal(elems["csv-run"].disabled,true,"one-use read consent consumed");
+    await click("csv-readback");
+    assert.match(elems.output.textContent,/COMPLETE_LOCAL_TYPED_CSV_NOT_NAS/);
+    assert.equal(fs.readFileSync(csvFile,"utf8").includes("alice,125"),true,
+                 "owner-like synthetic source never changed");
+  } finally {fs.rmSync(owned,{recursive:true,force:true});}
   await click("disconnect");
+  assert.equal(elems["csv-local-path"].value,"","disconnect clears file path");
+  assert.equal(elems["csv-readback"].disabled,true,"disconnect clears job ID");
   assert.equal(elems.create.disabled,true);
   assert.equal(elems.token.value,"");
   process.stdout.write("G166_NODE_DOM_HTTP_SMOKE_PASS\n");

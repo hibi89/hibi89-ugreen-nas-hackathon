@@ -32,6 +32,7 @@ from flowpilot_g227_metadata_receipts import (
 )
 from flowpilot_g230_local_council import evaluate_local_receipt, owner_report, CouncilRefused
 from flowpilot_g236_native_handoff import build_native_handoff, NativeHandoffRefused
+from flowpilot_g239_csv_jobs import LocalCsvJobs, CsvJobRefused
 
 SCHEMA = "flowpilot-backend-local-v1"
 IDENTITY = "flowpilot-g161-owner-created-backend-v1"
@@ -108,6 +109,7 @@ class Backend:
         self.path = path
         self.lock = threading.RLock()
         self.metadata = MetadataGate(metadata_root)
+        self.csv_jobs = LocalCsvJobs(path)  # lazy separate journal; no preview disk write
         if create:
             flags = os.O_CREAT | os.O_EXCL | os.O_RDWR | getattr(os, "O_NOFOLLOW", 0)
             try:
@@ -830,6 +832,8 @@ def create_server(backend: Backend, token: str, *, port: int=0):
                               "nas_verified":False,"release_gate":"HOLD"}
                     elif path=="/v1/workflows":
                         data=backend.list()
+                    elif re.fullmatch(r"/v1/local-csv/jobs/csv_[0-9a-f]{24}",path):
+                        data=backend.csv_jobs.readback(path.rsplit("/",1)[-1])
                     elif re.fullmatch(r"/v1/local-metadata/reviews/rev_[0-9a-f]{32}",path):
                         data=backend.metadata.get(path.rsplit("/",1)[-1])
                     elif re.fullmatch(r"/v1/workflows/wf_[0-9a-f]{32}/local-metadata",path):
@@ -873,7 +877,16 @@ def create_server(backend: Backend, token: str, *, port: int=0):
                         self.send(400,{"error":"INVALID_JSON"});return
                     if type(body) is not dict:
                         self.send(400,{"error":"JSON_OBJECT_REQUIRED"});return
-                    if path=="/v1/workflows":
+                    if path=="/v1/local-csv/preview":
+                        if set(body)!={"input_path","group_column"}:
+                            raise BackendRefused("UNEXPECTED_KEYS",400)
+                        data=backend.csv_jobs.preview(body["input_path"],body["group_column"])
+                    elif path=="/v1/local-csv/run":
+                        if set(body)!={"preview_id","request_id","plan_sha256","acknowledgement"}:
+                            raise BackendRefused("UNEXPECTED_KEYS",400)
+                        data=backend.csv_jobs.run(body["preview_id"],body["request_id"],
+                                                  body["plan_sha256"],body["acknowledgement"])
+                    elif path=="/v1/workflows":
                         if set(body)!={"goal","request_id"}:
                             raise BackendRefused("UNEXPECTED_KEYS",400)
                         data=backend.create(body["goal"],body["request_id"])
@@ -921,7 +934,7 @@ def create_server(backend: Backend, token: str, *, port: int=0):
                                 raise BackendRefused("UNEXPECTED_KEYS",400)
                             data=getattr(backend,action)(wf)
                 self.send(200,data)
-            except (BackendRefused, MetadataRefused, MetadataReceiptRefused, CouncilRefused, NativeHandoffRefused) as exc:
+            except (BackendRefused, MetadataRefused, MetadataReceiptRefused, CouncilRefused, NativeHandoffRefused, CsvJobRefused) as exc:
                 self.send(exc.status,{"error":exc.code,"release_gate":"HOLD"})
             except (OSError,sqlite3.Error,AssertionError,ValueError):
                 self.send(409,{"error":"LOCAL_BACKEND_REFUSED","release_gate":"HOLD"})

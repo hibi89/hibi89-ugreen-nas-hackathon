@@ -3,6 +3,13 @@
 const el = id => document.getElementById(id);
 const controls = [...document.querySelectorAll("button")];
 let token = "", workflow = null, verifiedPlan = null, review = null, lastLocalReport = null, busy = false;
+let csvTicket = null, csvJobId = null;
+function clearCsv() {
+  csvTicket = null; csvJobId = null;
+  el("csv-local-path").value = "";
+  el("csv-consent").checked = false;
+  el("csv-job-status").textContent = "CSV 계획 미확인 · 입력 경로 미저장 · NAS 미검증";
+}
 function status(message) { el("notice").textContent = message; }
 function output(data) { el("output").textContent = typeof data === "string" ? data : JSON.stringify(data, null, 2); }
 const adviceFields = [
@@ -54,7 +61,10 @@ function sync() {
       "meta-council": workflow?.template === "required_file_metadata_v1",
       "meta-report": workflow?.template === "required_file_metadata_v1",
       "native-handoff": workflow?.template === "required_file_metadata_v1",
-      "meta-export": !!lastLocalReport && workflow?.template === "required_file_metadata_v1"
+      "meta-export": !!lastLocalReport && workflow?.template === "required_file_metadata_v1",
+      "csv-preview": true,
+      "csv-run": !!csvTicket && el("csv-consent").checked,
+      "csv-readback": !!csvJobId
     };
     button.disabled = Object.prototype.hasOwnProperty.call(rules, button.id) && !rules[button.id];
   }
@@ -105,7 +115,7 @@ el("connect").addEventListener("click", () => act(async () => {
   // A new login attempt invalidates any previous authority even if input is bad.
   token = ""; workflow = null; verifiedPlan = null; review = null; lastLocalReport = null;
   el("synthetic-consent").checked = false; el("metadata-consent").checked = false; el("meta-save-consent").checked = false;
-  el("required").value = ""; el("version-candidates").value = ""; el("text-workflow").value = ""; clearAdvice();
+  el("required").value = ""; el("version-candidates").value = ""; el("text-workflow").value = ""; clearAdvice(); clearCsv();
   el("existing").replaceChildren(new Option("선택 안 함", ""));
   el("connection-status").textContent = "기존 세션 폐기 · 인증 확인 중";
   if (candidate.length < 32 || candidate.length > 256) throw Error("토큰 길이는 32–256자여야 합니다.");
@@ -121,7 +131,7 @@ el("connect").addEventListener("click", () => act(async () => {
 }));
 el("disconnect").addEventListener("click", () => {
   token = ""; workflow = null; verifiedPlan = null; review = null; lastLocalReport = null;
-  el("token").value = ""; el("required").value = ""; el("version-candidates").value = ""; el("text-workflow").value = ""; clearAdvice();
+  el("token").value = ""; el("required").value = ""; el("version-candidates").value = ""; el("text-workflow").value = ""; clearAdvice(); clearCsv();
   el("existing").replaceChildren(new Option("선택 안 함", ""));
   el("synthetic-consent").checked = false; el("metadata-consent").checked = false; el("meta-save-consent").checked = false;
   el("connection-status").textContent = "연결 해제 · 토큰 폐기";
@@ -488,6 +498,77 @@ el("meta-export").addEventListener("click", () => act(async () => {
   document.body.append(anchor); anchor.click(); anchor.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
   status("로컬 증거 보고서 저장 요청 완료 · 개인 파일명 포함 안 함");
+}));
+function randomCsvJobId() {
+  const bytes = crypto.getRandomValues(new Uint8Array(12));
+  return "csv_" + Array.from(bytes, x => x.toString(16).padStart(2, "0")).join("");
+}
+el("csv-consent").addEventListener("change", sync);
+el("csv-preview").addEventListener("click", () => act(async () => {
+  csvTicket = null; csvJobId = null;
+  el("csv-consent").checked = false;
+  const inputPath = el("csv-local-path").value;
+  const groupColumn = el("csv-group-column").value;
+  // Clear the raw private path from the DOM BEFORE any request, including errors.
+  el("csv-local-path").value = "";
+  el("csv-job-status").textContent = "새 CSV 계획 검토 중 · 이전 승인 폐기";
+  if (!inputPath || inputPath.length > 1024)
+    throw Error("로컬 CSV 절대경로가 필요합니다.");
+  const p = await json("/v1/local-csv/preview", {
+    input_path: inputPath, group_column: groupColumn
+  });
+  if (p.schema !== "flowpilot-g238-owner-local-typed-csv-v1" ||
+      p.status !== "WAITING_EXPLICIT_LOCAL_CSV_JOB_APPROVAL" ||
+      p.release_gate !== "HOLD" || p.real_nas_verified !== false ||
+      p.input_file_touched !== false ||
+      !/^cpre_[0-9a-f]{32}$/.test(p.preview_id) ||
+      !/^[0-9a-f]{64}$/.test(p.plan_sha256))
+    throw Error("로컬 CSV 계획 검증 실패");
+  csvTicket = p;
+  el("csv-job-status").textContent =
+    "계획 SHA " + p.plan_sha256.slice(0, 16) + " · 실행 전 승인 필요";
+  status("로컬 CSV 미리보기 완료 · 아직 파일을 읽지 않음 · NAS 아님");
+  output(p);
+}));
+el("csv-run").addEventListener("click", () => act(async () => {
+  if (!csvTicket || !el("csv-consent").checked)
+    throw Error("현재 로컬 CSV 계획을 확인하고 동의해야 합니다.");
+  const p = csvTicket;
+  // One-shot client consent. Preserve ONLY the job ID after uncertain POST.
+  csvTicket = null;
+  el("csv-consent").checked = false;
+  const job = randomCsvJobId();
+  csvJobId = job;
+  el("csv-job-status").textContent = "실행 결과 미확인 · 영수증 재조회 가능 · 자동 재시도 금지";
+  const result = await json("/v1/local-csv/run", {
+    preview_id: p.preview_id, request_id: job,
+    plan_sha256: p.plan_sha256, acknowledgement: "APPROVE_LOCAL_CSV_READ_ONCE"
+  });
+  if (result.schema !== "flowpilot-g239-local-csv-job-v1" ||
+      result.request_id !== job ||
+      result.status !== "COMPLETE_LOCAL_TYPED_CSV_NOT_NAS" ||
+      result.plan_sha256 !== p.plan_sha256 ||
+      result.release_gate !== "HOLD" || result.nas_verified !== false ||
+      result.path_and_labels_persisted !== false ||
+      result.result?.nas_verified !== false)
+    throw Error("CSV 실행 영수증 검증 실패");
+  el("csv-job-status").textContent = "로컬 CSV 완료 · 영수증 " + job + " · NAS 미검증";
+  status("로컬 CSV 실제 집계 완료 · 원본 수정/외부 전송 없음");
+  output(result);
+}));
+el("csv-readback").addEventListener("click", () => act(async () => {
+  if (!csvJobId) throw Error("먼저 CSV 작업을 선택해야 합니다.");
+  const result = await json("/v1/local-csv/jobs/" + csvJobId);
+  if (result.schema !== "flowpilot-g239-local-csv-job-v1" ||
+      result.request_id !== csvJobId ||
+      result.release_gate !== "HOLD" || result.nas_verified !== false ||
+      !["COMPLETE_LOCAL_TYPED_CSV_NOT_NAS",
+        "RUN_RESERVED_UNCERTAIN_NO_AUTORETRY",
+        "LOCAL_CSV_RUN_BLOCKED_NO_AUTORETRY"].includes(result.status))
+    throw Error("CSV 저장 영수증 검증 실패");
+  el("csv-job-status").textContent = result.status + " · " + csvJobId + " · NAS 미검증";
+  status("SQLite 저장 영수증 재조회 · 고객 CSV 다시 읽지 않음");
+  output(result);
 }));
 // Existing G117 advisor: only user-provided numeric samples, never a NAS watcher.
 el("advice-submit").addEventListener("click", () => act(async () => {

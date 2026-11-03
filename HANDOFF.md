@@ -1,3 +1,16 @@
+## 2026-11-03 KST — G239 owner-approved local CSV dashboard + persisted request-idempotent journal (CI PENDING)
+
+1. Goal/tech: Connect G238 approved local CSV grouping to G161/G166 bearer-authenticated 127.0.0.1 API and dashboard, Python3.11 and SQLite, not NAS.
+2. Design: Do not persist raw selected path or migrate original SQLite; store only redacted job state/results and hashes in separate create-only-on-consent SQLite. Preview tickets expire at 600 seconds, run requires one-use checkbox, plan digest and exact ack; journal reserves request before file read, no automatic retries.
+3. Implemented: New local CSV job module + ten HTTP/SQLite consent/duplicate/restart/tamper tests. Backend POST preview/run, GET job receipt. UI input path/column, preview, run, readback; Node browser test on disposable local fixture. G239 new source CI PENDING.
+4. State: Source pending live CI; no actual customer file processed; no Uliya Expert, NAS/Creator/Checker or Devpost. Hold, NAS NO-GO, NAS trial UNUSED.
+5. Security and failure: All paths temporary in memory, no path in HTTP response/sidecar. Lost POST returns via job GET, RESERVED/BLOCKED remain non-retryable. Source never written. Local SHA is not notarization. Normal Git revert available.
+6. Repo: hibi89/hibi89-ugreen-nas-hackathon lead/ugreen; baseline HEAD 4126a036ed01db201d9e4d1f9c9b63abe634e27b; module/tests/backend/dashboard/UI/STATUS/HANDOFF paths changed, no original G238 edit.
+7. Environment: GitHub Ubuntu/Windows full Python and local HTTP/Node/Chromium; Vercel production N/A.
+8. Originals: Owner local inputs only in future explicit run; all CI test input disposable, no official Kit/Skill or private PDF/ZIP changes; separate new companion DB created only after explicit read+receipt approval.
+9. Next: Inspect exact SHA CI, fix actual fails; G240: deliberate lost-reply browser readback and separate operator export consent, plus verified registered Uliya Expert runtime proof under owner approval.
+10. Time: 2026-11-03 KST; G239 initial CI pending, exact code SHA to be checked after commit.
+
 ## 2026-11-03 KST — G238 LOCAL operator-selected CSV real-data typed engine (5/5 CI SUCCESS)
 
 1. **Goal/tech:** Full FlowPilot3; unlock real locally approved CSV processing, instead of repeated code-owned fixtures. Python3.11 stdlib CSV/OS, SHA256 receipts and optional create-only local CSV/JSON artifacts.
