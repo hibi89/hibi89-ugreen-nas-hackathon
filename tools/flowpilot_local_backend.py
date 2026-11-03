@@ -26,6 +26,10 @@ from flowpilot_repair_ledger import run_once, verify_record
 from flowpilot_proactive_advisor import advise_local
 from flowpilot_g164_report_artifact import fixture_csv, ArtifactRefused, CANONICAL_CSV
 from flowpilot_g165_local_metadata_api import MetadataGate, MetadataRefused
+from flowpilot_g227_metadata_receipts import (
+    ACK as METADATA_RECEIPT_ACK, MetadataReceiptRefused,
+    from_completed_review, save_receipt, read_receipt,
+)
 
 SCHEMA = "flowpilot-backend-local-v1"
 IDENTITY = "flowpilot-g161-owner-created-backend-v1"
@@ -183,6 +187,32 @@ class Backend:
                 "nas_verified":False, "registered_expert_invoked":False,
                 "production_applied":False, "devpost_submitted":False,
                 "release_gate":"HOLD"}
+
+    def save_metadata_receipt(self, wf_id, review_id, scope_sha256, acknowledgement):
+        """Explicit second consent: persist only redacted real LOCAL lstat states.
+
+        Never infer live NAS approval from a local workflow, fixture, or receipt.
+        Existing workflow state and synthetic-only audit remain untouched.
+        """
+        if type(acknowledgement) is not str or acknowledgement != METADATA_RECEIPT_ACK:
+            raise BackendRefused("METADATA_SAVE_APPROVAL_REQUIRED", 403)
+        with self.lock:
+            workflow = self.verified_get(wf_id)
+            if workflow["template"] != "required_file_metadata_v1":
+                raise BackendRefused("METADATA_TEMPLATE_REQUIRED", 422)
+            review = self.metadata.get(review_id)
+            record = from_completed_review(wf_id, scope_sha256, review)
+            with closing(self._connect()) as db:
+                return save_receipt(db, review_id, record)
+
+    def metadata_receipt(self, wf_id):
+        """Read persisted LOCAL metadata without reading the owner folder."""
+        with self.lock:
+            workflow = self.verified_get(wf_id)
+            if workflow["template"] != "required_file_metadata_v1":
+                raise BackendRefused("METADATA_TEMPLATE_REQUIRED", 422)
+            with closing(self._connect()) as db:
+                return read_receipt(db, wf_id)
 
     def create(self, goal, request_id):
         if type(goal) is not str or type(request_id) is not str or not REQ.fullmatch(request_id):
@@ -775,6 +805,8 @@ def create_server(backend: Backend, token: str, *, port: int=0):
                         data=backend.list()
                     elif re.fullmatch(r"/v1/local-metadata/reviews/rev_[0-9a-f]{32}",path):
                         data=backend.metadata.get(path.rsplit("/",1)[-1])
+                    elif re.fullmatch(r"/v1/workflows/wf_[0-9a-f]{32}/local-metadata",path):
+                        data=backend.metadata_receipt(path.rsplit("/",2)[-2])
                     elif re.fullmatch(r"/v1/workflows/wf_[0-9a-f]{32}",path):
                         # G185: an uncertain POST must never be reconciled from
                         # a forged mutable state without validating event order.
@@ -830,6 +862,12 @@ def create_server(backend: Backend, token: str, *, port: int=0):
                         if set(body)!={"telemetry","opt_in"}:
                             raise BackendRefused("UNEXPECTED_KEYS",400)
                         data=backend.advice(body["telemetry"],opt_in=body["opt_in"])
+                    elif re.fullmatch(r"/v1/workflows/wf_[0-9a-f]{32}/local-metadata",path):
+                        if set(body)!={"review_id","scope_sha256","acknowledgement"}:
+                            raise BackendRefused("UNEXPECTED_KEYS",400)
+                        data=backend.save_metadata_receipt(
+                            path.rsplit("/",2)[-2],body["review_id"],
+                            body["scope_sha256"],body["acknowledgement"])
                     else:
                         match=re.fullmatch(r"/v1/workflows/(wf_[0-9a-f]{32})/(test|approve|run|recover)",path)
                         if not match:
@@ -844,7 +882,7 @@ def create_server(backend: Backend, token: str, *, port: int=0):
                                 raise BackendRefused("UNEXPECTED_KEYS",400)
                             data=getattr(backend,action)(wf)
                 self.send(200,data)
-            except (BackendRefused, MetadataRefused) as exc:
+            except (BackendRefused, MetadataRefused, MetadataReceiptRefused) as exc:
                 self.send(exc.status,{"error":exc.code,"release_gate":"HOLD"})
             except (OSError,sqlite3.Error,AssertionError,ValueError):
                 self.send(409,{"error":"LOCAL_BACKEND_REFUSED","release_gate":"HOLD"})

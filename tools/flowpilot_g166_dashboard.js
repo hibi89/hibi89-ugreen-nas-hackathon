@@ -42,7 +42,11 @@ function sync() {
       audit: !!workflow && s !== "UNKNOWN_REQUIRES_READBACK",
       evidence: s === "COMPLETE_LOCAL_SYNTHETIC", report: s === "COMPLETE_LOCAL_SYNTHETIC",
       recover: s === "RUNNING", "meta-approve": review?.status === "WAITING_APPROVAL" && el("metadata-consent").checked,
-      "meta-cancel": review?.status === "WAITING_APPROVAL", "meta-status": !!review
+      "meta-cancel": review?.status === "WAITING_APPROVAL", "meta-status": !!review,
+      "meta-save": workflow?.template === "required_file_metadata_v1" &&
+        ["LOCAL_METADATA_FINDINGS_READY", "LOCAL_METADATA_BLOCKED"].includes(review?.status) &&
+        el("meta-save-consent").checked,
+      "meta-readback": workflow?.template === "required_file_metadata_v1"
     };
     button.disabled = Object.prototype.hasOwnProperty.call(rules, button.id) && !rules[button.id];
   }
@@ -308,6 +312,7 @@ el("meta-preview").addEventListener("click", () => act(async () => {
   el("required").value = "";
   review = null;
   el("metadata-consent").checked = false;
+  el("meta-save-consent").checked = false;
   const required = raw.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
   if (required.length < 1 || required.length > 20) throw Error("경로 1–20개가 필요합니다.");
   review = await json("/v1/local-metadata/preview", {goal:"check required files",required});
@@ -346,6 +351,33 @@ el("meta-status").addEventListener("click", () => act(async () => {
   if (!review) throw Error("검토 세션 없음");
   review = await json("/v1/local-metadata/reviews/" + review.review_id);
   status("저장된 메모리 내 메타데이터 상태 재조회 · 재실행 없음"); output(review);
+}));
+el("meta-save").addEventListener("click", () => act(async () => {
+  if (!workflow || workflow.template !== "required_file_metadata_v1" ||
+      !review || !["LOCAL_METADATA_FINDINGS_READY", "LOCAL_METADATA_BLOCKED"].includes(review.status) ||
+      !el("meta-save-consent").checked)
+    throw Error("완료된 실제 로컬 점검·필수파일 계획·별도 저장 동의가 필요합니다.");
+  const ticket = review;
+  const wf = workflow.workflow_id;
+  el("meta-save-consent").checked = false;
+  review = null;  // Never replay a consent ticket after a lost reply.
+  const saved = await json("/v1/workflows/" + wf + "/local-metadata", {
+    review_id: ticket.review_id, scope_sha256: ticket.scope_sha256,
+    acknowledgement: "SAVE_REDACTED_LOCAL_METADATA_RECEIPT"
+  });
+  if (saved.status !== "REDACTED_LOCAL_METADATA_EVIDENCE_STORED_NOT_NAS")
+    throw Error("로컬 증거 저장 응답 검증 실패");
+  status("승인된 실제 로컬 메타데이터 결과를 SQLite에 저장 · NAS 실행 아님");
+  output(saved);
+}));
+el("meta-readback").addEventListener("click", () => act(async () => {
+  if (!workflow || workflow.template !== "required_file_metadata_v1")
+    throw Error("필수 파일 워크플로를 먼저 선택해야 합니다.");
+  const saved = await json("/v1/workflows/" + workflow.workflow_id + "/local-metadata");
+  if (saved.status !== "REDACTED_LOCAL_METADATA_EVIDENCE_STORED_NOT_NAS")
+    throw Error("증거 검증 실패");
+  status("SQLite 저장 증거 재조회 · 로컬 원본 재검사 없음");
+  output(saved);
 }));
 // Existing G117 advisor: only user-provided numeric samples, never a NAS watcher.
 el("advice-submit").addEventListener("click", () => act(async () => {
@@ -417,6 +449,7 @@ el("synthetic-consent").addEventListener("change", sync);
 el("advice-consent").addEventListener("change", sync);
 for (const [id] of adviceFields) el(id).addEventListener("input", sync);
 el("metadata-consent").addEventListener("change", sync);
+el("meta-save-consent").addEventListener("change", sync);
 el("existing").addEventListener("change", sync);
 el("clear").addEventListener("click", () => { output("화면 로그 초기화"); status("대기"); });
 window.addEventListener("pagehide", () => { token = ""; clearAdvice(); });
