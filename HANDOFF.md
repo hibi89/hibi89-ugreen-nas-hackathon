@@ -1,3 +1,16 @@
+## 2026-11-05 KST — G258 accepted: final-product tracking 67/100
+
+1. Goal/tech: FlowPilot 3.0 full native Uliya NAS target, Python 3.11 source-to-Kit read-only dispatch policy and G257 trial prep.
+2. Implemented/decision: G257 old receipt/current ZIP swap gap fixed by re-opening exact private G226 source at trial preflight. Check 2 agent guarded instructions, 8 official read-only Kit actions, planning modes never delegate, per-document consent and 5 failure states. Chose present-byte binding over trusting old receipt; new functionality, no provider invocation.
+3. Tests: feature `8ee6876a7bb4bfd694c0f61f1c7f81bb8f993097` CI **4/4 SUCCESS** — 41884404920 (Linux 1660 PASS / 0 FAIL / 16 SKIP, Windows full PASS), 41884404799 readiness, 41884405002 master, 41884404792 closeout. Actual private original G226/Kit independently 19/19 cross-checked read-only. Exact G258 code unit/regression tested in GitHub using synthetic fixtures only.
+4. State: official Skill tranche 6→7/15; whole-product 66→67/100, 33 outstanding. Locals saturated 60/60, actual registered NAS 0/20, final release 0/5. RELEASE HOLD / NAS NO-GO.
+5. Failure/rollback: initial ef1d8eb1 Linux unit FAIL (fixture mutating nonselected action), fixed with targeted known selected-action test and upstream Markdown-emphasis anchor at final SHA; no test disabled. Revert G258 commits via standard Git; never force push.
+6. Repo/branch/path/SHA: `hibi89/hibi89-ugreen-nas-hackathon`/`lead/ugreen` source `8ee6876a7bb4bfd694c0f61f1c7f81bb8f993097`; `tools/flowpilot_g258_skill_dispatch_binding.py`, `tests/test_flowpilot_g258_skill_dispatch_binding.py`, `tools/flowpilot_g257_native_trial_matrix.py`; this doc SHA follows.
+7. Runtime: GitHub Ubuntu/Windows Python3.11; actual private read-only source catalog audit; Vercel N/A; vendor Creator/Checker, registered Expert API, NAS live/owner permissions NOT_RUN.
+8. Original assets: canonical public Skill, owner-private G221/G226 ZIP and PDF, official Kit, databases, user files and credentials unchanged. No private source published; Git history serves backup.
+9. Next: approved real Creator provenance and current first-party Checker/right review; verified registered Expert signature, effective permissions, response schema and owner-approved real NAS readback. Trial entitlement unverified; retain 180-minute test plan. User directed final PDF/Devpost last. No re-credit local simulations.
+10. 2026-11-05 KST, exact source SHA CI and owner-private independent 19/19 scope verified. Docs-only CI requires a separate result check.
+
 ## 2026-11-05 KST — G257 verified offline NAS test preparation; overall 66/100 unchanged
 
 1. Goal: full FlowPilot 3.0 Uliya NAS workflow; focus product readiness, NOT PDF editing, packaging or Devpost.
