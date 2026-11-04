@@ -472,6 +472,8 @@ async function main(){
     elems["csv-report-path"].value=reportPath;elems["csv-report-path"].fire("input");
     assert.equal(elems["csv-run"].disabled,false,
                  "exact reviewed destination plus both consents enables run");
+    elems["csv-consent"].checked=false;elems["csv-consent"].fire("change");
+    elems["csv-report-consent"].checked=false;elems["csv-report-consent"].fire("change");
     elems["csv-consent"].checked=true;
     elems["csv-consent"].fire("change");
     assert.equal(elems["csv-run"].disabled,true,
