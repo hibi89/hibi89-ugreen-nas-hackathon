@@ -16,7 +16,7 @@ Date: 2026-11-04 KST. This is a conservative, owner-facing PROJECT MANAGEMENT ES
 | **Total final-product tracking estimate** | **100** | **51** | **Pre-G242 baseline, NOT an objective scientific measurement** |
 
 ## Exactly one target G242 acceptance point
-- Intent row score **6 → 7 / 10**, so whole-product **51 → 52 / 100**, **only if** the exact G242 code SHA passes: (1) actual local browser Korean AND English phrase → selected typed grouping while no read happens; (2) compound/unsafe text refused without network or execution; (3) reviewed plan still requires distinct CSV read consent; (4) full Linux and Windows regression; (5) genuine Chromium end-to-end same disposable CSV produces correct redacted aggregate and JSON, never NAS.
+- Intent row score **6 → 7 / 10**, so whole-product **51 → 52 / 100**, **fulfilled after** the exact G242 code SHA passed: (1) actual local browser Korean AND English phrase → selected typed grouping while no read happens; (2) compound/unsafe text refused without network or execution; (3) reviewed plan still requires distinct CSV read consent; (4) full Linux and Windows regression; (5) genuine Chromium end-to-end same disposable CSV produces correct redacted aggregate and JSON, never NAS.
 - Failure, unknown CI or unverified components earn **0**, not partial or optimistic credit. Changing test counts, docs, or the 24-day schedule alone earns **0**.
 - No future session may credit the same capability twice. Every future +1 point must identify a NEW unearned acceptance condition within a whole-product row before coding, with exact SHA and execution evidence.
 - This rubric is for progress reporting; final shipping remains **HOLD** until external native/rights/release gates are met even at high internal scores.
@@ -28,5 +28,5 @@ Date: 2026-11-04 KST. This is a conservative, owner-facing PROJECT MANAGEMENT ES
 
 ## Source evidence / time
 - G241 validated source SHA `fe10f062d15c5f43bb766965e26ab171264750c4`; Linux+Windows run 41838664827; real Chromium run 41838664807; 4/4 applicable CI success.
-- G242 added source SHA `10dd6607719bfe395999210e24de1d82005057cf`. **Exact SHA CI pending at this file creation.** Do not mark 52% achieved until post-run verified; current estimated completion stays 51%.
+- G242 added source SHA `10dd6607719bfe395999210e24de1d82005057cf`. **Exact G242 source CI 4/4 verified.** Linux+Windows full [41840164608](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/41840164608): Linux 1562 PASS / 0 FAIL / 16 SKIP, Windows full PASS. Real Chromium [41840164523](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/41840164523) PASS including supported Korean/English mapping, compound request refusal and existing disposable CSV real HTTP/GET/download. Master 41840164570 and closeout 41840164573 PASS. Earned ONE newly testable whole-product acceptance point: internal estimate now **52/100**, not objective platform/production proof.
 - Production / Vercel N/A. Registered Expert, actual NAS, Creator new candidate, Devpost NOT_RUN. 3-hour trial unused; RELEASE HOLD / NAS NO-GO.
