@@ -6,6 +6,8 @@ let token = "", workflow = null, verifiedPlan = null, review = null, lastLocalRe
 let csvTicket = null, csvJobId = null, csvReceipt = null;
 function clearCsv() {
   csvTicket = null; csvJobId = null; csvReceipt = null;
+  el("csv-verify-path").value = "";
+  el("csv-verify-consent").checked = false;
   el("csv-local-path").value = "";
   el("csv-report-path").value = "";
   el("csv-report-consent").checked = false;
@@ -78,6 +80,10 @@ function sync() {
       "csv-recover": true,
       "csv-history-list": el("csv-history-consent").checked,
       "csv-history-open": !!el("csv-history-select").value,
+      "csv-verify-report": !!csvReceipt &&
+        csvReceipt.status === "COMPLETE_LOCAL_TYPED_CSV_NOT_NAS" &&
+        csvReceipt.result?.report_file_created === true &&
+        !!el("csv-verify-path").value && el("csv-verify-consent").checked,
       "csv-export": !!csvReceipt && el("csv-export-consent").checked
     };
     button.disabled = Object.prototype.hasOwnProperty.call(rules, button.id) && !rules[button.id];
@@ -614,12 +620,16 @@ el("csv-intent-apply").addEventListener("click", () => act(async () => {
     release_gate:"HOLD"
   });
 }));
+el("csv-verify-consent").addEventListener("change", sync);
+el("csv-verify-path").addEventListener("input", sync);
 el("csv-report-consent").addEventListener("change", sync);
 el("csv-report-path").addEventListener("input", sync);
 el("csv-consent").addEventListener("change", sync);
 el("csv-export-consent").addEventListener("change", sync);
 el("csv-preview").addEventListener("click", () => act(async () => {
   csvTicket = null; csvJobId = null; csvReceipt = null;
+  el("csv-verify-path").value = "";
+  el("csv-verify-consent").checked = false;
   el("csv-report-consent").checked = false;
   el("csv-consent").checked = false;
   el("csv-export-consent").checked = false;
@@ -658,6 +668,8 @@ el("csv-run").addEventListener("click", () => act(async () => {
   el("csv-report-consent").checked = false;
   // One-shot client consent. Preserve ONLY the job ID after uncertain POST.
   csvTicket = null; csvReceipt = null;
+  el("csv-verify-path").value = "";
+  el("csv-verify-consent").checked = false;
   if ((!!reportPath) !== reportConsent || (reportConsent && reportPath.length > 1024))
     throw Error("새 로컬 CSV 저장 경로와 독립 승인 둘 다 필요합니다.");
   el("csv-consent").checked = false;
@@ -691,6 +703,8 @@ el("csv-run").addEventListener("click", () => act(async () => {
   output(result);
 }));
 async function readCsvJob(id) {
+  el("csv-verify-path").value = "";
+  el("csv-verify-consent").checked = false;
   if (typeof id !== "string" || !/^csv_[0-9a-f]{24}$/.test(id))
     throw Error("복구할 CSV 작업 ID가 올바르지 않습니다.");
   // Revoke old export rights before an uncertain GET, not after it.
@@ -781,6 +795,44 @@ el("csv-history-open").addEventListener("click", () => act(async () => {
   el("csv-consent").checked = false;
   el("csv-export-consent").checked = false;
   await readCsvJob(id); // no run POST
+}));
+// G245 separate one-shot LOCAL file inspection; no input CSV reread or
+// persisted path, and a digest mismatch must never be displayed as a success.
+el("csv-verify-report").addEventListener("click", () => act(async () => {
+  const receipt = csvReceipt;
+  const file = el("csv-verify-path").value;
+  const authorized = el("csv-verify-consent").checked;
+  el("csv-verify-path").value = "";
+  el("csv-verify-consent").checked = false;
+  el("csv-export-consent").checked = false;
+  if (!authorized || !file || file.length > 1024 ||
+      receipt?.status !== "COMPLETE_LOCAL_TYPED_CSV_NOT_NAS" ||
+      receipt?.result?.report_file_created !== true ||
+      !/^csv_[0-9a-f]{24}$/.test(receipt?.request_id || ""))
+    throw Error("로컬 생성 보고서의 영수증·경로·별도 읽기 동의 필요");
+  const result = await json("/v1/local-csv/verify-report", {
+    request_id:receipt.request_id,report_path:file,
+    acknowledgement:"APPROVE_LOCAL_REPORT_VERIFY_ONCE"
+  });
+  const verified = result?.status === "VERIFIED_LOCAL_OUTPUT_SHA_NOT_NAS";
+  const conflict = result?.status === "CONFLICT_LOCAL_OUTPUT_SHA_NOT_NAS";
+  if (result?.schema !== "flowpilot-g245-local-output-verify-v1" ||
+      (!verified && !conflict) || result.request_id !== receipt.request_id ||
+      result.release_gate !== "HOLD" || result.nas_verified !== false ||
+      result.matches_recorded_receipt !== verified ||
+      result.local_output_read_once !== true ||
+      result.original_input_reopened !== false ||
+      result.execution_replayed !== false ||
+      result.private_path_or_labels_included !== false ||
+      result.sqlite_mutated !== false ||
+      !/^[0-9a-f]{64}$/.test(result.expected_report_sha256 || "") ||
+      result.expected_report_sha256 !== receipt.result.report_sha256 ||
+      !/^[0-9a-f]{64}$/.test(result.observed_report_sha256 || ""))
+    throw Error("로컬 생성 보고서 검증 응답 무결성 실패");
+  status(verified ?
+    "로컬 생성 CSV SHA-256 일치 · NAS 미검증" :
+    "로컬 생성 CSV SHA-256 불일치 · 사용 전 수동 확인 필요");
+  output(result);
 }));
 el("csv-export").addEventListener("click", () => act(async () => {
   if (!csvReceipt || !el("csv-export-consent").checked)

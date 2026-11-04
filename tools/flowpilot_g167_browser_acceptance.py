@@ -366,6 +366,26 @@ def run_browser():
                 expect(page.locator("#output")).to_contain_text(
                     "COMPLETE_LOCAL_TYPED_CSV_NOT_NAS")
                 expect(page.locator("#csv-export")).to_be_disabled()
+                # G245 real GUI verifies recorded output SHA after G244;
+                # a deliberate change must return CONFLICT without CSV rerun.
+                expect(page.locator("#csv-verify-report")).to_be_disabled()
+                page.locator("#csv-verify-path").fill(str(report_target))
+                expect(page.locator("#csv-verify-report")).to_be_disabled()
+                page.locator("#csv-verify-consent").check()
+                page.locator("#csv-verify-report").click()
+                expect(page.locator("#output")).to_contain_text(
+                    "VERIFIED_LOCAL_OUTPUT_SHA_NOT_NAS")
+                assert page.locator("#csv-verify-path").input_value()==""
+                expect(page.locator("#csv-verify-consent")).not_to_be_checked()
+                assert csv_fixture.read_bytes()==original
+                report_target.write_bytes(report_target.read_bytes().replace(b"400",b"401"))
+                page.locator("#csv-verify-path").fill(str(report_target))
+                page.locator("#csv-verify-consent").check()
+                page.locator("#csv-verify-report").click()
+                expect(page.locator("#output")).to_contain_text(
+                    "CONFLICT_LOCAL_OUTPUT_SHA_NOT_NAS")
+                assert post_requests==["POST","POST"]
+                assert csv_fixture.read_bytes()==original
                 page.locator("#token").fill("short")
                 page.locator("#connect").click()
                 expect(page.locator("#create")).to_be_disabled()
@@ -390,7 +410,8 @@ def run_browser():
                               "G242_REAL_BROWSER_LOCAL_NL_TO_TYPED_CSV",
                               "G242_COMPOUND_WRITE_INTENT_FAIL_CLOSED",
                               "G243_OPTIN_REDACTED_CSV_HISTORY_GET_ONLY",
-                              "G244_EXPLICIT_CREATE_ONLY_FULL_LOCAL_REPORT"],
+                              "G244_EXPLICIT_CREATE_ONLY_FULL_LOCAL_REPORT",
+                              "G245_REAL_REPORT_SHA_OK_AND_TAMPER_CONFLICT"],
                     "real_nas_verified":False,"trial_started":False,"release_gate":"HOLD"
                 }
         finally:

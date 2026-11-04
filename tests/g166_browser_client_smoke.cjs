@@ -17,7 +17,7 @@ const nativeFetch = globalThis.fetch;
 let rejectOneRunReply = false;
 let runRequestCount = 0;
 let readbackCount = 0;
-let rejectOneCsvRunReply=false, csvRunPostCount=0, csvGetCount=0, csvHistoryGetCount=0;
+let rejectOneCsvRunReply=false, csvRunPostCount=0, csvGetCount=0, csvHistoryGetCount=0, csvVerifyPostCount=0;
 let rejectOneMetadataApproval = false;
 let rejectOneMetadataCancel = false;
 let adviceCalls = 0;
@@ -33,6 +33,7 @@ globalThis.fetch = (route, init) => {
   }
   if (route.startsWith("/v1/local-csv/jobs/")) csvGetCount++;
   if (route === "/v1/local-csv/jobs") csvHistoryGetCount++;
+  if (route === "/v1/local-csv/verify-report") csvVerifyPostCount++;
   if (route.endsWith("/run") && route.startsWith("/v1/workflows/wf_")) {
     runRequestCount++;
     if (rejectOneRunReply) {
@@ -71,10 +72,10 @@ const ids = ["token","connect","disconnect","clear","connection-status","notice"
   "list","load","plan","guide","test","approve","run","refresh","audit","evidence","report","recover",
   "synthetic-consent","metadata-consent","required","version-candidates","text-workflow","text-preview","meta-preview","meta-approve",
   "meta-cancel","meta-status","meta-save","meta-readback","meta-council","meta-report","meta-export","native-handoff","local-council-state","meta-save-consent","advice-disk","advice-errors","advice-backup",
-  "advice-consent","advice-submit","advice-summary","csv-local-path","csv-group-column","csv-preview","csv-run","csv-readback","csv-consent","csv-job-status","csv-export-consent","csv-export","csv-recover-id","csv-recover","csv-intent","csv-intent-apply","csv-report-path","csv-report-consent","csv-history-consent","csv-history-select","csv-history-list","csv-history-open"];
+  "advice-consent","advice-submit","advice-summary","csv-local-path","csv-group-column","csv-preview","csv-run","csv-readback","csv-consent","csv-job-status","csv-export-consent","csv-export","csv-recover-id","csv-recover","csv-intent","csv-intent-apply","csv-report-path","csv-report-consent","csv-verify-path","csv-verify-consent","csv-verify-report","csv-history-consent","csv-history-select","csv-history-list","csv-history-open"];
 const buttonIds = ["connect","disconnect","clear","create","list","load","plan","guide",
   "test","approve","run","refresh","audit","evidence","report","recover","text-preview","meta-preview",
-  "meta-approve","meta-cancel","meta-status","meta-save","meta-readback","meta-council","meta-report","meta-export","native-handoff","advice-submit","csv-preview","csv-run","csv-readback","csv-export","csv-recover","csv-intent-apply","csv-history-list","csv-history-open"];
+  "meta-approve","meta-cancel","meta-status","meta-save","meta-readback","meta-council","meta-report","meta-export","native-handoff","advice-submit","csv-preview","csv-run","csv-readback","csv-export","csv-recover","csv-intent-apply","csv-history-list","csv-history-open","csv-verify-report"];
 class FakeElement {
   constructor(id) {this.id=id;this.value="";this.checked=false;this.disabled=false;
     this.textContent="";this.handlers={};this.options=[];}
@@ -478,6 +479,28 @@ async function main(){
     await click("csv-readback");
     assert.match(elems.output.textContent,/COMPLETE_LOCAL_TYPED_CSV_NOT_NAS/);
     assert.equal(elems["csv-export"].disabled,true,"fresh export consent after GET");
+    // G245 verify a real previously created report; separate consent only.
+    assert.equal(elems["csv-verify-report"].disabled,true);
+    elems["csv-verify-path"].value=reportPath;elems["csv-verify-path"].fire("input");
+    assert.equal(elems["csv-verify-report"].disabled,true);
+    elems["csv-verify-consent"].checked=true;elems["csv-verify-consent"].fire("change");
+    assert.equal(elems["csv-verify-report"].disabled,false);
+    await click("csv-verify-report");
+    assert.equal(csvVerifyPostCount,1);
+    assert.equal(elems["csv-verify-path"].value,"");
+    assert.equal(elems["csv-verify-consent"].checked,false);
+    assert.equal(JSON.parse(elems.output.textContent).status,
+                 "VERIFIED_LOCAL_OUTPUT_SHA_NOT_NAS");
+    fs.writeFileSync(reportPath,
+      fs.readFileSync(reportPath,"utf8").replace("400","401"));
+    elems["csv-verify-path"].value=reportPath;elems["csv-verify-path"].fire("input");
+    elems["csv-verify-consent"].checked=true;elems["csv-verify-consent"].fire("change");
+    await click("csv-verify-report");
+    assert.equal(csvVerifyPostCount,2);
+    assert.equal(JSON.parse(elems.output.textContent).status,
+                 "CONFLICT_LOCAL_OUTPUT_SHA_NOT_NAS");
+    assert.equal(csvRunPostCount,2,"verifier never reruns CSV job");
+    assert.equal(fs.readFileSync(csvFile,"utf8").includes("alice,125"),true);
   } finally {fs.rmSync(owned,{recursive:true,force:true});}
   await click("disconnect");
   assert.equal(elems["csv-local-path"].value,"","disconnect clears file path");
