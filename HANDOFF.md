@@ -1,3 +1,15 @@
+## 2026-11-05 KST — G249 final CI reconciled: 59/100
+1. **Objective:** Reach full FlowPilot 3.0, using fixed 100-point product rubric and evidence, not tests or calendar as progress units.
+2. **Delivered:** G249 consented scoped LOCAL version evidence JSON (exact code 703fb254) now accepted as distinct real local execution point 9→10. G250 authenticated browser export and G251 manual owner decision are separately implemented but unaccepted pending exact CI.
+3. **Tests:** G249 final 4/4 GitHub workflows SUCCESS: 41861510935 Linux 1594 PASS / 0 FAIL / 16 SKIP and Windows full PASS, 41861511141 readiness, 41861511055 master, 41861510832 closeout. G250 41863464658/41863464691 queued, G251 41864970832 queued; 13 G251 local Linux tests PASS at exact blob 9e8430c7. NAS/official Creator/Checker NOT_RUN.
+4. **Current:** confirmed whole-product internal score **59/100**, 41 remaining; G250/G251 potential further +1 each only when validated. RELEASE HOLD / NAS NO-GO.
+5. **Problems/rollback:** Earlier queued CI delayed scoring, never credited without final conclusion; no force push. Ordinary Git history from code SHA 703fb254 enables revert. Windows G251 link handling patched at 025e5bdf, platform full regression pending.
+6. **Repo:** hibi89/hibi89-ugreen-nas-hackathon, lead/ugreen. G249 source 703fb254, G250 c88f7aea, G251 final 025e5bdf. Latest documentation SHA from GitHub branch, separately verify.
+7. **Environment:** Python3.11 Linux/Windows and Node/real Chromium for relevant local-only test; no Vercel production URL, official Uliya/NAS not executed.
+8. **Originals/security:** official Skill Markdown, owner private ZIP/PDF, Kit v0.7.3 ZIP cf557e5a...70e1b3, SQLite, credentials protected; no external uploads or NAS trial activation.
+9. **Next:** confirm G250 browser and Linux/Windows final CI and G251 Linux/Windows final CI. If green award separate real operator acceptance; if failed diagnose exact job. Current official Creator/Checker, registered Expert rights and NAS require explicit new owner authorization.
+10. **Time/provenance:** 2026-11-05 KST, GitHub exact G249 SHA Actions completed SUCCESS and code/source read, G250/G251 pending. See docs/operations/G249_FINAL_CI_ACCEPTANCE_20261105.md.
+
 ## 2026-11-05 KST — G251 full-product work handoff (GitHub CI queued)
 
 1. Goal/tech: Finish G247 typed version workflow's real manual owner-review step using G249/G250 privacy-redacted JSON and Python 3.11 local CLI, one required and one alternative only.
