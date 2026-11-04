@@ -1,3 +1,10 @@
+## 2026-11-04 KST — G241 manual CSV receipt recovery + real Chromium CSV E2E (CI PENDING)
+
+- PRODUCT: Local dashboard now accepts an operator-recorded `csv_` job ID after a browser reload and safely retrieves the G239 SQLite receipt via authenticated GET only. No browser token/job storage; no repeat POST, local CSV reread or implicit export. Invalid IDs are blocked; a fresh one-use export consent is required. Unknown POST outcomes now display the generated job ID before the POST to enable recovery after reply loss.
+- VERIFICATION: New Node real-loopback/SQLite recovery smoke and actual Chromium disposable CSV preview/approve/run (intentionally lost POST reply)/GET/download/reload/manual GET/download checks. Initial G241 feature commit `3e7f6d2cea75f9b3deabe11212a5017bf9a56578` Chromium FAIL at assertion source line 252: in the ambiguous POST state the UI did not display the created job ID. Functional UI fix commit `f813ab1b96c05feef6c4f719e214bf095336bef3` displays ID before request; exact-fix CI PENDING. Full Linux/Windows regression on this commit also PENDING.
+- BOUNDARY: Previous G240 source `3ea2bdff5204dd48c7920b50c52f94d4e2d38342` verified 4/4 Actions SUCCESS. Only synthetic disposable data tested. Registered Expert, real NAS, official Creator/Checker, NAS trial and Devpost NOT_RUN. RELEASE HOLD / NAS NO-GO. Product +1 percentage-point numerical gain is an objective, NOT a validated figure until independent acceptance.
+- Changed G166 JS/HTML and Node browser smoke, G167 Chromium acceptance, STATUS/HANDOFF. Original Skill, SDK/Kit, owner data and G238/G239 engine unchanged. Roll back normal Git revert; no force push.
+
 ## 2026-11-04 KST — G240 redacted local CSV receipt download / response-loss recovery (CI PENDING)
 
 - New operator function: After the authenticated G239 real local CSV run or manual GET receipt recovery, the browser can save a strictly allowlisted redacted JSON report after a separate, consumed export opt-in. Only group indexes, totals, counts, digests and NOT_NAS markers are emitted; no raw owner path, source CSV or group labels. No server writes, extra data reads, new DB migration or external transfer.

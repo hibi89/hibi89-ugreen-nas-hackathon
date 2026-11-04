@@ -1,3 +1,16 @@
+## 2026-11-04 KST — G241 manual job ID recovery and genuine Chromium CSV journey
+
+1. Goal/tech: Real local FlowPilot 3.0 operator journey with recoverable CSV receipt across reload; vanilla JS + Python loopback HTTP + SQLite; no NAS.
+2. Decision: Rejected automatic session/localStorage and POST retries. Chosen: user copies exact job ID, reconnects with bearer, manually GETs redacted receipt; separate download consent. Runtime remains local-only.
+3. Implemented: recovery input/action with strict ID pattern, state/consent clearing on any old readback; show job ID before ambiguous POST. Browser test includes disposable CSV real calculation, reply-loss simulation, JSON download, reload, manual GET, equal exported JSON, unchanged input, no second POST.
+4. Tests: G240 base `3ea2bdff5204dd48c7920b50c52f94d4e2d38342` 4/4 CI SUCCESS. G241 feature `3e7f6d2cea75f9b3deabe11212a5017bf9a56578` real Chromium FAILED (test line 252: ID missing from ambiguous state). Fixed in `f813ab1b96c05feef6c4f719e214bf095336bef3`; exact-fix Linux/Windows/Chromium CI PENDING at documentation time. Registered Expert/NAS/Creator/Checker/Devpost NOT_RUN, HOLD.
+5. Error and remedy: Lost-reply state originally lacked visible ID so browser recovery was impossible. Changed only id display before POST; do not rerun file processing. If CI failure inspect actual exact logs and patch minimally once. No credentials or owner inputs to public GitHub.
+6. Repo: hibi89/hibi89-ugreen-nas-hackathon, lead/ugreen. Source fix SHA f813ab1b96c05feef6c4f719e214bf095336bef3. Files G166 dashboard JS/HTML, tests/g166_browser_client_smoke.cjs, tools/flowpilot_g167_browser_acceptance.py; docs STATUS/HANDOFF.
+7. Environment: Actions Ubuntu/Windows Node/Python 3.11 and browser-preinstalled Chromium / Playwright 1.56.0. Vercel Production N/A. No actual vendor service.
+8. Originals/backups: Official Markdown Skill, Kit/PDF/ZIP, existing original SQLite and G238/G239 engine untouched; no owner CSV read; disposable test data only. Ordinary Git revert available.
+9. Next: Confirm exact source CI, fix actual test defect if found; continue independent product work while CI runs. Live registered Expert schema/permissions and real NAS readback separately approved only; release HOLD.
+10. Provenance: 2026-11-04 KST, G240 previously verified, G241 initial browser failure and fix recorded, fix run unresolved at writing. Completion % change not measurable from test count.
+
 ## 2026-11-04 KST — G240 (code+test pushed; CI PENDING)
 
 1. Goal/tech: Make local G239 authenticated CSV results downloadable as redacted JSON, separately approved, vanilla JS dashboard, Python/SQLite unchanged.
