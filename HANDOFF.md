@@ -1,3 +1,16 @@
+## 2026-11-04 KST — G243 opt-in local CSV job history: source CI pending
+
+1. Objective: Full-product UX/recovery integration (not just Round1). Last ten redacted G239 job IDs/status and separate GET-only readback after lost browser ID; browser local auth, Python SQLite.
+2. Compared automatic browser token/job persistence versus bounded, bearer-authenticated on-demand redacted index with one-use UI review consent and exact HTTP header; selected latter, no new external dependency/fee, no customer file read.
+3. Implemented: `LocalCsvJobs.recent()` validates selected receipt SHA/claims, maps allowlisted IDs/status/counts, bounds 10; new gated GET `/v1/local-csv/jobs`, fresh UI checkbox, selection and GET readback with old approval invalidation. Unit tests cover unauthorized/missing consent, no DB creation, 12→10 bounded sorting, tamper refusal, BLOCKED status; Node and real Chromium scenarios extend prior G241.
+4. Test state: Feature commit `41bd15aeaeaa13e5e79425fb6d20ded52d68f1a6`; exact-source CI PENDING at draft. G242 predecessor source `10dd6607719bfe395999210e24de1d82005057cf` previously 4/4 PASS (Linux 1562 PASS 0 FAIL 16 SKIP, Windows full, real browser). No NAS/Expert/Creator/Checker/Devpost.
+5. Failure handling: Refuse invalid/missing token/header, corrupt job or forged receipt; no auto-retry, no source file read or export from listing. If CI test failure inspect exact log, minimal correction, ordinary Git revert for regression. Never force push.
+6. Repo `hibi89/hibi89-ugreen-nas-hackathon` branch `lead/ugreen`; base `6f09e3b5c8195d10f39f8cbf82b59e59ccbc26e7`; feature SHA above. Changed G239 CSV store, local backend, G166 UI, G166 Node, G167 Chromium, G239 Python tests, STATUS/HANDOFF/rubric.
+7. Runtime: local 127.0.0.1 bearer+SQLite, GitHub Ubuntu/Windows Python3.11, Node and genuine Chrome/Playwright 1.56.0. Vercel/Production URL N/A.
+8. Backup: Existing code preserved by Git parent, original G238/239 schema/SQLite unchanged; official Uliya Markdown Skill, Kit/PDF/ZIP, owner private data untouched. Disposable test CSV only, no public secrets.
+9. Next: Verify exact feature CI, patch only actual failures, score 52→53 only on all acceptance criteria including actual Chrome+Linux/Windows. Continue platform capability gate evidence research without invoking real NAS/Creator or spending 3-hour trial.
+10. 2026-11-04 KST: 52/100 internal provisional full-product score baseline. G243 target 53/100 NOT YET VERIFIED at writing. Docs SHA will be separate commit.
+
 ## 2026-11-04 KST — G242 VERIFIED: whole-product +1pp estimate (51 → 52 / 100)
 
 1. Objective/technology: FlowPilot 3.0 entire final product (not Round1/local stage) uses source-backed 100-point rubric; target was +1 whole-product percentage point from verified safe natural-language CSV intent→typed plan. Browser JS/HTML, real localhost Python/SQLite, Node and Playwright Chrome.
