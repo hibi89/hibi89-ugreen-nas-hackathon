@@ -590,7 +590,7 @@ el("csv-run").addEventListener("click", () => act(async () => {
   el("csv-export-consent").checked = false;
   const job = randomCsvJobId();
   csvJobId = job;
-  el("csv-job-status").textContent = "실행 결과 미확인 · 영수증 재조회 가능 · 자동 재시도 금지";
+  el("csv-job-status").textContent = "실행 결과 미확인 · 작업 ID " + job + " · 영수증 GET 재조회 가능 · 자동 재시도 금지";
   const result = await json("/v1/local-csv/run", {
     preview_id: p.preview_id, request_id: job,
     plan_sha256: p.plan_sha256, acknowledgement: "APPROVE_LOCAL_CSV_READ_ONCE"
