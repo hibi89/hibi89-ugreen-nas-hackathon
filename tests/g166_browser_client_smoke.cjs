@@ -70,10 +70,10 @@ const ids = ["token","connect","disconnect","clear","connection-status","notice"
   "list","load","plan","guide","test","approve","run","refresh","audit","evidence","report","recover",
   "synthetic-consent","metadata-consent","required","version-candidates","text-workflow","text-preview","meta-preview","meta-approve",
   "meta-cancel","meta-status","meta-save","meta-readback","meta-council","meta-report","meta-export","native-handoff","local-council-state","meta-save-consent","advice-disk","advice-errors","advice-backup",
-  "advice-consent","advice-submit","advice-summary","csv-local-path","csv-group-column","csv-preview","csv-run","csv-readback","csv-consent","csv-job-status","csv-export-consent","csv-export","csv-recover-id","csv-recover"];
+  "advice-consent","advice-submit","advice-summary","csv-local-path","csv-group-column","csv-preview","csv-run","csv-readback","csv-consent","csv-job-status","csv-export-consent","csv-export","csv-recover-id","csv-recover","csv-intent","csv-intent-apply"];
 const buttonIds = ["connect","disconnect","clear","create","list","load","plan","guide",
   "test","approve","run","refresh","audit","evidence","report","recover","text-preview","meta-preview",
-  "meta-approve","meta-cancel","meta-status","meta-save","meta-readback","meta-council","meta-report","meta-export","native-handoff","advice-submit","csv-preview","csv-run","csv-readback","csv-export","csv-recover"];
+  "meta-approve","meta-cancel","meta-status","meta-save","meta-readback","meta-council","meta-report","meta-export","native-handoff","advice-submit","csv-preview","csv-run","csv-readback","csv-export","csv-recover","csv-intent-apply"];
 class FakeElement {
   constructor(id) {this.id=id;this.value="";this.checked=false;this.disabled=false;
     this.textContent="";this.handlers={};this.options=[];}
@@ -338,6 +338,28 @@ async function main(){
     const csvFile = path.join(owned, "test-owned.csv");
     fs.writeFileSync(csvFile,
       "customer,amount_cents\nalice,125\nbob,300\nalice,275\n");
+    // G242 intent is parsed without file access; unsafe/compound requests
+    // fail closed and revoke old approvals.
+    const beforeIntentGet=csvGetCount, beforeIntentPost=csvRunPostCount;
+    elems["csv-intent"].value="고객별 매출 합계와 NAS 삭제";
+    await click("csv-intent-apply");
+    assert.equal(elems["csv-intent"].value,"");
+    assert.match(elems.notice.textContent,/요청 거부/);
+    assert.equal(elems["csv-run"].disabled,true);
+    elems["csv-intent"].value="부서별 매출 합계";
+    await click("csv-intent-apply");
+    assert.equal(elems["csv-group-column"].value,"department");
+    assert.match(elems.output.textContent,/TYPED_LOCAL_INTENT_ONLY_NO_READ/);
+    assert.equal(JSON.parse(elems.output.textContent).source_file_touched,false);
+    assert.equal(elems["csv-consent"].checked,false);
+    elems["csv-intent"].value="sum revenue by project";
+    await click("csv-intent-apply");
+    assert.equal(elems["csv-group-column"].value,"project");
+    elems["csv-intent"].value="고객별 매출 합계";
+    await click("csv-intent-apply");
+    assert.equal(elems["csv-group-column"].value,"customer");
+    assert.equal(csvGetCount,beforeIntentGet,"intent must not make a GET");
+    assert.equal(csvRunPostCount,beforeIntentPost,"intent must not execute");
     elems["csv-local-path"].value = csvFile;
     elems["csv-group-column"].value = "customer";
     assert.equal(elems["csv-run"].disabled,true,"read must require separate consent");

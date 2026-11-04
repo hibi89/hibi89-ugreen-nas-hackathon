@@ -230,6 +230,25 @@ def run_browser():
                 post_requests=[]
                 page.on("request",lambda req: post_requests.append(req.method)
                         if req.url.endswith("/v1/local-csv/run") else None)
+                # G242: exact allowlisted Korean/English intents become a
+                # local typed CSV plan; reject compound write/NAS commands.
+                page.locator("#csv-intent").fill("고객별 매출 합계 + NAS 삭제")
+                page.locator("#csv-intent-apply").click()
+                expect(page.locator("#notice")).to_contain_text("요청 거부")
+                expect(page.locator("#csv-run")).to_be_disabled()
+                assert page.locator("#csv-intent").input_value()==""
+                page.locator("#csv-intent").fill("부서별 매출 합계")
+                page.locator("#csv-intent-apply").click()
+                expect(page.locator("#csv-group-column")).to_have_value("department")
+                expect(page.locator("#output")).to_contain_text(
+                    "TYPED_LOCAL_INTENT_ONLY_NO_READ")
+                page.locator("#csv-intent").fill("sum revenue by project")
+                page.locator("#csv-intent-apply").click()
+                expect(page.locator("#csv-group-column")).to_have_value("project")
+                page.locator("#csv-intent").fill("고객별 매출 합계")
+                page.locator("#csv-intent-apply").click()
+                expect(page.locator("#csv-group-column")).to_have_value("customer")
+                expect(page.locator("#csv-run")).to_be_disabled()
                 page.locator("#csv-local-path").fill(str(csv_fixture))
                 expect(page.locator("#csv-run")).to_be_disabled()
                 page.locator("#csv-preview").click()
@@ -313,7 +332,9 @@ def run_browser():
                               "OPT_IN_MANUAL_TELEMETRY_PROPOSALS_ONLY",
                               "G241_REAL_CHROMIUM_CSV_LOST_REPLY",
                               "G241_RELOAD_MANUAL_ID_GET_RECOVERY",
-                              "G241_JSON_DOWNLOAD_CONSENT"],
+                              "G241_JSON_DOWNLOAD_CONSENT",
+                              "G242_REAL_BROWSER_LOCAL_NL_TO_TYPED_CSV",
+                              "G242_COMPOUND_WRITE_INTENT_FAIL_CLOSED"],
                     "real_nas_verified":False,"trial_started":False,"release_gate":"HOLD"
                 }
         finally:

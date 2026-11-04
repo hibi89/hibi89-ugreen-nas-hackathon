@@ -42,6 +42,9 @@
 <p>선택한 로컬 CSV는 미리보기에서 읽지 않습니다. 실행 승인 시에만 1회 읽고, 경로·그룹명은 저장하지 않으며 별도 로컬 SQLite에 집계 결과·해시를 기록합니다. 원본 수정·외부 업로드·실패 자동 재시도는 없습니다.</p>
 <label for="csv-local-path">로컬 CSV 절대경로 (서버와 같은 PC)</label>
 <input id="csv-local-path" type="text" maxlength="1024" spellcheck="false" autocomplete="off" placeholder="승인할 로컬 CSV의 절대경로">
+<label for="csv-intent">자연어 CSV 집계 요청 (허용된 의도만, 실행 아님)</label>
+<div class="line"><input id="csv-intent" type="text" maxlength="96" autocomplete="off" spellcheck="false" placeholder="예: 고객별 매출 합계"><button id="csv-intent-apply" type="button" class="quiet">의도를 CSV 작업으로 변환</button></div>
+<p>지원 예: 고객별 매출 합계 / 부서별 매출 합계 / 프로젝트별 매출 합계 / sum revenue by customer. 데이터 읽기·실행·외부 전송을 승인하지 않습니다. 알 수 없는 명령이나 복합 요청은 거부됩니다.</p>
 <label for="csv-group-column">그룹 열</label>
 <select id="csv-group-column"><option value="customer">customer</option><option value="department">department</option><option value="project">project</option></select>
 <div class="actions"><button id="csv-preview" type="button">CSV 읽기 전 계획 확인</button><button id="csv-run" type="button" class="approval">로컬 CSV 1회 실행</button><button id="csv-readback" type="button" class="quiet">실행 영수증 재조회</button></div>

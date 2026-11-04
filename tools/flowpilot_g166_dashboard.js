@@ -7,6 +7,7 @@ let csvTicket = null, csvJobId = null, csvReceipt = null;
 function clearCsv() {
   csvTicket = null; csvJobId = null; csvReceipt = null;
   el("csv-local-path").value = "";
+  el("csv-intent").value = "";
   el("csv-recover-id").value = "";
   el("csv-export-consent").checked = false;
   el("csv-consent").checked = false;
@@ -65,6 +66,7 @@ function sync() {
       "native-handoff": workflow?.template === "required_file_metadata_v1",
       "meta-export": !!lastLocalReport && workflow?.template === "required_file_metadata_v1",
       "csv-preview": true,
+      "csv-intent-apply": true,
       "csv-run": !!csvTicket && el("csv-consent").checked,
       "csv-readback": !!csvJobId,
       "csv-recover": true,
@@ -550,6 +552,56 @@ function randomCsvJobId() {
   const bytes = crypto.getRandomValues(new Uint8Array(12));
   return "csv_" + Array.from(bytes, x => x.toString(16).padStart(2, "0")).join("");
 }
+// G242: capability-grounded intent mapping, NOT open-ended AI or NAS access.
+// Exact phrases are deliberately narrow: unknown, compound or write/transfer
+// intents fail closed. This stage never contacts the server or touches a CSV.
+const CSV_INTENTS = Object.freeze({
+  "고객별 매출 합계":"customer",
+  "고객별 매출 집계":"customer",
+  "고객별 매출 합계를 계산해줘":"customer",
+  "부서별 매출 합계":"department",
+  "부서별 매출 집계":"department",
+  "부서별 매출 합계를 계산해줘":"department",
+  "프로젝트별 매출 합계":"project",
+  "프로젝트별 매출 집계":"project",
+  "프로젝트별 매출 합계를 계산해줘":"project",
+  "sum revenue by customer":"customer",
+  "sum revenue by department":"department",
+  "sum revenue by project":"project",
+  "group revenue by customer":"customer",
+  "group revenue by department":"department",
+  "group revenue by project":"project"
+});
+el("csv-intent-apply").addEventListener("click", () => act(async () => {
+  const raw = el("csv-intent").value;
+  // Rejecting an intent must also revoke ANY previously reviewed local read.
+  el("csv-intent").value = "";
+  csvTicket = null; csvJobId = null; csvReceipt = null;
+  el("csv-consent").checked = false;
+  el("csv-export-consent").checked = false;
+  el("csv-recover-id").value = "";
+  el("csv-job-status").textContent = "자연어 검토 중 · 과거 CSV 승인 폐기";
+  if (typeof raw !== "string" || raw.length > 96)
+    throw Error("지원하지 않는 로컬 CSV 의도입니다.");
+  const normalized = raw.trim().toLowerCase().replace(/\s+/g, " ");
+  if (!Object.prototype.hasOwnProperty.call(CSV_INTENTS, normalized))
+    throw Error("지원하지 않는 로컬 CSV 의도입니다.");
+  const group = CSV_INTENTS[normalized];
+  el("csv-group-column").value = group;
+  el("csv-job-status").textContent = "승인된 의도: " + group +
+    " · 아직 CSV 미조회 · SHA 계획 확인 및 별도 동의 필요 · NAS 아님";
+  status("제한된 자연어를 코드 소유 4단계 CSV 작업으로 변환 · 읽기 전 계획 확인 필요");
+  output({
+    schema:"flowpilot-g242-csv-intent-v1",
+    status:"TYPED_LOCAL_INTENT_ONLY_NO_READ",
+    group_column:group,
+    typed_nodes:["csv_read","validate_decimal","group_sum","report"],
+    source_file_touched:false,
+    consent_to_read:false,
+    nas_verified:false,
+    release_gate:"HOLD"
+  });
+}));
 el("csv-consent").addEventListener("change", sync);
 el("csv-export-consent").addEventListener("change", sync);
 el("csv-preview").addEventListener("click", () => act(async () => {
