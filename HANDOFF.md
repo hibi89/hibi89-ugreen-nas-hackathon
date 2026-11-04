@@ -1,3 +1,16 @@
+## 2026-11-04 KST — G240 (code+test pushed; CI PENDING)
+
+1. Goal/tech: Make local G239 authenticated CSV results downloadable as redacted JSON, separately approved, vanilla JS dashboard, Python/SQLite unchanged.
+2. Decision: Compared server side full-label CSV reread/persistence (unsafe/not approved) with browser-only allowlisted redacted persisted-receipt export (chosen).
+3. Implemented: New export checkbox/button, validation of G238/G239 fields and counts, browser-only Blob export of index/totals/counts/digests; no source bytes/path/labels. Node fake-DOM uses disposable CSV and real localhost HTTP to simulate lost reply AFTER successful POST and reconcile with GET without rerun, test one-use consent and Blob content.
+4. Evidence: New exact-SHA Linux/Windows/Chromium CI PENDING as written. Baseline G239 feature SHA b649508deeeda6156881d5d6eb48709aa1d1df26 CI 5/5 SUCCESS, Linux 1562 PASS 0 FAIL 16 SKIP, Windows PASS. NAS, Expert, Creator, Checker and Devpost NOT_RUN; HOLD/NO-GO.
+5. Security/recovery: One-shot separate export consent, no raw names, no further server write or data read; no silent rerun. SHA not external notarization. If regression, ordinary Git revert.
+6. Repo: hibi89/hibi89-ugreen-nas-hackathon lead/ugreen. Baseline e2cb0d0319174e42752ccd741392d515a52e2f1e; G240 files tools/flowpilot_g166_dashboard.html, tools/flowpilot_g166_dashboard.js, tests/g166_browser_client_smoke.cjs, STATUS.md and HANDOFF.md. Check pushed commit SHA.
+7. Environment: Ubuntu/Windows Python3.11, Node real-loopback smoke, Chromium as available via GitHub Actions. Vercel N/A.
+8. Originals: Original Skill, official Kit/ZIP/PDF, G238/G239 engine/SQLite and owner files untouched. Only disposable CSV for smoke; no external APIs or trial activation.
+9. Next: Check exact SHA CI; fix real failures only. Registered Expert native signature/permissions and actual NAS readback require separately approved, supported access. Release HOLD.
+10. Time: 2026-11-04 KST. Product +1 percentage point is the target, not a measured or verified numerical result before CI.
+
 ## 2026-11-03 KST — G239 owner-approved local CSV dashboard + persisted request-idempotent journal (5/5 CI SUCCESS)
 
 1. Goal/tech: Connect G238 approved local CSV grouping to G161/G166 bearer-authenticated 127.0.0.1 API and dashboard, Python3.11 and SQLite, not NAS.

@@ -3,10 +3,11 @@
 const el = id => document.getElementById(id);
 const controls = [...document.querySelectorAll("button")];
 let token = "", workflow = null, verifiedPlan = null, review = null, lastLocalReport = null, busy = false;
-let csvTicket = null, csvJobId = null;
+let csvTicket = null, csvJobId = null, csvReceipt = null;
 function clearCsv() {
-  csvTicket = null; csvJobId = null;
+  csvTicket = null; csvJobId = null; csvReceipt = null;
   el("csv-local-path").value = "";
+  el("csv-export-consent").checked = false;
   el("csv-consent").checked = false;
   el("csv-job-status").textContent = "CSV 계획 미확인 · 입력 경로 미저장 · NAS 미검증";
 }
@@ -64,7 +65,8 @@ function sync() {
       "meta-export": !!lastLocalReport && workflow?.template === "required_file_metadata_v1",
       "csv-preview": true,
       "csv-run": !!csvTicket && el("csv-consent").checked,
-      "csv-readback": !!csvJobId
+      "csv-readback": !!csvJobId,
+      "csv-export": !!csvReceipt && el("csv-export-consent").checked
     };
     button.disabled = Object.prototype.hasOwnProperty.call(rules, button.id) && !rules[button.id];
   }
@@ -499,14 +501,59 @@ el("meta-export").addEventListener("click", () => act(async () => {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
   status("로컬 증거 보고서 저장 요청 완료 · 개인 파일명 포함 안 함");
 }));
+// G240: allowlisted redacted-only export, independent of read approval.
+function redactedCsvExport(receipt) {
+  const r = receipt?.result, rows = r?.redacted_group_totals;
+  const isInt = (n,max) => Number.isSafeInteger(n) && n >= 0 && n <= max;
+  const isHash = s => typeof s === "string" && /^[0-9a-f]{64}$/.test(s);
+  if (receipt?.schema !== "flowpilot-g239-local-csv-job-v1" ||
+      receipt.status !== "COMPLETE_LOCAL_TYPED_CSV_NOT_NAS" ||
+      !/^csv_[0-9a-f]{24}$/.test(receipt.request_id || "") ||
+      !isHash(receipt.plan_sha256) || receipt.path_and_labels_persisted !== false ||
+      receipt.nas_verified !== false || receipt.release_gate !== "HOLD" ||
+      r?.schema !== "flowpilot-g238-owner-local-typed-csv-v1" ||
+      r.status !== "APPROVED_LOCAL_TYPED_WORKFLOW_COMPLETE_NOT_NAS" ||
+      r.plan_sha256 !== receipt.plan_sha256 ||
+      !isHash(r.source_sha256) || !isHash(r.report_sha256) ||
+      !isHash(r.receipt_sha256) ||
+      r.owner_source_modified !== false || r.raw_group_names_in_response !== false ||
+      r.external_calls_performed !== false || r.nas_verified !== false ||
+      r.report_file_created !== false || r.local_audit_file_created !== false ||
+      r.release_gate !== "HOLD" ||
+      !isInt(r.source_rows,256) || !isInt(r.group_count,32) ||
+      !Array.isArray(rows) || rows.length !== r.group_count ||
+      !rows.every((v,i) => v && Object.keys(v).sort().join(",") ===
+        "group_index,source_rows,total_cents" && v.group_index === i+1 &&
+        isInt(v.total_cents,256000000) &&
+        isInt(v.source_rows,256) && v.source_rows > 0) ||
+      rows.reduce((sum,v) => sum+v.source_rows,0) !== r.source_rows)
+    throw Error("익명화 CSV 영수증 구조/무결성 확인 실패");
+  return {
+    schema:"flowpilot-g240-redacted-csv-export-v1",
+    status:"LOCAL_REDACTED_CSV_EXPORT_NOT_NAS",
+    request_id:receipt.request_id,
+    plan_sha256:receipt.plan_sha256,
+    source_sha256:r.source_sha256,
+    report_sha256_of_unexported_full_report:r.report_sha256,
+    receipt_sha256:r.receipt_sha256,
+    source_rows:r.source_rows,group_count:r.group_count,
+    redacted_group_totals:rows.map(v => ({
+      group_index:v.group_index,total_cents:v.total_cents,source_rows:v.source_rows
+    })),
+    raw_source_included:false,owner_path_included:false,
+    group_labels_included:false,nas_verified:false,release_gate:"HOLD"
+  };
+}
 function randomCsvJobId() {
   const bytes = crypto.getRandomValues(new Uint8Array(12));
   return "csv_" + Array.from(bytes, x => x.toString(16).padStart(2, "0")).join("");
 }
 el("csv-consent").addEventListener("change", sync);
+el("csv-export-consent").addEventListener("change", sync);
 el("csv-preview").addEventListener("click", () => act(async () => {
-  csvTicket = null; csvJobId = null;
+  csvTicket = null; csvJobId = null; csvReceipt = null;
   el("csv-consent").checked = false;
+  el("csv-export-consent").checked = false;
   const inputPath = el("csv-local-path").value;
   const groupColumn = el("csv-group-column").value;
   // Clear the raw private path from the DOM BEFORE any request, including errors.
@@ -535,8 +582,9 @@ el("csv-run").addEventListener("click", () => act(async () => {
     throw Error("현재 로컬 CSV 계획을 확인하고 동의해야 합니다.");
   const p = csvTicket;
   // One-shot client consent. Preserve ONLY the job ID after uncertain POST.
-  csvTicket = null;
+  csvTicket = null; csvReceipt = null;
   el("csv-consent").checked = false;
+  el("csv-export-consent").checked = false;
   const job = randomCsvJobId();
   csvJobId = job;
   el("csv-job-status").textContent = "실행 결과 미확인 · 영수증 재조회 가능 · 자동 재시도 금지";
@@ -552,6 +600,8 @@ el("csv-run").addEventListener("click", () => act(async () => {
       result.path_and_labels_persisted !== false ||
       result.result?.nas_verified !== false)
     throw Error("CSV 실행 영수증 검증 실패");
+  redactedCsvExport(result);
+  csvReceipt = result;
   el("csv-job-status").textContent = "로컬 CSV 완료 · 영수증 " + job + " · NAS 미검증";
   status("로컬 CSV 실제 집계 완료 · 원본 수정/외부 전송 없음");
   output(result);
@@ -566,9 +616,30 @@ el("csv-readback").addEventListener("click", () => act(async () => {
         "RUN_RESERVED_UNCERTAIN_NO_AUTORETRY",
         "LOCAL_CSV_RUN_BLOCKED_NO_AUTORETRY"].includes(result.status))
     throw Error("CSV 저장 영수증 검증 실패");
+  csvReceipt = null;
+  el("csv-export-consent").checked = false;
+  if (result.status === "COMPLETE_LOCAL_TYPED_CSV_NOT_NAS") {
+    redactedCsvExport(result);
+    csvReceipt = result;
+  }
   el("csv-job-status").textContent = result.status + " · " + csvJobId + " · NAS 미검증";
   status("SQLite 저장 영수증 재조회 · 고객 CSV 다시 읽지 않음");
   output(result);
+}));
+el("csv-export").addEventListener("click", () => act(async () => {
+  if (!csvReceipt || !el("csv-export-consent").checked)
+    throw Error("검증한 CSV 영수증과 별도 다운로드 동의가 필요합니다.");
+  el("csv-export-consent").checked = false;
+  const data = redactedCsvExport(csvReceipt);
+  const blob = new Blob([JSON.stringify(data,null,2) + "\n"],
+    {type:"application/json;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = "flowpilot-local-redacted-csv-not-nas.json";
+  document.body.append(anchor);anchor.click();anchor.remove();
+  setTimeout(() => URL.revokeObjectURL(url),1000);
+  status("별도 승인한 익명화 CSV 영수증 다운로드 · 원본/그룹명 미포함");
 }));
 // Existing G117 advisor: only user-provided numeric samples, never a NAS watcher.
 el("advice-submit").addEventListener("click", () => act(async () => {

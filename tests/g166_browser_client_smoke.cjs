@@ -17,10 +17,21 @@ const nativeFetch = globalThis.fetch;
 let rejectOneRunReply = false;
 let runRequestCount = 0;
 let readbackCount = 0;
+let rejectOneCsvRunReply=false, csvRunPostCount=0, csvGetCount=0;
 let rejectOneMetadataApproval = false;
 let rejectOneMetadataCancel = false;
 let adviceCalls = 0;
 globalThis.fetch = (route, init) => {
+  if (route === "/v1/local-csv/run") {
+    csvRunPostCount++;
+    if (rejectOneCsvRunReply) {
+      rejectOneCsvRunReply=false;
+      return nativeFetch(base+route,init).then(() => new Response(
+        JSON.stringify({error:"SIMULATED_LOST_CSV_RESPONSE"}),
+        {status:503,headers:{"Content-Type":"application/json"}}));
+    }
+  }
+  if (route.startsWith("/v1/local-csv/jobs/")) csvGetCount++;
   if (route.endsWith("/run") && route.startsWith("/v1/workflows/wf_")) {
     runRequestCount++;
     if (rejectOneRunReply) {
@@ -59,10 +70,10 @@ const ids = ["token","connect","disconnect","clear","connection-status","notice"
   "list","load","plan","guide","test","approve","run","refresh","audit","evidence","report","recover",
   "synthetic-consent","metadata-consent","required","version-candidates","text-workflow","text-preview","meta-preview","meta-approve",
   "meta-cancel","meta-status","meta-save","meta-readback","meta-council","meta-report","meta-export","native-handoff","local-council-state","meta-save-consent","advice-disk","advice-errors","advice-backup",
-  "advice-consent","advice-submit","advice-summary","csv-local-path","csv-group-column","csv-preview","csv-run","csv-readback","csv-consent","csv-job-status"];
+  "advice-consent","advice-submit","advice-summary","csv-local-path","csv-group-column","csv-preview","csv-run","csv-readback","csv-consent","csv-job-status","csv-export-consent","csv-export"];
 const buttonIds = ["connect","disconnect","clear","create","list","load","plan","guide",
   "test","approve","run","refresh","audit","evidence","report","recover","text-preview","meta-preview",
-  "meta-approve","meta-cancel","meta-status","meta-save","meta-readback","meta-council","meta-report","meta-export","native-handoff","advice-submit","csv-preview","csv-run","csv-readback"];
+  "meta-approve","meta-cancel","meta-status","meta-save","meta-readback","meta-council","meta-report","meta-export","native-handoff","advice-submit","csv-preview","csv-run","csv-readback","csv-export"];
 class FakeElement {
   constructor(id) {this.id=id;this.value="";this.checked=false;this.disabled=false;
     this.textContent="";this.handlers={};this.options=[];}
@@ -334,20 +345,48 @@ async function main(){
     assert.equal(elems["csv-local-path"].value,"","path cleared before run");
     assert.match(elems.output.textContent,/WAITING_EXPLICIT_LOCAL_CSV_JOB_APPROVAL/);
     assert.equal(elems["csv-run"].disabled,true,"preview is not execution consent");
-    elems["csv-consent"].checked=true; elems["csv-consent"].fire("change");
+    assert.equal(elems["csv-export"].disabled,true,"cannot export a preview");
+    elems["csv-export-consent"].checked=true;elems["csv-export-consent"].fire("change");
+    assert.equal(elems["csv-export"].disabled,true,"no receipt before run");
+    elems["csv-consent"].checked=true;elems["csv-consent"].fire("change");
+    rejectOneCsvRunReply=true;
     await click("csv-run");
+    assert.equal(csvRunPostCount,1,"one committed POST even with lost reply");
+    assert.match(elems.notice.textContent,/요청 거부|연결 오류/);
+    assert.equal(elems["csv-consent"].checked,false);
+    assert.equal(elems["csv-run"].disabled,true,"lost reply cannot rerun");
+    assert.equal(elems["csv-export"].disabled,true,"lost reply cannot export");
+    await click("csv-readback");
+    assert.equal(csvRunPostCount,1,"GET must not rerun CSV");
+    assert.equal(csvGetCount,1);
     assert.match(elems.output.textContent,/COMPLETE_LOCAL_TYPED_CSV_NOT_NAS/);
     assert.doesNotMatch(elems.output.textContent,/alice|bob|test-owned\.csv/);
-    assert.equal(elems["csv-consent"].checked,false);
-    assert.equal(elems["csv-run"].disabled,true,"one-use read consent consumed");
-    await click("csv-readback");
-    assert.match(elems.output.textContent,/COMPLETE_LOCAL_TYPED_CSV_NOT_NAS/);
+    assert.equal(elems["csv-export"].disabled,true,"fresh consent after readback");
+    elems["csv-export-consent"].checked=true;elems["csv-export-consent"].fire("change");
+    assert.equal(elems["csv-export"].disabled,false);
+    let exportedBlob;
+    const savedCreate=URL.createObjectURL;
+    URL.createObjectURL=function(blob){exportedBlob=blob;return savedCreate.call(URL,blob);};
+    try{await click("csv-export");}finally{URL.createObjectURL=savedCreate;}
+    assert.equal(globalThis.__downloads,3,"synthetic CSV + metadata + G240 JSON");
+    assert.equal(elems["csv-export-consent"].checked,false);
+    assert.equal(elems["csv-export"].disabled,true);
+    const result=JSON.parse(await exportedBlob.text());
+    assert.equal(result.schema,"flowpilot-g240-redacted-csv-export-v1");
+    assert.equal(result.group_count,2);
+    assert.deepEqual(result.redacted_group_totals.map(x=>x.total_cents),[400,300]);
+    assert.equal(result.owner_path_included,false);
+    assert.equal(result.group_labels_included,false);
+    assert.equal(result.nas_verified,false);
+    assert.doesNotMatch(JSON.stringify(result),/alice|bob|test-owned\.csv/);
     assert.equal(fs.readFileSync(csvFile,"utf8").includes("alice,125"),true,
                  "owner-like synthetic source never changed");
   } finally {fs.rmSync(owned,{recursive:true,force:true});}
   await click("disconnect");
   assert.equal(elems["csv-local-path"].value,"","disconnect clears file path");
   assert.equal(elems["csv-readback"].disabled,true,"disconnect clears job ID");
+  assert.equal(elems["csv-export"].disabled,true,"disconnect revokes CSV export");
+  assert.equal(elems["csv-export-consent"].checked,false);
   assert.equal(elems.create.disabled,true);
   assert.equal(elems.token.value,"");
   process.stdout.write("G166_NODE_DOM_HTTP_SMOKE_PASS\n");
