@@ -1,15 +1,16 @@
-## 2026-11-04 KST — G243 opt-in local CSV job history: source CI pending
+## 2026-11-04 KST — G243 VERIFIED: final-product 53/100 internal estimate
 
-1. Objective: Full-product UX/recovery integration (not just Round1). Last ten redacted G239 job IDs/status and separate GET-only readback after lost browser ID; browser local auth, Python SQLite.
-2. Compared automatic browser token/job persistence versus bounded, bearer-authenticated on-demand redacted index with one-use UI review consent and exact HTTP header; selected latter, no new external dependency/fee, no customer file read.
-3. Implemented: `LocalCsvJobs.recent()` validates selected receipt SHA/claims, maps allowlisted IDs/status/counts, bounds 10; new gated GET `/v1/local-csv/jobs`, fresh UI checkbox, selection and GET readback with old approval invalidation. Unit tests cover unauthorized/missing consent, no DB creation, 12→10 bounded sorting, tamper refusal, BLOCKED status; Node and real Chromium scenarios extend prior G241.
-4. Test state: Feature commit `41bd15aeaeaa13e5e79425fb6d20ded52d68f1a6`; exact-source CI PENDING at draft. G242 predecessor source `10dd6607719bfe395999210e24de1d82005057cf` previously 4/4 PASS (Linux 1562 PASS 0 FAIL 16 SKIP, Windows full, real browser). No NAS/Expert/Creator/Checker/Devpost.
-5. Failure handling: Refuse invalid/missing token/header, corrupt job or forged receipt; no auto-retry, no source file read or export from listing. If CI test failure inspect exact log, minimal correction, ordinary Git revert for regression. Never force push.
-6. Repo `hibi89/hibi89-ugreen-nas-hackathon` branch `lead/ugreen`; base `6f09e3b5c8195d10f39f8cbf82b59e59ccbc26e7`; feature SHA above. Changed G239 CSV store, local backend, G166 UI, G166 Node, G167 Chromium, G239 Python tests, STATUS/HANDOFF/rubric.
-7. Runtime: local 127.0.0.1 bearer+SQLite, GitHub Ubuntu/Windows Python3.11, Node and genuine Chrome/Playwright 1.56.0. Vercel/Production URL N/A.
-8. Backup: Existing code preserved by Git parent, original G238/239 schema/SQLite unchanged; official Uliya Markdown Skill, Kit/PDF/ZIP, owner private data untouched. Disposable test CSV only, no public secrets.
-9. Next: Verify exact feature CI, patch only actual failures, score 52→53 only on all acceptance criteria including actual Chrome+Linux/Windows. Continue platform capability gate evidence research without invoking real NAS/Creator or spending 3-hour trial.
-10. 2026-11-04 KST: 52/100 internal provisional full-product score baseline. G243 target 53/100 NOT YET VERIFIED at writing. Docs SHA will be separate commit.
+1. Objective/stack: Deliver real local CSV history-assisted recovery without saved browser ID; bearer-authenticated 127.0.0.1 API + SQLite + HTML/JS, Python and real Chrome. Counts whole-product recovery UX, not Round1-only.
+2. Alternatives/choice: A) persist client token/IDs automatically (rejected: secrets/authority leakage). B) selected opt-in bounded server index with exact header, fresh auth and GET-only readback (chosen, no external API fee or source read).
+3. Delivered: G239 recent receipts (up to 10 newest rowid) integrity-checked then redacted to ID/state/counts, new gated route, consent/list/select UI and no-auto-export; new Python 4 regression cases, Node localhost and real Chromium E2E; CI paths now cover CSV core and smoke.
+4. Tests: G243 feature SHA 41bd15aeaeaa13e5e79425fb6d20ded52d68f1a6 Chrome 41841667725 SUCCESS. Initial new Node script FAILED due undefined names. Test-only correction dd29863dabe39e20ff61b50ef433bb2ab34cb938 full Linux/Windows 41841965440 SUCCESS: 1566 PASS / 0 FAIL / 16 SKIP Linux, Windows full PASS. Source-identical CI wiring SHA 40318f77c1354c957670b52f1926b2a41d775a38 real Chromium 41842461021 SUCCESS; master 41842460906/closeout 41842460883 SUCCESS. Exact docs-only SHA checked separately.
+5. Failures and recovery: Replaced bad recoveredId/readsBeforeInvalid references in Node test with existing recorded/reads; no production code changes. SQLite integrity mismatch fails closed. No automatic execution retry, no owner file writes. Normal Git revert only, no force push.
+6. GitHub: hibi89/hibi89-ugreen-nas-hackathon branch lead/ugreen; code feature 41bd15ae, test-only correction dd29863d, CI trigger 40318f77. Paths G239 CSV jobs, local backend, G166 dashboard HTML/JS/Node, G167 Chrome, G172 workflow, Python regressions, STATUS/HANDOFF/rubric. Final documentation commit is enclosing SHA.
+7. Runtime/URL: Ubuntu/Windows Python3.11, Node, installed Chrome + Playwright1.56.0 on GitHub Actions; local HTTP 127.0.0.1. Vercel/Production N/A; no NAS runtime.
+8. Originals/backup: Unchanged canonical official Uliya Skill, Kit/PDF/ZIP, G238 CSV engine and G239 sidecar schema; all original customer data untouched. Disposable tests only, no secrets uploaded. Git previous commits provide rollback.
+9. Next: G244 prioritize supported native Expert invocation/permissions, official Creator and first-party Checker, independent real NAS readback only under separate approval; no NAS trial, upload or Devpost execution now. Additional work must meet another uncredited rubric gate before scoring.
+10. Date KST 2026-11-04; fixed final-product estimate 52→53 / 100 (+1pp) supported by new working capability and combined SHA-specific CI; objective production readiness remains unverified, RELEASE HOLD.
+
 
 ## 2026-11-04 KST — G242 VERIFIED: whole-product +1pp estimate (51 → 52 / 100)
 
