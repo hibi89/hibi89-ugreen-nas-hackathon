@@ -86,8 +86,8 @@ class G239CsvGatewayTests(unittest.TestCase):
         self.assertEqual(receipt["result"]["owner_source_modified"],False)
         self.assertEqual(self.csv.read_bytes(),CSV)
         self.assertNotIn(str(target),json.dumps(receipt))
-        self.assertNotIn(str(target),self.sidecar.read_bytes().decode())
-        self.assertNotIn("alice",self.sidecar.read_bytes().decode())
+        self.assertNotIn(str(target).encode("utf-8"),self.sidecar.read_bytes())
+        self.assertNotIn(b"alice",self.sidecar.read_bytes())
         with patch("flowpilot_g239_csv_jobs.execute",
                    side_effect=AssertionError("duplicate report create")):
             self.assertEqual(self.call("/v1/local-csv/jobs/"+body["request_id"]),
