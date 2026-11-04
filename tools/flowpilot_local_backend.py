@@ -248,7 +248,11 @@ class Backend:
         if type(goal) is not str or type(request_id) is not str or not REQ.fullmatch(request_id):
             raise BackendRefused("INVALID_INPUT",400)
         plan=compile_goal(goal)
-        if plan.get("status")!="READY_FOR_SYNTHETIC_TEST":
+        if (plan.get("status")!="READY_FOR_SYNTHETIC_TEST"
+                or plan.get("template") not in _GUIDE_FIXTURES):
+            # G247 version CLI is independent of the two-template legacy
+            # synthetic council/artifact runner. Refuse unsupported template
+            # before DB creation; never store an unrunnable workflow.
             raise BackendRefused("UNSUPPORTED_GOAL",422)
         sha=_hash(plan)
         with self.lock, closing(self._connect()) as db:

@@ -131,6 +131,16 @@ class BackendTests(unittest.TestCase):
         self.assertEqual(w["release_gate"],"HOLD")
         self.assertEqual(w["event_count"],1)
 
+    def test_g247_version_cli_cannot_create_unrunnable_dashboard_workflow(self):
+        for index, goal in enumerate(("review versions", "버전 비교해줘")):
+            with self.subTest(goal=goal):
+                with self.assertRaisesRegex(api.BackendRefused, "UNSUPPORTED_GOAL"):
+                    self.b.create(goal,"req_g247unsupported"+str(index))
+        with api.closing(self.b._connect()) as db:
+            self.assertEqual(db.execute("SELECT count(*) FROM fp_backend_workflows")
+                             .fetchone()[0],0)
+        self.assertEqual(self.b.list()["workflows"],[])
+
     def test_idempotent_create_and_same_key_conflict(self):
         a=self.b.create(GOAL,"req_abcdefgh1234")
         b=self.b.create(GOAL,"req_abcdefgh1234")
