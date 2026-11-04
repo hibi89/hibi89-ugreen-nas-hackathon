@@ -1,3 +1,16 @@
+## 2026-11-05 KST — G255 synthetic isolated Docker timeout recovery CANDIDATE / no new credit
+
+1. Product: FlowPilot 3.0 workflow safety; new nonterminating container stop-recovery class independent from finite CSV/typed-plan errors. Python3.11 and code-owned C `FROM scratch` Docker on GitHub Ubuntu.
+2. Chosen design: verified `SmokeTimedOut` from real Docker wait, exact owned-container kill exit 137, only then one new isolated healthy binary with original unchanged synthetic typed graph and G235 receipt; no remote Docker, registry pull, network, mounts, owner data, free-trial timer or general repair.
+3. Focused policy tests and G233 real-Docker workflow added; full GitHub cross-platform and actual Docker exact SHA CI still PENDING; no PASS claim before logs.
+4. Rubric: current **64/100 verified**, target local isolation row 9→10 / total 65 only if genuine hang/kill/retest and Linux+Windows full CI verified. RELEASE HOLD/NAS NO-GO. Native 0/20.
+5. Risks: subprocess error MUST be true timeout class, not general failure. Exact stage resource ownership and cleanup, private sources preserved. Revert only new G255 feature commit as rollback.
+6. Repo `hibi89/hibi89-ugreen-nas-hackathon` branch `lead/ugreen`; feature paths `tools/flowpilot_g255_timeout_recovery.py`, `tests/test_flowpilot_g255_timeout_recovery.py`, shared G233 helper/CI and runbook. SHA determined on push.
+7. Ubuntu Linux Docker CI and general Windows/Linux offline Python; no Vercel production or NAS.
+8. Existing canonical Skill, official vendor Kit, user ZIP/PDF and credentials unchanged; no owner data read/upload.
+9. Check exact CI; if failing diagnose and one improved retry; work independent official Creator/right-usage preflight while CI pending, never invoke provider without approval.
+10. Date 2026-11-05 KST; this is pre-CI engineering candidate, not final acceptance.
+
 ## 2026-11-05 KST — G254 FINAL acceptance, verified product 64/100
 
 1. **Goal/tech:** Full FlowPilot 3.0 Uliya NAS workflow product; independent local-only one-line Korean/English bounded version intent → operator-verifiable typed scope, using existing authenticated localhost UI and guarded metadata APIs, Node/real Chromium/Python 3.11.

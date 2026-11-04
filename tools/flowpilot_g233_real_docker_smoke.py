@@ -63,6 +63,11 @@ class SmokeRefused(RuntimeError):
     pass
 
 
+class SmokeTimedOut(SmokeRefused):
+    """Only a real client subprocess timeout, not an arbitrary Docker error."""
+    pass
+
+
 def _local_docker_socket_ready() -> bool:
     """Fail closed: a configured remote Docker context is never sufficient."""
     try:
@@ -93,8 +98,10 @@ def checked_run(argv: list[str], *, timeout: int = 45) -> str:
                 text=True, encoding="utf-8", errors="replace",
                 timeout=timeout, check=False, env=env, shell=False,
             )
-        except (OSError, subprocess.TimeoutExpired) as exc:
-            raise SmokeRefused("LOCAL_PROCESS_UNAVAILABLE_OR_TIMED_OUT") from exc
+        except subprocess.TimeoutExpired as exc:
+            raise SmokeTimedOut("LOCAL_PROCESS_TIMEOUT") from exc
+        except OSError as exc:
+            raise SmokeRefused("LOCAL_PROCESS_UNAVAILABLE") from exc
     if p.returncode != 0:
         raise SmokeRefused("LOCAL_PROCESS_REFUSED_OR_FAILED")
     return p.stdout.strip()
@@ -102,7 +109,7 @@ def checked_run(argv: list[str], *, timeout: int = 45) -> str:
 def verify_host_config(payload: dict, *, started: bool,
                        expected_exit_code: int = 0) -> None:
     if (type(expected_exit_code) is not int
-            or expected_exit_code not in (0, 11, 17)):
+            or expected_exit_code not in (0, 11, 17, 137)):
         raise SmokeRefused("UNSUPPORTED_EXPECTED_CONTAINER_EXIT")
     if type(payload) is not dict:
         raise SmokeRefused("INSPECT_NOT_OBJECT")

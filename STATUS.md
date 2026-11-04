@@ -1,3 +1,8 @@
+## 2026-11-05 KST — G255 real stalled Docker timeout recovery candidate, CI pending
+
+- New **previously untested nonterminating-container failure class**, not the G237/G253 finite-error cases. Code-owned sleep-only C fixture in actual isolated Docker; typed real wait TimeoutExpired → exact verified kill exit 137, one fresh healthy local image run with unchanged CSV/typed graph and exact output. Exit-137 alone or arbitrary Docker command failure never authorizes retry. No source/NAS/customer files, no pull/network/mounts. CLI requires explicit synthetic-only flag.
+- Proposed distinct fixed rubric **Local isolation, failure repair and re-test 9→10/10**, whole-product **64→65/100 CONDITIONAL** on exact full Linux/Windows regression + actual G233 Docker hang/kill/retest + supporting checks. Until then verified **64/100**, RELEASE HOLD / NAS NO-GO. Scope remains local synthetic, not production NAS self-healing.
+
 ## 2026-11-05 KST — G254 VERIFIED: whole-product 63 → 64/100 (local-only)
 
 - **Exact final functional SHA `7c033329c7a6a3b52570c478c76a54b55e1f1459`: 4/4 GitHub Actions completed SUCCESS.** Functional Linux/Windows [41873943760](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/41873943760): Linux **1,631 PASS / 0 FAIL / 16 SKIP** (1,647 total), Windows **UGREEN LOCAL VERIFY: PASS [full]**; real Chromium/localhost/SQLite [41873943445](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/41873943445) SUCCESS with **G254_ONE_LINE_VERSION_SCOPE_REAL_CHROMIUM_E2E**; master 41873943410 and closeout 41873943463 SUCCESS.

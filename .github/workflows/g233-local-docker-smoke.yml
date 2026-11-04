@@ -11,6 +11,8 @@ on:
       - tests/test_flowpilot_g237_bounded_docker_repair.py
       - tools/flowpilot_g253_typed_plan_repair.py
       - tests/test_flowpilot_g253_typed_plan_repair.py
+      - tools/flowpilot_g255_timeout_recovery.py
+      - tests/test_flowpilot_g255_timeout_recovery.py
   workflow_dispatch:
 
 permissions:
@@ -42,3 +44,9 @@ jobs:
         run: |
           set -euo pipefail
           python3 tools/flowpilot_g253_typed_plan_repair.py --approve-synthetic-typed-plan-repair
+
+      - name: G255 real Docker stalled container timeout, scoped kill and healthy isolated restart
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/flowpilot_g255_timeout_recovery.py --approve-synthetic-timeout-recovery
