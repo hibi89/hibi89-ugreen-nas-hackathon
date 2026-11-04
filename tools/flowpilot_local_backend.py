@@ -31,6 +31,7 @@ from flowpilot_g227_metadata_receipts import (
     from_completed_review, save_receipt, read_receipt,
 )
 from flowpilot_g230_local_council import evaluate_local_receipt, owner_report, CouncilRefused
+from flowpilot_g245_report_verify import verify_report
 from flowpilot_g236_native_handoff import build_native_handoff, NativeHandoffRefused
 from flowpilot_g239_csv_jobs import LocalCsvJobs, CsvJobRefused
 
@@ -886,6 +887,11 @@ def create_server(backend: Backend, token: str, *, port: int=0):
                         if set(body)!={"input_path","group_column"}:
                             raise BackendRefused("UNEXPECTED_KEYS",400)
                         data=backend.csv_jobs.preview(body["input_path"],body["group_column"])
+                    elif path=="/v1/local-csv/verify-report":
+                        if set(body)!={"request_id","report_path","acknowledgement"}:
+                            raise BackendRefused("UNEXPECTED_KEYS",400)
+                        data=verify_report(backend.csv_jobs,body["request_id"],
+                                           body["report_path"],body["acknowledgement"])
                     elif path=="/v1/local-csv/run":
                         normal={"preview_id","request_id","plan_sha256","acknowledgement"}
                         if set(body) not in (normal,normal | {"export_to","export_approval"}):

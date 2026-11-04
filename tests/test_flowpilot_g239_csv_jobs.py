@@ -66,6 +66,86 @@ class G239CsvGatewayTests(unittest.TestCase):
             "request_id":job,"acknowledgement":approval})
 
 
+    def g245_verify(self,job,path,approval="APPROVE_LOCAL_REPORT_VERIFY_ONCE"):
+        return self.call("/v1/local-csv/verify-report", {
+            "request_id":job,"report_path":str(path),"acknowledgement":approval})
+
+    def g245_create(self,job):
+        preview=self.preview()
+        target=self.root/("report-"+job[-6:]+".csv")
+        result=self.call("/v1/local-csv/run", {
+            "preview_id":preview["preview_id"],"request_id":job,
+            "plan_sha256":preview["plan_sha256"],"acknowledgement":READ_ACK,
+            "export_to":str(target),
+            "export_approval":"APPROVE_LOCAL_REPORT_CREATE"})
+        self.assertEqual(result[0],200,result)
+        return target
+
+    def test_g245_hash_check_after_restart_no_source_reexecution(self):
+        job="csv_"+"1"*24
+        report=self.g245_create(job)
+        before=self.csv.read_bytes()
+        from flowpilot_g245_report_verify import verify_report
+        reopened=Backend(self.db,create=False)
+        with patch("flowpilot_g239_csv_jobs.execute",
+                   side_effect=AssertionError("no source replay")):
+            status,data=self.g245_verify(job,report)
+            direct=verify_report(reopened.csv_jobs,job,str(report),
+                                 "APPROVE_LOCAL_REPORT_VERIFY_ONCE")
+        self.assertEqual(status,200,data)
+        self.assertEqual(data,direct)
+        self.assertEqual(data["status"],"VERIFIED_LOCAL_OUTPUT_SHA_NOT_NAS")
+        self.assertTrue(data["matches_recorded_receipt"])
+        self.assertEqual(data["expected_report_sha256"],
+                         data["observed_report_sha256"])
+        self.assertFalse(data["original_input_reopened"])
+        self.assertEqual(self.csv.read_bytes(),before)
+        self.assertNotIn(str(report),json.dumps(data))
+        self.assertNotIn("alice",json.dumps(data))
+
+    def test_g245_changed_full_report_produces_conflict_not_retry(self):
+        job="csv_"+"2"*24
+        target=self.g245_create(job)
+        before=self.csv.read_bytes()
+        target.write_bytes(target.read_bytes().replace(b"400",b"401"))
+        with patch("flowpilot_g239_csv_jobs.execute",
+                   side_effect=AssertionError("never rerun")):
+            status,data=self.g245_verify(job,target)
+        self.assertEqual(status,200,data)
+        self.assertEqual(data["status"],"CONFLICT_LOCAL_OUTPUT_SHA_NOT_NAS")
+        self.assertFalse(data["matches_recorded_receipt"])
+        self.assertEqual(self.csv.read_bytes(),before)
+
+    def test_g245_invalid_ack_or_job_without_output_never_reads_file(self):
+        job="csv_"+"3"*24
+        self.assertEqual(self.run_once(self.preview(),job)[0],200)
+        target=self.root/"owner-full-report.csv"
+        target.write_bytes(b"unapproved")
+        with patch("flowpilot_g245_report_verify._read_once",
+                   side_effect=AssertionError("cannot open without approval")):
+            self.assertEqual(self.g245_verify(job,target)[0],403)
+            self.assertEqual(self.g245_verify(job,target,"no")[0],403)
+            self.assertEqual(self.g245_verify("csv_"+"4"*24,target)[0],404)
+            self.assertEqual(self.call("/v1/local-csv/verify-report",{
+                "request_id":job,"report_path":str(target)})[0],400)
+        self.assertFalse(self.sidecar.is_symlink())
+
+    def test_g245_symlink_and_missing_report_fail_closed(self):
+        job="csv_"+"5"*24
+        target=self.g245_create(job)
+        missing=self.root/"not-present.csv"
+        status,data=self.g245_verify(job,missing)
+        self.assertEqual(status,409)
+        self.assertNotIn(str(missing),json.dumps(data))
+        link=self.root/"link-report.csv"
+        try:
+            link.symlink_to(target)
+        except (OSError,NotImplementedError):
+            return
+        status,data=self.g245_verify(job,link)
+        self.assertEqual(status,409)
+        self.assertNotIn(str(link),json.dumps(data))
+
     def test_g244_owner_approved_create_only_full_report(self):
         plan=self.preview()
         target=self.root/"new-aggregate.csv"
