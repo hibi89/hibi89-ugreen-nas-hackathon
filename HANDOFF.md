@@ -1,3 +1,16 @@
+## 2026-11-05 KST — G250 final Chromium/functional CI acceptance, product 61/100
+
+1. **Goal/tech:** FlowPilot 3.0 usable operator journey on trusted LOCAL folder: exact Korean/English version-review goal, G165 consented read, browser evidence export; JS/HTML/Node+Chromium with local bearer-auth Python backend.
+2. **Delivered/design:** Chose existing auth endpoint response + closed-schema in-browser G249-compatible JSON with separate one-use local download consent, rather than introducing a new persistent server export API. Revokes ticket on scope/goal/session changes; source filenames, paths, contents excluded. Separate from G248 preview, G249 developer CLI and G251 owner decision.
+3. **Tests:** Exact source `c88f7aeaf17378bb5e364bb0c4f220f969a33add`; 4/4 GitHub Actions SUCCESS: 41863464658 Linux 1594 PASS/0 FAIL/16 SKIP and Windows full PASS; 41863464691 genuine Chromium local-only PASSED, master 41863464454, closeout 41863464628 both SUCCESS. G251 025e5bdf 3/3 cross-platform CI SUCCESS; G252 8601ab3e functional success but pending independent readiness 41867688507.
+4. **State:** Internal fixed 100-point rubric now G249 59 + G251 owner decision 1 + G250 consented browser export 1 = **61/100, remaining 39**. G252 candidate additional 1 NOT YET CREDITED. RELEASE HOLD / NAS NO-GO.
+5. **Failure/rollback:** G250 browser parent workflow previously lagged after successful job, later reconciled to final completed SUCCESS; no test bypass/redeploy or force push. Revert ordinary G250 code SHA c88f7aea from parent 95231b4e, preserving original Skill/Kit/owner data.
+6. **Repo/branch/SHA:** `hibi89/hibi89-ugreen-nas-hackathon` / `lead/ugreen`. G250 code c88f7aea, G251 025e5bdf, G252 8601ab3e; latest docs SHA separately verify. Key files `tools/flowpilot_g166_dashboard.js`, `.html`, `tests/g166_browser_client_smoke.cjs`, `tools/flowpilot_g167_browser_acceptance.py`.
+7. **Production/environment:** Python 3.11 Windows/Ubuntu Actions, Node and preinstalled real Chromium + Playwright local-only HTTP; no Vercel/Production URL (N/A), no NAS or vendor runtime.
+8. **Original/backups/auth:** Official `skill/flowpilot-nas/SKILL.md` and Kit v0.7.3, owner private ZIP/PDF, local SQLite, all source/customer files unchanged. Bearer stays browser memory only; no file path/content exposed to GitHub or external provider.
+9. **Next:** Complete exact G252 readiness 41867688507 and cross-platform review before security point 9→10. Afterward official current Creator/Checker and registered Expert rights require separate user approval; 3-hour NAS trial and Devpost release remain explicitly held.
+10. **Time/evidence:** 2026-11-05 KST, exact G250 run-level 4/4 final SUCCESS, corresponding Linux/Windows and real Chromium job logs confirmed; internal rubric is not actual NAS production certification.
+
 ## 2026-11-05 KST — G251 VERIFIED acceptance and product 60/100
 
 1. **Goal/technology:** Whole UGREEN FlowPilot 3.0 product, fixed 100-point rubric, user-owned manual version decision step following G247 typed plan and G249 redacted evidence. Python 3.11, owner-local disposable scope.
