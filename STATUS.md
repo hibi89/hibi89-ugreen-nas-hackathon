@@ -1,3 +1,10 @@
+## 2026-11-05 KST — G253 VERIFIED: whole product 62 → 63/100 (LOCAL ONLY)
+
+- **Exact final source SHA `55250b597af6b7be549657f48f9b7d81df076a61`, GitHub Actions 5/5 final SUCCESS**: G233 real disconnected Docker 41871744175; Linux+Windows full functional 41871744049 (Linux **1,631 PASS / 0 FAIL / 16 SKIP**, Windows `UGREEN LOCAL VERIFY: PASS [full]`); readiness 41871744056, master 41871744046, closeout 41871744014 all final success.
+- New distinct failure class: actual fixed code-owned typed DAG PLAN corruption → real Docker exit 11 → explicitly approved exactly one disposable plan-copy fix → second real isolated container with exit 0 and expected typed DAG output; unchanged original failed Docker image, CSV and binary. Existing G237 only repaired bad CSV decimal (exit 17).
+- First source SHA 75d11cf1 failed Windows full because an optional real C compiler test timed out after 20 seconds. Corrected SHA `55250b597af6b7be549657f48f9b7d81df076a61` changes only to 75-sec compiler timeout and 140-line diagnostic log; does not skip tests. Exact corrected runs all success.
+- Fixed rubric **Local isolation, failure repair and retest 8→9/10**; whole-product internal acceptance **62→63/100 (37 remain)**. This is NOT generic autonomous repair, NOT actual registered Uliya Expert/NAS, NOT certified production. Official latest Creator/Checker, NAS trial and Devpost NOT_RUN. **RELEASE HOLD / NAS NO-GO**; Vercel N/A.
+
 ## 2026-11-05 KST — G253 Windows full CI failed; narrow diagnosis and single improved retry
 
 - Feature SHA 75d11cf1 Docker G233 and Linux 1631 PASS/0 FAIL/16 SKIP, readiness/master/closeout successful; Windows full 41870719760 FAILED (1647 tests, 2 errors), resulting whole-product score stays **62/100** and G253 remains UNACCEPTED.
