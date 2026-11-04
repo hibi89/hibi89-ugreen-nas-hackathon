@@ -18,6 +18,7 @@ from flowpilot_g260_official_catalog import (
     matrix, EXPECTED_SHA256 as KIT_SHA, OfficialCatalogRefused as UnsafePackage,
 )
 from flowpilot_g258_skill_dispatch_binding import verify_current_skill, SkillBoundaryRefused
+from flowpilot_g261_owner_scope import bind_owner_scope, ScopeRefused
 
 SCHEMA = "flowpilot-g257-nas-trial-readiness-v1"
 G256_SCHEMA = "flowpilot-g256-private-exact-source-admission-v1"
@@ -232,6 +233,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--g256-private-receipt", required=True, type=Path)
     parser.add_argument("--candidate-skill", type=Path,
                         help="Exact private G226 ZIP; no vendor/provider invocation")
+    parser.add_argument("--owner-scope-request", type=Path,
+                        help="Optional private owner-declared metadata scope JSON; only a plan")
     args = parser.parse_args(argv)
     # G259: a human-readable WAITING status is NOT a successful pre-trial
     # command. Reject before reading any owner-controlled private files.
@@ -249,9 +252,16 @@ def main(argv: list[str] | None = None) -> int:
             raise TrialReadinessRefused("OWNER_PRIVATE_SOURCE_INVALID")
         candidate = (args.candidate_skill.read_bytes() if args.candidate_skill
                      is not None else None)
+        if args.owner_scope_request is not None and (
+                not args.owner_scope_request.is_file() or
+                args.owner_scope_request.is_symlink()):
+            raise TrialReadinessRefused("OWNER_SCOPE_INPUT_INVALID")
+        scope_receipt = (bind_owner_scope(_strict_json(
+            args.owner_scope_request.read_bytes()))
+            if args.owner_scope_request is not None else None)
         out = prepare_trial(files[0].read_bytes(), _strict_json(files[1].read_bytes()),
                             candidate_skill=candidate)
-    except (OSError, ValueError, TypeError, UnsafePackage, KeyError):
+    except (OSError, ValueError, TypeError, UnsafePackage, ScopeRefused, KeyError):
         print(json.dumps({"status": "G257_OFFLINE_TRIAL_READINESS_REFUSED",
                           "nas_verified": False, "release_gate": "HOLD"}))
         return 2
@@ -269,6 +279,16 @@ def main(argv: list[str] | None = None) -> int:
             "current_skill_rechecked": out.get("current_skill_rechecked") is True,
             "nas_verified": False, "release_gate": "HOLD"}, sort_keys=True))
         return 2
+    if scope_receipt is not None:
+        out["operator_scope"] = {
+            "schema": scope_receipt["schema"],
+            "status": scope_receipt["status"],
+            "request_sha256": scope_receipt["request_sha256"],
+            "required_file_count": scope_receipt["required_file_count"],
+            "owner_paths_exposed": False,
+            "consent_independently_verified": False,
+            "actual_native_instruction_created": False,
+        }
     print(json.dumps(out, sort_keys=True))
     return 0
 
