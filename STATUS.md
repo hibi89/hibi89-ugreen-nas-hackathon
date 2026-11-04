@@ -1,3 +1,8 @@
+## 2026-11-05 KST — G275 exact SHA source CI VERIFIED: 4/4 SUCCESS; overall 73/100 HOLD
+
+- Source SHA `100bd48fbbb1e4311898d9af22555305ae41fd09`: push-event Actions four workflows **SUCCESS**. [Full FlowPilot Linux+Windows](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/41920837175) Linux **1,719 PASS / 0 FAIL / 16 SKIP** (1,735 total, including G275 14 new regression tests), Windows Python 3.11 full job **SUCCESS**. [Readiness](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/41920837425), [master](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/41920837557), [closeout](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/41920839025) each SUCCESS at same exact SHA. This is source CI, **not** private ZIP CI, legal rights approval, live registered Expert/NAS or final Devpost submission.
+- GitHub source blob equals locally executed source SHA-1 `32913b09d96e71bae28f36e173bf3f3b41a28c78`; test blob equals `0f44b061326eb838bbbd5ec2167dce5eaff8fd2e`. Owner-private G274+Kit tested locally, no archive uploaded. **Whole-product 73/100 (+0%p)**; release HOLD.
+
 ## 2026-11-05 KST — G275 exact current 5-file private Skill provenance audit; offline PASS, 73/100 HOLD
 
 - New public `tools/g275_current_rights_audit.py` + `tests/test_g275_current_rights_audit.py`: G274 five-Markdown source boundary auditing absent in old G263 four-file G226-only code. Exact original private G274+Kit SHA-validated audit returned `CURRENT_G274_SOURCE_BOUNDARY_PASS_LICENSE_NOT_CLEARED`, local regressions **14/14 PASS**. No raw owner ZIP or vendor Kit published. See `docs/operations/G275_CURRENT_RIGHTS_BOUNDARY_20261105.md`.
