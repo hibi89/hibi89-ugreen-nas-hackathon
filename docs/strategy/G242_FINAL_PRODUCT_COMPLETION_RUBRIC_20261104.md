@@ -1,5 +1,5 @@
 # FlowPilot 3.0 — whole-product completion acceptance rubric (G242)
-Date: 2026-11-05 KST. **Current after VERIFIED G248: 58/100 internal whole-product tracking estimate** (42 points outstanding). Historic table below is PRE-G242. This is a conservative, owner-facing PROJECT MANAGEMENT ESTIMATE, not independently certified completeness, a test-pass ratio, or the old 24-day calendar. Definition of 100%: end-to-end useful operator workflow on a supported registered Uliya NAS, validated evidence, authorizations, and accepted hackathon deliverables. It must not count off-NAS CI as production.
+Date: 2026-11-05 KST. **Current after VERIFIED G249: 59/100 internal whole-product tracking estimate** (42 points outstanding). Historic table below is PRE-G242. This is a conservative, owner-facing PROJECT MANAGEMENT ESTIMATE, not independently certified completeness, a test-pass ratio, or the old 24-day calendar. Definition of 100%: end-to-end useful operator workflow on a supported registered Uliya NAS, validated evidence, authorizations, and accepted hackathon deliverables. It must not count off-NAS CI as production.
 
 ## Fixed full-product weights and estimated baseline immediately before G242
 | Whole-product deliverable | Weight | Pre-G242 provisional earned | Grounded limitations |
@@ -92,3 +92,10 @@ Date: 2026-11-05 KST. **Current after VERIFIED G248: 58/100 internal whole-produ
 - Fixed typed template/constrained DAG/builder row at 9/10 from G247. G251 provides a usable, formerly unimplemented manual OWNER_REVIEW stage for exact one-required/one-alternative redacted VERSION_REVIEW evidence: separate read and create consent, record owner HOLD/PRIMARY/ALTERNATIVE as an evidence-hash-linked create-only JSON, do not alter source or auto-finalize. This qualifies for potential 9->10 only after exact full Linux/Windows regression SUCCESS.
 - Source SHA 025e5bdf, local 13/13 PASS twice, byte-identical source/test Git blobs verified. Exact GitHub full run 41864970832 queued, thus no credit yet. G249 local-output and G250 browser-export are different pending criteria; fully verified baseline remains 58/100, maximum if all three succeed 61/100, real NAS 0/20.
 - Owner-supplied official Uliya Kit 0.7.3 SHA cf557e5a...70e1b3 verified offline without first-party Checker execution; unsupported runtime/rights/upload/Devpost unverified. RELEASE HOLD.
+
+
+## G249 final acceptance — CONFIRMED 2026-11-05 KST
+
+G249 code 703fb254a6a91052d2348abc37463b112b387608 has 4/4 final GitHub Actions SUCCESS: full Linux/Windows 41861510935 (Linux 1594 PASS, 0 FAIL, 16 SKIP; Windows full PASS), readiness 41861511141, master 41861511055, closeout 41861510832. Fixed rubric real operator-owned LOCAL execution 9→10. Whole-product engineering estimate 58→59/100, remaining 41. This is not certified live NAS completeness.
+
+G250 local browser consented export and G251 local owner-choice step are distinct proposed +1 acceptance criteria but their exact full CI remains queued. Do not count until independent complete PASS. Actual official registered Uliya Expert, original file NAS use, first-party current Creator/Checker, Devpost, trial NOT_RUN; RELEASE HOLD. See docs/operations/G249_FINAL_CI_ACCEPTANCE_20261105.md.
