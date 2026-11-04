@@ -66,7 +66,7 @@ class G235TypedDockerTests(unittest.TestCase):
             src.write_text(g235.C_SOURCE, encoding="ascii")
             cc = subprocess.run(["cc", "-O2", "-static", "-Wall", "-Wextra",
                                  "-Werror", str(src), "-o", str(program)],
-                                capture_output=True, timeout=20)
+                                capture_output=True, timeout=75)
             if cc.returncode:
                 self.skipTest("static C compiler unavailable")
             # This unit test only compiles; fixture file paths are hard-coded

@@ -1,3 +1,8 @@
+## 2026-11-05 KST — G253 Windows full CI failed; narrow diagnosis and single improved retry
+
+- Feature SHA 75d11cf1 Docker G233 and Linux 1631 PASS/0 FAIL/16 SKIP, readiness/master/closeout successful; Windows full 41870719760 FAILED (1647 tests, 2 errors), resulting whole-product score stays **62/100** and G253 remains UNACCEPTED.
+- Confirmed Windows log tail: subprocess.TimeoutExpired while static C compiler `cc -O2 -static ...` timed out after 20 seconds. Windows full log output was only last 20 lines, so the other error's root is NOT VERIFIED. Modified a code-owned optional real compile test to allow 75 seconds WITHOUT skipping/weakening test, and now print 140 lines of original local failure output for exact diagnosis. No Docker/NAS/owner data invoked. New CI required; release HOLD.
+
 ## 2026-11-05 KST — G253 feature candidate committed, score stays 62/100 pending CI
 
 - New DISTINCT isolation/failure-repair behavior: real isolated container exit 11 from corrupted code-owned typed DAG plan, one explicitly approved exact-copy plan repair, new isolated retest expected exit 0 and canonical G235 typed report. G237 only corrected a synthetic CSV data decimal (exit 17).

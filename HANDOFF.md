@@ -1,3 +1,16 @@
+## 2026-11-05 KST — G253 Windows diagnostics; NO +1 YET
+
+1. Existing G253 source SHA 75d11cf1 real Docker 41870720354 PASS, Linux functional 1631 PASS/0 FAIL/16 SKIP, readiness/master/closeout PASS.
+2. Windows exact-source 41870719760 FAILED after ~171s, 2 unittest errors; tail proves `cc -O2 -static` compilation exceeded 20 sec. Other error not yet established because old verify_local prints only 20 lines.
+3. New exact-source targeted change: allow 75 sec for same C compiler test with no skipped safety check; expand Windows failure tail to 140 lines. No owner/private source changes, no NAS/Expert/Creator/Checker.
+4. Fixed internal product score stays **62/100** pending all exact-source CI. G253 candidate +1 to local isolation on real plan failure repair still on HOLD.
+5. If retry fails, inspect concrete additional root from full log and pivot; no blind repetitions. Standard Git revert available.
+6. Repo `hibi89/hibi89-ugreen-nas-hackathon`, branch lead/ugreen, candidate feature 75d11cf1. Docs SHA after this commit check separately.
+7. GitHub Windows PowerShell 5.1 / Python3.11; Vercel/production N/A.
+8. Canonical Skill, official Kit, private ZIP/PDF, original data unchanged.
+9. Continue independent official rights/Creator preflight while CI runs; no external action without owner approval.
+10. 2026-11-05 KST, incomplete Windows acceptance, not vendor certification.
+
 ## 2026-11-05 KST — G253 typed-plan Docker repair candidate, CI pending
 
 1. Goal/tech: newly covered code-owned typed DAG plan corruption in REAL local isolated Docker; G237 previously covered only CSV decimal repair. Python 3.11, cc and local Docker.

@@ -70,8 +70,8 @@ try {
   Write-Host ("Summary: " + $summary)
   Write-Host ("Log: " + $log)
   if ($exitCode -ne 0 -and (Test-Path -LiteralPath $log)) {
-    Write-Host "Failure log (last 20 lines):"
-    Get-Content -LiteralPath $log -Tail 20 | ForEach-Object { Write-Host $_ }
+    Write-Host "Failure log (last 140 lines):"
+    Get-Content -LiteralPath $log -Tail 140 | ForEach-Object { Write-Host $_ }
   }
 }
 exit $exitCode
