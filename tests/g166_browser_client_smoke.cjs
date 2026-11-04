@@ -70,10 +70,10 @@ const ids = ["token","connect","disconnect","clear","connection-status","notice"
   "list","load","plan","guide","test","approve","run","refresh","audit","evidence","report","recover",
   "synthetic-consent","metadata-consent","required","version-candidates","text-workflow","text-preview","meta-preview","meta-approve",
   "meta-cancel","meta-status","meta-save","meta-readback","meta-council","meta-report","meta-export","native-handoff","local-council-state","meta-save-consent","advice-disk","advice-errors","advice-backup",
-  "advice-consent","advice-submit","advice-summary","csv-local-path","csv-group-column","csv-preview","csv-run","csv-readback","csv-consent","csv-job-status","csv-export-consent","csv-export"];
+  "advice-consent","advice-submit","advice-summary","csv-local-path","csv-group-column","csv-preview","csv-run","csv-readback","csv-consent","csv-job-status","csv-export-consent","csv-export","csv-recover-id","csv-recover"];
 const buttonIds = ["connect","disconnect","clear","create","list","load","plan","guide",
   "test","approve","run","refresh","audit","evidence","report","recover","text-preview","meta-preview",
-  "meta-approve","meta-cancel","meta-status","meta-save","meta-readback","meta-council","meta-report","meta-export","native-handoff","advice-submit","csv-preview","csv-run","csv-readback","csv-export"];
+  "meta-approve","meta-cancel","meta-status","meta-save","meta-readback","meta-council","meta-report","meta-export","native-handoff","advice-submit","csv-preview","csv-run","csv-readback","csv-export","csv-recover"];
 class FakeElement {
   constructor(id) {this.id=id;this.value="";this.checked=false;this.disabled=false;
     this.textContent="";this.handlers={};this.options=[];}
@@ -381,6 +381,30 @@ async function main(){
     assert.doesNotMatch(JSON.stringify(result),/alice|bob|test-owned\.csv/);
     assert.equal(fs.readFileSync(csvFile,"utf8").includes("alice,125"),true,
                  "owner-like synthetic source never changed");
+    const recorded=elems["csv-job-status"].textContent.match(/csv_[0-9a-f]{24}/)?.[0];
+    assert(recorded,"operator must have a visible job ID");
+    await click("disconnect");
+    elems.token.value=auth;
+    await click("connect");
+    assert.equal(elems["csv-readback"].disabled,true,"no automatic job persistence");
+    const reads=csvGetCount;
+    elems["csv-recover-id"].value="../invalid";
+    await click("csv-recover");
+    assert.equal(elems["csv-recover-id"].value,"");
+    assert.equal(csvGetCount,reads,"invalid ID cannot hit HTTP");
+    assert.equal(elems["csv-export"].disabled,true);
+    elems["csv-recover-id"].value=recorded;
+    await click("csv-recover");
+    assert.equal(csvGetCount,reads+1,"manual recovery performs one GET");
+    assert.equal(csvRunPostCount,1,"no second CSV run POST");
+    assert.match(elems.output.textContent,/COMPLETE_LOCAL_TYPED_CSV_NOT_NAS/);
+    assert.equal(elems["csv-export"].disabled,true,"fresh opt-in required");
+    elems["csv-export-consent"].checked=true;elems["csv-export-consent"].fire("change");
+    assert.equal(elems["csv-export"].disabled,false);
+    await click("csv-readback");
+    assert.equal(elems["csv-export-consent"].checked,false,"GET revokes prior export consent");
+    assert.equal(elems["csv-export"].disabled,true);
+    assert.doesNotMatch(elems.output.textContent,/alice|bob|test-owned\.csv/);
   } finally {fs.rmSync(owned,{recursive:true,force:true});}
   await click("disconnect");
   assert.equal(elems["csv-local-path"].value,"","disconnect clears file path");

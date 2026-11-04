@@ -7,6 +7,7 @@ let csvTicket = null, csvJobId = null, csvReceipt = null;
 function clearCsv() {
   csvTicket = null; csvJobId = null; csvReceipt = null;
   el("csv-local-path").value = "";
+  el("csv-recover-id").value = "";
   el("csv-export-consent").checked = false;
   el("csv-consent").checked = false;
   el("csv-job-status").textContent = "CSV 계획 미확인 · 입력 경로 미저장 · NAS 미검증";
@@ -66,6 +67,7 @@ function sync() {
       "csv-preview": true,
       "csv-run": !!csvTicket && el("csv-consent").checked,
       "csv-readback": !!csvJobId,
+      "csv-recover": true,
       "csv-export": !!csvReceipt && el("csv-export-consent").checked
     };
     button.disabled = Object.prototype.hasOwnProperty.call(rules, button.id) && !rules[button.id];
@@ -554,6 +556,7 @@ el("csv-preview").addEventListener("click", () => act(async () => {
   csvTicket = null; csvJobId = null; csvReceipt = null;
   el("csv-consent").checked = false;
   el("csv-export-consent").checked = false;
+  el("csv-recover-id").value = "";
   const inputPath = el("csv-local-path").value;
   const groupColumn = el("csv-group-column").value;
   // Clear the raw private path from the DOM BEFORE any request, including errors.
@@ -606,25 +609,43 @@ el("csv-run").addEventListener("click", () => act(async () => {
   status("로컬 CSV 실제 집계 완료 · 원본 수정/외부 전송 없음");
   output(result);
 }));
-el("csv-readback").addEventListener("click", () => act(async () => {
-  if (!csvJobId) throw Error("먼저 CSV 작업을 선택해야 합니다.");
-  const result = await json("/v1/local-csv/jobs/" + csvJobId);
+async function readCsvJob(id) {
+  if (typeof id !== "string" || !/^csv_[0-9a-f]{24}$/.test(id))
+    throw Error("복구할 CSV 작업 ID가 올바르지 않습니다.");
+  // Revoke old export rights before an uncertain GET, not after it.
+  csvReceipt = null;
+  el("csv-export-consent").checked = false;
+  const result = await json("/v1/local-csv/jobs/" + id);
   if (result.schema !== "flowpilot-g239-local-csv-job-v1" ||
-      result.request_id !== csvJobId ||
+      result.request_id !== id ||
       result.release_gate !== "HOLD" || result.nas_verified !== false ||
       !["COMPLETE_LOCAL_TYPED_CSV_NOT_NAS",
         "RUN_RESERVED_UNCERTAIN_NO_AUTORETRY",
         "LOCAL_CSV_RUN_BLOCKED_NO_AUTORETRY"].includes(result.status))
     throw Error("CSV 저장 영수증 검증 실패");
-  csvReceipt = null;
-  el("csv-export-consent").checked = false;
   if (result.status === "COMPLETE_LOCAL_TYPED_CSV_NOT_NAS") {
     redactedCsvExport(result);
     csvReceipt = result;
   }
-  el("csv-job-status").textContent = result.status + " · " + csvJobId + " · NAS 미검증";
+  el("csv-job-status").textContent = result.status + " · " + id + " · NAS 미검증";
   status("SQLite 저장 영수증 재조회 · 고객 CSV 다시 읽지 않음");
   output(result);
+}
+el("csv-readback").addEventListener("click", () => act(async () => {
+  if (!csvJobId) throw Error("먼저 CSV 작업을 선택해야 합니다.");
+  await readCsvJob(csvJobId);
+}));
+el("csv-recover").addEventListener("click", () => act(async () => {
+  const id = el("csv-recover-id").value;
+  // No storage or implicit rerun; an operator must enter a recorded job ID.
+  el("csv-recover-id").value = "";
+  csvTicket = null; csvJobId = null; csvReceipt = null;
+  el("csv-consent").checked = false;
+  el("csv-export-consent").checked = false;
+  if (!/^csv_[0-9a-f]{24}$/.test(id))
+    throw Error("복구할 CSV 작업 ID가 올바르지 않습니다.");
+  csvJobId = id;
+  await readCsvJob(id);
 }));
 el("csv-export").addEventListener("click", () => act(async () => {
   if (!csvReceipt || !el("csv-export-consent").checked)

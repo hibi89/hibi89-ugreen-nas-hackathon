@@ -9,6 +9,7 @@ from contextlib import suppress
 from hashlib import sha256
 import json
 from pathlib import Path
+import re
 import secrets
 import shutil
 from tempfile import TemporaryDirectory
@@ -221,6 +222,77 @@ def run_browser():
                 expect(page.locator("#meta-approve")).to_be_disabled()
                 page.locator("#meta-cancel").click()
                 expect(page.locator("#metadata-summary")).to_contain_text("CANCELED")
+                # G241: actual Chromium and localhost SQLite, no owner CSV or NAS.
+                csv_fixture=folder/"g241-disposable.csv"
+                csv_fixture.write_text("customer,amount_cents\nalice,125\nbob,300\nalice,275\n",
+                                       encoding="utf-8")
+                original=csv_fixture.read_bytes()
+                post_requests=[]
+                page.on("request",lambda req: post_requests.append(req.method)
+                        if req.url.endswith("/v1/local-csv/run") else None)
+                page.locator("#csv-local-path").fill(str(csv_fixture))
+                expect(page.locator("#csv-run")).to_be_disabled()
+                page.locator("#csv-preview").click()
+                expect(page.locator("#output")).to_contain_text(
+                    "WAITING_EXPLICIT_LOCAL_CSV_JOB_APPROVAL")
+                assert page.locator("#csv-local-path").input_value()==""
+                page.locator("#csv-consent").check()
+                consumed_csv=[]
+                def lose_csv_reply(route):
+                    upstream=route.fetch()
+                    consumed_csv.append((upstream.status,upstream.json().get("status")))
+                    route.fulfill(status=200,content_type="application/json",body="{")
+                page.route("**/v1/local-csv/run",lose_csv_reply,times=1)
+                page.locator("#csv-run").click()
+                expect(page.locator("#notice")).to_contain_text("요청 거부 또는 연결 오류")
+                expect(page.locator("#csv-run")).to_be_disabled()
+                assert consumed_csv==[(200,"COMPLETE_LOCAL_TYPED_CSV_NOT_NAS")]
+                recorded=re.search(r"csv_[0-9a-f]{24}",
+                                   page.locator("#csv-job-status").inner_text())
+                assert recorded is not None
+                job_id=recorded.group()
+                page.locator("#csv-readback").click()
+                expect(page.locator("#output")).to_contain_text("COMPLETE_LOCAL_TYPED_CSV_NOT_NAS")
+                expect(page.locator("#csv-export")).to_be_disabled()
+                page.locator("#csv-export-consent").check()
+                with page.expect_download(timeout=8000) as csv_download:
+                    page.locator("#csv-export").click()
+                saved_csv=folder/"g241-export.json"
+                csv_download.value.save_as(saved_csv)
+                result=json.loads(saved_csv.read_text(encoding="utf-8"))
+                assert result["schema"]=="flowpilot-g240-redacted-csv-export-v1"
+                assert result["request_id"]==job_id
+                assert result["source_rows"]==3 and result["group_count"]==2
+                assert [x["total_cents"] for x in result["redacted_group_totals"]]==[400,300]
+                assert result["owner_path_included"] is False
+                assert result["group_labels_included"] is False
+                assert result["nas_verified"] is False
+                assert not any(s in saved_csv.read_text(encoding="utf-8")
+                               for s in ("alice","bob",str(csv_fixture)))
+                assert csv_fixture.read_bytes()==original
+                # A full reload must not persist the token or job ID.
+                page.reload(wait_until="load")
+                expect(page.locator("#csv-readback")).to_be_disabled()
+                expect(page.locator("#csv-recover")).to_be_disabled()
+                page.locator("#token").fill(token)
+                page.locator("#connect").click()
+                expect(page.locator("#connection-status")).to_contain_text("로컬 연결 확인")
+                page.locator("#csv-recover-id").fill("../invalid")
+                page.locator("#csv-recover").click()
+                expect(page.locator("#notice")).to_contain_text("요청 거부 또는 연결 오류")
+                assert page.locator("#csv-recover-id").input_value()==""
+                page.locator("#csv-recover-id").fill(job_id)
+                page.locator("#csv-recover").click()
+                expect(page.locator("#output")).to_contain_text("COMPLETE_LOCAL_TYPED_CSV_NOT_NAS")
+                assert post_requests==["POST"],"recovery must not replay execution"
+                expect(page.locator("#csv-export")).to_be_disabled()
+                page.locator("#csv-export-consent").check()
+                with page.expect_download(timeout=8000) as again:
+                    page.locator("#csv-export").click()
+                after=folder/"g241-recovered.json"
+                again.value.save_as(after)
+                assert json.loads(after.read_text(encoding="utf-8"))==result
+                assert csv_fixture.read_bytes()==original
                 page.locator("#token").fill("short")
                 page.locator("#connect").click()
                 expect(page.locator("#create")).to_be_disabled()
@@ -238,7 +310,10 @@ def run_browser():
                               "METADATA_CANCEL_REPLY_LOSS_FAIL_CLOSED",
                               "PLAN_BOUND_SEVEN_STEP_OPERATOR_GUIDE",
                               "STATE_AWARE_GUIDE_WITH_CANONICAL_SHA",
-                              "OPT_IN_MANUAL_TELEMETRY_PROPOSALS_ONLY"],
+                              "OPT_IN_MANUAL_TELEMETRY_PROPOSALS_ONLY",
+                              "G241_REAL_CHROMIUM_CSV_LOST_REPLY",
+                              "G241_RELOAD_MANUAL_ID_GET_RECOVERY",
+                              "G241_JSON_DOWNLOAD_CONSENT"],
                     "real_nas_verified":False,"trial_started":False,"release_gate":"HOLD"
                 }
         finally:
