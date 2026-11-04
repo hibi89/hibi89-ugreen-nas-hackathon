@@ -458,6 +458,20 @@ async function main(){
     await click("csv-preview");
     assert.equal(elems["csv-report-consent"].checked,false,
                  "new preview revokes past write consent");
+    const boundPreview=JSON.parse(elems.output.textContent);
+    assert.equal(boundPreview.create_only_report_planned,true);
+    assert.match(boundPreview.report_destination_sha256,/^[0-9a-f]{64}$/);
+    assert.equal(boundPreview.report_path_in_response,false);
+    assert.doesNotMatch(JSON.stringify(boundPreview),/new-full-report\.csv/);
+    elems["csv-report-path"].value=path.join(owned,"unreviewed-target.csv");
+    elems["csv-report-path"].fire("input");
+    elems["csv-consent"].checked=true;elems["csv-consent"].fire("change");
+    elems["csv-report-consent"].checked=true;elems["csv-report-consent"].fire("change");
+    assert.equal(elems["csv-run"].disabled,true,
+                 "changed output scope cannot inherit old approval");
+    elems["csv-report-path"].value=reportPath;elems["csv-report-path"].fire("input");
+    assert.equal(elems["csv-run"].disabled,false,
+                 "exact reviewed destination plus both consents enables run");
     elems["csv-consent"].checked=true;
     elems["csv-consent"].fire("change");
     assert.equal(elems["csv-run"].disabled,true,

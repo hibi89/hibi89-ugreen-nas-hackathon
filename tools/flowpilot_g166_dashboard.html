@@ -48,6 +48,7 @@
 <label for="csv-group-column">그룹 열</label>
 <select id="csv-group-column"><option value="customer">customer</option><option value="department">department</option><option value="project">project</option></select>
 <label for="csv-report-path">새 로컬 집계 CSV 저장 경로 (선택, 기존 파일 덮어쓰기 금지)</label>
+<p>저장 경로는 CSV 읽기 전 계획 확인 단계에서 함께 검토·고정합니다. 미리보기 이후 경로를 변경하면 새 계획 검토가 필요하며 실행되지 않습니다. 입력 파일/출력 파일은 미리보기에서 읽지 않습니다.</p>
 <input id="csv-report-path" type="text" maxlength="1024" autocomplete="off" spellcheck="false" placeholder="별도 승인 시 새 파일만 생성할 절대경로 (.csv)">
 <div class="consent"><input id="csv-report-consent" type="checkbox"><label for="csv-report-consent">입력 CSV 읽기·집계 동의와 별개로, 지금 지정한 새 로컬 경로에 그룹명 포함 전체 집계 CSV를 딱 한 번 생성하는 데 동의합니다. 기존 파일 변경·덮어쓰기·자동 재시도·NAS 전송은 승인하지 않습니다.</label></div>
 <div class="actions"><button id="csv-preview" type="button">CSV 읽기 전 계획 확인</button><button id="csv-run" type="button" class="approval">로컬 CSV 1회 실행</button><button id="csv-readback" type="button" class="quiet">실행 영수증 재조회</button></div>

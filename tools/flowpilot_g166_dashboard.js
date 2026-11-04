@@ -4,8 +4,10 @@ const el = id => document.getElementById(id);
 const controls = [...document.querySelectorAll("button")];
 let token = "", workflow = null, verifiedPlan = null, review = null, lastLocalReport = null, busy = false;
 let csvTicket = null, csvJobId = null, csvReceipt = null;
+let csvBoundReportPath = null; // ephemeral reviewed destination, never persisted
 function clearCsv() {
   csvTicket = null; csvJobId = null; csvReceipt = null;
+  csvBoundReportPath = null;
   el("csv-verify-path").value = "";
   el("csv-verify-consent").checked = false;
   el("csv-local-path").value = "";
@@ -74,6 +76,8 @@ function sync() {
       "csv-preview": true,
       "csv-intent-apply": true,
       "csv-run": !!csvTicket && el("csv-consent").checked &&
+        csvBoundReportPath !== null &&
+        el("csv-report-path").value === csvBoundReportPath &&
         ((!el("csv-report-path").value && !el("csv-report-consent").checked) ||
          (!!el("csv-report-path").value && el("csv-report-consent").checked)),
       "csv-readback": !!csvJobId,
@@ -593,6 +597,7 @@ el("csv-intent-apply").addEventListener("click", () => act(async () => {
   // Rejecting an intent must also revoke ANY previously reviewed local read.
   el("csv-intent").value = "";
   csvTicket = null; csvJobId = null; csvReceipt = null;
+  csvBoundReportPath = null;
   el("csv-consent").checked = false;
   el("csv-export-consent").checked = false;
   el("csv-report-path").value = "";
@@ -628,6 +633,7 @@ el("csv-consent").addEventListener("change", sync);
 el("csv-export-consent").addEventListener("change", sync);
 el("csv-preview").addEventListener("click", () => act(async () => {
   csvTicket = null; csvJobId = null; csvReceipt = null;
+  csvBoundReportPath = null;
   el("csv-verify-path").value = "";
   el("csv-verify-consent").checked = false;
   el("csv-report-consent").checked = false;
@@ -636,24 +642,35 @@ el("csv-preview").addEventListener("click", () => act(async () => {
   el("csv-recover-id").value = "";
   const inputPath = el("csv-local-path").value;
   const groupColumn = el("csv-group-column").value;
+  const previewReportPath = el("csv-report-path").value;
   // Clear the raw private path from the DOM BEFORE any request, including errors.
   el("csv-local-path").value = "";
   el("csv-job-status").textContent = "새 CSV 계획 검토 중 · 이전 승인 폐기";
-  if (!inputPath || inputPath.length > 1024)
-    throw Error("로컬 CSV 절대경로가 필요합니다.");
-  const p = await json("/v1/local-csv/preview", {
-    input_path: inputPath, group_column: groupColumn
-  });
+  if (!inputPath || inputPath.length > 1024 ||
+      previewReportPath.length > 1024)
+    throw Error("로컬 CSV 절대경로 및 보고서 대상 경로 확인 필요");
+  const request = {input_path: inputPath, group_column: groupColumn};
+  if (previewReportPath) request.export_to = previewReportPath;
+  const p = await json("/v1/local-csv/preview", request);
   if (p.schema !== "flowpilot-g238-owner-local-typed-csv-v1" ||
       p.status !== "WAITING_EXPLICIT_LOCAL_CSV_JOB_APPROVAL" ||
       p.release_gate !== "HOLD" || p.real_nas_verified !== false ||
       p.input_file_touched !== false ||
       !/^cpre_[0-9a-f]{32}$/.test(p.preview_id) ||
-      !/^[0-9a-f]{64}$/.test(p.plan_sha256))
+      !/^[0-9a-f]{64}$/.test(p.plan_sha256) ||
+      p.create_only_report_planned !== !!previewReportPath ||
+      p.report_path_in_response !== false ||
+      (previewReportPath ?
+        !/^[0-9a-f]{64}$/.test(p.report_destination_sha256) :
+        p.report_destination_sha256 !== null))
     throw Error("로컬 CSV 계획 검증 실패");
   csvTicket = p;
+  csvBoundReportPath = previewReportPath;
   el("csv-job-status").textContent =
-    "계획 SHA " + p.plan_sha256.slice(0, 16) + " · 실행 전 승인 필요";
+    "계획 SHA " + p.plan_sha256.slice(0, 16) +
+    (p.create_only_report_planned ?
+      " · 출력경로 SHA " + p.report_destination_sha256.slice(0, 16) : "") +
+    " · 실행 전 별도 승인 필요";
   status("로컬 CSV 미리보기 완료 · 아직 파일을 읽지 않음 · NAS 아님");
   output(p);
 }));
@@ -661,6 +678,7 @@ el("csv-run").addEventListener("click", () => act(async () => {
   if (!csvTicket || !el("csv-consent").checked)
     throw Error("현재 로컬 CSV 계획을 확인하고 동의해야 합니다.");
   const p = csvTicket;
+  const boundPath = csvBoundReportPath;
   const reportPath = el("csv-report-path").value;
   const reportConsent = el("csv-report-consent").checked;
   // Revoke both permissions and private destination before any POST/failure.
@@ -668,9 +686,13 @@ el("csv-run").addEventListener("click", () => act(async () => {
   el("csv-report-consent").checked = false;
   // One-shot client consent. Preserve ONLY the job ID after uncertain POST.
   csvTicket = null; csvReceipt = null;
+  csvBoundReportPath = null;
   el("csv-verify-path").value = "";
   el("csv-verify-consent").checked = false;
-  if ((!!reportPath) !== reportConsent || (reportConsent && reportPath.length > 1024))
+  if (boundPath === null || reportPath !== boundPath ||
+      p.create_only_report_planned !== reportConsent ||
+      (!!reportPath) !== reportConsent ||
+      (reportConsent && reportPath.length > 1024))
     throw Error("새 로컬 CSV 저장 경로와 독립 승인 둘 다 필요합니다.");
   el("csv-consent").checked = false;
   el("csv-export-consent").checked = false;

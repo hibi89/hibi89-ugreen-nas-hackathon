@@ -344,9 +344,19 @@ def run_browser():
                 page.locator("#csv-report-path").fill(str(report_target))
                 page.locator("#csv-preview").click()
                 expect(page.locator("#csv-report-consent")).not_to_be_checked()
+                # G246: previewed destination is SHA-bound to the actual
+                # one-time run; a changed path disables consent reuse.
+                preview_scope=json.loads(page.locator("#output").inner_text())
+                assert preview_scope["create_only_report_planned"] is True
+                assert re.fullmatch(r"[0-9a-f]{64}",
+                                    preview_scope["report_destination_sha256"])
+                assert preview_scope["report_path_in_response"] is False
+                assert str(report_target) not in page.locator("#output").inner_text()
+                page.locator("#csv-report-path").fill(str(folder/"unreviewed.csv"))
                 page.locator("#csv-consent").check()
-                expect(page.locator("#csv-run")).to_be_disabled()
                 page.locator("#csv-report-consent").check()
+                expect(page.locator("#csv-run")).to_be_disabled()
+                page.locator("#csv-report-path").fill(str(report_target))
                 expect(page.locator("#csv-run")).to_be_enabled()
                 page.locator("#csv-run").click()
                 expect(page.locator("#output")).to_contain_text(
@@ -411,7 +421,8 @@ def run_browser():
                               "G242_COMPOUND_WRITE_INTENT_FAIL_CLOSED",
                               "G243_OPTIN_REDACTED_CSV_HISTORY_GET_ONLY",
                               "G244_EXPLICIT_CREATE_ONLY_FULL_LOCAL_REPORT",
-                              "G245_REAL_REPORT_SHA_OK_AND_TAMPER_CONFLICT"],
+                              "G245_REAL_REPORT_SHA_OK_AND_TAMPER_CONFLICT",
+                              "G246_REVIEWED_OUTPUT_SCOPE_REUSE_REFUSED"],
                     "real_nas_verified":False,"trial_started":False,"release_gate":"HOLD"
                 }
         finally:
