@@ -233,6 +233,14 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--candidate-skill", type=Path,
                         help="Exact private G226 ZIP; no vendor/provider invocation")
     args = parser.parse_args(argv)
+    # G259: a human-readable WAITING status is NOT a successful pre-trial
+    # command. Reject before reading any owner-controlled private files.
+    if args.candidate_skill is None:
+        print(json.dumps({
+            "status": "G259_CURRENT_G226_SKILL_REQUIRED",
+            "current_skill_rechecked": False, "nas_verified": False,
+            "release_gate": "HOLD"}, sort_keys=True))
+        return 2
     try:
         files = [args.official_kit, args.g256_private_receipt]
         if args.candidate_skill is not None:
@@ -246,6 +254,20 @@ def main(argv: list[str] | None = None) -> int:
     except (OSError, ValueError, TypeError, UnsafePackage, KeyError):
         print(json.dumps({"status": "G257_OFFLINE_TRIAL_READINESS_REFUSED",
                           "nas_verified": False, "release_gate": "HOLD"}))
+        return 2
+    # G259: report success ONLY for a current byte-checked source and pinned
+    # Kit. A plan, old receipt or simulator alone cannot start owner testing.
+    ready = (out.get("status") == "CURRENT_SKILL_BOUND_OFFLINE_TRIAL_PLAN_READY"
+             and out.get("current_skill_rechecked") is True
+             and len(out.get("current_skill_instruction_sha256", [])) == 2
+             and out.get("nas_verified") is False
+             and out.get("may_activate_nas_trial") is False
+             and out.get("release_gate") == "HOLD")
+    if not ready:
+        print(json.dumps({
+            "status": "G259_REAL_SOURCE_BOUND_OFFLINE_PREFLIGHT_INCOMPLETE",
+            "current_skill_rechecked": out.get("current_skill_rechecked") is True,
+            "nas_verified": False, "release_gate": "HOLD"}, sort_keys=True))
         return 2
     print(json.dumps(out, sort_keys=True))
     return 0
