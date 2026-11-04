@@ -29,6 +29,13 @@
   placeholder="파일 확인: README.md; 버전 비교: final.pdf =&gt; final_v2.pdf"></textarea>
 <p>지원되는 명령 예시: <code>파일 확인:</code>, <code>버전 비교:</code>, <code>납품 확인:</code>. 세미콜론으로 1–8단계 연결합니다. 자유형 AI 추측 없이 정확한 문법을 사용하며 NAS를 실행하지 않습니다.</p>
 <div class="actions"><button id="text-preview" type="button" class="quiet">다단계 읽기 전 검토</button></div>
+<label for="metadata-goal">로컬 읽기 전 검토 의도</label>
+<select id="metadata-goal">
+<option value="check required files">필수 파일 확인 (기존)</option>
+<option value="review versions">버전 비교 (English)</option>
+<option value="버전 비교해줘">버전 비교 (한국어)</option>
+</select>
+<p>버전 비교는 아래 필수 경로와 명시적 후보 관계가 있어야 계획을 생성할 수 있습니다. 미리보기에서는 파일을 읽지 않으며, 승인 후에도 자동으로 최종본을 선택하지 않습니다. NAS와 공식 Expert를 실행하지 않습니다.</p>
 <label for="required">필수 상대 경로 (한 줄당 하나, 1–20개)</label><textarea id="required" rows="3" spellcheck="false" placeholder="README.md&#10;release/final.pdf"></textarea>
 <label for="version-candidates">선택적 버전 후보 관계 (필수경로=후보경로, 줄당 하나, 전체 최대 20개)</label>
 <textarea id="version-candidates" rows="2" spellcheck="false" placeholder="release/design.pdf=release/design_v2.pdf"></textarea>

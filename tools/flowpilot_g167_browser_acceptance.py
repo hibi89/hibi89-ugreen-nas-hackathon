@@ -142,6 +142,48 @@ def run_browser():
                 page.locator("#meta-approve").click()
                 expect(page.locator("#metadata-summary")).to_contain_text("LOCAL_METADATA_BLOCKED")
 
+                # G248: use REAL Chromium against the local-only MetadataGate,
+                # with an actual disposable competing version file pair.
+                release=root/"release"
+                release.mkdir()
+                source_v1=release/"final.pdf"
+                source_v2=release/"final_v2.pdf"
+                source_v1.write_bytes(b"g248 version one synthetic")
+                source_v2.write_bytes(b"g248 version two synthetic")
+                page.locator("#metadata-goal").select_option("버전 비교해줘")
+                expect(page.locator("#meta-approve")).to_be_disabled()
+                page.locator("#required").fill("release/final.pdf")
+                page.locator("#meta-preview").click()
+                expect(page.locator("#notice")).to_contain_text("요청 거부")
+                expect(page.locator("#meta-approve")).to_be_disabled()
+                page.locator("#required").fill("release/final.pdf")
+                page.locator("#version-candidates").fill(
+                    "release/final.pdf=release/final_v2.pdf")
+                page.locator("#meta-preview").click()
+                expect(page.locator("#metadata-summary")).to_contain_text(
+                    "WAITING_APPROVAL")
+                g248_preview=json.loads(page.locator("#output").inner_text())
+                assert g248_preview["selected_intent"]=="REVIEW_VERSIONS"
+                assert len(g248_preview["typed_review_plan"])==4
+                assert g248_preview["inspection_result"] is None
+                assert str(root) not in page.locator("#output").inner_text()
+                assert "final_v2.pdf" not in page.locator("#output").inner_text()
+                expect(page.locator("#meta-approve")).to_be_disabled()
+                page.locator("#metadata-consent").check()
+                page.locator("#meta-approve").click()
+                expect(page.locator("#metadata-summary")).to_contain_text(
+                    "LOCAL_METADATA_BLOCKED")
+                g248_result=json.loads(page.locator("#output").inner_text())
+                assert g248_result["selected_intent"]=="REVIEW_VERSIONS"
+                assert g248_result["inspection_result"]==[
+                    {"index":1,"state":"VERSION_REVIEW"}]
+                assert g248_result["nas_verified"] is False
+                assert g248_result["file_contents_opened"] is False
+                assert source_v1.read_bytes()==b"g248 version one synthetic"
+                assert source_v2.read_bytes()==b"g248 version two synthetic"
+                expect(page.locator("#meta-approve")).to_be_disabled()
+                page.locator("#metadata-goal").select_option("check required files")
+                expect(page.locator("#meta-approve")).to_be_disabled()
                 # G175: the actual localhost server consumes a one-use metadata
                 # approval, but the browser receives a corrupt reply. The
                 # UI must revoke the consumed ticket and approval immediately.
@@ -423,7 +465,8 @@ def run_browser():
                               "G243_OPTIN_REDACTED_CSV_HISTORY_GET_ONLY",
                               "G244_EXPLICIT_CREATE_ONLY_FULL_LOCAL_REPORT",
                               "G245_REAL_REPORT_SHA_OK_AND_TAMPER_CONFLICT",
-                              "G246_REVIEWED_OUTPUT_SCOPE_REUSE_REFUSED"],
+                              "G246_REVIEWED_OUTPUT_SCOPE_REUSE_REFUSED",
+                              "G248_REAL_CHROME_SCOPED_VERSION_REVIEW_OPTIN"],
                     "real_nas_verified":False,"trial_started":False,"release_gate":"HOLD"
                 }
         finally:

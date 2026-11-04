@@ -70,7 +70,7 @@ globalThis.fetch = (route, init) => {
 const ids = ["token","connect","disconnect","clear","connection-status","notice","output",
   "workflow-id","workflow-state","plan-hash","metadata-summary","goal","existing","create",
   "list","load","plan","guide","test","approve","run","refresh","audit","evidence","report","recover",
-  "synthetic-consent","metadata-consent","required","version-candidates","text-workflow","text-preview","meta-preview","meta-approve",
+  "synthetic-consent","metadata-consent","required","version-candidates","metadata-goal","text-workflow","text-preview","meta-preview","meta-approve",
   "meta-cancel","meta-status","meta-save","meta-readback","meta-council","meta-report","meta-export","native-handoff","local-council-state","meta-save-consent","advice-disk","advice-errors","advice-backup",
   "advice-consent","advice-submit","advice-summary","csv-local-path","csv-group-column","csv-preview","csv-run","csv-readback","csv-consent","csv-job-status","csv-export-consent","csv-export","csv-recover-id","csv-recover","csv-intent","csv-intent-apply","csv-report-path","csv-report-consent","csv-verify-path","csv-verify-consent","csv-verify-report","csv-history-consent","csv-history-select","csv-history-list","csv-history-open"];
 const buttonIds = ["connect","disconnect","clear","create","list","load","plan","guide",
@@ -89,6 +89,7 @@ class FakeElement {
 }
 const elems=Object.fromEntries(ids.map(id=>[id,new FakeElement(id)]));
 elems.goal.value="check required files";
+elems["metadata-goal"].value="check required files";
 globalThis.Option=function(label,value){return {label,value};};
 globalThis.document={
   getElementById:id=>{if(!elems[id])throw Error("Missing DOM element "+id);return elems[id];},
@@ -199,6 +200,34 @@ async function main(){
   assert(!saved.label.includes("check required files"),"raw user goal is never shown");
   elems.existing.value=workflowId;elems.existing.fire("change");
   await click("load");assert.equal(elems["workflow-state"].textContent,"COMPLETE_LOCAL_SYNTHETIC");
+  // G248 exact version-review goal is an independently approvable typed,
+  // read-only local workflow, not a silently persisted synthetic runner.
+  elems["metadata-goal"].value="review versions";elems["metadata-goal"].fire("change");
+  assert.equal(elems["meta-approve"].disabled,true);
+  elems.required.value="README.md";
+  await click("meta-preview");
+  assert.match(elems.notice.textContent,/요청 거부|연결 오류/);
+  assert.equal(elems["meta-approve"].disabled,true);
+  elems.required.value="README.md";
+  elems["version-candidates"].value="README.md=not-a-version.pdf";
+  await click("meta-preview");
+  const versionPreview=JSON.parse(elems.output.textContent);
+  assert.equal(versionPreview.selected_intent,"REVIEW_VERSIONS");
+  assert.equal(versionPreview.typed_review_plan.length,4);
+  assert.equal(versionPreview.approved_local_metadata_access,false);
+  assert.equal(elems["metadata-consent"].checked,false);
+  assert.equal(elems["meta-approve"].disabled,true);
+  elems["metadata-consent"].checked=true;elems["metadata-consent"].fire("change");
+  assert.equal(elems["meta-approve"].disabled,false);
+  await click("meta-approve");
+  const versionResult=JSON.parse(elems.output.textContent);
+  assert.equal(versionResult.selected_intent,"REVIEW_VERSIONS");
+  assert.equal(versionResult.nas_verified,false);
+  assert.equal(versionResult.file_contents_opened,false);
+  assert.equal(elems["metadata-consent"].checked,false);
+  elems["metadata-goal"].value="check required files";
+  elems["metadata-goal"].fire("change");
+  assert.equal(elems["meta-approve"].disabled,true);
   elems.required.value="README.md\nnot-here.pdf";
   await click("meta-preview"); assert.equal(elems.required.value,"","raw checklist cleared from DOM");
   assert.equal(elems["metadata-consent"].checked,false);

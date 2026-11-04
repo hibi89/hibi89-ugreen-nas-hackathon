@@ -27,6 +27,55 @@ class G165Tests(unittest.TestCase):
         self.db = Path(self.tmp.name) / "new-backend.sqlite"
         self.backend = Backend(self.db, create=True, metadata_root=self.root)
 
+    def test_g248_readonly_version_goal_preview_has_typed_plan_no_access(self):
+        (self.root/"final.pdf").write_bytes(b"synthetic v1")
+        (self.root/"final_v2.pdf").write_bytes(b"synthetic v2")
+        gate=MetadataGate(self.root)
+        from flowpilot_task_compiler import compile_goal
+        for request in ("review versions","버전 비교해줘"):
+            with self.subTest(request=request):
+                with patch("flowpilot_g165_local_metadata_api.inspect_owner_folder",
+                           wraps=__import__("flowpilot_g165_local_metadata_api").inspect_owner_folder) as inspector:
+                    pre=gate.begin(request,["final.pdf"],
+                                   versions={"final.pdf":["final_v2.pdf"]})
+                self.assertEqual(inspector.call_count,1)
+                self.assertEqual(inspector.call_args.kwargs["metadata_consent"],False)
+                self.assertEqual(pre["selected_intent"],"REVIEW_VERSIONS")
+                self.assertEqual(pre["status"],"WAITING_APPROVAL")
+                self.assertEqual(pre["typed_review_plan"],
+                                 compile_goal(request)["steps"])
+                self.assertEqual(len(pre["typed_review_plan"]),4)
+                self.assertFalse(pre["approved_local_metadata_access"])
+                self.assertIsNone(pre["inspection_result"])
+                self.assertNotIn(str(self.root),json.dumps(pre))
+                self.assertNotIn("final.pdf",json.dumps(pre))
+                out=gate.approve(pre["review_id"],pre["scope_sha256"],
+                                 "APPROVE_LOCAL_METADATA_READ_ONLY")
+                self.assertEqual(out["status"],"LOCAL_METADATA_BLOCKED")
+                self.assertEqual(out["selected_intent"],"REVIEW_VERSIONS")
+                self.assertEqual(out["inspection_result"],
+                                 [{"index":1,"state":"VERSION_REVIEW"}])
+                self.assertFalse(out["nas_verified"])
+                self.assertFalse(out["file_contents_opened"])
+                self.assertEqual(gate.get(pre["review_id"]),out)
+                with self.assertRaisesRegex(MetadataRefused,"CONSUMED"):
+                    gate.approve(pre["review_id"],pre["scope_sha256"],
+                                 "APPROVE_LOCAL_METADATA_READ_ONLY")
+        self.assertEqual((self.root/"final.pdf").read_bytes(),b"synthetic v1")
+        self.assertEqual((self.root/"final_v2.pdf").read_bytes(),b"synthetic v2")
+
+    def test_g248_unknown_goal_and_missing_candidate_fail_before_local_access(self):
+        gate=MetadataGate(self.root)
+        with patch("flowpilot_g165_local_metadata_api.inspect_owner_folder",
+                   side_effect=AssertionError("NO_METADATA_ALLOWED")):
+            for bad in ("review versions and delete all","review versions; upload",
+                        "compare versions and move files"):
+                with self.assertRaises(MetadataRefused):
+                    gate.begin(bad,["README.md"],versions={"README.md":["other.md"]})
+            with self.assertRaisesRegex(MetadataRefused,"G248_EXACT_VERSION_CANDIDATES_REQUIRED"):
+                gate.begin("review versions",["README.md"])
+        self.assertEqual(len(gate._reviews),0)
+
     def test_preview_no_fs_metadata_even_when_root_not_present(self):
         unknown = self.root / "not-created"
         gate = MetadataGate(unknown)

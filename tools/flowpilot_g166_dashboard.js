@@ -358,6 +358,7 @@ el("meta-preview").addEventListener("click", () => act(async () => {
   // input is invalid or the HTTP preview is refused. Clear raw paths first.
   const raw = el("required").value;
   const rawVersions = el("version-candidates").value;
+  const versionGoal = el("metadata-goal").value;
   el("required").value = "";
   el("version-candidates").value = "";
   el("text-workflow").value = "";
@@ -380,10 +381,32 @@ el("meta-preview").addEventListener("click", () => act(async () => {
     versions[key].push(value);
     if (versions[key].length > 5) throw Error("한 필수경로당 후보 5개 이내입니다.");
   }
-  const args = {goal:"check required files",required};
+  if (!["check required files","review versions","버전 비교해줘"].includes(versionGoal))
+    throw Error("허용되지 않은 로컬 점검 의도");
+  if (versionGoal !== "check required files" && !lines.length)
+    throw Error("버전 비교에는 정확한 후보 파일 관계가 필요합니다.");
+  const args = {goal:versionGoal,required};
   if (lines.length) args.versions = versions;
-  review = await json("/v1/local-metadata/preview", args);
-  status("로컬 메타데이터 읽기 전 미리보기 · 아직 파일 미조회"); output(review);
+  const plan = await json("/v1/local-metadata/preview", args);
+  const isVersion = versionGoal !== "check required files";
+  if (plan.schema !== "flowpilot-owner-local-metadata-session-v1" ||
+      plan.status !== "WAITING_APPROVAL" || plan.release_gate !== "HOLD" ||
+      plan.nas_verified !== false ||
+      plan.selected_intent !== (isVersion ? "REVIEW_VERSIONS" : "CHECK_REQUIRED") ||
+      plan.approved_local_metadata_access !== false ||
+      plan.file_contents_opened !== false || plan.raw_filenames_returned !== false ||
+      plan.owner_root_returned !== false ||
+      !/^[a-f0-9]{64}$/.test(plan.scope_sha256 || "") ||
+      (isVersion && (!Array.isArray(plan.typed_review_plan) ||
+        plan.typed_review_plan.length !== 4 ||
+        plan.typed_review_plan[0].access !== "READ" ||
+        plan.typed_review_plan.slice(1).some(step => step.access !== "COMPUTE"))))
+    throw Error("버전 검토 계획이 안전성 계약과 다릅니다.");
+  review = plan;
+  status(isVersion ?
+    "명시된 버전 후보 읽기 전 4단계 계획 확인 · 별도 1회 동의 필요" :
+    "로컬 메타데이터 읽기 전 미리보기 · 아직 파일 미조회");
+  output(review);
 }));
 el("text-preview").addEventListener("click", () => act(async () => {
   const raw = el("text-workflow").value;
@@ -940,6 +963,18 @@ el("advice-submit").addEventListener("click", () => act(async () => {
 el("synthetic-consent").addEventListener("change", sync);
 el("advice-consent").addEventListener("change", sync);
 for (const [id] of adviceFields) el(id).addEventListener("input", sync);
+el("metadata-goal").addEventListener("change", () => {
+  // A different intent cannot inherit an already previewed scope or consent.
+  review = null;
+  lastLocalReport = null;
+  el("metadata-consent").checked = false;
+  el("meta-save-consent").checked = false;
+  el("required").value = "";
+  el("version-candidates").value = "";
+  el("text-workflow").value = "";
+  status("점검 의도 변경 · 기존 미리보기 및 읽기 승인 폐기");
+  sync();
+});
 el("metadata-consent").addEventListener("change", sync);
 el("meta-save-consent").addEventListener("change", sync);
 el("existing").addEventListener("change", sync);

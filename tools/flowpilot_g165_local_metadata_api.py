@@ -15,6 +15,7 @@ import time
 
 from flowpilot_owner_local_audit import inspect_owner_folder, OwnerAuditError, _valid_relative
 from flowpilot_text_workflow import parse_instructions, WorkflowRefused
+from flowpilot_task_compiler import compile_goal
 
 SCHEMA = "flowpilot-owner-local-metadata-session-v1"
 MAX_REVIEWS = 32
@@ -56,8 +57,14 @@ class MetadataGate:
             extra = {"stage_layout": [dict(x) for x in item["stage_layout"]],
                      "parsed_actions_count": len(item["stage_layout"]),
                      "bound_workflow_id": item["bound_workflow_id"]}
+        typed = compile_goal(item["goal"])
         return {
             "schema": SCHEMA, "review_id": token, "status": item["status"],
+            "selected_intent": ("REVIEW_VERSIONS" if item["goal"] != "check required files"
+                                else "CHECK_REQUIRED"),
+            "typed_review_plan": (typed["steps"]
+                                  if typed.get("template") == "scoped_version_review_v1"
+                                  else None),
             "scope_sha256": item["digest"], "required_count": item["required_count"],
             "version_candidate_count": item["version_count"],
             "approved_local_metadata_access": item["status"] in
@@ -74,8 +81,13 @@ class MetadataGate:
             self._prune()
             if self._root is None:
                 raise MetadataRefused("LOCAL_ROOT_NOT_CONFIGURED", 409)
-            # First version supports exactly one proven local metadata action.
-            if type(goal) is not str or goal != "check required files":
+            # G248: also allow the EXACT G247 read-only version template.
+            # No arbitrary NLU and no new filesystem authority.
+            if type(goal) is not str:
+                raise MetadataRefused("UNSUPPORTED_METADATA_GOAL", 422)
+            typed = compile_goal(goal)
+            version_mode = typed.get("template") == "scoped_version_review_v1"
+            if goal != "check required files" and not version_mode:
                 raise MetadataRefused("UNSUPPORTED_METADATA_GOAL", 422)
             if type(required) is not list or not 1 <= len(required) <= MAX_PATHS:
                 raise MetadataRefused("INVALID_METADATA_CHECKLIST", 400)
@@ -90,6 +102,8 @@ class MetadataGate:
                 versions = {}
             if type(versions) is not dict or len(versions) > MAX_PATHS:
                 raise MetadataRefused("INVALID_VERSION_CANDIDATES", 400)
+            if version_mode and not versions:
+                raise MetadataRefused("G248_EXACT_VERSION_CANDIDATES_REQUIRED", 400)
             mapped = {}
             seen = set(items)
             for wanted, alternatives in versions.items():
