@@ -1,5 +1,5 @@
 # FlowPilot 3.0 — whole-product completion acceptance rubric (G242)
-Date: 2026-11-05 KST. **Current after VERIFIED G249: 59/100 internal whole-product tracking estimate** (42 points outstanding). Historic table below is PRE-G242. This is a conservative, owner-facing PROJECT MANAGEMENT ESTIMATE, not independently certified completeness, a test-pass ratio, or the old 24-day calendar. Definition of 100%: end-to-end useful operator workflow on a supported registered Uliya NAS, validated evidence, authorizations, and accepted hackathon deliverables. It must not count off-NAS CI as production.
+Date: 2026-11-05 KST. **Current after VERIFIED G251: 60/100 internal whole-product tracking estimate** (40 points outstanding). Historic table below is PRE-G242. This is a conservative, owner-facing PROJECT MANAGEMENT ESTIMATE, not independently certified completeness, a test-pass ratio, or the old 24-day calendar. Definition of 100%: end-to-end useful operator workflow on a supported registered Uliya NAS, validated evidence, authorizations, and accepted hackathon deliverables. It must not count off-NAS CI as production.
 
 ## Fixed full-product weights and estimated baseline immediately before G242
 | Whole-product deliverable | Weight | Pre-G242 provisional earned | Grounded limitations |
@@ -99,3 +99,15 @@ Date: 2026-11-05 KST. **Current after VERIFIED G249: 59/100 internal whole-produ
 G249 code 703fb254a6a91052d2348abc37463b112b387608 has 4/4 final GitHub Actions SUCCESS: full Linux/Windows 41861510935 (Linux 1594 PASS, 0 FAIL, 16 SKIP; Windows full PASS), readiness 41861511141, master 41861511055, closeout 41861510832. Fixed rubric real operator-owned LOCAL execution 9→10. Whole-product engineering estimate 58→59/100, remaining 41. This is not certified live NAS completeness.
 
 G250 local browser consented export and G251 local owner-choice step are distinct proposed +1 acceptance criteria but their exact full CI remains queued. Do not count until independent complete PASS. Actual official registered Uliya Expert, original file NAS use, first-party current Creator/Checker, Devpost, trial NOT_RUN; RELEASE HOLD. See docs/operations/G249_FINAL_CI_ACCEPTANCE_20261105.md.
+
+## G251 final accepted whole-product +1 — 2026-11-05 KST
+
+- **Fixed typed graph/template/owner builder row 9→10/10**: G247 made the 4-stage version graph; G251 newly implements a usable separately owner-consented create-only manual HOLD/PRIMARY/ALTERNATIVE decision receipt from one conflict's redacted evidence, bound to previous SHA and scope hash. No automatic version selection. This is distinct from G247 typed plan, G248 preview, G249 file evidence, and G250 browser export; no repeated score.
+- Exact fixed code SHA `025e5bdf898fc8e5d0602803c522af31c699b259`: full GitHub [Linux/Windows 41864970832](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/41864970832) SUCCESS, 1607 PASS/0 FAIL/16 SKIP on Linux, Windows `UGREEN LOCAL VERIFY: PASS [full]`. Master 41864970728 and closeout 41864970918 also final SUCCESS (3/3). Previous accepted internal 59→60/100, 40 unearned; not a NAS certification.
+- G250's supported NL browser export point 8→9 and G252's independent decision/evidence integrity verification under security council row 9→10 are **not credited** while exact full workflows are unresolved. Actual vendor Expert/NAS, final Creator/Checker and Devpost NOT_RUN. RELEASE HOLD.
+
+## G252 distinct conditional acceptance — local 29 PASS, exact CI pending
+
+- Unclaimed scope/security council & negative cases row **9→10/10** requires the delivered G251 owner-choice receipt to be verifiable after program restart against the *independently retained original decision SHA*, saved evidence SHA and scoped evidence digest, rejecting altered yet valid choice codes, tampered JSON, missing approval, extra owner paths and symlinks without modifying files or claiming trusted identity.
+- G252 code `8601ab3eb44e496b57c36e01fa7cd1a7f82c0681`, local 29 PASS/0 FAIL/0 SKIP combined G251+G252; Git blobs match tested source `c6fbd0299587353b6b7c53a0480510683da10097`, tests `74fdba892de43690f49a1035df0b463c0ba6037a`. Full Linux/Windows Actions 41867688506, readiness 41867688507, master 41867688451, closeout 41867688501 require final SUCCESS to accept. No credit from local-only tests or mere docs.
+- SHA proves consistency only against a trusted previous digest, NOT vendor origin/signature. Real NAS/Expert rights still 0/20 and release HOLD.
