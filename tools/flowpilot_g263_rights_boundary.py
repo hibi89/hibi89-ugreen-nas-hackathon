@@ -33,7 +33,10 @@ REQUIRED_DISCLOSURE = (
 )
 OFFICIAL_SOURCE_PAGES = (
     "https://ugreenhackathon.devpost.com/rules",
-    "https://ai.ugreen.com/pages/useragreement",
+    "https://ai.ugreen.com/pages/hackathon-starter-kit",
+    "https://api.ugnas.com/api/system/v1/ua/agreement/page?acceptLanguage=en-US&agreementCode=skillhub-user-agreement",
+    "https://api.ugnas.com/api/system/v1/ua/agreement/page?acceptLanguage=en-US&agreementCode=skillhub-publish-audit-spec",
+    "https://ai.ugreen.com/pages/uliya-user-agreement",
     "https://openai.com/ko-KR/policies/terms-of-use/",
 )
 
@@ -119,6 +122,9 @@ def audit_original(skill: bytes, kit: bytes) -> dict:
         "openai_output_ownership_is_subject_to_applicable_terms_and_law": True,
         "third_party_ip_non_infringement_proven": False,
         "vendor_kit_redistribution_license_proven": False,
+        "skillhub_publisher_rights_attestation_verified": False,
+        "skillhub_compatible_license_choice_verified": False,
+        "platform_static_checker_is_license_clearance": False,
         "supported_creator_invocation_verified": False,
         "entrant_rights_attestation_received": False,
         "owner_submission_approved": False,
