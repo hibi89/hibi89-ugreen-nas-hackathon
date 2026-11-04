@@ -47,7 +47,7 @@ def run_browser():
                              if shutil.which(name)),None)
                 try:
                     browser=playwright.chromium.launch(
-                        executable_path=binary,headless=True,timeout=30000)
+                        executable_path=binary,headless=True,timeout=60000)
                 except Exception:
                     # Browser execution can be environment-blocked. Never
                     # substitute a mocked DOM and never report a false PASS.
