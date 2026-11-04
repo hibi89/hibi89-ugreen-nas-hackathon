@@ -1,3 +1,16 @@
+## 2026-11-05 KST — G275 HANDOFF: 73/100 HOLD, read-only rights/source gate on G274
+
+1. Goal/stack: UGREEN FlowPilot 3.0 Markdown-only Skill, exact G274 rights/provenance check ahead of Nov16 16:45 KST Round1.
+2. Change: new generic five-Markdown `tools/g275_current_rights_audit.py`, synthetic `tests/test_g275_current_rights_audit.py`; private G274 and Kit unchanged; old G263 was G226 four-Markdown only.
+3. Tests/evidence: actual owner-private G274+Kit bound static audit PASS; 14/14 synthetic Python PASS locally. Linux/Windows GitHub CI check exact new SHA separately.
+4. Status: full product **73/100 +0pp**, 2 rights/license approval, 20 native NAS, 5 final Devpost still unearned. HOLD, NAS NOT_RUN, Devpost NOT_SUBMITTED.
+5. Failure/recovery: first attempt at GitHub source transfer had stale file handles, made no remote changes; switched to newly listed exact conversation file refs. No source/quality scope reduction. Restore via normal Git revert if CI failure.
+6. Repo/branch: `hibi89/hibi89-ugreen-nas-hackathon@lead/ugreen`, pre-G275 SHA `6f5f07e22502b2c3fcaa7d01226dcfff929786a6`. Source/test paths above; docs `docs/operations/G275_CURRENT_RIGHTS_BOUNDARY_20261105.md`. Exact resulting HEAD must be checked.
+7. Python local 3.13, GitHub Python CI to verify; Vercel N/A, actual NAS and registered expert N/A/NOT_RUN.
+8. Private G269/G272/G273/G274 ZIPs, raw official kit, original PDF, customer data and credentials untouched. No user-private archive pushed.
+9. Next: verify GitHub Actions, then require explicit participant rights/license decision and later exact-artifact release authorization; not a generic coding continuation approval.
+10. KST 2026-11-05; verified offline hashes/source and 14 tests, not legal rights/NAS. No artificial +1pp.
+
 ## 2026-11-05 KST — G274 CI / OFFICIAL NAS ACCESS RULES VERIFIED, resume on `lead/ugreen`
 
 1. **Goal:** G274 fixes bounded initial `find` delegation and owner-limit count/truncation in separate private candidate; public source regression guard. Full-product 73/100, release HOLD, Round1 PDF+ZIP Nov16 16:45 KST.
