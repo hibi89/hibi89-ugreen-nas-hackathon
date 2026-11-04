@@ -7,6 +7,10 @@ on:
       - "tools/flowpilot_g167_browser_acceptance.py"
       - "tools/flowpilot_g166_dashboard.*"
       - "tools/flowpilot_local_backend.py"
+      - "tools/flowpilot_g238_local_csv_engine.py"
+      - "tools/flowpilot_g239_csv_jobs.py"
+      - "tests/g166_browser_client_smoke.cjs"
+      - "tests/test_flowpilot_g239_csv_jobs.py"
   workflow_dispatch:
 permissions:
   contents: read
