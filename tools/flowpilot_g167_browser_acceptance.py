@@ -204,6 +204,51 @@ def run_browser():
                 expect(page.locator("#version-export-consent")).not_to_be_checked()
                 expect(page.locator("#version-export")).to_be_disabled()
                 expect(page.locator("#meta-approve")).to_be_disabled()
+                # G254: real Chromium exact text -> scope -> explicitly
+                # consented read -> redacted download, no NAS or file changes.
+                page.locator("#version-intent").fill(
+                    "버전 비교: release/final.pdf => ../outside.pdf")
+                page.locator("#version-intent-apply").click()
+                expect(page.locator("#notice")).to_contain_text("요청 거부")
+                expect(page.locator("#meta-approve")).to_be_disabled()
+                assert page.locator("#version-intent").input_value()==""
+                page.locator("#version-intent").fill(
+                    "compare versions: release/final.pdf => release/final_v2.pdf")
+                page.locator("#version-intent-apply").click()
+                assert page.locator("#metadata-goal").input_value()=="review versions"
+                assert page.locator("#required").input_value()=="release/final.pdf"
+                assert page.locator("#version-candidates").input_value()==(
+                    "release/final.pdf=release/final_v2.pdf")
+                parsed=json.loads(page.locator("#output").inner_text())
+                assert parsed["status"]=="LOCAL_TYPED_VERSION_SCOPE_NO_READ"
+                assert parsed["local_metadata_read"] is False
+                expect(page.locator("#meta-approve")).to_be_disabled()
+                page.locator("#meta-preview").click()
+                expect(page.locator("#metadata-summary")).to_contain_text(
+                    "WAITING_APPROVAL")
+                assert page.locator("#required").input_value()==""
+                assert page.locator("#version-candidates").input_value()==""
+                page.locator("#metadata-consent").check()
+                page.locator("#meta-approve").click()
+                expect(page.locator("#metadata-summary")).to_contain_text(
+                    "LOCAL_METADATA_BLOCKED")
+                expect(page.locator("#version-export")).to_be_disabled()
+                page.locator("#version-export-consent").check()
+                with page.expect_download(timeout=8000) as transfer:
+                    page.locator("#version-export").click()
+                evidence_path=folder/"g254-redacted.json"
+                transfer.value.save_as(evidence_path)
+                redacted=evidence_path.read_text(encoding="utf-8")
+                result_g254=json.loads(redacted)
+                assert result_g254["findings"]==[
+                    {"index":1,"state":"VERSION_REVIEW"}]
+                assert result_g254["nas_verified"] is False
+                assert result_g254["auto_selected_final_version"] is False
+                assert "release/final.pdf" not in redacted
+                assert "release/final_v2.pdf" not in redacted
+                assert source_v1.read_bytes()==b"g248 version one synthetic"
+                assert source_v2.read_bytes()==b"g248 version two synthetic"
+                expect(page.locator("#version-export-consent")).not_to_be_checked()
                 page.locator("#metadata-goal").select_option("check required files")
                 expect(page.locator("#meta-approve")).to_be_disabled()
                 # G175: the actual localhost server consumes a one-use metadata
@@ -488,7 +533,8 @@ def run_browser():
                               "G244_EXPLICIT_CREATE_ONLY_FULL_LOCAL_REPORT",
                               "G245_REAL_REPORT_SHA_OK_AND_TAMPER_CONFLICT",
                               "G246_REVIEWED_OUTPUT_SCOPE_REUSE_REFUSED",
-                              "G248_REAL_CHROME_SCOPED_VERSION_REVIEW_OPTIN"],
+                              "G248_REAL_CHROME_SCOPED_VERSION_REVIEW_OPTIN",
+                              "G254_ONE_LINE_VERSION_SCOPE_REAL_CHROMIUM_E2E"],
                     "real_nas_verified":False,"trial_started":False,"release_gate":"HOLD"
                 }
         finally:
