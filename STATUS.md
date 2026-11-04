@@ -1,3 +1,7 @@
+## 2026-11-05 KST — G249 FINAL VERIFIED 59/100; G250/G251 CI PENDING
+
+G249 source SHA 703fb254 completed GitHub Actions 4/4 SUCCESS: Linux/Windows 41861510935 (1594 PASS / 0 FAIL / 16 SKIP on Linux; Windows full PASS), readiness 41861511141, master 41861511055, closeout 41861510832. The new consented local create-only version evidence point is accepted: fixed whole-product internal management estimate **58→59/100**. G250 and G251 have NOT earned points: their exact CI is queued. Actual Uliya/NAS/Creator/Checker/Devpost NOT_RUN. RELEASE HOLD. Full proof: docs/operations/G249_FINAL_CI_ACCEPTANCE_20261105.md.
+
 ## 2026-11-05 KST — G251 owner-review stage: local 13 PASS, full GitHub CI QUEUED
 
 - New working local capability: consume a G249/G250 *redacted* one-pair VERSION_REVIEW JSON after explicit read approval; owner separately approves a create-only local decision receipt recording HOLD, PRIMARY or ALTERNATIVE. Receipt carries evidence-byte SHA256 and salted scope SHA, not owner filenames or content. No NAS operation, file mutation, version auto-selection or READY claim.
