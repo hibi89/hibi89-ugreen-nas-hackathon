@@ -23,6 +23,48 @@ function clearCsv() {
 }
 function status(message) { el("notice").textContent = message; }
 function output(data) { el("output").textContent = typeof data === "string" ? data : JSON.stringify(data, null, 2); }
+// G250: only allowlisted evidence fields may leave the browser; no HTTP write.
+function revokeVersionExport() { el("version-export-consent").checked = false; }
+function versionEvidence(x) {
+  if (!x || x.schema !== "flowpilot-owner-local-metadata-session-v1" ||
+      x.selected_intent !== "REVIEW_VERSIONS" ||
+      !["LOCAL_METADATA_FINDINGS_READY","LOCAL_METADATA_BLOCKED"].includes(x.status) ||
+      x.approved_local_metadata_access !== true ||
+      x.file_contents_opened !== false || x.raw_filenames_returned !== false ||
+      x.owner_root_returned !== false || x.nas_verified !== false ||
+      x.registered_expert_invoked !== false || x.release_gate !== "HOLD" ||
+      typeof x.scope_sha256 !== "string" || !/^[0-9a-f]{64}$/.test(x.scope_sha256) ||
+      !Number.isInteger(x.required_count) || x.required_count < 1 || x.required_count > 20 ||
+      !Number.isInteger(x.version_candidate_count) ||
+      x.version_candidate_count < 1 || x.version_candidate_count > 20 ||
+      !Array.isArray(x.typed_review_plan) || x.typed_review_plan.length !== 4 ||
+      x.typed_review_plan[0]?.access !== "READ" ||
+      x.typed_review_plan.slice(1).some(s=>s?.access !== "COMPUTE") ||
+      !Array.isArray(x.inspection_result) || x.inspection_result.length !== x.required_count)
+    throw Error("검증된 로컬 버전 증거만 내보낼 수 있습니다.");
+  const findings=x.inspection_result.map((row,i)=>{
+    if (!row || row.index !== i+1 ||
+        !["PRESENT","MISSING","NOT_CHECKED","VERSION_REVIEW"].includes(row.state))
+      throw Error("버전 증거의 인덱스/상태 검증 실패");
+    return {index:i+1,state:row.state};
+  });
+  return {
+    schema:"flowpilot-local-version-evidence-g249-v1",
+    status:"REDACTED_LOCAL_VERSION_EVIDENCE_NOT_NAS",
+    scope_sha256:x.scope_sha256,
+    required_count:x.required_count,
+    version_candidate_count:x.version_candidate_count,
+    stages:["SCOPED_READ","VERSION_COMPARE","OWNER_REVIEW","REDACTED_EVIDENCE"],
+    findings,
+    manual_owner_review_required:findings.some(row=>row.state==="VERSION_REVIEW"),
+    auto_selected_final_version:false,
+    owner_file_contents_opened:false,
+    original_files_modified:false,
+    owner_paths_included:false,
+    nas_verified:false,
+    release_gate:"HOLD"
+  };
+}
 const adviceFields = [
   ["advice-disk", "disk_used_percent", 100],
   ["advice-errors", "repeated_error_count", 87600],
@@ -64,6 +106,9 @@ function sync() {
       evidence: s === "COMPLETE_LOCAL_SYNTHETIC", report: s === "COMPLETE_LOCAL_SYNTHETIC",
       recover: s === "RUNNING", "meta-approve": review?.status === "WAITING_APPROVAL" && el("metadata-consent").checked,
       "meta-cancel": review?.status === "WAITING_APPROVAL", "meta-status": !!review,
+      "version-export": review?.selected_intent === "REVIEW_VERSIONS" &&
+        ["LOCAL_METADATA_FINDINGS_READY","LOCAL_METADATA_BLOCKED"].includes(review?.status) &&
+        el("version-export-consent").checked,
       "meta-save": workflow?.template === "required_file_metadata_v1" &&
         ["LOCAL_METADATA_FINDINGS_READY", "LOCAL_METADATA_BLOCKED"].includes(review?.status) &&
         el("meta-save-consent").checked,
@@ -122,6 +167,7 @@ function resetWorkflow(result) {
   workflow = result;
   verifiedPlan = null;
   review = null;
+  revokeVersionExport();
   el("metadata-consent").checked = false;
   el("meta-save-consent").checked = false;
   lastLocalReport = null;
@@ -140,7 +186,7 @@ el("connect").addEventListener("click", () => act(async () => {
   // A new login attempt invalidates any previous authority even if input is bad.
   token = ""; workflow = null; verifiedPlan = null; review = null; lastLocalReport = null;
   el("synthetic-consent").checked = false; el("metadata-consent").checked = false; el("meta-save-consent").checked = false;
-  el("required").value = ""; el("version-candidates").value = ""; el("text-workflow").value = ""; clearAdvice(); clearCsv();
+  el("required").value = ""; el("version-candidates").value = ""; el("text-workflow").value = ""; revokeVersionExport(); clearAdvice(); clearCsv();
   el("existing").replaceChildren(new Option("선택 안 함", ""));
   el("connection-status").textContent = "기존 세션 폐기 · 인증 확인 중";
   if (candidate.length < 32 || candidate.length > 256) throw Error("토큰 길이는 32–256자여야 합니다.");
@@ -156,7 +202,7 @@ el("connect").addEventListener("click", () => act(async () => {
 }));
 el("disconnect").addEventListener("click", () => {
   token = ""; workflow = null; verifiedPlan = null; review = null; lastLocalReport = null;
-  el("token").value = ""; el("required").value = ""; el("version-candidates").value = ""; el("text-workflow").value = ""; clearAdvice(); clearCsv();
+  el("token").value = ""; el("required").value = ""; el("version-candidates").value = ""; el("text-workflow").value = ""; revokeVersionExport(); clearAdvice(); clearCsv();
   el("existing").replaceChildren(new Option("선택 안 함", ""));
   el("synthetic-consent").checked = false; el("metadata-consent").checked = false; el("meta-save-consent").checked = false;
   el("connection-status").textContent = "연결 해제 · 토큰 폐기";
@@ -366,6 +412,7 @@ el("meta-preview").addEventListener("click", () => act(async () => {
   review = null;
   el("metadata-consent").checked = false;
   el("meta-save-consent").checked = false;
+  revokeVersionExport();
   const required = raw.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
   if (required.length < 1 || required.length > 20) throw Error("경로 1–20개가 필요합니다.");
   const lines = rawVersions.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
@@ -417,6 +464,7 @@ el("text-preview").addEventListener("click", () => act(async () => {
   lastLocalReport = null;
   el("metadata-consent").checked = false;
   el("meta-save-consent").checked = false;
+  revokeVersionExport();
   if (!workflow || workflow.template !== "required_file_metadata_v1")
     throw Error("먼저 필수 파일 워크플로를 생성하거나 불러오세요.");
   if (!raw || raw.length > 1100) throw Error("다단계 명령 1–1100자가 필요합니다.");
@@ -436,6 +484,7 @@ el("meta-approve").addEventListener("click", () => act(async () => {
   // never receives the reply. Never keep an actionable ticket after dispatch.
   const ticket = review;
   review = null;
+  revokeVersionExport();
   el("metadata-consent").checked = false;
   review = await json("/v1/local-metadata/approve", {
     review_id:ticket.review_id, scope_sha256:ticket.scope_sha256,
@@ -449,6 +498,7 @@ el("meta-cancel").addEventListener("click", () => act(async () => {
   // Revoke the browser's ticket/consent before dispatch, even on HTTP failure.
   const reviewId = review.review_id;
   review = null;
+  revokeVersionExport();
   el("metadata-consent").checked = false;
   el("required").value = "";
   el("version-candidates").value = "";
@@ -462,8 +512,26 @@ el("meta-cancel").addEventListener("click", () => act(async () => {
 }));
 el("meta-status").addEventListener("click", () => act(async () => {
   if (!review) throw Error("검토 세션 없음");
+  revokeVersionExport();
   review = await json("/v1/local-metadata/reviews/" + review.review_id);
   status("저장된 메모리 내 메타데이터 상태 재조회 · 재실행 없음"); output(review);
+}));
+el("version-export").addEventListener("click", () => act(async () => {
+  if (!review || !el("version-export-consent").checked)
+    throw Error("검토 완료 및 별도 저장 동의가 필요합니다.");
+  revokeVersionExport();
+  const proof=versionEvidence(review);
+  const text=JSON.stringify(proof,null,2)+"\n";
+  if (text.length>10000) throw Error("저장할 버전 증거가 너무 큽니다.");
+  const url=URL.createObjectURL(new Blob([text],{type:"application/json;charset=utf-8"}));
+  try {
+    const a=document.createElement("a");
+    a.href=url; a.download="flowpilot-local-version-evidence.json";
+    document.body.append(a); a.click(); a.remove();
+  } finally { setTimeout(()=>URL.revokeObjectURL(url),1000); }
+  status("별도 승인된 버전 JSON 로컬 다운로드 요청 · NAS 미검증");
+  output({status:proof.status,manual_owner_review_required:proof.manual_owner_review_required,
+          original_paths_included:false,external_transfer:false,nas_verified:false});
 }));
 el("meta-save").addEventListener("click", () => act(async () => {
   if (!workflow || workflow.template !== "required_file_metadata_v1" ||
@@ -969,6 +1037,7 @@ el("metadata-goal").addEventListener("change", () => {
   lastLocalReport = null;
   el("metadata-consent").checked = false;
   el("meta-save-consent").checked = false;
+  revokeVersionExport();
   el("required").value = "";
   el("version-candidates").value = "";
   el("text-workflow").value = "";
@@ -977,7 +1046,8 @@ el("metadata-goal").addEventListener("change", () => {
 });
 el("metadata-consent").addEventListener("change", sync);
 el("meta-save-consent").addEventListener("change", sync);
+el("version-export-consent").addEventListener("change", sync);
 el("existing").addEventListener("change", sync);
 el("clear").addEventListener("click", () => { output("화면 로그 초기화"); status("대기"); });
-window.addEventListener("pagehide", () => { token = ""; clearAdvice(); });
+window.addEventListener("pagehide", () => { token = ""; revokeVersionExport(); clearAdvice(); });
 sync();

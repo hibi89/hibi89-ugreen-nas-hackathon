@@ -71,11 +71,11 @@ const ids = ["token","connect","disconnect","clear","connection-status","notice"
   "workflow-id","workflow-state","plan-hash","metadata-summary","goal","existing","create",
   "list","load","plan","guide","test","approve","run","refresh","audit","evidence","report","recover",
   "synthetic-consent","metadata-consent","required","version-candidates","metadata-goal","text-workflow","text-preview","meta-preview","meta-approve",
-  "meta-cancel","meta-status","meta-save","meta-readback","meta-council","meta-report","meta-export","native-handoff","local-council-state","meta-save-consent","advice-disk","advice-errors","advice-backup",
+  "meta-cancel","meta-status","version-export","meta-save","meta-readback","meta-council","meta-report","meta-export","native-handoff","local-council-state","meta-save-consent","version-export-consent","advice-disk","advice-errors","advice-backup",
   "advice-consent","advice-submit","advice-summary","csv-local-path","csv-group-column","csv-preview","csv-run","csv-readback","csv-consent","csv-job-status","csv-export-consent","csv-export","csv-recover-id","csv-recover","csv-intent","csv-intent-apply","csv-report-path","csv-report-consent","csv-verify-path","csv-verify-consent","csv-verify-report","csv-history-consent","csv-history-select","csv-history-list","csv-history-open"];
 const buttonIds = ["connect","disconnect","clear","create","list","load","plan","guide",
   "test","approve","run","refresh","audit","evidence","report","recover","text-preview","meta-preview",
-  "meta-approve","meta-cancel","meta-status","meta-save","meta-readback","meta-council","meta-report","meta-export","native-handoff","advice-submit","csv-preview","csv-run","csv-readback","csv-export","csv-recover","csv-intent-apply","csv-history-list","csv-history-open","csv-verify-report"];
+  "meta-approve","meta-cancel","meta-status","version-export","meta-save","meta-readback","meta-council","meta-report","meta-export","native-handoff","advice-submit","csv-preview","csv-run","csv-readback","csv-export","csv-recover","csv-intent-apply","csv-history-list","csv-history-open","csv-verify-report"];
 class FakeElement {
   constructor(id) {this.id=id;this.value="";this.checked=false;this.disabled=false;
     this.textContent="";this.handlers={};this.options=[];}
@@ -215,6 +215,7 @@ async function main(){
   assert.equal(versionPreview.selected_intent,"REVIEW_VERSIONS");
   assert.equal(versionPreview.typed_review_plan.length,4);
   assert.equal(versionPreview.approved_local_metadata_access,false);
+  assert.equal(elems["version-export"].disabled,true,"no export before read opt-in");
   assert.equal(elems["metadata-consent"].checked,false);
   assert.equal(elems["meta-approve"].disabled,true);
   elems["metadata-consent"].checked=true;elems["metadata-consent"].fire("change");
@@ -224,6 +225,22 @@ async function main(){
   assert.equal(versionResult.selected_intent,"REVIEW_VERSIONS");
   assert.equal(versionResult.nas_verified,false);
   assert.equal(versionResult.file_contents_opened,false);
+  assert.equal(elems["version-export"].disabled,true,"second consent required");
+  elems["version-export-consent"].checked=true;
+  elems["version-export-consent"].fire("change");
+  const createUrlOld=URL.createObjectURL;let versionBlob=null;
+  URL.createObjectURL=function(blob){versionBlob=blob;return createUrlOld.call(URL,blob);};
+  try { await click("version-export"); } finally { URL.createObjectURL=createUrlOld; }
+  const doc=JSON.parse(await versionBlob.text());
+  assert.equal(doc.schema,"flowpilot-local-version-evidence-g249-v1");
+  assert.equal(doc.nas_verified,false);
+  assert.equal(doc.owner_paths_included,false);
+  assert.equal(doc.auto_selected_final_version,false);
+  assert.equal(doc.findings.length,1);
+  assert(!JSON.stringify(doc).includes("README.md"));
+  assert(!JSON.stringify(doc).includes("not-a-version.pdf"));
+  assert.equal(elems["version-export-consent"].checked,false);
+  assert.equal(elems["version-export"].disabled,true,"one opt-in per download");
   assert.equal(elems["metadata-consent"].checked,false);
   elems["metadata-goal"].value="check required files";
   elems["metadata-goal"].fire("change");
@@ -311,7 +328,7 @@ async function main(){
   assert.equal(JSON.parse(elems.output.textContent).nas_verified,false);
   assert.equal(elems["meta-export"].disabled,false);
   await click("meta-export");
-  assert.equal(globalThis.__downloads,2,"one synthetic CSV and one redacted local report");
+  assert.equal(globalThis.__downloads,3,"synthetic CSV, version JSON and local report");
   assert.match(elems["local-council-state"].textContent,/NAS 미검증/);
   // G231 owner-selected candidate exists, exact item does not: review required.
   elems.required.value="README-v1.md";
@@ -421,7 +438,7 @@ async function main(){
     const savedCreate=URL.createObjectURL;
     URL.createObjectURL=function(blob){exportedBlob=blob;return savedCreate.call(URL,blob);};
     try{await click("csv-export");}finally{URL.createObjectURL=savedCreate;}
-    assert.equal(globalThis.__downloads,3,"synthetic CSV + metadata + G240 JSON");
+    assert.equal(globalThis.__downloads,4,"synthetic CSV + version JSON + metadata + G240 JSON");
     assert.equal(elems["csv-export-consent"].checked,false);
     assert.equal(elems["csv-export"].disabled,true);
     const result=JSON.parse(await exportedBlob.text());

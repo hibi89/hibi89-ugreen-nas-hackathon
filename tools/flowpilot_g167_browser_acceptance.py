@@ -181,6 +181,28 @@ def run_browser():
                 assert g248_result["file_contents_opened"] is False
                 assert source_v1.read_bytes()==b"g248 version one synthetic"
                 assert source_v2.read_bytes()==b"g248 version two synthetic"
+                # G250 authentic Chromium download of only the closed-schema review.
+                expect(page.locator("#version-export")).to_be_disabled()
+                page.locator("#version-export-consent").check()
+                with page.expect_download(timeout=8000) as transfer:
+                    page.locator("#version-export").click()
+                version_output=folder/"g250-version-evidence.json"
+                transfer.value.save_as(version_output)
+                raw=version_output.read_text(encoding="utf-8")
+                result=json.loads(raw)
+                assert result["schema"]=="flowpilot-local-version-evidence-g249-v1"
+                assert result["findings"]==[{"index":1,"state":"VERSION_REVIEW"}]
+                assert result["manual_owner_review_required"] is True
+                assert result["auto_selected_final_version"] is False
+                assert result["nas_verified"] is False
+                assert result["release_gate"]=="HOLD"
+                assert str(root) not in raw
+                assert "final_v2.pdf" not in raw
+                assert "release/final.pdf" not in raw
+                assert source_v1.read_bytes()==b"g248 version one synthetic"
+                assert source_v2.read_bytes()==b"g248 version two synthetic"
+                expect(page.locator("#version-export-consent")).not_to_be_checked()
+                expect(page.locator("#version-export")).to_be_disabled()
                 expect(page.locator("#meta-approve")).to_be_disabled()
                 page.locator("#metadata-goal").select_option("check required files")
                 expect(page.locator("#meta-approve")).to_be_disabled()
