@@ -14,6 +14,111 @@ SCRIPT = ROOT / "tools" / "flowpilot_task_compiler.py"
 
 
 class G115CompilerTests(unittest.TestCase):
+    def test_g247_version_review_compiles_four_read_only_nodes(self):
+        for goal in ("버전 비교해줘", "문서 버전 충돌 확인해줘",
+                     "review versions", "compare versions"):
+            with self.subTest(goal=goal):
+                spec=compile_goal(goal)
+                self.assertEqual(spec["template"],"scoped_version_review_v1")
+                self.assertEqual(spec["status"],"READY_FOR_SYNTHETIC_TEST")
+                self.assertEqual(len(spec["steps"]),4)
+                self.assertEqual([s["access"] for s in spec["steps"]],
+                                 ["READ","COMPUTE","COMPUTE","COMPUTE"])
+                self.assertEqual(len(spec["edges"]),3)
+                self.assertFalse(spec["executed"])
+                self.assertFalse(spec["production_approval_granted"])
+        for unsafe in ("review versions and upload files",
+                       "버전 비교해줘 그리고 삭제해줘",
+                       "compare versions; move all",
+                       "review versions\nrm -rf /"):
+            self.assertEqual(compile_goal(unsafe)["status"],
+                             "WAITING_USER_UNSUPPORTED_WORKFLOW")
+
+    def test_g247_version_fixture_competing_files_never_auto_chooses(self):
+        result=run_compiled("review versions")
+        self.assertEqual(result["status"],"SYNTHETIC_LOCAL_REHEARSAL_PASS")
+        self.assertEqual(result["template"],"scoped_version_review_v1")
+        self.assertEqual(result["test_evidence"]["competing_version_states"],
+                         ["VERSION_REVIEW"])
+        self.assertFalse(result["test_evidence"]["owner_selection_automatic"])
+        self.assertTrue(result["test_evidence"]["fixture_originals_preserved"])
+        self.assertFalse(result["owner_files_opened"])
+        self.assertEqual(len(result["test_results"]),6)
+        self.assertIn("--candidate",result["operator_runbook_markdown"])
+        self.assertIn("--approve-local-metadata",
+                      result["operator_runbook_markdown"])
+
+    def test_g247_real_scoped_user_cli_requires_consent_and_redacts(self):
+        from tempfile import TemporaryDirectory
+        from unittest.mock import patch
+        with TemporaryDirectory(prefix="g247-local-") as d:
+            folder=Path(d)
+            (folder/"release").mkdir()
+            original=folder/"release/final.pdf"
+            other=folder/"release/final_v2.pdf"
+            original.write_bytes(b"local disposable v1")
+            other.write_bytes(b"local disposable v2")
+            args=["--goal","review versions","--root",str(folder),
+                  "--required","release/final.pdf",
+                  "--candidate","release/final.pdf=release/final_v2.pdf"]
+            # Denied preview does not stat user-owned folder at all.
+            with patch("flowpilot_owner_local_audit._valid_root",
+                       side_effect=AssertionError("unexpected folder access")):
+                from flowpilot_task_compiler import run_compiled
+                denied=run_compiled(
+                    "review versions",local_root=folder,
+                    required_paths=("release/final.pdf",),
+                    version_candidates={"release/final.pdf":["release/final_v2.pdf"]})
+                self.assertEqual(denied["status"],
+                                 "WAITING_LOCAL_METADATA_APPROVAL")
+                self.assertFalse(denied["local_metadata_inspected"])
+            proc=subprocess.run([sys.executable,str(SCRIPT),*args,
+                                 "--approve-local-metadata"],
+                                capture_output=True,text=True,timeout=20)
+            self.assertEqual(proc.returncode,0,proc.stderr)
+            result=json.loads(proc.stdout)
+            self.assertEqual(result["status"],
+                             "LOCAL_VERSION_REVIEW_REQUIRED_NOT_NAS")
+            self.assertEqual(result["review_indices"],[1])
+            self.assertFalse(result["auto_selected_final_version"])
+            self.assertFalse(result["owner_file_contents_opened"])
+            self.assertTrue(result["local_metadata_inspected"])
+            self.assertEqual(result["item_states"],
+                             [{"index":1,"state":"VERSION_REVIEW"}])
+            self.assertTrue(proc.stdout.isascii())
+            for secret in (str(folder),"release/final.pdf",
+                           "release/final_v2.pdf","local disposable"):
+                self.assertNotIn(secret,proc.stdout)
+            self.assertEqual(original.read_bytes(),b"local disposable v1")
+            self.assertEqual(other.read_bytes(),b"local disposable v2")
+
+    def test_g247_owner_version_rejects_cross_scope_and_path_escape(self):
+        from tempfile import TemporaryDirectory
+        with TemporaryDirectory(prefix="g247-invalid-") as d:
+            root=Path(d)
+            p=root/"file.pdf"
+            p.write_bytes(b"synthetic")
+            command=[sys.executable,str(SCRIPT),"--goal","review versions",
+                     "--root",str(root),"--required","file.pdf",
+                     "--candidate","file.pdf=../out-of-scope.pdf",
+                     "--approve-local-metadata"]
+            proc=subprocess.run(command,capture_output=True,text=True,timeout=15)
+            self.assertEqual(proc.returncode,2)
+            self.assertEqual(json.loads(proc.stdout)["status"],
+                             "LOCAL_VERSION_OR_FIXTURE_REFUSED_NOT_NAS")
+            self.assertNotIn(str(root),proc.stdout)
+            self.assertEqual(p.read_bytes(),b"synthetic")
+
+    def test_g247_nonversion_goal_cannot_leak_into_owner_local_scope(self):
+        from tempfile import TemporaryDirectory
+        with TemporaryDirectory(prefix="g247-goal-") as d:
+            with patch("flowpilot_owner_local_audit._valid_root",
+                       side_effect=AssertionError("unexpected file I/O")):
+                r=run_compiled("check required files",local_root=Path(d),
+                    required_paths=("README.md",),metadata_consent=True)
+            self.assertEqual(r["status"],"WAITING_USER_UNSUPPORTED_WORKFLOW")
+            self.assertFalse(r["executed"])
+
     def test_csv_goal_creates_typed_graph_with_write_boundary(self):
         p = compile_goal("고객별 매출 보고서 만들어줘")
         self.assertEqual(p["status"], "READY_FOR_SYNTHETIC_TEST")

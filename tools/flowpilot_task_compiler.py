@@ -1,4 +1,4 @@
-"""G115: exact-intent task compiler and two disposable fixture rehearsals.
+"""G115/G247: exact-intent compiler, three typed local workflow templates.
 
 NOT a general-purpose NLU model, Uliya SDK, real NAS executor, or scheduler.
 The generated specification is executable only by this allowlisted local test
@@ -13,7 +13,7 @@ from pathlib import Path
 
 from flowpilot_builder_rehearsal import rehearse as csv_rehearsal
 from flowpilot_csv_goal_bridge import SUPPORTED_GOALS
-from flowpilot_owner_local_audit import inspect_owner_folder
+from flowpilot_owner_local_audit import inspect_owner_folder, _versions, OwnerAuditError
 
 SCHEMA = "flowpilot-typed-workflow-v1"
 _CSV_GOALS = frozenset(x.casefold() for x in SUPPORTED_GOALS)
@@ -23,6 +23,18 @@ _FILE_GOALS = frozenset((
     "check required files",
     "check for missing files",
 ))
+_VERSION_GOALS = frozenset((
+    "버전 비교해줘",
+    "문서 버전 충돌 확인해줘",
+    "review versions",
+    "compare versions",
+))
+_VERSION_NODES = (
+    ("inventory", "scoped_file_metadata_lstat", "local_fixture", "READ"),
+    ("compare", "approved_version_candidate_compare", "local_fixture", "COMPUTE"),
+    ("review", "owner_version_resolution_required", "local_fixture", "COMPUTE"),
+    ("evidence", "redacted_version_review_report", "local_fixture", "COMPUTE"),
+)
 _CSV_NODES = (
     ("read", "csv_read", "local_fixture", "READ"),
     ("aggregate", "decimal_group_sum", "local_fixture", "COMPUTE"),
@@ -46,6 +58,8 @@ def compile_goal(goal: str) -> dict:
         template, nodes = "csv_customer_revenue_v1", _CSV_NODES
     elif folded in _FILE_GOALS:
         template, nodes = "required_file_metadata_v1", _FILE_NODES
+    elif folded in _VERSION_GOALS:
+        template, nodes = "scoped_version_review_v1", _VERSION_NODES
     else:
         return _unsupported()
     steps = [
@@ -69,7 +83,8 @@ def compile_goal(goal: str) -> dict:
 def _unsupported() -> dict:
     return {
         "schema": SCHEMA, "status": "WAITING_USER_UNSUPPORTED_WORKFLOW",
-        "supported_templates": ["csv_customer_revenue_v1", "required_file_metadata_v1"],
+        "supported_templates": ["csv_customer_revenue_v1", "required_file_metadata_v1",
+                                "scoped_version_review_v1"],
         "executed": False, "real_nas_capability_verified": False,
         "release_gate": "HOLD",
     }
@@ -143,10 +158,141 @@ def _file_fixture_rehearsal() -> dict:
         }
 
 
-def run_compiled(goal: str) -> dict:
+def _version_fixture_rehearsal() -> dict:
+    """Real lstat over disposable version candidates; NEVER auto-pick latest.
+
+    Existing owner-local metadata reader enforces scoped candidate paths,
+    link/reparse denial, no file-body reads and exact user opt-in.
+    """
+    with tempfile.TemporaryDirectory(prefix="flowpilot-g247-") as tmp:
+        root = Path(tmp)
+        release = root / "release"
+        release.mkdir()
+        original = release / "final.pdf"
+        competitor = release / "final_v2.pdf"
+        original_bytes = b"%PDF-1.4 synthetic original, NOT A REAL CUSTOMER DOC\n"
+        alternate_bytes = b"%PDF-1.4 synthetic competing document, NOT CUSTOMER\n"
+        original.write_bytes(original_bytes)
+        competitor.write_bytes(alternate_bytes)
+        required = ("release/final.pdf",)
+        candidates = {"release/final.pdf": ("release/final_v2.pdf",)}
+        denied = inspect_owner_folder(
+            root, required, version_candidates=candidates,
+            goal="compare versions", metadata_consent=False)
+        if denied["status"] != "WAITING_APPROVAL" or denied["inspected_local_metadata"]:
+            raise AssertionError("Version review touched a local folder without approval")
+        reviewed = inspect_owner_folder(
+            root, required, version_candidates=candidates,
+            goal="compare versions", metadata_consent=True)
+        if (reviewed["status"] != "NEEDS_REVIEW" or
+                reviewed["items"] != [{"index":1, "state":"VERSION_REVIEW",
+                                      "local_reference_count":0}] or
+                not reviewed["inspected_local_metadata"] or
+                reviewed["file_contents_opened"] or reviewed["nas_verified"]):
+            raise AssertionError("Did not detect competing version safely")
+        if original.read_bytes() != original_bytes or competitor.read_bytes() != alternate_bytes:
+            raise AssertionError("Version inspector mutated fixture source")
+        return {
+            "status":"SYNTHETIC_LOCAL_REHEARSAL_PASS",
+            "template":"scoped_version_review_v1",
+            "tests":[{"id":name,"status":"PASS"} for name in (
+                "preview_without_metadata_access",
+                "explicit_owner_scope_and_metadata_consent",
+                "real_local_version_conflict_detected",
+                "competing_versions_never_auto_selected",
+                "file_body_never_opened_by_inspector",
+                "original_and_alternative_files_unchanged",
+            )],
+            "evidence":{
+                "source":"ACTUAL_DISPOSABLE_LOCAL_LSTAT",
+                "competing_version_states":["VERSION_REVIEW"],
+                "owner_selection_automatic":False,
+                "local_os_metadata_inspected":True,
+                "file_contents_opened_by_adapter":False,
+                "fixture_originals_preserved":True,
+                "original_file_names_or_paths_included":False,
+                "real_nas_verified":False,
+            },
+            "operator_runbook_markdown":(
+                "# FlowPilot version review — SCOPED LOCAL ONLY\n\n"
+                "1. Select an exact trusted, non-NAS local folder and one required"
+                " relative path with explicitly named competing candidate paths.\n"
+                "2. Preview a typed plan without opening the folder:\n"
+                "   python tools/flowpilot_task_compiler.py --goal \"review versions\" --compile-only\n"
+                "3. Without consent, the scoped CLI returns WAITING_LOCAL_METADATA_APPROVAL.\n"
+                "4. To inspect ONLY exact named candidates, run:\n"
+                '   python tools/flowpilot_task_compiler.py --goal "review versions"'
+                ' --root "<TRUSTED_LOCAL_FOLDER>" --required release/final.pdf'
+                ' --candidate release/final.pdf=release/final_v2.pdf --approve-local-metadata\n'
+                "5. VERSION_REVIEW means the owner must select which version is final;"
+                " do not infer latest from filename or timestamps.\n"
+                "6. If an input, path, version, permission or actual completeness is"
+                " uncertain, show NOT_CHECKED or BLOCKED; do not promote READY.\n"
+                "7. This local step is NOT registered Uliya Expert or NAS execution;"
+                " no platform permissions have been tested.\n"
+            ),
+        }
+
+
+def _owner_version_review(goal: str, local_root: Path,
+                          required_paths: tuple[str,...],
+                          version_candidates: dict[str,list[str]],
+                          metadata_consent: bool) -> dict:
+    """Actual scoped LOCAL metadata run; all raw file names remain private."""
+    if (not required_paths or not version_candidates
+            or type(metadata_consent) is not bool):
+        raise OwnerAuditError("VERSION_SCOPE_OR_CONSENT_REQUIRED")
+    audited = inspect_owner_folder(
+        local_root, required_paths,
+        version_candidates=version_candidates,
+        goal="compare versions", metadata_consent=metadata_consent)
+    seen = audited["inspected_local_metadata"] is True
+    states = [r["state"] for r in audited["items"]]
+    if not seen:
+        state = "WAITING_LOCAL_METADATA_APPROVAL"
+    elif "VERSION_REVIEW" in states:
+        state = "LOCAL_VERSION_REVIEW_REQUIRED_NOT_NAS"
+    elif "MISSING" in states or "NOT_CHECKED" in states:
+        state = "LOCAL_VERSION_INSPECTION_INCOMPLETE_NOT_NAS"
+    else:
+        state = "LOCAL_NO_COMPETING_VERSION_OBSERVED_NOT_NAS"
+    return {
+        "schema": SCHEMA,
+        "status": state,
+        "template": "scoped_version_review_v1",
+        "local_metadata_inspected": seen,
+        "owner_file_contents_opened": False,
+        "actual_nas_verified": False,
+        "uliya_expert_invoked": False,
+        "external_api_invoked": False,
+        "auto_selected_final_version": False,
+        "source_names_or_paths_included": False,
+        "review_indices": [r["index"] for r in audited["items"]
+                           if r["state"] == "VERSION_REVIEW"],
+        "item_states": [{"index":r["index"], "state":r["state"]}
+                        for r in audited["items"]],
+        "release_gate": "HOLD",
+    }
+
+
+def run_compiled(goal: str, *,
+                 local_root: Path | None = None,
+                 required_paths: tuple[str, ...] = (),
+                 version_candidates: dict[str, list[str]] | None = None,
+                 metadata_consent: bool = False) -> dict:
     spec = compile_goal(goal)
     if spec["status"] != "READY_FOR_SYNTHETIC_TEST":
         return spec
+    if local_root is not None:
+        # Current owner-local mode is intentionally limited to version review.
+        # Never silently execute another template against a selected folder.
+        if spec["template"] != "scoped_version_review_v1":
+            return _unsupported()
+        return _owner_version_review(
+            goal, local_root, required_paths, version_candidates or {},
+            metadata_consent)
+    if required_paths or version_candidates or metadata_consent:
+        return _unsupported()
     if spec["template"] == "csv_customer_revenue_v1":
         receipt = csv_rehearsal(goal)
         if receipt["status"] != "SYNTHETIC_LOCAL_REHEARSAL_PASS":
@@ -158,6 +304,8 @@ def run_compiled(goal: str) -> dict:
             "evidence": receipt["test_evidence"],
             "operator_runbook_markdown": receipt["operator_runbook_markdown"],
         }
+    elif spec["template"] == "scoped_version_review_v1":
+        summary = _version_fixture_rehearsal()
     else:
         summary = _file_fixture_rehearsal()
     return {
@@ -177,14 +325,33 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--goal", required=True)
     parser.add_argument("--compile-only", action="store_true",
                         help="Return typed plan only, without even a temporary fixture")
+    parser.add_argument("--root", type=Path,
+                        help="Trusted local owner-chosen folder, not NAS mount")
+    parser.add_argument("--required", action="append", default=[],
+                        help="Explicit required relative version path, repeatable")
+    parser.add_argument("--candidate", action="append", default=[],
+                        help="Explicit required=candidate version, repeatable")
+    parser.add_argument("--approve-local-metadata", action="store_true",
+                        help="Separate opt-in for scoped local metadata lstat")
     args = parser.parse_args(argv)
     try:
-        result = compile_goal(args.goal) if args.compile_only else run_compiled(args.goal)
+        if args.compile_only:
+            result = compile_goal(args.goal)
+        else:
+            result = run_compiled(
+                args.goal, local_root=args.root,
+                required_paths=tuple(args.required),
+                version_candidates=_versions(args.candidate),
+                metadata_consent=args.approve_local_metadata)
     except (AssertionError, OSError, ValueError, TypeError):
-        print(json.dumps({"status": "SYNTHETIC_REHEARSAL_FAILED", "release_gate": "HOLD"}))
+        print(json.dumps({"status":"LOCAL_VERSION_OR_FIXTURE_REFUSED_NOT_NAS",
+                          "release_gate":"HOLD", "actual_nas_verified":False}))
         return 2
     print(json.dumps(result, ensure_ascii=True, indent=2))
-    return 0 if result["status"] in ("READY_FOR_SYNTHETIC_TEST", "SYNTHETIC_LOCAL_REHEARSAL_PASS") else 1
+    return 0 if result["status"] in (
+        "READY_FOR_SYNTHETIC_TEST","SYNTHETIC_LOCAL_REHEARSAL_PASS",
+        "WAITING_LOCAL_METADATA_APPROVAL","LOCAL_VERSION_REVIEW_REQUIRED_NOT_NAS",
+        "LOCAL_NO_COMPETING_VERSION_OBSERVED_NOT_NAS") else 1
 
 
 if __name__ == "__main__":
