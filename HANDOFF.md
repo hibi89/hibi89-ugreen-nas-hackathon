@@ -1,3 +1,16 @@
+## 2026-11-05 KST — G273 PRIVATE SKILL INTEGRATION HANDOFF; complete product 73/100 unchanged / HOLD
+
+1. Goal/requirements: UGREEN FlowPilot 3.0 genuine supported read-only NAS workflow Skill with G269 council/typed DAG/consent/duplicate budgets, and separate G272 Codex-authored evidence lessons. Round1 cutoff Nov 16 16:45 KST; no unapproved NAS, Provider API, owner content, paid service, upload or Devpost.
+2. Work: New separate 5-Markdown G273 ZIP, SHA256 `49bb0a5a865879ef849f0d6b3c151f974afd122d1552e4b5d99951a6967bcd40`, 18,383 bytes. G269 three original references 3/3 byte-identical, core council and hash constraints unchanged; added stricter evidence/status, initial depth5/limit200, one document/operation consent. Original G269/G272 ZIPs preserved, NOT pushed publicly.
+3. Tests: actual pinned official Kit first-party Checker **2/2 exit0 static-pass 0E/0W/0I**, pure-Python merge tests **9/9 PASS**, ZIP SHA, CRC, manifest, path and size checks. These are offline only, not NAS/registered agent proofs; new GitHub documentation CI must be checked on final SHA.
+4. Stage: **73/100 unchanged** (local 60, official 13, NAS 0, final 0); 27 still require owner rights 2, real registered NAS 20, release/Devpost 5. RELEASE HOLD/NAS NO-GO/NOT_SUBMITTED, no production target.
+5. Error/rollback: G272 original raw failed official Checker (7E/3W), separate repaired G272 passed. Its broader scan options and weaker version review rule were not imported. A merger layout negative test found fail-closed validation defect and was fixed before 9/9 final PASS. Do not overwrite G269 or double count existing authoring/static points.
+6. Repo/branch: `hibi89/hibi89-ugreen-nas-hackathon@lead/ugreen`. Pre-G273 SHA `de3238a209f9b98ac12bb3ae40585be34e73bd48`. New public record `docs/operations/G273_FEATURE_PRESERVING_INTEGRATION_20261105.md`, `STATUS.md`, `HANDOFF.md`; report exact committed SHA after verifying. Original code G265 untouched.
+7. Execution: private ChatGPT local Python 3.11+ / Node22 checker, Uliya Kit 0.7.3; Vercel N/A. Registered Expert, NAS and Devpost NOT_RUN.
+8. Originals/private handling: pinned G269, G272, official Kit and G270 PDF untouched; owner-private G273 ZIP/private receipt available only as conversation outputs, not GitHub; no credential/data transfer or public ZIP. Git parent is rollback for docs.
+9. Next: verify doc SHA/CI, owner reviews private G273 vs G269 before a license/rights decision, separately authorize supported native NAS if appropriate, and explicitly approve exact Round1 PDF+ZIP before Devpost. Do not begin 3-hour NAS trial or external upload from this record.
+10. KST: 2026-11-05. Scope: source hashes, offline test/checker, source preservation; **no runtime/rights/release evidence**, so +1%p target not met this turn. See [detailed G273 report](docs/operations/G273_FEATURE_PRESERVING_INTEGRATION_20261105.md).
+
 ## 2026-11-05 KST — G272 CODEx CREATOR HANDOFF, new chat jump point; internal full product 73/100, HOLD
 
 1. **Goal/stack/requirements:** FlowPilot 3.0 UGREEN NAS delivery readiness Skill, official Uliya Kit 0.7.3, compliant Markdown only; existing G269 robust owner-review candidate and Nov 16 16:45 KST Round1 PDF/ZIP. Only owner-approved scope, no unapproved live NAS/API/cloud/Devpost.
