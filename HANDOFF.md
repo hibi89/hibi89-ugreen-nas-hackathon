@@ -1,3 +1,15 @@
+## 2026-11-05 KST — G251 full-product work handoff (GitHub CI queued)
+
+1. Goal/tech: Finish G247 typed version workflow's real manual owner-review step using G249/G250 privacy-redacted JSON and Python 3.11 local CLI, one required and one alternative only.
+2. Changes/design: Selected explicit manual HOLD/PRIMARY/ALTERNATIVE evidence-bound local decision instead of mutating or choosing NAS files. Separate read approval and create-only output approval; no source reads or automatic READY.
+3. Tests: Locally executed Linux 13 PASS/0 FAIL/0 SKIP, twice; fixed source Git blob 9e8430c7fb683ec7d4efcd858c9f23e8eb2d2c1d and tests blob 6394b533023dc4a87cb431b2dfd8ec31e6264a04 exact-match GitHub. GitHub CI run 41864970832 QUEUED, Windows unverified, actual NAS/Expert/Creator/Checker NOT_RUN.
+4. State: G251 code DONE/local verified, integrated CI PENDING, last fully accepted whole-product score 58/100. G249/G250 other acceptance points pending. RELEASE HOLD/NAS NO-GO.
+5. Failures/rollback: Windows O_NOFOLLOW may be absent; added lstat symlink/reparse and open-file identity comparison in 025e5bdf, locally retested. Non-atomic race under adversarial mutation remains. Normal Git revert from feature parent fcc6ece54c4ff1b0cf3ea7de6e88a80f5b432e83, no force push or unauthorised file action.
+6. Repo/branch/SHA/paths: hibi89/hibi89-ugreen-nas-hackathon lead/ugreen. G251 initial d34728b4, fixed 025e5bdf. New tools/flowpilot_g251_owner_decision.py, tests/test_flowpilot_g251_owner_decision.py, docs/operations/G251_LOCAL_OWNER_VERSION_DECISION.md. Verify documentation commit separately.
+7. Production/commands: Python 3.11 CLI with --evidence ABS_JSON, --approve-read-evidence, --owner-choice hold|primary|alternative, --output NEW_JSON, --approve-save-decision. No production URL, Vercel N/A, no paid API.
+8. Source/security: Original Uliya official SKILL/kit, G103/G223 owner ZIP/PDF, source files, local SQLite and private credentials unchanged. Owner Library Kit SHA256 cf557e5a...70e1b3 verified offline only, no vendor execution. No customer data in GitHub.
+9. Next action: Check exact G249 workflow 41861510935 final conclusion, G250 functional 41863464658 + Chrome 41863464691, G251 functional 41864970832. Credit each independently only on proper CI SUCCESS, then pursue first-party Creator/Checker + registered Expert effective rights with owner approval.
+10. KST/provenance: 2026-11-05, exact local tests and Git blobs verified, GitHub workflow queued/in-progress not claimed success. All release gates remain HOLD.
 ## 2026-11-05 KST — G250 HANDOFF: authenticated browser version evidence download (CI queued)
 
 1. **Goal/technology:** entire FlowPilot 3.0 operator usable product, not a scoring-only demonstration; G248 exact Korean/English version intent and G165 MetadataGate, G249 redacted JSON contract, existing G166 authenticated browser with one-use consent.
