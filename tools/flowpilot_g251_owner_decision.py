@@ -61,11 +61,23 @@ def _reject_nonfinite(value):
 
 def _read_redacted_evidence(path: Path) -> tuple[dict[str,Any], str]:
     _private_path(path)
+    # O_NOFOLLOW is not universally supported (notably Windows). Explicitly
+    # reject a stable symlink/reparse file and compare identity after open;
+    # no claim of atomic safety under a hostile concurrently mutable tree.
+    try:
+        before = path.lstat()
+    except (OSError, ValueError) as exc:
+        raise OwnerDecisionRefused("EVIDENCE_METADATA_REFUSED") from exc
+    if (not stat.S_ISREG(before.st_mode) or stat.S_ISLNK(before.st_mode)
+            or bool(getattr(before, "st_file_attributes", 0) & 0x400)):
+        raise OwnerDecisionRefused("EVIDENCE_LINK_OR_NONFILE_REFUSED")
     flags = os.O_RDONLY | getattr(os, "O_BINARY", 0) | getattr(os, "O_NOFOLLOW", 0)
     try:
         fd = os.open(path, flags)
         with os.fdopen(fd, "rb") as source:
             info = os.fstat(source.fileno())
+            if (info.st_dev != before.st_dev or info.st_ino != before.st_ino):
+                raise OwnerDecisionRefused("EVIDENCE_REPLACED_DURING_READ")
             if (not stat.S_ISREG(info.st_mode) or
                     bool(getattr(info, "st_file_attributes", 0) & 0x400) or
                     info.st_size > READ_LIMIT):
