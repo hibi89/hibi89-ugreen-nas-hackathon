@@ -7,7 +7,7 @@ import zipfile
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "tools"))
 from flowpilot_g263_rights_boundary import (
-    RightsBoundaryRefused, _markdown_zip, ENTRY_SHA, audit_original,
+    RightsBoundaryRefused, _markdown_zip, ENTRY_SHA, OFFICIAL_SOURCE_PAGES, audit_original,
 )
 
 
@@ -57,6 +57,12 @@ class G263RightsTests(unittest.TestCase):
     def test_reject_nonbytes(self):
         with self.assertRaises(RightsBoundaryRefused):
             _markdown_zip("not bytes", exact_manifest=False)
+    def test_source_list_tracks_actual_skillhub_and_uliya_terms(self):
+        self.assertEqual(len(OFFICIAL_SOURCE_PAGES), len(set(OFFICIAL_SOURCE_PAGES)))
+        self.assertTrue(any("skillhub-publish-audit-spec" in s for s in OFFICIAL_SOURCE_PAGES))
+        self.assertTrue(any("skillhub-user-agreement" in s for s in OFFICIAL_SOURCE_PAGES))
+        self.assertIn("https://ai.ugreen.com/pages/uliya-user-agreement", OFFICIAL_SOURCE_PAGES)
+        self.assertNotIn("https://ai.ugreen.com/pages/useragreement", OFFICIAL_SOURCE_PAGES)
 
 if __name__ == "__main__":
     unittest.main()
