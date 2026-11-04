@@ -1,3 +1,10 @@
+## 2026-11-05 KST — G250 VERIFIED: fixed whole-product score 60 → 61 / 100
+
+- **Exact G250 source SHA `c88f7aeaf17378bb5e364bb0c4f220f969a33add`: 4/4 final GitHub Actions SUCCESS**: Linux/Windows functional 41863464658, real Chromium localhost 41863464691, master 41863464454, closeout 41863464628. Linux 1594 PASS/0 FAIL/16 SKIP (1610 total); Windows PowerShell full PASS; Chromium local-only acceptance job PASS with actually consented JSON download from authorized version review. No NAS/Expert performed.
+- Distinct fixed whole-product **Supported NL intent → inspectable local design** criterion **8→9/10**: operator selects English/Korean REVIEW_VERSIONS, sees typed scope/hash plan, authorizes one local metadata read and separately consents to *download* a code-owned G249-compatible privacy-redacted JSON report; auto-final version never selected. This is not a repeat of G248 preview, G249 Python CLI export or G251 separate manual owner decision.
+- Previously G251 accepted fixed Typed DAG/owner decision 9→10 (59→60). G250 now raises **fully accepted 60→61/100 (39 remaining)**. G252 separate decision SHA binding security criterion remains **unaccepted pending exact readiness 41867688507**, even though its functional regression was SUCCESS. These are internal planning milestones, NOT certified actual NAS functional completeness.
+- RELEASE HOLD / NAS NO-GO: original Skill/official Kit/owner sources preserved; first-party current Creator/Checker, registered Expert rights, live NAS, 3-hour trial and Devpost NOT_RUN. No Vercel Production (N/A).
+
 ## 2026-11-05 KST — G251 VERIFIED: whole-product internal score 59 → 60 / 100
 
 - **G251 exact corrected code SHA** `025e5bdf898fc8e5d0602803c522af31c699b259` has **3/3 final GitHub Actions SUCCESS**: Linux/Windows functional [41864970832](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/41864970832), master 41864970728, closeout 41864970918. Linux **1607 PASS / 0 FAIL / 16 SKIP** (1623 tests total); Windows `UGREEN LOCAL VERIFY: PASS [full]`, both jobs finished SUCCESS. The previous inconsistent queued job metadata was refreshed before acceptance.
