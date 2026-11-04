@@ -9,6 +9,7 @@ on:
       - "tools/flowpilot_local_backend.py"
       - "tools/flowpilot_g238_local_csv_engine.py"
       - "tools/flowpilot_g239_csv_jobs.py"
+      - "tools/flowpilot_g245_report_verify.py"
       - "tests/g166_browser_client_smoke.cjs"
       - "tests/test_flowpilot_g239_csv_jobs.py"
   workflow_dispatch:
