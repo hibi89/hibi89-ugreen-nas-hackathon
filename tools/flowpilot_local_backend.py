@@ -884,9 +884,11 @@ def create_server(backend: Backend, token: str, *, port: int=0):
                     if type(body) is not dict:
                         self.send(400,{"error":"JSON_OBJECT_REQUIRED"});return
                     if path=="/v1/local-csv/preview":
-                        if set(body)!={"input_path","group_column"}:
+                        if set(body) not in ({"input_path","group_column"},
+                                             {"input_path","group_column","export_to"}):
                             raise BackendRefused("UNEXPECTED_KEYS",400)
-                        data=backend.csv_jobs.preview(body["input_path"],body["group_column"])
+                        data=backend.csv_jobs.preview(body["input_path"],body["group_column"],
+                                                      export_to=body.get("export_to"))
                     elif path=="/v1/local-csv/verify-report":
                         if set(body)!={"request_id","report_path","acknowledgement"}:
                             raise BackendRefused("UNEXPECTED_KEYS",400)

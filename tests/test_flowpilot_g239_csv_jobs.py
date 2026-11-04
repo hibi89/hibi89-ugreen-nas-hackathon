@@ -52,9 +52,11 @@ class G239CsvGatewayTests(unittest.TestCase):
         finally:
             conn.close()
 
-    def preview(self):
-        code,data=self.call("/v1/local-csv/preview",
-                            {"input_path":str(self.csv),"group_column":"customer"})
+    def preview(self,report_path=None):
+        body={"input_path":str(self.csv),"group_column":"customer"}
+        if report_path is not None:
+            body["export_to"]=str(report_path)
+        code,data=self.call("/v1/local-csv/preview",body)
         self.assertEqual(code,200,data)
         self.assertEqual(data["status"],"WAITING_EXPLICIT_LOCAL_CSV_JOB_APPROVAL")
         return data
@@ -71,8 +73,9 @@ class G239CsvGatewayTests(unittest.TestCase):
             "request_id":job,"report_path":str(path),"acknowledgement":approval})
 
     def g245_create(self,job):
-        preview=self.preview()
         target=self.root/("report-"+job[-6:]+".csv")
+        preview=self.preview(target)
+        self.assertTrue(preview["create_only_report_planned"])
         result=self.call("/v1/local-csv/run", {
             "preview_id":preview["preview_id"],"request_id":job,
             "plan_sha256":preview["plan_sha256"],"acknowledgement":READ_ACK,
@@ -146,9 +149,77 @@ class G239CsvGatewayTests(unittest.TestCase):
         self.assertEqual(status,409)
         self.assertNotIn(str(link),json.dumps(data))
 
-    def test_g244_owner_approved_create_only_full_report(self):
+    def test_g246_unreviewed_changed_write_target_refused_before_any_read(self):
+        reviewed=self.root/"reviewed-target.csv"
+        changed=self.root/"substituted-target.csv"
+        plan=self.preview(reviewed)
+        self.assertFalse(self.sidecar.exists())
+        self.assertFalse(reviewed.exists())
+        self.assertFalse(changed.exists())
+        self.assertEqual(len(plan["report_destination_sha256"]),64)
+        self.assertNotIn(str(reviewed),json.dumps(plan))
+        body={"preview_id":plan["preview_id"],"request_id":"csv_"+"6"*24,
+              "plan_sha256":plan["plan_sha256"],"acknowledgement":READ_ACK,
+              "export_to":str(changed),
+              "export_approval":"APPROVE_LOCAL_REPORT_CREATE"}
+        with patch("flowpilot_g239_csv_jobs.execute",
+                   side_effect=AssertionError("unreviewed destination must not execute")), \
+             patch("flowpilot_g239_csv_jobs.LocalCsvJobs._initialize_only_on_approval",
+                   side_effect=AssertionError("unreviewed destination must not create DB")):
+            status,out=self.call("/v1/local-csv/run",body)
+            self.assertEqual(status,403,out)
+            self.assertNotIn(str(changed),json.dumps(out))
+            # Changed scope revokes this preview ID; even the original target
+            # cannot later reuse it without a fresh preview/consent.
+            self.assertEqual(self.call("/v1/local-csv/run",
+                             {**body,"export_to":str(reviewed)})[0],403)
+        self.assertFalse(self.sidecar.exists())
+        self.assertFalse(reviewed.exists())
+        self.assertFalse(changed.exists())
+
+    def test_g246_preview_without_output_can_never_gain_write_authority(self):
         plan=self.preview()
+        dest=self.root/"not-previewed.csv"
+        self.assertIsNone(plan["report_destination_sha256"])
+        self.assertFalse(plan["create_only_report_planned"])
+        body={"preview_id":plan["preview_id"],"request_id":"csv_"+"6"*24,
+              "plan_sha256":plan["plan_sha256"],"acknowledgement":READ_ACK,
+              "export_to":str(dest),
+              "export_approval":"APPROVE_LOCAL_REPORT_CREATE"}
+        with patch("flowpilot_g239_csv_jobs.execute",
+                   side_effect=AssertionError("unreviewed new write")):
+            self.assertEqual(self.call("/v1/local-csv/run",body)[0],403)
+        self.assertFalse(self.sidecar.exists())
+        self.assertFalse(dest.exists())
+
+    def test_g246_previewed_write_cannot_run_without_exact_output_destination(self):
+        planned=self.root/"approved-write.csv"
+        plan=self.preview(planned)
+        self.assertTrue(plan["create_only_report_planned"])
+        with patch("flowpilot_g239_csv_jobs.execute",
+                   side_effect=AssertionError("missing consent must not execute")):
+            status,out=self.run_once(plan,"csv_"+"6"*24)
+        self.assertEqual(status,403,out)
+        self.assertFalse(self.sidecar.exists())
+        self.assertFalse(planned.exists())
+
+    def test_g246_invalid_preview_output_is_denied_without_touch(self):
+        for target in ("relative.csv","../escape.csv",
+                       str(self.root/"not-a-csv.txt"),""):
+            status,body=self.call("/v1/local-csv/preview",{
+                "input_path":str(self.csv),"group_column":"customer",
+                "export_to":target})
+            self.assertEqual(status,403,body)
+            self.assertFalse(self.sidecar.exists())
+        self.assertEqual(self.csv.read_bytes(),CSV)
+
+    def test_g244_owner_approved_create_only_full_report(self):
         target=self.root/"new-aggregate.csv"
+        plan=self.preview(target)
+        self.assertEqual(plan["report_destination_sha256"],
+                         self.backend.csv_jobs._report_destination_scope(str(target)))
+        self.assertFalse(plan["report_path_in_response"])
+        self.assertNotIn(str(target),json.dumps(plan))
         body={"preview_id":plan["preview_id"],"request_id":"csv_"+"9"*24,
               "plan_sha256":plan["plan_sha256"],"acknowledgement":READ_ACK,
               "export_to":str(target),
@@ -196,9 +267,9 @@ class G239CsvGatewayTests(unittest.TestCase):
         self.assertFalse(self.sidecar.exists())
 
     def test_g244_existing_destination_is_never_overwritten(self):
-        p=self.preview()
         target=self.root/"existing-report.csv"
         target.write_bytes(b"preserve bytes")
+        p=self.preview(target)
         body={"preview_id":p["preview_id"],"request_id":"csv_"+"7"*24,
               "plan_sha256":p["plan_sha256"],"acknowledgement":READ_ACK,
               "export_to":str(target),

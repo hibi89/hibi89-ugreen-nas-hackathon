@@ -53,7 +53,7 @@ class LocalCsvJobs:
         # The G161 database itself is NEVER migrated by G239.
         self.path = original_db.with_name(original_db.stem + "-csv-g239.sqlite")
         self.lock = threading.RLock()
-        self.tickets: dict[str, tuple[str, str, str, float]] = {}
+        self.tickets: dict[str, tuple[str, str, str, float, str | None]] = {}
 
     def _guard(self, *, required: bool) -> None:
         path = self.path
@@ -117,9 +117,25 @@ class LocalCsvJobs:
         except sqlite3.Error as exc:
             raise CsvJobRefused("G239_SIDECAR_INITIALIZATION_REFUSED") from exc
 
-    def preview(self, input_path: str, group_column: str) -> dict:
+    @staticmethod
+    def _report_destination_scope(destination: str) -> str:
+        # G246: bind the EXACT intended output to a preview ticket, never
+        # open/stat/store/echo the location or require a paid/cloud provider.
+        if (type(destination) is not str or not 0 < len(destination) <= 1024
+                or "\x00" in destination):
+            raise CsvJobRefused("G246_ABSOLUTE_REPORT_SCOPE_REQUIRED", 403)
+        target = Path(destination)
+        if (not target.is_absolute() or ".." in target.parts or
+                target.suffix.lower() != ".csv" or not target.name):
+            raise CsvJobRefused("G246_ABSOLUTE_REPORT_SCOPE_REQUIRED", 403)
+        return hashlib.sha256(os.fsencode(destination)).hexdigest()
+
+    def preview(self, input_path: str, group_column: str,
+                export_to: str | None = None) -> dict:
         # G238 preview never even stats the operator-selected input.
         contract = preview(input_path, group_column)
+        report_scope = (self._report_destination_scope(export_to)
+                        if export_to is not None else None)
         with self.lock:
             now = time.monotonic()
             self.tickets = {
@@ -131,10 +147,13 @@ class LocalCsvJobs:
             ticket = "cpre_" + secrets.token_hex(16)
             self.tickets[ticket] = (
                 input_path, group_column, contract["plan_sha256"],
-                now + TTL_SECONDS,
+                now + TTL_SECONDS, report_scope,
             )
         return {
             **contract, "preview_id": ticket,
+            "report_destination_sha256": report_scope,
+            "create_only_report_planned": report_scope is not None,
+            "report_path_in_response": False,
             "status": "WAITING_EXPLICIT_LOCAL_CSV_JOB_APPROVAL",
             "read_consent_includes_redacted_local_receipt": True,
             "raw_input_path_in_response": False,
@@ -283,9 +302,16 @@ class LocalCsvJobs:
             if (ticket is None or ticket[3] <= time.monotonic()
                     or ticket[2] != plan_sha256):
                 raise CsvJobRefused("G239_STALE_OR_MISMATCHED_TICKET", 403)
+            actual_scope = (self._report_destination_scope(export_to)
+                            if export_to is not None else None)
+            if len(ticket) != 5 or ticket[4] != actual_scope:
+                # An unreviewed destination must never be used to read/write.
+                # Re-preview is mandatory; do not silently retain old consent.
+                del self.tickets[preview_id]
+                raise CsvJobRefused("G246_REPORT_DESTINATION_CHANGED_REPREVIEW", 403)
             # One use, even if the subsequent I/O returns an uncertain result.
             del self.tickets[preview_id]
-            source, group, _, _ = ticket
+            source, group, _, _, _ = ticket
             self._initialize_only_on_approval()
             with closing(self._connect()) as db:
                 db.execute("BEGIN IMMEDIATE")
