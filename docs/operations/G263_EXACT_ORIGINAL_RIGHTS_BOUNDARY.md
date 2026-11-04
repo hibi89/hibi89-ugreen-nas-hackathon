@@ -1,3 +1,17 @@
+## G264 official SkillHub policy correction (2026-11-05 KST)
+
+The G263 general UGREEN NAS User Agreement was **not** the directly relevant SkillHub publishing contract. The official hackathon Starter Kit links to the current `SkillHub User Agreement` and `UGREEN SkillHub Content Submission and Publication Standards`; separate Uliya runtime terms also apply. Source:
+- https://ai.ugreen.com/pages/hackathon-starter-kit
+- https://api.ugnas.com/api/system/v1/ua/agreement/page?acceptLanguage=en-US&agreementCode=skillhub-user-agreement
+- https://api.ugnas.com/api/system/v1/ua/agreement/page?acceptLanguage=en-US&agreementCode=skillhub-publish-audit-spec
+- https://ai.ugreen.com/pages/uliya-user-agreement
+
+Official first-party terms allow independently owned developer Skill content subject to third-party rights, require an appropriate license label and a license grant to the platform on upload, and expressly state a unilateral ownership declaration does NOT itself prove ownership. The first-party static Checker cannot replace rights evidence. A supported Creator execution is still unproven. No upload or publisher license was granted.
+
+G264 corrects `OFFICIAL_SOURCE_PAGES` in `tools/flowpilot_g263_rights_boundary.py`, adds explicit output flags `skillhub_publisher_rights_attestation_verified=false`, `skillhub_compatible_license_choice_verified=false` and `platform_static_checker_is_license_clearance=false`, and adds a source-list regression test. Original G226+first-party Kit offline CLI pass; local Python 3.13 unit **11 PASS / 0 FAIL**, full Linux/Windows GitHub Actions for exact new source not verified. Source Git blob `2833c53926ffe51f1b5eeb3bc9609792a7540167`, test Git blob `1dac5216b30afd0ce3fd20eb7a82263c907cd810`; owner-private evidence SHA256 `b78397ae1e0341c89224910ae9e5895c6810a86c142bbb2fa77fa45ccff513cc`, not uploaded to public repo.
+
+**No full-product point earned yet:** official 10/15, full product 70/100; Creator/rights 5, registered native/NAS 20, final release 5 remain. Release HOLD, NAS NO-GO. This corrigendum supersedes the G263 source list/assumed applicable agreement but does not alter its original-source acceptance caveats.
+
 # G263 — original G226 Markdown provenance and limited rights boundary
 Date: 2026-11-05 KST. No official Creator or NAS run. Release HOLD.
 
