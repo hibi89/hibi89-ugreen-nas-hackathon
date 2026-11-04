@@ -35,6 +35,9 @@
 <option value="review versions">버전 비교 (English)</option>
 <option value="버전 비교해줘">버전 비교 (한국어)</option>
 </select>
+<label for="version-intent">G254 · 한 줄로 버전 비교 범위 지정 (한글·영어, 읽기 전)</label>
+<div class="line"><input id="version-intent" type="text" maxlength="300" autocomplete="off" spellcheck="false" placeholder="버전 비교: release/final.pdf =&gt; release/final_v2.pdf"><button id="version-intent-apply" type="button" class="quiet">버전 비교 범위 채우기</button></div>
+<p>지원: <code>버전 비교: 파일 =&gt; 후보</code> 또는 <code>compare versions: file =&gt; candidate</code>. 상대 경로만 변환하며 미리보기·1회 읽기·증거 저장에 각각 별도 승인 필요. 자동 최종본 선택·NAS 호출 없음.</p>
 <p>버전 비교는 아래 필수 경로와 명시적 후보 관계가 있어야 계획을 생성할 수 있습니다. 미리보기에서는 파일을 읽지 않으며, 승인 후에도 자동으로 최종본을 선택하지 않습니다. NAS와 공식 Expert를 실행하지 않습니다.</p>
 <label for="required">필수 상대 경로 (한 줄당 하나, 1–20개)</label><textarea id="required" rows="3" spellcheck="false" placeholder="README.md&#10;release/final.pdf"></textarea>
 <label for="version-candidates">선택적 버전 후보 관계 (필수경로=후보경로, 줄당 하나, 전체 최대 20개)</label>

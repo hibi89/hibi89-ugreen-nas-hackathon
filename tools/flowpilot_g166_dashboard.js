@@ -120,6 +120,7 @@ function sync() {
       "meta-export": !!lastLocalReport && workflow?.template === "required_file_metadata_v1",
       "csv-preview": true,
       "csv-intent-apply": true,
+      "version-intent-apply": true,
       "csv-run": !!csvTicket && el("csv-consent").checked &&
         csvBoundReportPath !== null &&
         el("csv-report-path").value === csvBoundReportPath &&
@@ -186,7 +187,7 @@ el("connect").addEventListener("click", () => act(async () => {
   // A new login attempt invalidates any previous authority even if input is bad.
   token = ""; workflow = null; verifiedPlan = null; review = null; lastLocalReport = null;
   el("synthetic-consent").checked = false; el("metadata-consent").checked = false; el("meta-save-consent").checked = false;
-  el("required").value = ""; el("version-candidates").value = ""; el("text-workflow").value = ""; revokeVersionExport(); clearAdvice(); clearCsv();
+  el("required").value = ""; el("version-candidates").value = ""; el("text-workflow").value = ""; el("version-intent").value = ""; revokeVersionExport(); clearAdvice(); clearCsv();
   el("existing").replaceChildren(new Option("선택 안 함", ""));
   el("connection-status").textContent = "기존 세션 폐기 · 인증 확인 중";
   if (candidate.length < 32 || candidate.length > 256) throw Error("토큰 길이는 32–256자여야 합니다.");
@@ -202,7 +203,7 @@ el("connect").addEventListener("click", () => act(async () => {
 }));
 el("disconnect").addEventListener("click", () => {
   token = ""; workflow = null; verifiedPlan = null; review = null; lastLocalReport = null;
-  el("token").value = ""; el("required").value = ""; el("version-candidates").value = ""; el("text-workflow").value = ""; revokeVersionExport(); clearAdvice(); clearCsv();
+  el("token").value = ""; el("required").value = ""; el("version-candidates").value = ""; el("text-workflow").value = ""; el("version-intent").value = ""; revokeVersionExport(); clearAdvice(); clearCsv();
   el("existing").replaceChildren(new Option("선택 안 함", ""));
   el("synthetic-consent").checked = false; el("metadata-consent").checked = false; el("meta-save-consent").checked = false;
   el("connection-status").textContent = "연결 해제 · 토큰 폐기";
@@ -399,12 +400,46 @@ el("report").addEventListener("click", () => act(async () => {
   status("합성 CSV SHA-256 검증 및 다운로드 요청 완료");
   output({status:"LOCAL_SYNTHETIC_CSV_SHA_VERIFIED", sha256:computed, byte_length:bytes.byteLength, real_nas_verified:false});
 }));
+// G254: local allowlisted text mapping; never reads source or contacts server.
+el("version-intent-apply").addEventListener("click", () => act(async () => {
+  const raw = el("version-intent").value;
+  el("version-intent").value = "";
+  // Even invalid text revokes previous browser review and approvals.
+  review = null; lastLocalReport = null;
+  el("metadata-consent").checked = false;
+  el("meta-save-consent").checked = false;
+  revokeVersionExport();
+  el("required").value = "";
+  el("version-candidates").value = "";
+  el("text-workflow").value = "";
+  const matched = typeof raw === "string" && raw.length <= 300 ?
+    /^(버전 비교|compare versions)\s*:\s*(\S+)\s*=>\s*(\S+)$/i.exec(raw.trim()) : null;
+  if (!matched) throw Error("지원된 단일 버전 비교 문법이 아닙니다.");
+  const required = matched[2], candidate = matched[3];
+  const safe = value => value.length <= 120 &&
+    /^[A-Za-z0-9._-]+(?:\/[A-Za-z0-9._-]+){0,5}$/.test(value) &&
+    value.split("/").every(part => part !== "." && part !== ".." &&
+      !part.startsWith(".") && !part.endsWith("."));
+  if (!safe(required) || !safe(candidate) || required === candidate)
+    throw Error("허용되지 않은 상대 파일 범위입니다.");
+  el("metadata-goal").value = matched[1] === "버전 비교" ?
+    "버전 비교해줘" : "review versions";
+  el("required").value = required;
+  el("version-candidates").value = required + "=" + candidate;
+  status("버전 비교 범위 구조화 · 파일 미조회 · 별도 계획 미리보기 필요");
+  output({schema:"flowpilot-g254-scoped-version-intent-v1",
+    status:"LOCAL_TYPED_VERSION_SCOPE_NO_READ", selected_intent:"REVIEW_VERSIONS",
+    required_count:1, version_candidate_count:1, local_metadata_read:false,
+    requires_separate_preview:true, requires_explicit_read_approval:true,
+    auto_selected_final_version:false, nas_verified:false, release_gate:"HOLD"});
+}));
 el("meta-preview").addEventListener("click", () => act(async () => {
   // Starting a NEW review must revoke old consent/review even when the new
   // input is invalid or the HTTP preview is refused. Clear raw paths first.
   const raw = el("required").value;
   const rawVersions = el("version-candidates").value;
   const versionGoal = el("metadata-goal").value;
+  el("version-intent").value = "";
   el("required").value = "";
   el("version-candidates").value = "";
   el("text-workflow").value = "";
@@ -457,6 +492,7 @@ el("meta-preview").addEventListener("click", () => act(async () => {
 }));
 el("text-preview").addEventListener("click", () => act(async () => {
   const raw = el("text-workflow").value;
+  el("version-intent").value = "";
   el("text-workflow").value = "";
   el("required").value = "";
   el("version-candidates").value = "";
@@ -1041,6 +1077,7 @@ el("metadata-goal").addEventListener("change", () => {
   el("required").value = "";
   el("version-candidates").value = "";
   el("text-workflow").value = "";
+  el("version-intent").value = "";
   status("점검 의도 변경 · 기존 미리보기 및 읽기 승인 폐기");
   sync();
 });
@@ -1049,5 +1086,5 @@ el("meta-save-consent").addEventListener("change", sync);
 el("version-export-consent").addEventListener("change", sync);
 el("existing").addEventListener("change", sync);
 el("clear").addEventListener("click", () => { output("화면 로그 초기화"); status("대기"); });
-window.addEventListener("pagehide", () => { token = ""; revokeVersionExport(); clearAdvice(); });
+window.addEventListener("pagehide", () => { token = ""; el("version-intent").value = ""; revokeVersionExport(); clearAdvice(); });
 sync();

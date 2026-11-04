@@ -20,7 +20,7 @@ let readbackCount = 0;
 let rejectOneCsvRunReply=false, csvRunPostCount=0, csvGetCount=0, csvHistoryGetCount=0, csvVerifyPostCount=0;
 let rejectOneMetadataApproval = false;
 let rejectOneMetadataCancel = false;
-let adviceCalls = 0;
+let adviceCalls = 0, metadataPreviewCalls = 0;
 globalThis.fetch = (route, init) => {
   if (route === "/v1/local-csv/run") {
     csvRunPostCount++;
@@ -64,17 +64,18 @@ globalThis.fetch = (route, init) => {
       status:503, headers:{"Content-Type":"application/json"}
     }));
   }
+  if (route === "/v1/local-metadata/preview") metadataPreviewCalls++;
   if (route === "/v1/advice") adviceCalls++;
   return nativeFetch(base + route, init);
 };
 const ids = ["token","connect","disconnect","clear","connection-status","notice","output",
   "workflow-id","workflow-state","plan-hash","metadata-summary","goal","existing","create",
   "list","load","plan","guide","test","approve","run","refresh","audit","evidence","report","recover",
-  "synthetic-consent","metadata-consent","required","version-candidates","metadata-goal","text-workflow","text-preview","meta-preview","meta-approve",
+  "synthetic-consent","metadata-consent","required","version-candidates","metadata-goal","version-intent","version-intent-apply","text-workflow","text-preview","meta-preview","meta-approve",
   "meta-cancel","meta-status","version-export","meta-save","meta-readback","meta-council","meta-report","meta-export","native-handoff","local-council-state","meta-save-consent","version-export-consent","advice-disk","advice-errors","advice-backup",
   "advice-consent","advice-submit","advice-summary","csv-local-path","csv-group-column","csv-preview","csv-run","csv-readback","csv-consent","csv-job-status","csv-export-consent","csv-export","csv-recover-id","csv-recover","csv-intent","csv-intent-apply","csv-report-path","csv-report-consent","csv-verify-path","csv-verify-consent","csv-verify-report","csv-history-consent","csv-history-select","csv-history-list","csv-history-open"];
 const buttonIds = ["connect","disconnect","clear","create","list","load","plan","guide",
-  "test","approve","run","refresh","audit","evidence","report","recover","text-preview","meta-preview",
+  "test","approve","run","refresh","audit","evidence","report","recover","text-preview","version-intent-apply","meta-preview",
   "meta-approve","meta-cancel","meta-status","version-export","meta-save","meta-readback","meta-council","meta-report","meta-export","native-handoff","advice-submit","csv-preview","csv-run","csv-readback","csv-export","csv-recover","csv-intent-apply","csv-history-list","csv-history-open","csv-verify-report"];
 class FakeElement {
   constructor(id) {this.id=id;this.value="";this.checked=false;this.disabled=false;
@@ -242,6 +243,31 @@ async function main(){
   assert.equal(elems["version-export-consent"].checked,false);
   assert.equal(elems["version-export"].disabled,true,"one opt-in per download");
   assert.equal(elems["metadata-consent"].checked,false);
+  // G254 maps one command into both scope fields but grants no approval.
+  const previewCountBefore=metadataPreviewCalls;
+  elems["version-intent"].value="버전 비교: README.md => ../outside.pdf";
+  await click("version-intent-apply");
+  assert.match(elems.notice.textContent,/요청 거부/);
+  assert.equal(elems["meta-approve"].disabled,true);
+  assert.equal(elems["metadata-consent"].checked,false);
+  assert.equal(elems.required.value,"");
+  elems["version-intent"].value="compare versions: README.md => not-a-version.pdf";
+  await click("version-intent-apply");
+  assert.equal(metadataPreviewCalls,previewCountBefore,"mapping must not request HTTP");
+  assert.equal(elems["metadata-goal"].value,"review versions");
+  assert.equal(elems.required.value,"README.md");
+  assert.equal(elems["version-candidates"].value,"README.md=not-a-version.pdf");
+  assert.equal(JSON.parse(elems.output.textContent).local_metadata_read,false);
+  assert.equal(elems["meta-approve"].disabled,true);
+  await click("meta-preview");
+  assert.equal(metadataPreviewCalls,previewCountBefore+1);
+  assert.equal(elems["metadata-consent"].checked,false);
+  assert.equal(elems.required.value,"");
+  assert.equal(elems["version-candidates"].value,"");
+  elems["metadata-consent"].checked=true;elems["metadata-consent"].fire("change");
+  await click("meta-approve");
+  assert.equal(JSON.parse(elems.output.textContent).selected_intent,"REVIEW_VERSIONS");
+  assert.equal(elems["version-export"].disabled,true);
   elems["metadata-goal"].value="check required files";
   elems["metadata-goal"].fire("change");
   assert.equal(elems["meta-approve"].disabled,true);
@@ -372,6 +398,7 @@ async function main(){
   await click("connect");  // refusal must discard the PREVIOUS valid bearer
   assert.equal(elems.required.value,"","reauth must scrub private textarea");
   assert.equal(elems["version-candidates"].value,"","reauth must scrub version paths");
+  assert.equal(elems["version-intent"].value,"","reauth must scrub typed intent");
   assert.equal(elems["advice-disk"].value,"","reauth scrubs manual samples");
   assert.equal(elems["advice-consent"].checked,false,"reauth revokes advice consent");
   assert.equal(elems.existing.value,"","reauth must clear previous workflow selection");
