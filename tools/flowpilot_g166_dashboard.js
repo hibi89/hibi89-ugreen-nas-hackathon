@@ -7,6 +7,8 @@ let csvTicket = null, csvJobId = null, csvReceipt = null;
 function clearCsv() {
   csvTicket = null; csvJobId = null; csvReceipt = null;
   el("csv-local-path").value = "";
+  el("csv-report-path").value = "";
+  el("csv-report-consent").checked = false;
   el("csv-intent").value = "";
   el("csv-recover-id").value = "";
   el("csv-history-consent").checked = false;
@@ -69,7 +71,9 @@ function sync() {
       "meta-export": !!lastLocalReport && workflow?.template === "required_file_metadata_v1",
       "csv-preview": true,
       "csv-intent-apply": true,
-      "csv-run": !!csvTicket && el("csv-consent").checked,
+      "csv-run": !!csvTicket && el("csv-consent").checked &&
+        ((!el("csv-report-path").value && !el("csv-report-consent").checked) ||
+         (!!el("csv-report-path").value && el("csv-report-consent").checked)),
       "csv-readback": !!csvJobId,
       "csv-recover": true,
       "csv-history-list": el("csv-history-consent").checked,
@@ -527,7 +531,7 @@ function redactedCsvExport(receipt) {
       !isHash(r.receipt_sha256) ||
       r.owner_source_modified !== false || r.raw_group_names_in_response !== false ||
       r.external_calls_performed !== false || r.nas_verified !== false ||
-      r.report_file_created !== false || r.local_audit_file_created !== false ||
+      typeof r.report_file_created !== "boolean" || r.local_audit_file_created !== false ||
       r.release_gate !== "HOLD" ||
       !isInt(r.source_rows,256) || !isInt(r.group_count,32) ||
       !Array.isArray(rows) || rows.length !== r.group_count ||
@@ -550,7 +554,8 @@ function redactedCsvExport(receipt) {
       group_index:v.group_index,total_cents:v.total_cents,source_rows:v.source_rows
     })),
     raw_source_included:false,owner_path_included:false,
-    group_labels_included:false,nas_verified:false,release_gate:"HOLD"
+    group_labels_included:false,full_report_file_created_locally:r.report_file_created,
+    nas_verified:false,release_gate:"HOLD"
   };
 }
 function randomCsvJobId() {
@@ -584,6 +589,8 @@ el("csv-intent-apply").addEventListener("click", () => act(async () => {
   csvTicket = null; csvJobId = null; csvReceipt = null;
   el("csv-consent").checked = false;
   el("csv-export-consent").checked = false;
+  el("csv-report-path").value = "";
+  el("csv-report-consent").checked = false;
   el("csv-recover-id").value = "";
   el("csv-job-status").textContent = "자연어 검토 중 · 과거 CSV 승인 폐기";
   if (typeof raw !== "string" || raw.length > 96)
@@ -607,10 +614,13 @@ el("csv-intent-apply").addEventListener("click", () => act(async () => {
     release_gate:"HOLD"
   });
 }));
+el("csv-report-consent").addEventListener("change", sync);
+el("csv-report-path").addEventListener("input", sync);
 el("csv-consent").addEventListener("change", sync);
 el("csv-export-consent").addEventListener("change", sync);
 el("csv-preview").addEventListener("click", () => act(async () => {
   csvTicket = null; csvJobId = null; csvReceipt = null;
+  el("csv-report-consent").checked = false;
   el("csv-consent").checked = false;
   el("csv-export-consent").checked = false;
   el("csv-recover-id").value = "";
@@ -641,29 +651,43 @@ el("csv-run").addEventListener("click", () => act(async () => {
   if (!csvTicket || !el("csv-consent").checked)
     throw Error("현재 로컬 CSV 계획을 확인하고 동의해야 합니다.");
   const p = csvTicket;
+  const reportPath = el("csv-report-path").value;
+  const reportConsent = el("csv-report-consent").checked;
+  // Revoke both permissions and private destination before any POST/failure.
+  el("csv-report-path").value = "";
+  el("csv-report-consent").checked = false;
   // One-shot client consent. Preserve ONLY the job ID after uncertain POST.
   csvTicket = null; csvReceipt = null;
+  if ((!!reportPath) !== reportConsent || (reportConsent && reportPath.length > 1024))
+    throw Error("새 로컬 CSV 저장 경로와 독립 승인 둘 다 필요합니다.");
   el("csv-consent").checked = false;
   el("csv-export-consent").checked = false;
   const job = randomCsvJobId();
   csvJobId = job;
   el("csv-job-status").textContent = "실행 결과 미확인 · 작업 ID " + job + " · 영수증 GET 재조회 가능 · 자동 재시도 금지";
-  const result = await json("/v1/local-csv/run", {
+  const request = {
     preview_id: p.preview_id, request_id: job,
     plan_sha256: p.plan_sha256, acknowledgement: "APPROVE_LOCAL_CSV_READ_ONCE"
-  });
+  };
+  if (reportConsent) {
+    request.export_to = reportPath;
+    request.export_approval = "APPROVE_LOCAL_REPORT_CREATE";
+  }
+  const result = await json("/v1/local-csv/run", request);
   if (result.schema !== "flowpilot-g239-local-csv-job-v1" ||
       result.request_id !== job ||
       result.status !== "COMPLETE_LOCAL_TYPED_CSV_NOT_NAS" ||
       result.plan_sha256 !== p.plan_sha256 ||
       result.release_gate !== "HOLD" || result.nas_verified !== false ||
       result.path_and_labels_persisted !== false ||
-      result.result?.nas_verified !== false)
+      result.result?.nas_verified !== false ||
+      result.result?.report_file_created !== reportConsent)
     throw Error("CSV 실행 영수증 검증 실패");
   redactedCsvExport(result);
   csvReceipt = result;
   el("csv-job-status").textContent = "로컬 CSV 완료 · 영수증 " + job + " · NAS 미검증";
-  status("로컬 CSV 실제 집계 완료 · 원본 수정/외부 전송 없음");
+  status(reportConsent ? "로컬 CSV 집계 및 별도 승인한 새 보고서 파일 생성 · 원본 불변" :
+    "로컬 CSV 실제 집계 완료 · 원본 수정/외부 전송 없음");
   output(result);
 }));
 async function readCsvJob(id) {
@@ -699,6 +723,8 @@ el("csv-recover").addEventListener("click", () => act(async () => {
   csvTicket = null; csvJobId = null; csvReceipt = null;
   el("csv-consent").checked = false;
   el("csv-export-consent").checked = false;
+  el("csv-report-path").value = "";
+  el("csv-report-consent").checked = false;
   if (!/^csv_[0-9a-f]{24}$/.test(id))
     throw Error("복구할 CSV 작업 ID가 올바르지 않습니다.");
   csvJobId = id;
@@ -750,6 +776,8 @@ el("csv-history-open").addEventListener("click", () => act(async () => {
       ![...el("csv-history-select").options].some(x => x.value === id))
     throw Error("검증된 로컬 CSV 목록 항목을 선택해야 합니다.");
   csvTicket = null; csvJobId = id; csvReceipt = null;
+  el("csv-report-path").value = "";
+  el("csv-report-consent").checked = false;
   el("csv-consent").checked = false;
   el("csv-export-consent").checked = false;
   await readCsvJob(id); // no run POST

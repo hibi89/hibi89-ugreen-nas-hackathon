@@ -4,7 +4,8 @@ Preview holds owner-selected paths in server memory for <=600s only.
 A new create-only companion SQLite records only job IDs, plan digests and
 redacted receipts, never paths, source CSV, group labels or report bytes.
 Reserve before any real read; uncertain/failed states MUST NOT auto-retry.
-No NAS, Uliya, cloud, Docker, input writes, export or background tasks.
+No NAS, Uliya, cloud, Docker, input writes, automatic exports or background tasks.
+An owner may separately approve a one-time CREATE-ONLY local CSV output at run time.
 """
 from __future__ import annotations
 
@@ -21,7 +22,7 @@ import threading
 import time
 
 from flowpilot_g238_local_csv_engine import (
-    LocalCsvRefused, READ_ACK, execute, preview,
+    LocalCsvRefused, READ_ACK, EXPORT_ACK, execute, preview,
 )
 
 SCHEMA = "flowpilot-g239-local-csv-job-v1"
@@ -245,7 +246,8 @@ class LocalCsvJobs:
             return self._decode(row, job_id)
 
     def run(self, preview_id: str, request_id: str, plan_sha256: str,
-            acknowledgement: str) -> dict:
+            acknowledgement: str, *, export_to: str | None = None,
+            export_approval: str | None = None) -> dict:
         # Validate exact user approval BEFORE any disk creation/read.
         if (type(preview_id) is not str or not PREVIEW.fullmatch(preview_id)
                 or type(request_id) is not str or not REQUEST.fullmatch(request_id)
@@ -253,6 +255,16 @@ class LocalCsvJobs:
                 or type(acknowledgement) is not str or
                 acknowledgement != READ_ACK):
             raise CsvJobRefused("G239_EXACT_APPROVAL_REQUIRED", 403)
+        # G244 local output is independent one-time authority. Never persist path.
+        if (export_to is None) != (export_approval is None):
+            raise CsvJobRefused("G244_SEPARATE_EXPORT_APPROVAL_REQUIRED", 403)
+        if export_to is not None:
+            if (type(export_to) is not str or not 0 < len(export_to) <= 1024 or
+                    export_approval != EXPORT_ACK):
+                raise CsvJobRefused("G244_SEPARATE_EXPORT_APPROVAL_REQUIRED", 403)
+            target = Path(export_to)
+            if not target.is_absolute() or ".." in target.parts or target.suffix.lower() != ".csv":
+                raise CsvJobRefused("G244_CREATE_ONLY_ABSOLUTE_CSV_PATH_REQUIRED", 403)
         with self.lock:
             # First reconcile a lost response by ID. NEVER rerun the source.
             try:
@@ -262,6 +274,8 @@ class LocalCsvJobs:
                     raise
                 existing = None
             if existing is not None:
+                if export_to is not None:
+                    raise CsvJobRefused("G244_EXPORT_RETRY_REFUSED_USE_GET", 409)
                 if existing["plan_sha256"] != plan_sha256:
                     raise CsvJobRefused("G239_IDEMPOTENCY_CONFLICT")
                 return existing
@@ -281,6 +295,8 @@ class LocalCsvJobs:
                     " FROM g239_jobs WHERE job_id=?", (request_id,)).fetchone()
                 if old is not None:
                     db.commit()
+                    if export_to is not None:
+                        raise CsvJobRefused("G244_EXPORT_RETRY_REFUSED_USE_GET", 409)
                     if old[1] != plan_sha256:
                         raise CsvJobRefused("G239_IDEMPOTENCY_CONFLICT")
                     return self._decode(old, request_id)
@@ -289,7 +305,8 @@ class LocalCsvJobs:
                     (request_id, plan_sha256))
                 db.commit()
             try:
-                report = execute(source, group, plan_sha256, READ_ACK)
+                report = execute(source, group, plan_sha256, READ_ACK,
+                                 export_to=export_to, export_approval=export_approval)
                 if report.get("nas_verified") is not False:
                     raise CsvJobRefused("G239_NATIVE_CLAIM_REFUSED")
                 receipt = {

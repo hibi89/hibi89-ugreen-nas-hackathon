@@ -887,10 +887,13 @@ def create_server(backend: Backend, token: str, *, port: int=0):
                             raise BackendRefused("UNEXPECTED_KEYS",400)
                         data=backend.csv_jobs.preview(body["input_path"],body["group_column"])
                     elif path=="/v1/local-csv/run":
-                        if set(body)!={"preview_id","request_id","plan_sha256","acknowledgement"}:
+                        normal={"preview_id","request_id","plan_sha256","acknowledgement"}
+                        if set(body) not in (normal,normal | {"export_to","export_approval"}):
                             raise BackendRefused("UNEXPECTED_KEYS",400)
                         data=backend.csv_jobs.run(body["preview_id"],body["request_id"],
-                                                  body["plan_sha256"],body["acknowledgement"])
+                                                  body["plan_sha256"],body["acknowledgement"],
+                                                  export_to=body.get("export_to"),
+                                                  export_approval=body.get("export_approval"))
                     elif path=="/v1/workflows":
                         if set(body)!={"goal","request_id"}:
                             raise BackendRefused("UNEXPECTED_KEYS",400)

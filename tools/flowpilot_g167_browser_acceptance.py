@@ -336,6 +336,36 @@ def run_browser():
                     "COMPLETE_LOCAL_TYPED_CSV_NOT_NAS")
                 assert post_requests==["POST"]
                 expect(page.locator("#csv-export")).to_be_disabled()
+                # G244: owner approves a distinct create-only local full CSV.
+                # This output contains synthetic labels and stays on the CI
+                # runner; it is not a browser download or a NAS operation.
+                report_target=folder/"g244-full-aggregate.csv"
+                page.locator("#csv-local-path").fill(str(csv_fixture))
+                page.locator("#csv-report-path").fill(str(report_target))
+                page.locator("#csv-preview").click()
+                expect(page.locator("#csv-report-consent")).not_to_be_checked()
+                page.locator("#csv-consent").check()
+                expect(page.locator("#csv-run")).to_be_disabled()
+                page.locator("#csv-report-consent").check()
+                expect(page.locator("#csv-run")).to_be_enabled()
+                page.locator("#csv-run").click()
+                expect(page.locator("#output")).to_contain_text(
+                    "COMPLETE_LOCAL_TYPED_CSV_NOT_NAS")
+                assert page.locator("#csv-report-path").input_value()==""
+                expect(page.locator("#csv-report-consent")).not_to_be_checked()
+                assert report_target.read_text(encoding="utf-8")==(
+                    "customer,total_cents,source_rows\n"
+                    "alice,400,2\nbob,300,1\n")
+                report_receipt=json.loads(page.locator("#output").inner_text())
+                assert report_receipt["result"]["report_file_created"] is True
+                assert report_receipt["result"]["nas_verified"] is False
+                assert str(report_target) not in page.locator("#output").inner_text()
+                assert csv_fixture.read_bytes()==original
+                expect(page.locator("#csv-run")).to_be_disabled()
+                page.locator("#csv-readback").click()
+                expect(page.locator("#output")).to_contain_text(
+                    "COMPLETE_LOCAL_TYPED_CSV_NOT_NAS")
+                expect(page.locator("#csv-export")).to_be_disabled()
                 page.locator("#token").fill("short")
                 page.locator("#connect").click()
                 expect(page.locator("#create")).to_be_disabled()
@@ -359,7 +389,8 @@ def run_browser():
                               "G241_JSON_DOWNLOAD_CONSENT",
                               "G242_REAL_BROWSER_LOCAL_NL_TO_TYPED_CSV",
                               "G242_COMPOUND_WRITE_INTENT_FAIL_CLOSED",
-                              "G243_OPTIN_REDACTED_CSV_HISTORY_GET_ONLY"],
+                              "G243_OPTIN_REDACTED_CSV_HISTORY_GET_ONLY",
+                              "G244_EXPLICIT_CREATE_ONLY_FULL_LOCAL_REPORT"],
                     "real_nas_verified":False,"trial_started":False,"release_gate":"HOLD"
                 }
         finally:

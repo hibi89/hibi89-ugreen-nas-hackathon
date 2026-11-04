@@ -71,7 +71,7 @@ const ids = ["token","connect","disconnect","clear","connection-status","notice"
   "list","load","plan","guide","test","approve","run","refresh","audit","evidence","report","recover",
   "synthetic-consent","metadata-consent","required","version-candidates","text-workflow","text-preview","meta-preview","meta-approve",
   "meta-cancel","meta-status","meta-save","meta-readback","meta-council","meta-report","meta-export","native-handoff","local-council-state","meta-save-consent","advice-disk","advice-errors","advice-backup",
-  "advice-consent","advice-submit","advice-summary","csv-local-path","csv-group-column","csv-preview","csv-run","csv-readback","csv-consent","csv-job-status","csv-export-consent","csv-export","csv-recover-id","csv-recover","csv-intent","csv-intent-apply","csv-history-consent","csv-history-select","csv-history-list","csv-history-open"];
+  "advice-consent","advice-submit","advice-summary","csv-local-path","csv-group-column","csv-preview","csv-run","csv-readback","csv-consent","csv-job-status","csv-export-consent","csv-export","csv-recover-id","csv-recover","csv-intent","csv-intent-apply","csv-report-path","csv-report-consent","csv-history-consent","csv-history-select","csv-history-list","csv-history-open"];
 const buttonIds = ["connect","disconnect","clear","create","list","load","plan","guide",
   "test","approve","run","refresh","audit","evidence","report","recover","text-preview","meta-preview",
   "meta-approve","meta-cancel","meta-status","meta-save","meta-readback","meta-council","meta-report","meta-export","native-handoff","advice-submit","csv-preview","csv-run","csv-readback","csv-export","csv-recover","csv-intent-apply","csv-history-list","csv-history-open"];
@@ -449,6 +449,35 @@ async function main(){
     assert.equal(csvRunPostCount,1,"history reopening must not run");
     assert.equal(csvGetCount,reads+3,"history selection uses GET only");
     assert.equal(elems["csv-export"].disabled,true,"history is not export consent");
+
+    // G244 separate owner-consented full CSV report, not the redacted JSON.
+    const reportPath=path.join(owned,"new-full-report.csv");
+    elems["csv-local-path"].value=csvFile;
+    elems["csv-report-path"].value=reportPath;
+    await click("csv-preview");
+    assert.equal(elems["csv-report-consent"].checked,false,
+                 "new preview revokes past write consent");
+    elems["csv-consent"].checked=true;
+    elems["csv-consent"].fire("change");
+    assert.equal(elems["csv-run"].disabled,true,
+                 "write destination without separate approval blocks run");
+    elems["csv-report-consent"].checked=true;
+    elems["csv-report-consent"].fire("change");
+    assert.equal(elems["csv-run"].disabled,false);
+    await click("csv-run");
+    assert.equal(csvRunPostCount,2);
+    assert.equal(elems["csv-report-path"].value,"","private path cleared");
+    assert.equal(elems["csv-report-consent"].checked,false);
+    assert.equal(fs.readFileSync(reportPath,"utf8"),
+      "customer,total_cents,source_rows\nalice,400,2\nbob,300,1\n");
+    const fullReceipt=JSON.parse(elems.output.textContent);
+    assert.equal(fullReceipt.result.report_file_created,true);
+    assert.doesNotMatch(JSON.stringify(fullReceipt),/new-full-report\.csv|alice|bob/);
+    assert.equal(fs.readFileSync(csvFile,"utf8").includes("alice,125"),true);
+    assert.equal(elems["csv-run"].disabled,true,"one shot not repeated");
+    await click("csv-readback");
+    assert.match(elems.output.textContent,/COMPLETE_LOCAL_TYPED_CSV_NOT_NAS/);
+    assert.equal(elems["csv-export"].disabled,true,"fresh export consent after GET");
   } finally {fs.rmSync(owned,{recursive:true,force:true});}
   await click("disconnect");
   assert.equal(elems["csv-local-path"].value,"","disconnect clears file path");

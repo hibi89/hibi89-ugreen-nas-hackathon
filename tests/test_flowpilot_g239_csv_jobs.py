@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor
+from hashlib import sha256
 from contextlib import closing
 import http.client
 import json
@@ -63,6 +64,72 @@ class G239CsvGatewayTests(unittest.TestCase):
             "preview_id":plan["preview_id"],
             "plan_sha256":plan["plan_sha256"],
             "request_id":job,"acknowledgement":approval})
+
+
+    def test_g244_owner_approved_create_only_full_report(self):
+        plan=self.preview()
+        target=self.root/"new-aggregate.csv"
+        body={"preview_id":plan["preview_id"],"request_id":"csv_"+"9"*24,
+              "plan_sha256":plan["plan_sha256"],"acknowledgement":READ_ACK,
+              "export_to":str(target),
+              "export_approval":"APPROVE_LOCAL_REPORT_CREATE"}
+        status,receipt=self.call("/v1/local-csv/run",body)
+        self.assertEqual(status,200,receipt)
+        self.assertTrue(target.is_file())
+        self.assertEqual(target.read_bytes(),
+                         b"customer,total_cents,source_rows\n"
+                         b"alice,400,2\nbob,300,1\n")
+        self.assertEqual(target.stat().st_size,len(target.read_bytes()))
+        self.assertEqual(sha256(target.read_bytes()).hexdigest(),
+                         receipt["result"]["report_sha256"])
+        self.assertIs(receipt["result"]["report_file_created"],True)
+        self.assertEqual(receipt["result"]["owner_source_modified"],False)
+        self.assertEqual(self.csv.read_bytes(),CSV)
+        self.assertNotIn(str(target),json.dumps(receipt))
+        self.assertNotIn(str(target),self.sidecar.read_bytes().decode())
+        self.assertNotIn("alice",self.sidecar.read_bytes().decode())
+        with patch("flowpilot_g239_csv_jobs.execute",
+                   side_effect=AssertionError("duplicate report create")):
+            self.assertEqual(self.call("/v1/local-csv/jobs/"+body["request_id"]),
+                             (200,receipt))
+            self.assertEqual(self.call("/v1/local-csv/run",body)[0],409)
+        self.assertEqual(len(list(self.root.glob("new-aggregate.csv"))),1)
+
+    def test_g244_create_without_distinct_ack_refused_before_input_read(self):
+        p=self.preview()
+        target=self.root/"not-created.csv"
+        common={"preview_id":p["preview_id"],"request_id":"csv_"+"8"*24,
+                "plan_sha256":p["plan_sha256"],"acknowledgement":READ_ACK}
+        with patch("flowpilot_g239_csv_jobs.execute",
+                   side_effect=AssertionError("no source read")), \
+             patch("flowpilot_g239_csv_jobs.LocalCsvJobs._initialize_only_on_approval",
+                   side_effect=AssertionError("no SQLite create")):
+            self.assertEqual(self.call("/v1/local-csv/run",
+                             {**common,"export_to":str(target)})[0],400)
+            self.assertEqual(self.call("/v1/local-csv/run",
+                             {**common,"export_to":str(target),
+                              "export_approval":"wrong"})[0],403)
+            self.assertEqual(self.call("/v1/local-csv/run",
+                             {**common,"export_to":str(target.with_suffix(".txt")),
+                              "export_approval":"APPROVE_LOCAL_REPORT_CREATE"})[0],403)
+        self.assertFalse(target.exists())
+        self.assertFalse(self.sidecar.exists())
+
+    def test_g244_existing_destination_is_never_overwritten(self):
+        p=self.preview()
+        target=self.root/"existing-report.csv"
+        target.write_bytes(b"preserve bytes")
+        body={"preview_id":p["preview_id"],"request_id":"csv_"+"7"*24,
+              "plan_sha256":p["plan_sha256"],"acknowledgement":READ_ACK,
+              "export_to":str(target),
+              "export_approval":"APPROVE_LOCAL_REPORT_CREATE"}
+        self.assertEqual(self.call("/v1/local-csv/run",body)[0],409)
+        self.assertEqual(target.read_bytes(),b"preserve bytes")
+        self.assertEqual(self.csv.read_bytes(),CSV)
+        status,receipt=self.call("/v1/local-csv/jobs/"+body["request_id"])
+        self.assertEqual(status,200)
+        self.assertEqual(receipt["status"],"LOCAL_CSV_RUN_BLOCKED_NO_AUTORETRY")
+        self.assertEqual(self.call("/v1/local-csv/run",body)[0],409)
 
     def test_g243_empty_history_is_opt_in_and_never_creates_db(self):
         self.assertEqual(self.call("/v1/local-csv/jobs")[0],403)
