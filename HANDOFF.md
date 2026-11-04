@@ -1,3 +1,16 @@
+## 2026-11-05 KST — G274 CI / OFFICIAL NAS ACCESS RULES VERIFIED, resume on `lead/ugreen`
+
+1. **Goal:** G274 fixes bounded initial `find` delegation and owner-limit count/truncation in separate private candidate; public source regression guard. Full-product 73/100, release HOLD, Round1 PDF+ZIP Nov16 16:45 KST.
+2. **Completion:** exact feature source commit `cd78a7a1ef7b0ef16dd81713ff4e659ea542f5ea` CI 4/4 SUCCESS; no new owner-private Skill upload or change to G273 original. Private G274 SHA256 `f8774f45dd78d04c0f78bb3609645c63eed85fd15a2d181e2d8e6a4d5635ec78`.
+3. **Tests:** genuine Kit Checker twice 0E/0W/0I static-pass; private patch 12/12 and public contract 4/4 local PASS. Push Linux run `41918304283`: **1,721 total, 1,705 PASS, 16 SKIP, 0 FAIL**; Windows full SUCCESS. Other exact-SHA workflows `41918304161`, `41918304186`, `41918304297`: all SUCCESS.
+4. **Stages:** local 60/60, source Skill 13/15, actual registered NAS 0/20, final 0/5 = **73/100**. Remaining 27 externally gated: rights/license participant authorization 2, true finalist NAS 20, approved release/Devpost 5. The user +1%p per-work target not met; no double count.
+5. **Issue/rollback:** G273 had unbounded `ls` possibility and incorrect 200-only completeness; isolated G274 corrects. Source G269/G272/G273 and Kit preserved. Checkout/revert exact original Git parent normally; private G273 fallback unchanged. Do not claim official checker = native NAS.
+6. **Repo:** `hibi89/hibi89-ugreen-nas-hackathon`, `lead/ugreen`, feature SHA `cd78a7a1ef7b0ef16dd81713ff4e659ea542f5ea`. Documents updated with verified CI on subsequent docs-only SHA; check latest HEAD on resume. Public guard `tools/g274_public_contract_check.py`, tests `tests/test_g274_public_contract_check.py`.
+7. **Runtime/prod:** no Vercel target; Python 3.11 CI Linux/Windows, Node pinned Uliya Checker offline, no registered NAS work. Official rules say Round1 needs no NAS runtime; up to 30 finalists assigned real NAS slots Nov22–28, 2026 after Nov21 invitation.
+8. **Originals/security:** no ZIP/Kit/entrant data published, credentials untouched. Private G274 ZIP and evidence only conversation artifact; Library persistence not assumed; no new paid services or external provider data.
+9. **Next:** Read latest docs, preserve tests, keep Round1 separate from post-finalist NAS work; owner must specifically choose entrant license/rights and approve exact release before Devpost. Once genuinely invited, separately authorize device session/Expert tests; do not expend user NAS trial earlier. Avoid redundant static checks.
+10. **Checked:** 2026-11-05 KST. Exact source CI and official https://ugreenhackathon.devpost.com/rules verified. Live NAS, license grant, Devpost submission NOT VERIFIED/NOT_RUN. This docs receipt final commit SHA to verify after push.
+
 ## 2026-11-05 KST — G274 SOURCE/REGRESSION HANDOFF, whole product 73/100 unchanged / RELEASE HOLD
 
 1. Goal/requirements: FlowPilot 3.0 official Markdown-only UGREEN NAS Skill; owner-selected read-only metadata, design council, version and document checks, official vendor Kit; Round1 cutoff 2026-11-16 16:45 KST. No unapproved NAS trial, cloud, paid API, upload or Devpost.
