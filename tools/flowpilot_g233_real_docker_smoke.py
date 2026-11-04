@@ -102,7 +102,7 @@ def checked_run(argv: list[str], *, timeout: int = 45) -> str:
 def verify_host_config(payload: dict, *, started: bool,
                        expected_exit_code: int = 0) -> None:
     if (type(expected_exit_code) is not int
-            or expected_exit_code not in (0, 17)):
+            or expected_exit_code not in (0, 11, 17)):
         raise SmokeRefused("UNSUPPORTED_EXPECTED_CONTAINER_EXIT")
     if type(payload) is not dict:
         raise SmokeRefused("INSPECT_NOT_OBJECT")

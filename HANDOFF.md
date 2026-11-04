@@ -1,3 +1,16 @@
+## 2026-11-05 KST — G253 typed-plan Docker repair candidate, CI pending
+
+1. Goal/tech: newly covered code-owned typed DAG plan corruption in REAL local isolated Docker; G237 previously covered only CSV decimal repair. Python 3.11, cc and local Docker.
+2. Source: new G253 fixed plan copy repair after observed exit 11; one attempt, actual retest exact G235 receipt; unchanged input CSV/binary/original failed image, scoped cleanup.
+3. Tests: focused 8 synthetic policy tests added; actual Linux/Windows full and G233 Docker CI on this exact SHA are PENDING, no NAS executed.
+4. Status: fixed internal whole-product **62/100 verified**, potential isolation rubric 8→9 / total **63/100 only after full exact-source CI SUCCESS**. Release HOLD, NAS NO-GO.
+5. Safety/recovery: no remote Docker, mounts, network, images pull, owner data, Uliya or Creator/Checker execution. Revert normal feature commit if regression.
+6. Repo/branch: `hibi89/hibi89-ugreen-nas-hackathon` / `lead/ugreen`; G253 `tools/flowpilot_g253_typed_plan_repair.py`, `tests/test_flowpilot_g253_typed_plan_repair.py`, G233 shared fail-code verifier and Docker workflow.
+7. Runtime: GitHub Ubuntu Docker fixture; Windows/Linux general unittest. No Vercel/Production, no real NAS.
+8. Original: canonical Skill, private Kit/PDF/ZIP and owner data unchanged; Git history retained.
+9. Next: verify exact-code G253 Docker, Linux/Windows, readiness, master/closeout results before +1 scoring; while waiting, independently inspect remaining vendor gates without invoking official tools.
+10. Time: 2026-11-05 KST, candidate pre-CI. Exact code SHA will be the resulting commit, no certification implied.
+
 ## 2026-11-05 KST — FINAL G252 acceptance: verified product internal 62/100
 
 1. **Final goal/tech:** Whole UGREEN FlowPilot 3.0 operator product on supported Uliya NAS. Current verified off-NAS local operator chain G249 redacted version evidence → G250 consented browser JSON download → G251 owner HOLD/PRIMARY/ALTERNATIVE record → G252 explicit read-only evidence/decision integrity re-verification. Python3.11, JS/Chrome, exact SHA-bound local JSON.

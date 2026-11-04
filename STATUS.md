@@ -1,3 +1,9 @@
+## 2026-11-05 KST — G253 feature candidate committed, score stays 62/100 pending CI
+
+- New DISTINCT isolation/failure-repair behavior: real isolated container exit 11 from corrupted code-owned typed DAG plan, one explicitly approved exact-copy plan repair, new isolated retest expected exit 0 and canonical G235 typed report. G237 only corrected a synthetic CSV data decimal (exit 17).
+- Added 8 focused policy regressions and dedicated G233 local Docker workflow step; common Docker inspect permits exact expected 11 while keeping deny-by-default other codes. No external agent, owner files or NAS.
+- **No +1 yet**. Fixed local isolation row 8→9 / whole product 62→63 is CONDITIONAL on this exact feature SHA's actual Linux Docker, full Linux/Windows, readiness/master/closeout CI success. G252 62/100 is the last fully verified value. Release HOLD / NAS NO-GO; official registered Expert/NAS/Creator/Checker/Devpost NOT_RUN.
+
 ## 2026-11-05 KST — G252 FINAL VERIFIED: whole-product 61 → 62 / 100
 
 - **Exact source SHA:** `8601ab3eb44e496b57c36e01fa7cd1a7f82c0681`, all **4/4 GitHub Actions completed SUCCESS**: Linux/Windows full [41867688506](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/41867688506) (Linux **1623 PASS / 0 FAIL / 16 SKIP**, Windows `UGREEN LOCAL VERIFY: PASS [full]`), master 41867688451, readiness 41867688507, closeout 41867688501. Actual runnable G251→G252 temp JSON proof verified locally, expected tamper returns exit 2. No real NAS.

@@ -9,6 +9,8 @@ on:
       - tests/test_flowpilot_g235_typed_dag_docker.py
       - tools/flowpilot_g237_bounded_docker_repair.py
       - tests/test_flowpilot_g237_bounded_docker_repair.py
+      - tools/flowpilot_g253_typed_plan_repair.py
+      - tests/test_flowpilot_g253_typed_plan_repair.py
   workflow_dispatch:
 
 permissions:
@@ -35,3 +37,8 @@ jobs:
         run: |
           set -euo pipefail
           python3 tools/flowpilot_g237_bounded_docker_repair.py --approve-synthetic-only-auto-repair
+      - name: G253 real typed-plan failure, exact copy repair and isolated retest
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/flowpilot_g253_typed_plan_repair.py --approve-synthetic-typed-plan-repair
