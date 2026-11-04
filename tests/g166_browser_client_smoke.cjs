@@ -441,13 +441,13 @@ async function main(){
     const listed=JSON.parse(elems.output.textContent);
     assert.equal(listed.schema,"flowpilot-g243-csv-history-v1");
     assert.equal(listed.jobs.length,1);
-    assert.equal(listed.jobs[0].request_id,recoveredId);
+    assert.equal(listed.jobs[0].request_id,recorded);
     assert.doesNotMatch(JSON.stringify(listed),/alice|bob|test-owned\.csv/);
-    elems["csv-history-select"].value=recoveredId;
+    elems["csv-history-select"].value=recorded;
     elems["csv-history-select"].fire("change");
     await click("csv-history-open");
     assert.equal(csvRunPostCount,1,"history reopening must not run");
-    assert.equal(csvGetCount,readsBeforeInvalid+3,"history selection uses GET only");
+    assert.equal(csvGetCount,reads+3,"history selection uses GET only");
     assert.equal(elems["csv-export"].disabled,true,"history is not export consent");
   } finally {fs.rmSync(owned,{recursive:true,force:true});}
   await click("disconnect");
