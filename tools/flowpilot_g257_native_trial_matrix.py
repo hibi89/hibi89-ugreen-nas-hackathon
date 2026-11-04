@@ -17,6 +17,7 @@ import sys
 from sdk_parameter_matrix import matrix
 from sdk_semantic_index import EXPECTED_SHA256 as KIT_SHA
 from inspect_official_sdk import UnsafePackage
+from flowpilot_g258_skill_dispatch_binding import verify_current_skill, SkillBoundaryRefused
 
 SCHEMA = "flowpilot-g257-nas-trial-readiness-v1"
 G256_SCHEMA = "flowpilot-g256-private-exact-source-admission-v1"
@@ -113,7 +114,9 @@ def _catalog_rows(raw: bytes, kit_sha: str, *, override_for_tests: bool = False)
 
 
 def prepare_trial(kit: bytes, proof: dict, *,
-                  test_sha: str | None = None) -> dict:
+                  test_sha: str | None = None,
+                  candidate_skill: bytes | None = None,
+                  test_candidate_sha: str | None = None) -> dict:
     digest = hashlib.sha256(kit).hexdigest() if type(kit) is bytes else ""
     # A synthetic fixture may exercise the public catalog contract in unit
     # tests, but NEVER use G256 owner-proof or say official registration passed.
@@ -125,6 +128,19 @@ def prepare_trial(kit: bytes, proof: dict, *,
         _receipt_ok(proof, digest)
     actions = _catalog_rows(kit, test_sha if synthetic else KIT_SHA,
                             override_for_tests=synthetic)
+    bound = None
+    if candidate_skill is not None:
+        if (synthetic and test_candidate_sha is None) or (
+                not synthetic and test_candidate_sha is not None):
+            raise TrialReadinessRefused("G258_INVALID_CANDIDATE_HASH_OVERRIDE")
+        try:
+            bound = verify_current_skill(
+                candidate_skill, kit, skill_pin=(
+                    test_candidate_sha if synthetic else G226_SHA),
+                kit_pin=(test_sha if synthetic else KIT_SHA),
+                synthetic_only=synthetic)
+        except SkillBoundaryRefused as exc:
+            raise TrialReadinessRefused("CURRENT_G226_SKILL_RECHECK_REFUSED") from exc
     stages = []
     for name, minutes, dependencies, condition in STAGES:
         if not set(dependencies).issubset(actions):
@@ -141,12 +157,19 @@ def prepare_trial(kit: bytes, proof: dict, *,
     return {
         "schema": SCHEMA,
         "status": "SYNTHETIC_TRIAL_PLAN_ONLY" if synthetic
-                  else "SOURCE_BOUND_OFFLINE_TRIAL_PLAN_READY",
+                  else ("CURRENT_SKILL_BOUND_OFFLINE_TRIAL_PLAN_READY" if bound
+                        else "AWAITING_CURRENT_G226_SKILL_BYTES"),
         "budget_minutes": 180,
         "starts_trial_or_timer": False, "performs_native_cli_calls": False,
         "source_candidate_sha256": G226_SHA if not synthetic else None,
         "public_kit_sha256": digest,
         "catalog_actions_checked": actions,
+        "current_skill_rechecked": bound is not None,
+        "current_skill_instruction_sha256": (
+            bound["guarded_instruction_sha256"] if bound else []),
+        "current_skill_policy_status": (
+            bound["status"] if bound else "SKILL_NOT_SUPPLIED"),
+        "may_activate_nas_trial": False,
         "exact_registered_expert_signatures_verified": False,
         "effective_nas_permissions_verified": False,
         "native_return_envelope_verified": False,
@@ -207,12 +230,19 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="G257 offline-only NAS trial readiness; no timer")
     parser.add_argument("--official-kit", required=True, type=Path)
     parser.add_argument("--g256-private-receipt", required=True, type=Path)
+    parser.add_argument("--candidate-skill", type=Path,
+                        help="Exact private G226 ZIP; no vendor/provider invocation")
     args = parser.parse_args(argv)
     try:
         files = [args.official_kit, args.g256_private_receipt]
+        if args.candidate_skill is not None:
+            files.append(args.candidate_skill)
         if any(not p.is_file() or p.is_symlink() for p in files):
             raise TrialReadinessRefused("OWNER_PRIVATE_SOURCE_INVALID")
-        out = prepare_trial(files[0].read_bytes(), _strict_json(files[1].read_bytes()))
+        candidate = (args.candidate_skill.read_bytes() if args.candidate_skill
+                     is not None else None)
+        out = prepare_trial(files[0].read_bytes(), _strict_json(files[1].read_bytes()),
+                            candidate_skill=candidate)
     except (OSError, ValueError, TypeError, UnsafePackage, KeyError):
         print(json.dumps({"status": "G257_OFFLINE_TRIAL_READINESS_REFUSED",
                           "nas_verified": False, "release_gate": "HOLD"}))
