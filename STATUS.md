@@ -1,3 +1,10 @@
+## 2026-11-04 KST — G242 whole-product +1pp target: bounded local NL→CSV intent (CI PENDING)
+
+- Full-product (not stage) completion rubric: [G242 rubric](docs/strategy/G242_FINAL_PRODUCT_COMPLETION_RUBRIC_20261104.md). Conservative engineering estimate **51/100 BEFORE G242**; **52/100 TARGET**, conditional on genuine Chromium and Linux/Windows source CI, never on test count or document volume. Rubric newly introduced and is an internal estimate, not independently certified.
+- New product function: supported Korean and English customer/department/project revenue requests become an inspectable 4-stage typed local CSV plan with no read or remote call. Unsafe/compound/unknown requests refused. Existing saved CSV read/run/export consent is cleared, actual approved G239 backend job unchanged; one-use owner consent still needed. No broad LLM/NAS semantic capability claimed.
+- Code source [10dd6607719bfe395999210e24de1d82005057cf](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/commit/10dd6607719bfe395999210e24de1d82005057cf). Exact source CI is **PENDING at documentation time**; new Node localhost and real Chromium checks added, but no claim of PASS before confirmation. Prev G241 exact source fe10f062d15c5f43bb766965e26ab171264750c4 4/4 SUCCESS.
+- Existing official Skill/Kit/private owner files/SQLite/Docker untouched. Real registered Expert/NAS official Creator/Checker/trial/Devpost NOT_RUN, RELEASE HOLD / NAS NO-GO. Next: verify exact G242 CI, correct any tested regression, only then credit one point; prioritize native capability contract evidence when authorized.
+
 ## 2026-11-04 KST — G241 manual CSV receipt recovery + genuine Chromium CSV E2E (4/4 SOURCE CI SUCCESS)
 
 - PRODUCT: Authenticated local dashboard supports manual GET-only recovery of a redacted CSV result by an operator-recorded `csv_` job ID after browser reload. Strict ID validation and clearing, no auto token/job storage, no file reread/POST replay, no old export consent retained. Unknown POST now displays the generated ID before sending the request, allowing owner to record it even when the reply is lost. A newly checked one-use consent is required for JSON download.

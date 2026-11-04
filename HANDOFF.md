@@ -1,3 +1,16 @@
+## 2026-11-04 KST — G242 whole-product target (+1pp only on exact acceptance)
+
+1. Goal/tech: Improve final FlowPilot 3.0 product NL-to-design component, not standalone preview volume. Strict Korean/English supported intent → customer/department/project group column → already guarded G238/G239 typed CSV path. HTML/JS + disposable Node/Chromium E2E.
+2. Choice: Rejected broad LLM intent inference (unclear API cost/rights/commands). Chose deterministic allowlist, visible column selection and no filesystem or network call before independent owner preview and one-use consent. Does not run arbitrary new workflows.
+3. Implemented: G166 new CSV natural-language field and apply control, fixed typed 4-node plan display, rejection of compound/write intents and clearing prior tokens for job/consent. Node DOM-local HTTP and actual Chrome/Playwright E2E extended.
+4. Evidence: G242 code SHA 10dd6607719bfe395999210e24de1d82005057cf, source CI PENDING. Prior G241 verified SHA fe10f062d15c5f43bb766965e26ab171264750c4, Linux 1562 PASS 0 FAIL 16 SKIP, Windows full PASS, real Chrome PASS. NAS/Expert/Creator/Checker/Devpost NOT_RUN.
+5. Fail/rollback: No actual failure observed yet for G242; if CI fails inspect exact failure and minimal fix. No external call or user path sent; no unsafe intent inference. Revert feature normally; never force-push.
+6. GitHub: hibi89/hibi89-ugreen-nas-hackathon lead/ugreen, G242 source SHA 10dd6607719bfe395999210e24de1d82005057cf. Changed tools/flowpilot_g166_dashboard.js/.html, tests/g166_browser_client_smoke.cjs, tools/flowpilot_g167_browser_acceptance.py and G242 rubric, STATUS/HANDOFF.
+7. Runtime/deploy: Actions Ubuntu/Windows Node/Python3.11, browser-preinstalled Chrome with Playwright1.56.0, local127.0.0.1/SQLite. Production Vercel N/A.
+8. Originals: Existing G238/239 source, local databases, official SKILL.md/Kit/ZIP/PDF and owner data untouched, only disposable fixture tests; no secrets in public repo.
+9. Next: Confirm exact code SHA CI, then update scoreboard from 51 provisional to 52 only on full acceptance. Native Uliya Expert rights+signature, NAS readback, Creator/Checker and Devpost need separate owner approval. RELEASE HOLD.
+10. KST 2026-11-04; rubric is an explicitly provisional full-product tracking estimate, not measured production percentage. Docs commit SHA checked separately after creation.
+
 ## 2026-11-04 KST — G241 VERIFIED: manual CSV receipt recovery + real Chromium CSV E2E
 
 1. Goal/tech: Complete usable local operator recovery after lost CSV POST response or browser reload. Vanilla HTML/JS, Python 3.11 localhost bearer API, SQLite redacted sidecar, Node + real Chromium Playwright. This is NOT a registered NAS Skill execution.
