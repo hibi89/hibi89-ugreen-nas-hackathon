@@ -312,6 +312,30 @@ def run_browser():
                 again.value.save_as(after)
                 assert json.loads(after.read_text(encoding="utf-8"))==result
                 assert csv_fixture.read_bytes()==original
+                # G243 requires a fresh one-use approval to see persistent IDs.
+                expect(page.locator("#csv-history-list")).to_be_disabled()
+                page.locator("#csv-history-consent").check()
+                page.locator("#csv-history-list").click()
+                expect(page.locator("#output")).to_contain_text(
+                    "LOCAL_CSV_HISTORY_NOT_NAS")
+                expect(page.locator("#csv-history-consent")).not_to_be_checked()
+                expect(page.locator("#csv-history-list")).to_be_disabled()
+                assert page.locator("#csv-history-select option").count()==2
+                result_index=json.loads(page.locator("#output").inner_text())
+                assert result_index["jobs"]==[{
+                    "request_id":job_id,
+                    "status":"COMPLETE_LOCAL_TYPED_CSV_NOT_NAS",
+                    "group_count":2,
+                    "source_rows":3
+                }]
+                assert not any(x in page.locator("#output").inner_text()
+                               for x in ("alice","bob",str(csv_fixture)))
+                page.locator("#csv-history-select").select_option(job_id)
+                page.locator("#csv-history-open").click()
+                expect(page.locator("#output")).to_contain_text(
+                    "COMPLETE_LOCAL_TYPED_CSV_NOT_NAS")
+                assert post_requests==["POST"]
+                expect(page.locator("#csv-export")).to_be_disabled()
                 page.locator("#token").fill("short")
                 page.locator("#connect").click()
                 expect(page.locator("#create")).to_be_disabled()
@@ -334,7 +358,8 @@ def run_browser():
                               "G241_RELOAD_MANUAL_ID_GET_RECOVERY",
                               "G241_JSON_DOWNLOAD_CONSENT",
                               "G242_REAL_BROWSER_LOCAL_NL_TO_TYPED_CSV",
-                              "G242_COMPOUND_WRITE_INTENT_FAIL_CLOSED"],
+                              "G242_COMPOUND_WRITE_INTENT_FAIL_CLOSED",
+                              "G243_OPTIN_REDACTED_CSV_HISTORY_GET_ONLY"],
                     "real_nas_verified":False,"trial_started":False,"release_gate":"HOLD"
                 }
         finally:

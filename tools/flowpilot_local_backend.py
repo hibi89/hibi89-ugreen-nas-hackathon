@@ -832,6 +832,11 @@ def create_server(backend: Backend, token: str, *, port: int=0):
                               "nas_verified":False,"release_gate":"HOLD"}
                     elif path=="/v1/workflows":
                         data=backend.list()
+                    elif path=="/v1/local-csv/jobs":
+                        if (self.headers.get("X-Local-Receipt-Review") !=
+                                "APPROVE_LOCAL_CSV_HISTORY_READ_ONCE"):
+                            raise CsvJobRefused("G243_HISTORY_OPTIN_REQUIRED",403)
+                        data=backend.csv_jobs.recent()
                     elif re.fullmatch(r"/v1/local-csv/jobs/csv_[0-9a-f]{24}",path):
                         data=backend.csv_jobs.readback(path.rsplit("/",1)[-1])
                     elif re.fullmatch(r"/v1/local-metadata/reviews/rev_[0-9a-f]{32}",path):

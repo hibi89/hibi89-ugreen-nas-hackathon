@@ -9,6 +9,8 @@ function clearCsv() {
   el("csv-local-path").value = "";
   el("csv-intent").value = "";
   el("csv-recover-id").value = "";
+  el("csv-history-consent").checked = false;
+  el("csv-history-select").replaceChildren(new Option("선택 안 함", ""));
   el("csv-export-consent").checked = false;
   el("csv-consent").checked = false;
   el("csv-job-status").textContent = "CSV 계획 미확인 · 입력 경로 미저장 · NAS 미검증";
@@ -70,15 +72,18 @@ function sync() {
       "csv-run": !!csvTicket && el("csv-consent").checked,
       "csv-readback": !!csvJobId,
       "csv-recover": true,
+      "csv-history-list": el("csv-history-consent").checked,
+      "csv-history-open": !!el("csv-history-select").value,
       "csv-export": !!csvReceipt && el("csv-export-consent").checked
     };
     button.disabled = Object.prototype.hasOwnProperty.call(rules, button.id) && !rules[button.id];
   }
 }
-async function api(path, body) {
+async function api(path, body, historyReview = false) {
   if (!token) throw Error("로컬 API 연결이 필요합니다.");
   const headers = { "Authorization": "Bearer " + token };
   if (body !== undefined) headers["Content-Type"] = "application/json";
+  if (historyReview) headers["X-Local-Receipt-Review"] = "APPROVE_LOCAL_CSV_HISTORY_READ_ONCE";
   const response = await fetch(path, {
     method: body === undefined ? "GET" : "POST", headers,
     body: body === undefined ? undefined : JSON.stringify(body),
@@ -90,7 +95,7 @@ async function api(path, body) {
   }
   return response;
 }
-async function json(path, body) { return (await api(path, body)).json(); }
+async function json(path, body, historyReview = false) { return (await api(path, body, historyReview)).json(); }
 async function act(fn) {
   if (busy) return;
   busy = true; sync();
@@ -698,6 +703,56 @@ el("csv-recover").addEventListener("click", () => act(async () => {
     throw Error("복구할 CSV 작업 ID가 올바르지 않습니다.");
   csvJobId = id;
   await readCsvJob(id);
+}));
+// G243 explicitly consented, authenticated, read-only history of at most 10
+// approved local receipt IDs. No source CSV open, no export consent inheritance.
+el("csv-history-consent").addEventListener("change", sync);
+el("csv-history-select").addEventListener("change", sync);
+el("csv-history-list").addEventListener("click", () => act(async () => {
+  if (!el("csv-history-consent").checked)
+    throw Error("별도 로컬 영수증 목록 조회 동의가 필요합니다.");
+  el("csv-history-consent").checked = false;
+  el("csv-history-select").replaceChildren(new Option("선택 안 함", ""));
+  csvReceipt = null;
+  el("csv-export-consent").checked = false;
+  const result = await json("/v1/local-csv/jobs", undefined, true);
+  const allowed = new Set([
+    "COMPLETE_LOCAL_TYPED_CSV_NOT_NAS",
+    "RUN_RESERVED_UNCERTAIN_NO_AUTORETRY",
+    "LOCAL_CSV_RUN_BLOCKED_NO_AUTORETRY"
+  ]);
+  if (result.schema !== "flowpilot-g243-csv-history-v1" ||
+      result.status !== "LOCAL_CSV_HISTORY_NOT_NAS" ||
+      result.release_gate !== "HOLD" || result.nas_verified !== false ||
+      result.source_files_accessed !== false || result.read_only !== true ||
+      result.max_returned !== 10 || !Array.isArray(result.jobs) ||
+      result.jobs.length > 10 || result.count !== result.jobs.length ||
+      !result.jobs.every(x =>
+        x && /^csv_[0-9a-f]{24}$/.test(x.request_id) &&
+        allowed.has(x.status) &&
+        Object.keys(x).every(key => ["request_id","status","group_count","source_rows"].includes(key)) &&
+        (x.status === "COMPLETE_LOCAL_TYPED_CSV_NOT_NAS"
+          ? Number.isSafeInteger(x.group_count) && x.group_count >= 1 && x.group_count <= 32 &&
+            Number.isSafeInteger(x.source_rows) && x.source_rows >= x.group_count && x.source_rows <= 256
+          : x.group_count === undefined && x.source_rows === undefined)))
+    throw Error("검증되지 않은 CSV 영수증 목록 응답");
+  for (const item of result.jobs) {
+    const title = item.status + " · " + item.request_id.slice(-6) +
+      (item.source_rows ? " · " + item.source_rows + "행" : "");
+    el("csv-history-select").add(new Option(title,item.request_id));
+  }
+  status("조회 승인 1회 소비 · 최근 영수증 번호만 확인 · 고객 CSV 미조회");
+  output(result);
+}));
+el("csv-history-open").addEventListener("click", () => act(async () => {
+  const id = el("csv-history-select").value;
+  if (!/^csv_[0-9a-f]{24}$/.test(id) ||
+      ![...el("csv-history-select").options].some(x => x.value === id))
+    throw Error("검증된 로컬 CSV 목록 항목을 선택해야 합니다.");
+  csvTicket = null; csvJobId = id; csvReceipt = null;
+  el("csv-consent").checked = false;
+  el("csv-export-consent").checked = false;
+  await readCsvJob(id); // no run POST
 }));
 el("csv-export").addEventListener("click", () => act(async () => {
   if (!csvReceipt || !el("csv-export-consent").checked)

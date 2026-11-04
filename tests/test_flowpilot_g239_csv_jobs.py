@@ -64,6 +64,77 @@ class G239CsvGatewayTests(unittest.TestCase):
             "plan_sha256":plan["plan_sha256"],
             "request_id":job,"acknowledgement":approval})
 
+    def test_g243_empty_history_is_opt_in_and_never_creates_db(self):
+        self.assertEqual(self.call("/v1/local-csv/jobs")[0],403)
+        self.assertEqual(self.call("/v1/local-csv/jobs",auth=False)[0],403)
+        self.assertFalse(self.sidecar.exists())
+        with patch("flowpilot_g239_csv_jobs.execute",
+                   side_effect=AssertionError("history must not read source")):
+            status,data=self.call_history()
+        self.assertEqual(status,200)
+        self.assertEqual(data["schema"],"flowpilot-g243-csv-history-v1")
+        self.assertEqual(data["jobs"],[])
+        self.assertEqual(data["max_returned"],10)
+        self.assertEqual(data["source_files_accessed"],False)
+        self.assertFalse(self.sidecar.exists())
+
+    def call_history(self, *, token=TOKEN):
+        conn=http.client.HTTPConnection("127.0.0.1",self.server.server_port,timeout=5)
+        try:
+            conn.request("GET","/v1/local-csv/jobs",headers={
+                "Host":f"127.0.0.1:{self.server.server_port}",
+                "Authorization":"Bearer "+token,
+                "X-Local-Receipt-Review":"APPROVE_LOCAL_CSV_HISTORY_READ_ONCE",
+            })
+            res=conn.getresponse()
+            return res.status,json.loads(res.read())
+        finally:
+            conn.close()
+
+    def test_g243_recent_history_is_bounded_and_redacted(self):
+        source=self.csv.read_bytes()
+        for i in range(12):
+            plan=self.preview()
+            job="csv_"+format(i,"024x")
+            self.assertEqual(self.run_once(plan,job)[0],200)
+        with patch("flowpilot_g239_csv_jobs.execute",
+                   side_effect=AssertionError("history source re-opened")):
+            status,data=self.call_history()
+        self.assertEqual(status,200)
+        self.assertEqual(data["count"],10)
+        self.assertEqual(len(data["jobs"]),10)
+        self.assertEqual(data["jobs"][0]["request_id"],"csv_"+format(11,"024x"))
+        self.assertEqual(data["jobs"][-1]["request_id"],"csv_"+format(2,"024x"))
+        self.assertTrue(all(x["group_count"]==2 and x["source_rows"]==3
+                            for x in data["jobs"]))
+        self.assertEqual(self.csv.read_bytes(),source)
+        for private in (str(self.csv),"alice","bob","private-owner-test.csv"):
+            self.assertNotIn(private,json.dumps(data))
+        self.assertEqual(data["nas_verified"],False)
+
+    def test_g243_history_tampered_receipt_fails_closed(self):
+        plan=self.preview()
+        self.assertEqual(self.run_once(plan,"csv_"+"b"*24)[0],200)
+        with closing(sqlite3.connect(self.sidecar)) as db:
+            db.execute("UPDATE g239_jobs SET receipt_sha=?",("0"*64,))
+            db.commit()
+        status,result=self.call_history()
+        self.assertEqual(status,409)
+        self.assertNotIn("jobs",result)
+
+    def test_g243_history_includes_blocked_without_retry(self):
+        plan=self.preview()
+        self.csv.write_bytes(b"customer,amount_cents\nalice,3O0\n")
+        job="csv_"+"f"*24
+        self.assertEqual(self.run_once(plan,job)[0],409)
+        with patch("flowpilot_g239_csv_jobs.execute",
+                   side_effect=AssertionError("blocked job rerun")):
+            status,data=self.call_history()
+        self.assertEqual(status,200)
+        self.assertEqual(data["jobs"],[
+            {"request_id":job,"status":"LOCAL_CSV_RUN_BLOCKED_NO_AUTORETRY"}
+        ])
+
     def test_auth_and_preview_no_owner_file_read_or_disk_write(self):
         self.assertEqual(self.call("/v1/local-csv/preview",
             {"input_path":str(self.csv),"group_column":"customer"},auth=False)[0],403)

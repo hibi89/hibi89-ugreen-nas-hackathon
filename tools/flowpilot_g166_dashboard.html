@@ -50,7 +50,9 @@
 <div class="actions"><button id="csv-preview" type="button">CSV 읽기 전 계획 확인</button><button id="csv-run" type="button" class="approval">로컬 CSV 1회 실행</button><button id="csv-readback" type="button" class="quiet">실행 영수증 재조회</button></div>
 <label for="csv-recover-id">브라우저 재시작 후 수동 복구: 기록해 둔 CSV 작업 ID (경로·그룹명 입력 금지)</label>
 <div class="line"><input id="csv-recover-id" type="text" maxlength="28" autocomplete="off" spellcheck="false" placeholder="csv_ + 24자리 16진수"><button id="csv-recover" type="button" class="quiet">영수증 수동 복구 (GET 전용)</button></div>
-<p>작업 ID는 자동 저장되지 않습니다. 이전 실행 시 기록해 둔 ID가 있어야 재조회할 수 있습니다. 파일 재읽기·자동 재실행은 하지 않습니다.</p>
+<p>브라우저에서는 작업 ID를 자동 저장하지 않습니다. 수동 ID 복구 또는 별도 승인한 최근 영수증 목록 조회를 이용할 수 있습니다. 원본 CSV 재조회·자동 실행 없음.</p>
+<div class="consent"><input id="csv-history-consent" type="checkbox"><label for="csv-history-consent">현재 로컬 SQLite의 최근 CSV 작업 ID·상태·집계 행 수만 한 번 조회하는 데 동의합니다. 원본·경로·그룹명은 열지 않습니다.</label></div>
+<div class="line"><button id="csv-history-list" type="button" class="quiet">최근 로컬 CSV 영수증 조회 (최대 10개)</button><select id="csv-history-select"><option value="">선택 안 함</option></select><button id="csv-history-open" type="button" class="quiet">선택 영수증 재조회 (GET만)</button></div>
 <div class="consent"><input id="csv-consent" type="checkbox"><label for="csv-consent">현재 선택한 CSV의 메타데이터/내용을 한 번 읽어 집계하고, 경로·그룹명을 제외한 결과와 해시를 별도 로컬 SQLite에 저장하는 데 동의합니다. NAS 사용·보고서 파일 저장·재실행은 승인하지 않습니다.</label></div>
 <div class="consent"><input id="csv-export-consent" type="checkbox"><label for="csv-export-consent">완료된 로컬 CSV 집계 영수증의 번호·합계·행 수·해시만 다운로드하는 데 별도로 동의합니다. 실제 그룹명·원본 CSV는 포함되지 않습니다.</label></div>
 <div class="actions"><button id="csv-export" type="button" class="quiet">익명화 CSV 영수증 다운로드</button></div>

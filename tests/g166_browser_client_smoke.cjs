@@ -17,7 +17,7 @@ const nativeFetch = globalThis.fetch;
 let rejectOneRunReply = false;
 let runRequestCount = 0;
 let readbackCount = 0;
-let rejectOneCsvRunReply=false, csvRunPostCount=0, csvGetCount=0;
+let rejectOneCsvRunReply=false, csvRunPostCount=0, csvGetCount=0, csvHistoryGetCount=0;
 let rejectOneMetadataApproval = false;
 let rejectOneMetadataCancel = false;
 let adviceCalls = 0;
@@ -32,6 +32,7 @@ globalThis.fetch = (route, init) => {
     }
   }
   if (route.startsWith("/v1/local-csv/jobs/")) csvGetCount++;
+  if (route === "/v1/local-csv/jobs") csvHistoryGetCount++;
   if (route.endsWith("/run") && route.startsWith("/v1/workflows/wf_")) {
     runRequestCount++;
     if (rejectOneRunReply) {
@@ -70,10 +71,10 @@ const ids = ["token","connect","disconnect","clear","connection-status","notice"
   "list","load","plan","guide","test","approve","run","refresh","audit","evidence","report","recover",
   "synthetic-consent","metadata-consent","required","version-candidates","text-workflow","text-preview","meta-preview","meta-approve",
   "meta-cancel","meta-status","meta-save","meta-readback","meta-council","meta-report","meta-export","native-handoff","local-council-state","meta-save-consent","advice-disk","advice-errors","advice-backup",
-  "advice-consent","advice-submit","advice-summary","csv-local-path","csv-group-column","csv-preview","csv-run","csv-readback","csv-consent","csv-job-status","csv-export-consent","csv-export","csv-recover-id","csv-recover","csv-intent","csv-intent-apply"];
+  "advice-consent","advice-submit","advice-summary","csv-local-path","csv-group-column","csv-preview","csv-run","csv-readback","csv-consent","csv-job-status","csv-export-consent","csv-export","csv-recover-id","csv-recover","csv-intent","csv-intent-apply","csv-history-consent","csv-history-select","csv-history-list","csv-history-open"];
 const buttonIds = ["connect","disconnect","clear","create","list","load","plan","guide",
   "test","approve","run","refresh","audit","evidence","report","recover","text-preview","meta-preview",
-  "meta-approve","meta-cancel","meta-status","meta-save","meta-readback","meta-council","meta-report","meta-export","native-handoff","advice-submit","csv-preview","csv-run","csv-readback","csv-export","csv-recover","csv-intent-apply"];
+  "meta-approve","meta-cancel","meta-status","meta-save","meta-readback","meta-council","meta-report","meta-export","native-handoff","advice-submit","csv-preview","csv-run","csv-readback","csv-export","csv-recover","csv-intent-apply","csv-history-list","csv-history-open"];
 class FakeElement {
   constructor(id) {this.id=id;this.value="";this.checked=false;this.disabled=false;
     this.textContent="";this.handlers={};this.options=[];}
@@ -427,6 +428,27 @@ async function main(){
     assert.equal(elems["csv-export-consent"].checked,false,"GET revokes prior export consent");
     assert.equal(elems["csv-export"].disabled,true);
     assert.doesNotMatch(elems.output.textContent,/alice|bob|test-owned\.csv/);
+    // G243 history must require new consent; no client-side auto retrieval.
+    assert.equal(elems["csv-history-list"].disabled,true);
+    assert.equal(csvHistoryGetCount,0);
+    elems["csv-history-consent"].checked=true;
+    elems["csv-history-consent"].fire("change");
+    await click("csv-history-list");
+    assert.equal(csvHistoryGetCount,1,"history read only on user review");
+    assert.equal(elems["csv-history-consent"].checked,false);
+    assert.equal(elems["csv-history-list"].disabled,true);
+    assert.equal(elems["csv-history-select"].options.length,2,"placeholder plus one");
+    const listed=JSON.parse(elems.output.textContent);
+    assert.equal(listed.schema,"flowpilot-g243-csv-history-v1");
+    assert.equal(listed.jobs.length,1);
+    assert.equal(listed.jobs[0].request_id,recoveredId);
+    assert.doesNotMatch(JSON.stringify(listed),/alice|bob|test-owned\.csv/);
+    elems["csv-history-select"].value=recoveredId;
+    elems["csv-history-select"].fire("change");
+    await click("csv-history-open");
+    assert.equal(csvRunPostCount,1,"history reopening must not run");
+    assert.equal(csvGetCount,readsBeforeInvalid+3,"history selection uses GET only");
+    assert.equal(elems["csv-export"].disabled,true,"history is not export consent");
   } finally {fs.rmSync(owned,{recursive:true,force:true});}
   await click("disconnect");
   assert.equal(elems["csv-local-path"].value,"","disconnect clears file path");

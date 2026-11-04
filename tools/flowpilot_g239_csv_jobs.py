@@ -186,6 +186,49 @@ class LocalCsvJobs:
             raise CsvJobRefused("G239_RECEIPT_CLAIM_REFUSED")
         return result
 
+    def recent(self) -> dict:
+        """Authenticated operator review: last 10 persisted IDs, no owner CSV I/O.
+
+        Never create a companion DB for a read-only history request. Validate
+        every selected receipt with the existing G239 integrity gate, and
+        expose only allowlisted status/count metadata.
+        """
+        with self.lock:
+            self._guard(required=False)
+            entries = []
+            if self.path.exists():
+                with closing(self._connect()) as connection:
+                    rows = connection.execute(
+                        "SELECT job_id,plan_sha,state,receipt_json,receipt_sha"
+                        " FROM g239_jobs ORDER BY rowid DESC LIMIT 10").fetchall()
+                for row in rows:
+                    verified = self._decode(row, row[0])
+                    summary = {
+                        "request_id": verified["request_id"],
+                        "status": verified["status"],
+                    }
+                    if verified["status"] == "COMPLETE_LOCAL_TYPED_CSV_NOT_NAS":
+                        data = verified["result"]
+                        if (type(data.get("group_count")) is not int or
+                                type(data.get("source_rows")) is not int or
+                                not 1 <= data["group_count"] <= 32 or
+                                not 1 <= data["source_rows"] <= 256):
+                            raise CsvJobRefused("G243_RECEIPT_COUNTS_REFUSED")
+                        summary["group_count"] = data["group_count"]
+                        summary["source_rows"] = data["source_rows"]
+                    entries.append(summary)
+            return {
+                "schema": "flowpilot-g243-csv-history-v1",
+                "status": "LOCAL_CSV_HISTORY_NOT_NAS",
+                "jobs": entries,
+                "count": len(entries),
+                "max_returned": 10,
+                "read_only": True,
+                "source_files_accessed": False,
+                "nas_verified": False,
+                "release_gate": "HOLD",
+            }
+
     def readback(self, job_id: str) -> dict:
         if type(job_id) is not str or not REQUEST.fullmatch(job_id):
             raise CsvJobRefused("G239_INVALID_REQUEST_ID", 400)
