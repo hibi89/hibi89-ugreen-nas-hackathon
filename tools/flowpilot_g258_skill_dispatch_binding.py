@@ -13,9 +13,9 @@ import re
 import stat
 import zipfile
 
-from sdk_parameter_matrix import matrix
-from sdk_semantic_index import EXPECTED_SHA256 as KIT_SHA
-from inspect_official_sdk import UnsafePackage
+from flowpilot_g260_official_catalog import (
+    matrix, EXPECTED_SHA256 as KIT_SHA, OfficialCatalogRefused as UnsafePackage,
+)
 
 SCHEMA = "flowpilot-g258-exact-skill-runtime-policy-v1"
 G226_SHA = "fcd628b86ea55b1b1923256d088d21f8bb28642df0839df8353c139a2e6fa803"
@@ -102,7 +102,7 @@ def verify_current_skill(candidate: bytes, kit: bytes, *,
         if "- "+chr(96)+state+chr(96)+":" not in main:
             raise SkillBoundaryRefused("DELEGATE_FAILURE_STATE_NOT_HANDLED")
     try:
-        catalog=matrix(kit,kit_pin)
+        catalog=matrix(kit,kit_pin,synthetic_only=synthetic_only)
     except (UnsafePackage,ValueError,TypeError,KeyError) as exc:
         raise SkillBoundaryRefused("PINNED_KIT_CATALOG_REFUSED") from exc
     rows={(row["cli"],row["action"]):row for row in catalog["actions"]}

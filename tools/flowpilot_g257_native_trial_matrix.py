@@ -14,9 +14,9 @@ from pathlib import Path
 import re
 import sys
 
-from sdk_parameter_matrix import matrix
-from sdk_semantic_index import EXPECTED_SHA256 as KIT_SHA
-from inspect_official_sdk import UnsafePackage
+from flowpilot_g260_official_catalog import (
+    matrix, EXPECTED_SHA256 as KIT_SHA, OfficialCatalogRefused as UnsafePackage,
+)
 from flowpilot_g258_skill_dispatch_binding import verify_current_skill, SkillBoundaryRefused
 
 SCHEMA = "flowpilot-g257-nas-trial-readiness-v1"
@@ -84,7 +84,7 @@ def _catalog_rows(raw: bytes, kit_sha: str, *, override_for_tests: bool = False)
         raise TrialReadinessRefused("OFFICIAL_KIT_HASH_MISMATCH")
     if kit_sha != KIT_SHA and not override_for_tests:
         raise TrialReadinessRefused("OFFICIAL_KIT_NOT_PINNED")
-    result = matrix(raw, kit_sha)
+    result = matrix(raw, kit_sha, synthetic_only=override_for_tests)
     rows = result.get("actions")
     if type(rows) is not list or result.get("action_count") != len(rows):
         raise TrialReadinessRefused("INVALID_OFFICIAL_CAPABILITY_MATRIX")
