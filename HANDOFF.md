@@ -1,3 +1,16 @@
+## 2026-11-05 KST — G251 VERIFIED acceptance and product 60/100
+
+1. **Goal/technology:** Whole UGREEN FlowPilot 3.0 product, fixed 100-point rubric, user-owned manual version decision step following G247 typed plan and G249 redacted evidence. Python 3.11, owner-local disposable scope.
+2. **Delivered/decision:** Selected separate consented LOCAL create-only owner-choice receipt over automatic NAS file rewriting/auto-selection (unapproved, high risk). G251 allows `hold|primary|alternative`, binds scope/evidence SHA, no file modification. This previously unimplemented typed graph owner-review step earns fixed typed row 9→10/10, independently from G247 plan and G249 evidence.
+3. **Tests:** Exact final code SHA `025e5bdf898fc8e5d0602803c522af31c699b259`; GitHub Actions **3/3 completed SUCCESS**, Linux/Windows 41864970832 (1607 PASS/0 FAIL/16 SKIP Linux; Windows `UGREEN LOCAL VERIFY: PASS [full]`), master 41864970728, closeout 41864970918. G250 Chromium parent 41863464691 not final, G252 readiness 41867688507 not final at handoff, neither gets score.
+4. **State:** Fully accepted internal whole-product 59→60/100, remaining 40. Release HOLD/NAS NO-GO. G250 and G252 separately candidate +1 each only after complete exact CI; no advance counting.
+5. **Failures/rollback:** Previously fetched G251 run SUCCESS but individual jobs indexed QUEUED; refreshed and verified actual Windows+Linux jobs both completed SUCCESS before credit. G251 Windows symlink/fstat compatibility fixed at 025e5bdf, negative tests preserved. Ordinary Git revert from previous working SHA; no force push or duplicate run.
+6. **Repository/branch/SHA/paths:** `hibi89/hibi89-ugreen-nas-hackathon`, `lead/ugreen`. Functional G251 SHA `025e5bdf`, G250 `c88f7aea`, G252 `8601ab3e`; G251 source `tools/flowpilot_g251_owner_decision.py`, G252 pending source `tools/flowpilot_g252_decision_readback.py`. Documentation HEAD separately verify.
+7. **Production/commands:** Python 3.11 Linux and Windows GitHub Actions and local synthetic fixture. Real registered Uliya/NAS/Expert and external live Production N/A / NOT_RUN; no Vercel. G251 CLI opts into local metadata evidence read and explicit create-only decision.
+8. **Originals/security:** Canonical `skill/flowpilot-nas/SKILL.md`, official Uliya Kit 0.7.3 original, G103/G223 private ZIP/PDF, SQLite, source data and credentials untouched; no customer/source data or secrets uploaded.
+9. **Next:** Confirm exact G250 Chromium parent 41863464691 and G252 readiness 41867688507 final CI. If G250 4/4 SUCCESS accept NL intent browser evidence +1; if G252 all four SUCCESS accept separate security/binding negative-path +1, otherwise diagnose errors. First-party Checker/Creator, registered Expert rights, actual NAS trial/readback and Devpost require separate owner approval.
+10. **KST/provenance:** 2026-11-05; exact GitHub run/job success status and Linux/Windows logs verified. Full-product score is a management estimate, not certified NAS execution or final deliverable release.
+
 ## 2026-11-05 KST — G252 exact-source local decision evidence readback, CI pending
 
 1. **Goal/tech:** Complete practical local owner-review integrity verification across G249 redacted version evidence and G251 explicit owner decision on trusted non-NAS local files. Python 3.11, G251 consent boundary and SHA-256.
