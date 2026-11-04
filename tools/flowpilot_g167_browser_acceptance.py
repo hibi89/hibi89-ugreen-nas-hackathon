@@ -343,6 +343,7 @@ def run_browser():
                 page.locator("#csv-local-path").fill(str(csv_fixture))
                 page.locator("#csv-report-path").fill(str(report_target))
                 page.locator("#csv-preview").click()
+                expect(page.locator("#output")).to_contain_text("report_destination_sha256")
                 expect(page.locator("#csv-report-consent")).not_to_be_checked()
                 # G246: previewed destination is SHA-bound to the actual
                 # one-time run; a changed path disables consent reuse.
