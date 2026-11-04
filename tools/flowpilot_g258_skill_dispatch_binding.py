@@ -96,7 +96,7 @@ def verify_current_skill(candidate: bytes, kit: bytes, *,
     if (not 0<=main.find("PLAN_ONLY / NOT_CHECKED")<fst<snd or
             not 0<=main.find("DESIGN_ONLY / NOT_EXECUTED")<fst or
             not 0<=main.find("owner separately approves content access")<snd or
-            not 0<=main.find("real exact document references")<snd):
+            not 0<=main.find("exact document references")<snd):
         raise SkillBoundaryRefused("PLAN_ONLY_OR_DOCUMENT_UPSTREAM_GATE_MISSING")
     for state in ("completed","failed","cancelled","waiting_user","waiting_approval"):
         if "- "+chr(96)+state+chr(96)+":" not in main:

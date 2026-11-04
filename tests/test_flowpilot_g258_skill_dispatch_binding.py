@@ -136,7 +136,9 @@ class G258ExactSkillPolicyTests(unittest.TestCase):
     def test_forged_write_effect_cannot_pass_as_read(self):
         skill,_,s,_=inputs()
         def change(c):
-            c["clis"][0]["actions"][0]["effect"]="state-change"
+            for action in c["clis"][0]["actions"]:
+                if action["name"] == "find":
+                    action["effect"] = "state-change"
         kit,k=fake(change)
         with self.assertRaises(g258.SkillBoundaryRefused):
             g258.verify_current_skill(skill,kit,skill_pin=s,kit_pin=k,
