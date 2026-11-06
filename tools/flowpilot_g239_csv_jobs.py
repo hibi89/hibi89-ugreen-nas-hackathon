@@ -23,6 +23,7 @@ import time
 
 from flowpilot_g238_local_csv_engine import (
     LocalCsvRefused, READ_ACK, EXPORT_ACK, execute, preview,
+    _is_link_or_reparse,
 )
 
 SCHEMA = "flowpilot-g239-local-csv-job-v1"
@@ -61,7 +62,11 @@ class LocalCsvJobs:
                 str(path).startswith(("//", "\\\\"))):
             raise CsvJobRefused("G239_SIDECAR_PATH_REFUSED")
         for part in (path.parent, *path.parent.parents):
-            if part.is_symlink() or not part.is_dir():
+            try:
+                parent = part.lstat()
+            except (OSError, ValueError) as exc:
+                raise CsvJobRefused("G239_SIDECAR_PARENT_REFUSED") from exc
+            if not stat.S_ISDIR(parent.st_mode) or _is_link_or_reparse(parent):
                 raise CsvJobRefused("G239_SIDECAR_PARENT_REFUSED")
         if not required and not path.exists() and not path.is_symlink():
             return
@@ -69,7 +74,8 @@ class LocalCsvJobs:
             item = path.lstat()
         except OSError as exc:
             raise CsvJobRefused("G239_SIDECAR_NOT_FOUND", 404) from exc
-        if (not stat.S_ISREG(item.st_mode) or item.st_size > 4 * 1024 * 1024
+        if (_is_link_or_reparse(item) or not stat.S_ISREG(item.st_mode)
+                or item.st_size > 4 * 1024 * 1024
                 or (os.name != "nt" and item.st_nlink != 1)):
             raise CsvJobRefused("G239_SIDECAR_UNSAFE")
 

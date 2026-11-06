@@ -30,6 +30,7 @@ MAX_BYTES = 32768
 MAX_ROWS = 256
 MAX_GROUPS = 32
 MAX_CENTS = 1000000
+FILE_ATTRIBUTE_REPARSE_POINT = 0x400
 LABEL = re.compile(r"[A-Za-z][A-Za-z0-9_-]{0,31}\Z")
 DECIMAL = re.compile(r"(?:0|[1-9][0-9]{0,6})\Z")
 SHA = re.compile(r"[0-9a-f]{64}\Z")
@@ -94,25 +95,40 @@ def preview(input_path: str, group_column: str) -> dict:
     }
 
 
+def _is_link_or_reparse(metadata) -> bool:
+    """Reject Windows junction/reparse and ordinary symlinks alike."""
+    return (stat.S_ISLNK(metadata.st_mode)
+            or bool(getattr(metadata, "st_file_attributes", 0)
+                    & FILE_ATTRIBUTE_REPARSE_POINT))
+
+
 def _secure_parent_and_entry(path: Path, *, require_file: bool) -> None:
-    """Refuse link parents and link/hardlink sources; no permission escalation."""
+    """Read-only preflight against link/reparse ancestors and source/output."""
     for part in (path.parent, *path.parent.parents):
         try:
-            if part.is_symlink() or not part.is_dir():
-                _refuse("G238_UNSAFE_PARENT")
-        except OSError:
+            parent = part.lstat()
+        except (OSError, ValueError):
+            _refuse("G238_UNSAFE_PARENT")
+        if not stat.S_ISDIR(parent.st_mode) or _is_link_or_reparse(parent):
             _refuse("G238_UNSAFE_PARENT")
     if require_file:
         try:
             s = path.lstat()
-        except OSError:
+        except (OSError, ValueError):
             _refuse("G238_INPUT_NOT_REGULAR")
-        if (not stat.S_ISREG(s.st_mode) or s.st_size <= 0
-                or s.st_size > MAX_BYTES or
-                (os.name != "nt" and s.st_nlink != 1)):
+        if (_is_link_or_reparse(s) or not stat.S_ISREG(s.st_mode)
+                or s.st_size <= 0 or s.st_size > MAX_BYTES
+                or (os.name != "nt" and s.st_nlink != 1)):
             _refuse("G238_INPUT_NOT_REGULAR")
-    elif path.is_symlink():
-        _refuse("G238_OUTPUT_LINK_REFUSED")
+    else:
+        try:
+            candidate = path.lstat()
+        except FileNotFoundError:
+            return  # Exactly one new output may be created by explicit consent.
+        except (OSError, ValueError):
+            _refuse("G238_OUTPUT_NOT_VERIFIABLE")
+        if _is_link_or_reparse(candidate):
+            _refuse("G238_OUTPUT_LINK_REFUSED")
 
 
 def _read_once(p: Path) -> bytes:
@@ -123,7 +139,8 @@ def _read_once(p: Path) -> bytes:
         flags |= getattr(os, "O_NONBLOCK", 0)
         fd = os.open(p, flags)
         before = os.fstat(fd)
-        if (not stat.S_ISREG(before.st_mode) or not 0 < before.st_size <= MAX_BYTES
+        if (_is_link_or_reparse(before) or not stat.S_ISREG(before.st_mode)
+                or not 0 < before.st_size <= MAX_BYTES
                 or (os.name != "nt" and before.st_nlink != 1)):
             _refuse("G238_OPENED_FILE_INVALID")
         chunks = []
@@ -139,7 +156,8 @@ def _read_once(p: Path) -> bytes:
         after = os.fstat(fd)
         now = p.lstat()
         fields = ("st_dev", "st_ino", "st_size", "st_mtime_ns")
-        if (not stat.S_ISREG(now.st_mode)
+        if (_is_link_or_reparse(after) or _is_link_or_reparse(now)
+                or not stat.S_ISREG(now.st_mode)
                 or any(getattr(before, k) != getattr(after, k)
                        or getattr(after, k) != getattr(now, k) for k in fields)
                 or used != before.st_size):

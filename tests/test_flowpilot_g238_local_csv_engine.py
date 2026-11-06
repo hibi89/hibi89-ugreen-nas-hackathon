@@ -7,6 +7,8 @@ import io
 import json
 import os
 from pathlib import Path
+import stat
+from types import SimpleNamespace
 import subprocess
 import sys
 from tempfile import TemporaryDirectory
@@ -171,6 +173,43 @@ class LocalCsvWorkflowTests(unittest.TestCase):
             self.run_approved(export_to=str(self.input),
                               export_approval=engine.EXPORT_ACK)
         self.assertEqual(self.input.read_bytes(), ROWS)
+
+
+    def test_g278_reparse_parent_or_input_refused_before_source_open(self):
+        # Cross-platform simulation of Windows junction/reparse metadata:
+        # Path.is_symlink() alone cannot guarantee this boundary.
+        actual_lstat = Path.lstat
+        for flagged in (self.base, self.input):
+            with self.subTest(flagged=str(flagged)):
+                def synthetic_lstat(path, *args, **kwargs):
+                    metadata = actual_lstat(path, *args, **kwargs)
+                    if path == flagged:
+                        return SimpleNamespace(
+                            st_mode=metadata.st_mode, st_size=metadata.st_size,
+                            st_nlink=metadata.st_nlink,
+                            st_file_attributes=engine.FILE_ATTRIBUTE_REPARSE_POINT)
+                    return metadata
+                with patch.object(Path, "lstat", synthetic_lstat), \
+                     patch.object(engine.os, "open",
+                                  side_effect=AssertionError("unexpected input open")):
+                    with self.assertRaises(engine.LocalCsvRefused):
+                        engine._read_once(self.input)
+        self.assertEqual(self.input.read_bytes(), ROWS)
+
+    def test_g278_reparse_output_refused_before_create(self):
+        output = self.base / "review-output.csv"
+        actual_lstat = Path.lstat
+        def synthetic_lstat(path, *args, **kwargs):
+            if path == output:
+                return SimpleNamespace(st_mode=stat.S_IFREG | 0o600,
+                                       st_file_attributes=engine.FILE_ATTRIBUTE_REPARSE_POINT)
+            return actual_lstat(path, *args, **kwargs)
+        with patch.object(Path, "lstat", synthetic_lstat), \
+             patch.object(engine.os, "open",
+                          side_effect=AssertionError("unexpected report creation")):
+            with self.assertRaises(engine.LocalCsvRefused):
+                engine._create_only(str(output), b"safe", self.input)
+        self.assertFalse(output.exists())
 
     def test_preview_vs_run_cli_and_no_secret_log(self):
         src=Path(engine.__file__)

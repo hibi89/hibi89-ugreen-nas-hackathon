@@ -7,6 +7,7 @@ from contextlib import closing
 import http.client
 import json
 from pathlib import Path
+from types import SimpleNamespace
 import sqlite3
 import sys
 from tempfile import TemporaryDirectory
@@ -281,6 +282,23 @@ class G239CsvGatewayTests(unittest.TestCase):
         self.assertEqual(status,200)
         self.assertEqual(receipt["status"],"LOCAL_CSV_RUN_BLOCKED_NO_AUTORETRY")
         self.assertEqual(self.call("/v1/local-csv/run",body)[0],409)
+
+
+    def test_g278_reparse_sqlite_sidecar_parent_refused(self):
+        # Windows reparse/junction directory cannot back the local journal.
+        actual_lstat = Path.lstat
+        def synthetic_lstat(path, *args, **kwargs):
+            metadata = actual_lstat(path, *args, **kwargs)
+            if path == self.root:
+                return SimpleNamespace(
+                    st_mode=metadata.st_mode,
+                    st_file_attributes=0x400)
+            return metadata
+        with patch.object(Path, "lstat", synthetic_lstat):
+            with self.assertRaisesRegex(Exception,
+                                        "G239_SIDECAR_PARENT_REFUSED"):
+                self.backend.csv_jobs._initialize_only_on_approval()
+        self.assertFalse(self.sidecar.exists())
 
     def test_g243_empty_history_is_opt_in_and_never_creates_db(self):
         self.assertEqual(self.call("/v1/local-csv/jobs")[0],403)
