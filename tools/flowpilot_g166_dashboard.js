@@ -210,7 +210,18 @@ el("disconnect").addEventListener("click", () => {
   status("로컬 세션 연결 해제"); output("토큰은 저장되지 않습니다."); sync();
 });
 el("create").addEventListener("click", () => act(async () => {
-  const result = await json("/v1/workflows", {goal: el("goal").value, request_id: randomRequestId()});
+  const goal = el("goal").value;
+  // A new request may have committed even if its reply was lost. Revoke old
+  // workflow authority BEFORE dispatch, not only after a successful response.
+  resetWorkflow(null);
+  const result = await json("/v1/workflows", {goal, request_id: randomRequestId()});
+  if (result.schema !== "flowpilot-backend-local-v1" ||
+      !/^wf_[0-9a-f]{32}$/.test(result.workflow_id || "") ||
+      result.status !== "PLANNED" || result.synthetic_only !== true ||
+      result.nas_verified !== false || result.release_gate !== "HOLD" ||
+      !/^[a-f0-9]{64}$/.test(result.plan_sha256 || "") ||
+      result.event_count !== 1)
+    throw Error("생성 응답 검증 실패 · 목록에서 읽기 전용으로 확인하세요");
   resetWorkflow(result); status("합성 계획 생성 · 명시적 테스트와 승인 필요"); output(result);
 }));
 el("list").addEventListener("click", () => act(async () => {
@@ -249,8 +260,22 @@ el("list").addEventListener("click", () => act(async () => {
 }));
 el("load").addEventListener("click", () => act(async () => {
   const id = el("existing").value;
+  // A failed or forged GET must not leave the previously approved workflow
+  // actionable. Never treat a response for a different ID as this selection.
+  resetWorkflow(null);
   if (!/^wf_[0-9a-f]{32}$/.test(id)) throw Error("워크플로 ID를 선택하세요.");
-  resetWorkflow(await json("/v1/workflows/" + id));
+  const result = await json("/v1/workflows/" + id);
+  const states = ["PLANNED","TESTED","APPROVED_SYNTHETIC","RUNNING",
+    "COMPLETE_LOCAL_SYNTHETIC","BLOCKED","INTERRUPTED_BLOCKED"];
+  const templates = ["required_file_metadata_v1","csv_customer_revenue_v1"];
+  if (result.workflow_id !== id || result.schema !== "flowpilot-backend-local-v1" ||
+      !states.includes(result.status) || !templates.includes(result.template) ||
+      !/^[a-f0-9]{64}$/.test(result.plan_sha256 || "") ||
+      result.release_gate !== "HOLD" || result.synthetic_only !== true ||
+      result.nas_verified !== false || result.registered_expert_invoked !== false ||
+      !Number.isInteger(result.event_count) || result.event_count < 1)
+    throw Error("저장된 상태 응답 검증 실패 · 이전 승인 사용 불가");
+  resetWorkflow(result);
   status("기존 상태 로드 · 이전 승인 체크는 유지하지 않음"); output(workflow);
 }));
 el("plan").addEventListener("click", () => act(async () => {
