@@ -34,6 +34,7 @@ from flowpilot_g230_local_council import evaluate_local_receipt, owner_report, C
 from flowpilot_g245_report_verify import verify_report
 from flowpilot_g236_native_handoff import build_native_handoff, NativeHandoffRefused
 from flowpilot_g239_csv_jobs import LocalCsvJobs, CsvJobRefused
+from flowpilot_g238_local_csv_engine import _is_link_or_reparse
 
 SCHEMA = "flowpilot-backend-local-v1"
 IDENTITY = "flowpilot-g161-owner-created-backend-v1"
@@ -86,21 +87,36 @@ def _hash(data: object) -> str:
 
 
 def _path_gate(path: Path, *, create: bool) -> None:
+    """Refuse symlinks and Windows junction/reparse ancestors before SQLite IO.
+
+    Preflight guards are deliberately conservative and are not a guarantee
+    against a concurrent filesystem swap; never use untrusted mutable roots.
+    """
     if (not isinstance(path, Path) or not path.is_absolute() or
-            path.suffix != ".sqlite" or not path.parent.is_dir() or
-            str(path).startswith(("//", "\\\\")) or path.is_symlink() or
-            any(p.is_symlink() for p in (path.parent, *path.parent.parents))):
+            path.suffix != ".sqlite" or str(path).startswith(("//", "\\\\"))):
         raise BackendRefused("DB_PATH_DENIED", 400)
-    if create and path.exists():
-        raise BackendRefused("DB_EXISTS_NO_OVERWRITE", 409)
-    if not create:
+    for parent in (path.parent, *path.parent.parents):
         try:
-            s = path.stat()
-            if (not stat.S_ISREG(s.st_mode) or not 0 <= s.st_size < MAX_DB_BYTES or
-                    (os.name != "nt" and s.st_nlink != 1)):
-                raise BackendRefused("DB_NOT_OWNED_OR_OVERSIZED")
-        except OSError as exc:
-            raise BackendRefused("DB_NOT_FOUND") from exc
+            metadata = parent.lstat()
+        except (OSError, ValueError) as exc:
+            raise BackendRefused("DB_PATH_DENIED", 400) from exc
+        if not stat.S_ISDIR(metadata.st_mode) or _is_link_or_reparse(metadata):
+            raise BackendRefused("DB_PATH_DENIED", 400)
+    try:
+        metadata = path.lstat()
+    except FileNotFoundError as exc:
+        if create:
+            return  # Exclusive O_CREAT | O_EXCL opens the new file afterward.
+        raise BackendRefused("DB_NOT_FOUND") from exc
+    except (OSError, ValueError) as exc:
+        raise BackendRefused("DB_PATH_DENIED", 400) from exc
+    if _is_link_or_reparse(metadata) or not stat.S_ISREG(metadata.st_mode):
+        raise BackendRefused("DB_PATH_DENIED", 400)
+    if create:
+        raise BackendRefused("DB_EXISTS_NO_OVERWRITE", 409)
+    if (not 0 <= metadata.st_size < MAX_DB_BYTES or
+            (os.name != "nt" and metadata.st_nlink != 1)):
+        raise BackendRefused("DB_NOT_OWNED_OR_OVERSIZED")
 
 
 class Backend:
