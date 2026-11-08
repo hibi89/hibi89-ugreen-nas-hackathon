@@ -1,3 +1,16 @@
+## 2026-11-09 KST — G300 DEVPOST OPTIONAL GALLERY HANDOFF
+
+1. Goal: Answer owner request to show envisioned web dashboard/final user experience on Devpost Project Media without creating misleading native UGREEN runtime evidence.
+2. Completed: Two generated concept JPGs illustrating FlowPilot AI NAS Dashboard and guided natural-language workflow. Each 1500x1000 (3:2), English, marked `CONCEPT PREVIEW / NOT A LIVE NAS CAPTURE`. Transport ZIP contains only two JPGs.
+3. QA: JPG sizes 295,213 / 337,513 bytes (<5MB each) and 1500x1000; exact SHA256 01=`bcbb4d97ecc363ef40ffd3a38d8c60b72c617c3c5bc37ba3f48ad76a1dbad198`, 02=`375f6c4eeab647f805978833a9866d7131661d167926c6e773f5c44f4658af4e`; ZIP 554,392 bytes SHA256 `47a4367920c5170a65d6e7f8a6345372f2a6364e0974fa36caac2ad5c15e6e02`, CRC readback PASS; visual inspection both passed. No new real NAS tests.
+4. State: Owner download/upload to Devpost **PENDING/NOT_VERIFIED**; Round1 Skill PDF+ZIP unchanged. Internal NAS-excluded 100/100; overall provisional 75% unchanged.
+5. Limit: Concept art illustrative, not a live dashboard or real NAS scan. Vendor official Round1 rules require no gallery or video; demo video mandatory only for Round2 with actual assigned UGREEN NAS footage.
+6. Repo: `hibi89/hibi89-ugreen-nas-hackathon` `lead/ugreen`; previous latest HEAD `97e99ebaceb85960818f38a12647292a74e2ab1b`, docs-only G300 SHA/CI to verify. No image binaries pushed to repo.
+7. Deployment: No Vercel/hosted web UI created; JPG concept only. Do not claim live dashboard.
+8. Sources/security: Images use fictional visual contents; no real owner files, NAS login, credentials or raw documents. Local outputs in conversation working directory; owner should download if retention needed. Original Skill and project kept.
+9. Next: User uploads both extracted JPGs through Devpost Image gallery and leaves optional Round1 demo URL empty; clicks Save & continue; then verifies submission details. No additional code changes needed for gallery.
+10. Updated 2026-11-09 KST; verified two generated JPG assets/ZIP and official Devpost rules, not user-hosted Devpost upload.
+
 ## 2026-11-09 KST — G299 ENGLISH-ONLY ROUND1 OWNER-READY REVIEW HANDOFF
 
 1. **Goal:** Respond to user screenshot of Korean internal '10 예선 공식 요건 점검' and explicit instruction that the actual UGREEN competition submission must be in English.
