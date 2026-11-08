@@ -1,3 +1,16 @@
+## 2026-11-09 KST — G295 FINAL QNAP DEMO HANDOFF
+
+1. **Goal and stack:** FlowPilot 3.0 UGREEN Uliya Skill; QNAP QuTScloud browser demo used only for third-party manual synthetic NAS file operations.
+2. **Completed:** Four-file synthetic folder state, missing-file add, file search, metadata, owner/group/public permission UI, rename v1 to `계약서_구버전_v1.txt` and re-search; snapshot manager and App Center inspection.
+3. **Tests:** Screenshot UI evidence PASS for rename/re-search (two results), metadata and permission display, snapshots manager opening (0 snapshots), Container Station offered but not installed. Snapshot restore, read-only enforcement, automated FlowPilot HOLD/APPROVE, Uliya Expert `find/stat`, UGREEN NAS runtime NOT_RUN. No new product tests executed this round.
+4. **Status:** NAS-excluded internal 100%; NAS-inclusive provisional 75%, unchanged. Round1 original submissions frozen; actual NAS/Expert HOLD.
+5. **Issues:** Browser raw TXT Korean mojibake; Text Editor missing. Snapshot 0, restore cannot be tested without creating snapshot; do not install apps or alter public demo system. QNAP UI cannot establish UGREEN compatibility.
+6. **Repo:** `hibi89/hibi89-ugreen-nas-hackathon`, `lead/ugreen`; pre-G295 SHA `30415090aa3948ecc3930d295f2452d11e718f82`; G295 docs SHA/CI verify after commit. Paths `STATUS.md`, `HANDOFF.md`, `AGENTS.md`, `REQUIREMENTS.md` and Skill source preserved.
+7. **Deployment:** Vercel N/A; QNAP temporary public 90-min demo, no official UGREEN runtime access in this exercise.
+8. **Security/originals:** No credentials, browser session URLs, private data or screenshots committed. No permission edits or app installs. Final Skill ZIP/PDF unchanged; original hashes in earlier HANDOFF.
+9. **Next:** Verify GitHub docs CI; stop redundant QNAP interactions. If official UGREEN NAS/Expert becomes available, run approved read-only consent, scoped file-agent find/stat, missing/version guard tests and collect genuine evidence; otherwise HOLD.
+10. **Time and scope:** 2026-11-09 KST, user screenshots through App Center; QNAP manual only; docs-only commit, no score increase.
+
 ## 2026-11-09 KST — G294 QNAP FOLLOW-UP EVIDENCE / CLOSEOUT
 
 1. **Goal:** Preserve genuine QNAP synthetic NAS evidence while keeping UGREEN FlowPilot 3.0 Skill and release originals unchanged.
