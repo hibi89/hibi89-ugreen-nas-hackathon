@@ -1,3 +1,11 @@
+## 2026-11-09 KST — G282 UI APPROVAL REVOCATION VERIFIED / OWNER INTERVENTION BATCHED
+
+- **Owner direction:** Continue to complete NAS-excluded technical product autonomously; ask for participant actions only if independent progress is blocked, otherwise accumulate a single end-of-work approval packet. This does not imply approval to execute vendor JS, accept a license, use NAS, or change Devpost.
+- **Actual defect fixed:** `tools/flowpilot_g166_dashboard.js` formerly left the previous `APPROVED_SYNTHETIC` workflow actionable if creating or loading another workflow failed. New Create and Load revoke prior authority **before** HTTP dispatch; server readback for Load must match selected workflow ID and expected contract; Create rejects malformed/wrong-state reply.
+- **Real injected failure verification:** Actual Chromium browser E2E new case for truncated Create/Load JSON, old Run disabled, fresh GET restores confirmed state, then only the appropriate synthetic Run proceeds. Code+test source `7476e64966d57c39926a4f84a9582ffc6892417f`; browser [42516231390](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/42516231390) SUCCESS. Linux/Windows full [42516231405](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/42516231405) SUCCESS, **1,731 PASS/0 FAIL/16 SKIP**. Same-source readiness [42516231392](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/42516231392), closeout [42516231406](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/42516231406) SUCCESS.
+- **Completion:** NAS-excluded G280 rubric stays **80/100**, not 100: exact-final first-party Uliya Checker and entrant IP/license attestations remain approval-gated. Historic full-product NAS-inclusive 73/100 unchanged. No real NAS/Expert/official Checker/Devpost resubmission.
+- **Rollback:** Ordinary revert source commits `0e17cd0e65906167562bc501e6ca6c55f1abcb71` and `7476e64966d57c39926a4f84a9582ffc6892417f` if verified regression. This docs update only records evidence, no source or original Library artifact modified.
+
 ## 2026-11-09 KST — G281 LOCAL SQLITE JUNCTION HARDENING AND PRE-NAS GATE REVIEW
 
 - Scope: pre-NAS 100-point engineering rubric only; genuine-NAS-inclusive 73/100 stays unchanged. No owner-private ZIP/PDF bytes modified or published; Round1 Devpost remains submitted.
