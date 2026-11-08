@@ -126,9 +126,11 @@ def run_browser():
                 page.route("**/v1/workflows/" + tested_id + "/approve",
                            obscure_approved_reply, times=1)
                 page.locator("#approve").click()
-                assert approval_replies == [(200, "APPROVED_SYNTHETIC")]
+                # Browser click dispatches an async fetch; wait for the
+                # error notice before inspecting the intercepted server reply.
                 expect(page.locator("#notice")).to_contain_text(
                     "요청 거부 또는 연결 오류")
+                assert approval_replies == [(200, "APPROVED_SYNTHETIC")]
                 expect(page.locator("#workflow-state")).to_contain_text(
                     "결과 미확인")
                 expect(page.locator("#approve")).to_be_disabled()
