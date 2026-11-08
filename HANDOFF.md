@@ -1,3 +1,16 @@
+## 2026-11-09 KST — G296 DARK UGREEN ROUND1 PROPOSAL CANDIDATE / OWNER REVIEW HANDOFF
+
+1. **Goal/requirements:** User corrected KIC→UGREEN and requested final high-readability dark Korean explanation of proprietary differentiation, benefit for UGREEN AI NAS and finalist development, plus contest-conforming English proposal candidate. Official 10 English answers ≤500 words; Skill ZIP Markdown only.
+2. **Completed:** Created Korean dark 12-page review PDF and English dark 3-page proposal candidate; exact files/hashes in STATUS G296. Korean includes full ten Q&A and extensive technical/capability/roadmap explanations.
+3. **Test evidence:** Rendered all 12+3 pages and inspected contact sheets; all extracted text bounding boxes within pages, both PDFs <1MB; English answer count **470/500**. Original ZIP SHA256 `d1d362f1d88507a97e04ce2b186040786aa3a6ec13b4840b7d436a8e45c45984` CRC PASS, 5 Markdown; prior exact vendor Checker static-pass. No re-run of unchanged Skill in G296.
+4. **Current state:** Owner review of the new English candidate PENDING; original Devpost Round1 untouched, attachment binary parity NOT_VERIFIED. NAS-excluded internal 100/100, overall provisional 75/100; official UGREEN NAS/registered Expert NOT_RUN.
+5. **Errors/limits:** HAE, LA/Lightning Azent, SOVIA not present as imported/embedded engines in Skill ZIP. Only inspiration/design lineage; do not advertise full integration or independent AI council runtime. UGREEN data locality/effective permissions and Expert response uncertain. No newly claimed actual savings.
+6. **Repo/branch/SHA:** `hibi89/hibi89-ugreen-nas-hackathon` `lead/ugreen`; pre-G296 HEAD `f990f25f23606261e2af586ba7e787cc89ac1153`; this docs-only SHA/CI to verify. Main originals in private user Library, new PDFs remain in conversation sandbox; **not** committed as public GitHub artifacts.
+7. **Environment:** PDF review and local static structure QA, no Vercel. UGREEN real NAS untested, QNAP manual synthetic separate.
+8. **Originals/backup:** Old archived PDF ZIP and submitted project not modified. Original PDF SHA `34ae9d7fecccac5bde10d977597b76f5fa7e43f3a6ecb737058314b4d8a17db7`, original ZIP above. New candidate PDFs temporary conversation outputs: Korean SHA `361d5779542bd57c798d5d91948a9cde9f47a8ab553f6089cfed2c18cb0811c0`; English `2dc8d744f8d76de4b714b3a7923cf2610d6bf468c3fdbc2f2828feb0009a21f3`. User may download; Library backup only on request.
+9. **Next:** Verify this SHA/CI; invite user to review Korean PDF and approve English proposal candidate separately before changing Devpost. If official Round1 materials already uploaded and acceptable, do not replace by default. Finalist native Expert readback, consent and video remain conditional.
+10. **KST/current evidence:** 2026-11-09; primary official Devpost rules and exact owner-original files reviewed; PDFs raster visual QA and file hashes verified, no official submission, public release or product code change.
+
 ## 2026-11-09 KST — G295 FINAL QNAP DEMO HANDOFF
 
 1. **Goal and stack:** FlowPilot 3.0 UGREEN Uliya Skill; QNAP QuTScloud browser demo used only for third-party manual synthetic NAS file operations.
