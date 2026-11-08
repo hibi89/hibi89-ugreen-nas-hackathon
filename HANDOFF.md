@@ -1,3 +1,16 @@
+## 2026-11-09 KST — G291 VERIFIED GLOBAL FREE 3-HOUR UGREEN DEMO CORRECTION
+
+1. **Goal:** User requested all free NAS access options worldwide. After extending searches to other regional languages, found genuinely official free three-hour global UGREEN AI NAS demo advertisement, correcting a previous false negative.
+2. **Evidence and result:** On https://ai-au.ugreen.com/pages/ugreen-ai-nas-feature-introduction-uk first-party UGREEN explicitly says 'Experience UGOS on AI NAS for free for 3 hours' and to use email for credentials. German first-party mirror https://ai-ca.ugreen.com/pages/ugreen-ki-nas-produktfeatures confirms. Clicking official CTA gives https://exp.ugnas.com/global/ — `Apply for trial account` JS SPA. **Official advertised no-cost offer CONFIRMED; actual account issued/working session NOT_VERIFIED.**
+3. **Validation:** Public first-party pages and outbound official CTA link checked 2026-11-09 KST, no login, email, source ZIP upload or installed Uliya. The text web client cannot run SPA JS; don't overstate availability or OS version.
+4. **State:** G280 internal NAS-excluded 100/100 unchanged, NAS-inclusive 75/100 provisional. Actual UGREEN native Skill registered Expert runtime NOT_RUN; 3h global demo may lack permissions. Official finalist 24h assigned NAS remains separate and conditional.
+5. **Cause and correction:** Prior G290 no-3h conclusion based on Chinese/English/Korean queries only; German/Japanese language queries revealed archived current international official AI NAS feature copy. G290 header now prominently supersedes its negative finding. Avoid repeated unsupported no-three-hour claims.
+6. **Repo/ref:** `hibi89/hibi89-ugreen-nas-hackathon` `lead/ugreen`, prior HEAD `1f9c0d8265e293d1eb8f58e239e25f9a5c868c39`. Updated `docs/strategy/G290_WORLDWIDE_FREE_NAS_EXPERIENCE_RESEARCH_20261109.md`, STATUS and HANDOFF atomically; verify final SHA/CI. Source functional SHA `0fc8b967...` unchanged.
+7. **Environment/deploy:** No NAS connected or deployment; only official public link + JS shell response. Production URL N/A; no active owner account established.
+8. **Secrets/original:** No API key, email, PII, original private PDF/Skill or vendor Kit transmitted to trial. Existing final Skill ZIP SHA256 `d1d362f1d88507a97e04ce2b186040786aa3a6ec13b4840b7d436a8e45c45984` and owner PDF remain unmodified in Library.
+9. **Next tasks/permissions:** User can open https://exp.ugnas.com/global/ in a normal JS browser to check email application and any Korean-region restrictions. Creating an account or transmitting an email requires user action/approval; if trial granted verify exactly which features are permitted **before** any Skill upload. If not available, fall back Chinese portal familiarity and official Nov21 finalist NAS-day process.
+10. **Evidence time/scope:** 2026-11-09 KST official UGREEN country pages and button destination only; not independently authenticated real session, unverified full Uliya Skill capability. Documentation correction, not new code/CI feature progress.
+
 ## 2026-11-09 KST — G290 WORLDWIDE UGREEN FREE NAS TEST SEARCH HANDOFF
 
 1. **Goal:** User asked for worldwide legitimate free NAS trial routes, particularly a way to validate FlowPilot 3.0 before being named a hackathon finalist.
