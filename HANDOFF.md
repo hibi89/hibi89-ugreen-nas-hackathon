@@ -1,3 +1,16 @@
+## 2026-11-09 KST — G301 OPTIONAL CONCEPT VISION FILM HANDOFF
+
+1. **Goal/requirements/tech:** User wanted an ambitious early dashboard/vision video for UGREEN AI NAS while asking about judge trust. Developed an English **concept-only** 66-second product vision video using Pillow scene assets, an original synthesized audio bed, and FFmpeg. The user asked for imagined final dashboard flow, not fabricated genuine UGREEN runtime evidence.
+2. **Completed/decision:** Ten scenes illustrate storage→workflow positioning, customer file/version pain, natural-language requirement dialogue, four-stage guidance, dashboard UI concept, evidence states, HAE/LA/SOVIA original design lineages and official finalist native NAS test targets. All scenes labelled that they are not live NAS capture.
+3. **QA:** MP4 full decode PASS, 1280×720 H.264 at 20fps + AAC, 66.0sec, 5,849,562 bytes, SHA256 `1f0a11bcf5a695cb48cfd1cfa653bc3c2823d7c3643bfca62f48cc13ed993b18`; 10 sampled visual scenes contact JPG 233,904 bytes SHA256 `458a5a99a58bbadaaee29259882ae706d2d35b86469a94438e514ff9a86274ad`. ZIP 5,660,448 bytes SHA256 `37e2347cc7a7ce2a1c02c241da5ea459eca52781d655f8da9c3fd10783120683`, CRC and byte readback PASS. No live Expert/NAS test; original code untouched.
+4. **Status:** Owner review of optional concept video pending; no video public YouTube link/Devpost change, no new official submission. Official Round1 remains original PDF/Skill ZIP; native Round2 demonstration NOT_RUN. Internal rubric 100% NAS-excluded / 75% provisional whole.
+5. **Errors/stop-pivot:** Direct FFmpeg xfade graph failed twice due reported frame_rate 1/0; do not retry unchanged. Pivot to Pillow generated crossfade PNGs+concat scheduling succeeded. Original ambient audio generated locally; no external licensed media.
+6. **Repo:** `hibi89/hibi89-ugreen-nas-hackathon` `lead/ugreen`, previous G300 HEAD `712c5533affa421018f26357f75b0787b9fcf727`. New G301 docs-only successor SHA/CI to verify. Source scripts and current MP4/ZIP exist only in conversation `/mnt/data`; not public repo/Library.
+7. **Runtime/deployment:** No Vercel website; 66-second offline MP4 only. Browser/static preview not an actual UGREEN AI NAS test.
+8. **Original/backup/security:** Final Round1 Skill ZIP 18,774B unchanged (SHA256 `d1d362f1d88507a97e04ce2b186040786aa3a6ec13b4840b7d436a8e45c45984`). Devpost submission, local NAS, rights, credentials untouched. User should download artifact if retention desired; Library backup not requested.
+9. **Next:** User may view concept MP4 and decide whether OPTIONAL Round1 media is worth a public YouTube upload; not required and judges officially review only PDF and Skill for Round1. **For Round2** replace illustrated outputs with genuine assigned UGREEN NAS Skill execution, live read-only find/stat and evidence, English narration/subtitles, video under 3m. Require separate operator approval for login, video publishing and Devpost modification.
+10. **Time/evidence:** 2026-11-09 KST; verified exact video bytes, frame/coding probes and visual samples. No claim of native runtime or product completion.
+
 ## 2026-11-09 KST — G300 DEVPOST OPTIONAL GALLERY HANDOFF
 
 1. Goal: Answer owner request to show envisioned web dashboard/final user experience on Devpost Project Media without creating misleading native UGREEN runtime evidence.
