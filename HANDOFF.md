@@ -1,3 +1,16 @@
+## 2026-11-09 KST — G299 ENGLISH-ONLY ROUND1 OWNER-READY REVIEW HANDOFF
+
+1. **Goal:** Respond to user screenshot of Korean internal '10 예선 공식 요건 점검' and explicit instruction that the actual UGREEN competition submission must be in English.
+2. **Changes:** Created clean English-only 3-page PDF with footer `ROUND 1`, no `OWNER REVIEW`/status disclaimer, retaining 10 responses 459/500 English words; transport ZIP includes this PDF, unchanged official five-Markdown Skill ZIP, and a short English README. Previous Korean 13p PDF remains private review only.
+3. **Checks:** PDF 7,860 bytes SHA256 `9fbe52db8da7ba4556238a5de68cf9d69a11eb8d6252e8144e7d624ba4d9e9df`, 3 pages, text extraction no Korean, visible page images inspected, all spans in bounds. Transport ZIP 24,848 B SHA256 `e1c8b3d5639e4e84b54136182e4664b1b2355ae5c72ab04b1432fbe90bcc8abf`, CRC/readback PASS; original Skill ZIP 18,774 B SHA256 `d1d362f1d88507a97e04ce2b186040786aa3a6ec13b4840b7d436a8e45c45984`. No new native NAS test.
+4. **States:** English submission candidate generated and inspected; external Devpost change NOT_DONE, actual old attachment identity unverified. Overall product internal NAS-excluded 100/100, inclusive 75% provisional; real NAS/registered Expert NOT_RUN.
+5. **Limits:** Outer download ZIP is **not valid as Skill ZIP**; must unpack and upload the English PDF plus unchanged inner 5-Markdown Skill ZIP separately. `SUBMISSION_READY` denotes formatting readiness only, not final authorization or contest acceptance.
+6. **Repo:** `hibi89/hibi89-ugreen-nas-hackathon`, `lead/ugreen`; pre-G299 SHA `bb341ccc8b431c567a5030dd3beb4e7b4ff0ce5d`, G299 docs-only SHA/CI check after write; file artifacts only in current conversation /mnt/data, not git or Library.
+7. **Runtime:** ReportLab/PyMuPDF local PDF generation and rendering, no Vercel; unrelated QNAP demo is not UGREEN native execution.
+8. **Originals:** Current Devpost files and owner-certified Skill ZIP untouched, no user files or secret in public git. Original hard hash listed above; earlier proposal versions preserved.
+9. **Next:** User may review English PDF and authorize any actual Devpost replacement separately; identify exact uploaded attachment before changing. If finalized, preserve submitted file receipts. If finalist, separately authorize genuine UGREEN NAS tests/video.
+10. **As-of:** 2026-11-09 KST; verified English PDF, ZIP, SHA and layout; official submission NOT_VERIFIED/NOT_PERFORMED.
+
 ## 2026-11-09 KST — G298 GUIDED NATURAL-LANGUAGE WORKFLOW VISION / PDF V3 HANDOFF
 
 1. **Goal and confirmed requirements:** User instructed a product-leader narrative for UGREEN: to pursue category leadership, build NAS hardware+AI synergy and accessible differentiated innovation. Customers describe tasks in natural language; FlowPilot guides missing document/requirement capture step by step and produces a bounded workflow plan. Maintain official Round1 English 10 answers <=500 and PDF/ZIP constraints.
