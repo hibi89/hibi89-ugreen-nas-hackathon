@@ -503,6 +503,8 @@ class Backend:
 
     def test(self,wf_id):
         with self.lock, closing(self._connect()) as db:
+            # Cross-instance SQLite write reservation must precede state checks.
+            db.execute("BEGIN IMMEDIATE")
             row=self._row(db,wf_id)
             self._verify_events(db,wf_id)
             if row[5] in ("TESTED","APPROVED_SYNTHETIC","COMPLETE_LOCAL_SYNTHETIC"):
@@ -516,7 +518,6 @@ class Backend:
                   and checked.get("fixture_executed") is True)
             receipt=_hash({"goal_sha":row[4],"status":checked.get("status"),
                            "trace":checked.get("trace",[])})
-            db.execute("BEGIN IMMEDIATE")
             db.execute("UPDATE fp_backend_workflows SET state=?, receipt_sha=? WHERE wf_id=?",
                        ("TESTED" if good else "BLOCKED",receipt,wf_id))
             self._event(db,wf_id,"SYNTHETIC_QA_PASS" if good else "SYNTHETIC_QA_BLOCKED")
@@ -611,6 +612,8 @@ class Backend:
         if type(plan_sha) is not str or type(ack) is not str:
             raise BackendRefused("APPROVAL_INPUT_INVALID",400)
         with self.lock, closing(self._connect()) as db:
+            # Cross-instance SQLite write reservation must precede state checks.
+            db.execute("BEGIN IMMEDIATE")
             row=self._row(db,wf_id)
             self._verify_events(db,wf_id)
             if plan_sha!=row[4] or ack!="APPROVE_SYNTHETIC_ONLY":
@@ -619,7 +622,6 @@ class Backend:
                 return self.get(wf_id)
             if row[5]!="TESTED":
                 raise BackendRefused("APPROVAL_STATE_CONFLICT")
-            db.execute("BEGIN IMMEDIATE")
             db.execute("UPDATE fp_backend_workflows SET state='APPROVED_SYNTHETIC' WHERE wf_id=?",
                        (wf_id,))
             self._event(db,wf_id,"SYNTHETIC_ONLY_APPROVED")
@@ -656,6 +658,8 @@ class Backend:
 
     def run(self,wf_id):
         with self.lock, closing(self._connect()) as db:
+            # Cross-instance SQLite write reservation must precede state checks.
+            db.execute("BEGIN IMMEDIATE")
             row=self._row(db,wf_id)
             self._verify_events(db,wf_id)
             if row[5]=="COMPLETE_LOCAL_SYNTHETIC":
@@ -668,7 +672,6 @@ class Backend:
                 raise BackendRefused("ARTIFACT_SCHEMA_NEEDS_OWNER_MIGRATION")
             # Commit reservation BEFORE calling the already replay-protected
             # G119 engine. A crash leaves RUNNING, never silently reruns.
-            db.execute("BEGIN IMMEDIATE")
             db.execute("UPDATE fp_backend_workflows SET state='RUNNING' WHERE wf_id=?", (wf_id,))
             self._event(db,wf_id,"RUN_RESERVED")
             db.commit()
