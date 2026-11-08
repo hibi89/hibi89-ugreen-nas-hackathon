@@ -1,3 +1,16 @@
+## 2026-11-09 KST — G280 PRE-NAS ACCEPTANCE / FIVE-REFERENCE ZIP QA
+
+1. **Goal:** Owner-approved NAS-excluded 100-point technical target by Nov11. Separate from historic 73/100 whole-product rubric. See [G280](docs/strategy/G280_PRENAS_100_ACCEPTANCE_20261109.md).
+2. **Changed:** Existing G274 public offline verifier now reads all five owner-private Markdown references, checks CRC/UTF-8, rejects symlink/special modes/unlinked or unknown members; five negative regression cases.
+3. **Tests:** Exact Library final ZIP SHA d1d362f1d88507a97e04ce2b186040786aa3a6ec13b4840b7d436a8e45c45984 rehashed; five Markdown members, archive CRC PASS. New committed source/CI **PENDING** until independently observed. No final ZIP official vendor Checker run in this session.
+4. **State:** Round1 Devpost SUBMITTED; pre-NAS target NOT YET VERIFIED; actual NAS/registered Expert NOT_RUN; historic 73/100 unchanged.
+5. **Defect/recovery:** Old checker read only two docs, may miss corruption in another member. Ordinary Git revert of the G280 change if tests regress; no originals modified.
+6. **Repository:** hibi89/hibi89-ugreen-nas-hackathon, lead/ugreen; parent d88e608224f2856084f390acec58ddd52784ed62. Verify resulting exact HEAD and CI.
+7. **Runtime:** No Vercel, external provider, vendor code execution, NAS test, trial activation or new Devpost submission.
+8. **Originals:** Library final ZIP unchanged, PDF SHA 34ae9d7fecccac5bde10d977597b76f5fa7e43f3a6ecb737058314b4d8a17db7 unchanged; no private content sent to public repository.
+9. **Next:** fix actual CI failure if any, full pre-NAS workflow/UI regression, explicit entrant authorization for exact final first-party Checker, Nov11 acceptance freeze.
+10. **Checked:** Nov9 KST, current GitHub branch, local Library ZIP, history of submission. Never credit unverified CI or NAS.
+
 ## 2026-11-07 KST — ROUND 1 SUBMISSION CONFIRMED; EXACT LIBRARY PAIR VERIFIED; OFFICIAL CHECKER AWAITS OWNER APPROVAL
 
 1. **Goal / requirements / technology:** FlowPilot 3.0 Round 1 entry uses the official Markdown-only Uliya Skill ZIP and an English PDF answering all ten prompts under 500 substantive words. Round 1 does not require NAS runtime; preserve separation between submission completion and full product/device validation.

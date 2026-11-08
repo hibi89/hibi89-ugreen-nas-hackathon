@@ -1,3 +1,11 @@
+## 2026-11-09 KST — NAS-EXCLUDED 100% TARGET / G280 ZIP REFERENCE QA (CI PENDING)
+
+- Owner redefined **pre-NAS** product goal to an evidence-gated independent 100-point scope by Nov11; historic 73/100 (includes NAS) is unchanged, no automatic percentage increment. [Rubric](docs/strategy/G280_PRENAS_100_ACCEPTANCE_20261109.md).
+- G280 source fixes offline G274 candidate guard that read only two Markdown members: checks all five members CRC/UTF-8, rejects unsafe modes/unknown members, and requires all reference links. Five synthetic negative regressions added. Exact GitHub code tests and CI **PENDING until observed**.
+- Private Library exact ZIP SHA d1d362f1d88507a97e04ce2b186040786aa3a6ec13b4840b7d436a8e45c45984, 5 Markdown, local CRC PASS, was independently rehashed without vendor execution. Exact Library PDF SHA 34ae9d7fecccac5bde10d977597b76f5fa7e43f3a6ecb737058314b4d8a17db7.
+- Final bytes official Uliya Checker, owner rights, NAS native Expert and uploaded Devpost binary identity remain unverified. Round1 submission remains confirmed and untouched. No private artifact/vendor Kit/credential uploaded to public GitHub.
+- Next: exact source CI, local functional/UI regression, independently approved official Checker and Nov11 freeze decision. Rollback code by normal Git revert; no fake +1pp.
+
 ## 2026-11-07 KST — ROUND 1 DEVPOST SUBMITTED; LIBRARY ARTIFACT PAIR RE-HASHED (technical product 73/100)
 
 - **Receipt evidence:** Participant-provided Devpost Submission History screenshot lists “FlowPilot 3.0 — AI Workflow Copilot for UGREEN NAS” under “Submitted to: UGREEN Hackathon 2026 on AI NAS”; public project page displayed “SUBMITTED TO UGREEN Hackathon 2026 on AI NAS”. Round 1 submission record is **CONFIRMED**. Do not submit a duplicate entry.
