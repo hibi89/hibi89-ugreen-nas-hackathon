@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import sys
 from tempfile import TemporaryDirectory
+from types import SimpleNamespace
 import threading
 import unittest
 from unittest.mock import patch
@@ -223,6 +224,61 @@ class BackendTests(unittest.TestCase):
         except (OSError,NotImplementedError):self.skipTest("symlinks unavailable")
         with self.assertRaisesRegex(api.BackendRefused,"DB_PATH_DENIED"):
             api.Backend(link)
+
+    def test_g281_windows_reparse_db_entry_denied_before_sqlite_open(self):
+        # Synthetic Windows FILE_ATTRIBUTE_REPARSE_POINT on a regular-looking
+        # database must not bypass a POSIX-only is_symlink() check.
+        actual_lstat = Path.lstat
+        def marked_lstat(path, *args, **kwargs):
+            original = actual_lstat(path, *args, **kwargs)
+            if path == self.db:
+                return SimpleNamespace(
+                    st_mode=original.st_mode, st_file_attributes=0x400,
+                    st_size=original.st_size, st_nlink=original.st_nlink)
+            return original
+        with patch.object(Path, "lstat", marked_lstat):
+            with self.assertRaisesRegex(api.BackendRefused, "DB_PATH_DENIED"):
+                api.Backend(self.db)
+        self.assertTrue(self.db.is_file())
+
+    def test_g281_windows_junction_parent_denies_existing_db_and_reconnect(self):
+        actual_lstat = Path.lstat
+        def marked_lstat(path, *args, **kwargs):
+            original = actual_lstat(path, *args, **kwargs)
+            if path == self.db.parent:
+                return SimpleNamespace(
+                    st_mode=original.st_mode, st_file_attributes=0x400)
+            return original
+        with patch.object(Path, "lstat", marked_lstat):
+            with self.assertRaisesRegex(api.BackendRefused, "DB_PATH_DENIED"):
+                api.Backend(self.db)
+            with self.assertRaisesRegex(api.BackendRefused, "DB_PATH_DENIED"):
+                self.b.get("wf_" + "0"*32)
+        self.assertTrue(self.db.is_file())
+
+    def test_g281_windows_junction_parent_denies_new_db_creation(self):
+        newdb = self.db.parent / "uncreated.sqlite"
+        actual_lstat = Path.lstat
+        def marked_lstat(path, *args, **kwargs):
+            original = actual_lstat(path, *args, **kwargs)
+            if path == self.db.parent:
+                return SimpleNamespace(
+                    st_mode=original.st_mode, st_file_attributes=0x400)
+            return original
+        with patch.object(Path, "lstat", marked_lstat):
+            with self.assertRaisesRegex(api.BackendRefused, "DB_PATH_DENIED"):
+                api.Backend(newdb, create=True)
+        self.assertFalse(newdb.exists())
+
+    def test_g281_actual_symlink_directory_denied(self):
+        parent_alias = self.db.parent / "folder-alias"
+        try:
+            parent_alias.symlink_to(self.db.parent, target_is_directory=True)
+        except (OSError, NotImplementedError):
+            self.skipTest("Directory symlink privilege unavailable")
+        with self.assertRaisesRegex(api.BackendRefused, "DB_PATH_DENIED"):
+            api.Backend(parent_alias / self.db.name)
+        self.assertTrue(self.db.is_file())
 
     def test_requires_explicit_token(self):
         with self.assertRaisesRegex(api.BackendRefused,"TOKEN_MUST"):
