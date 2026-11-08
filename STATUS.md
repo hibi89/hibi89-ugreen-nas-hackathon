@@ -1,3 +1,11 @@
+## 2026-11-09 KST — G300 DEVPOST ROUND1 OPTIONAL IMAGE GALLERY CONCEPT ASSETS
+
+- **Owner UI request:** Devpost Project Media optional image gallery. Official 2026 UGREEN rules rechecked: Round1 evaluated on proposal PDF + initial Skill ZIP; website/demo/video and real NAS evidence NOT required, genuine UGREEN NAS footage mandatory in Round2 only. Source: https://ugreenhackathon.devpost.com/rules .
+- **Output:** Two separately uploadable English JPGs (1500×1000, 3:2) for visual description of proposed FlowPilot: `01_FlowPilot3_Dashboard_Concept.jpg` 295,213 B SHA256 `bcbb4d97ecc363ef40ffd3a38d8c60b72c617c3c5bc37ba3f48ad76a1dbad198`; `02_FlowPilot3_Guided_Workflow_Concept.jpg` 337,513 B SHA256 `375f6c4eeab647f805978833a9866d7131661d167926c6e773f5c44f4658af4e`. Both <5MB and 3:2; English labels with persistent `CONCEPT PREVIEW / NOT A LIVE NAS CAPTURE` disclaimer. Actual graphics show illustrative counts, not NAS evidence.
+- **Download ZIP:** `UGREEN_FlowPilot3_Devpost_Concept_Gallery_20261109.zip` 554,392 B SHA256 `47a4367920c5170a65d6e7f8a6345372f2a6364e0974fa36caac2ad5c15e6e02`, CRC PASS, exactly 2 JPGs, exact dimensions/5MB checked on readback. Temporary conversation artifacts in /mnt/data, **not** uploaded to GitHub/Library/Devpost.
+- **Recommended user form:** Upload JPGs in optional image gallery, leave Round1 demo URL empty, Save & continue. Do NOT upload gallery ZIP as Skill package. No false claims of running UGREEN NAS or bundled HAE/LA/SOVIA runtimes; not part of statutory required 10-answer/Skill submission.
+- **Scope:** Product code, original Skill ZIP/PDF, existing Devpost submissions and hardware access untouched. Internal NAS-excluded 100/100 and overall provisional 75% unchanged. This is presentation asset generation, not functional validation.
+
 ## 2026-11-09 KST — G299 ENGLISH-ONLY ROUND1 UPLOAD SET / OWNER APPROVAL PENDING
 
 - **Owner clarification:** Korean 13-page document is internal explanation/review only. Round1 materials for Devpost must be in **English**. Corrected previous V3 PDF's presentation-only `OWNER REVIEW` footers and 'new owner-review candidate' disclaimer; produced clean all-English 3-page `FlowPilot3_UGREEN_Round1_ENGLISH_SUBMISSION_READY_20261109.pdf` (7,860 B, SHA256 `9fbe52db8da7ba4556238a5de68cf9d69a11eb8d6252e8144e7d624ba4d9e9df`).
