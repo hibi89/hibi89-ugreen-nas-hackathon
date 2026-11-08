@@ -113,8 +113,35 @@ def run_browser():
                 expect(page.locator("#workflow-state")).to_have_text("TESTED")
                 page.locator("#plan").click()
                 page.locator("#synthetic-consent").check()
+                # G283: the real backend commits consent, but HTTP response
+                # becomes invalid. Never keep approval enabled or retry POST.
+                tested_id=page.locator("#workflow-id").inner_text()
+                approval_replies=[]
+                def obscure_approved_reply(route):
+                    upstream=route.fetch()
+                    approval_replies.append(
+                        (upstream.status, upstream.json().get("status")))
+                    route.fulfill(status=200, content_type="application/json",
+                                  body="{")
+                page.route("**/v1/workflows/" + tested_id + "/approve",
+                           obscure_approved_reply, times=1)
                 page.locator("#approve").click()
-                expect(page.locator("#workflow-state")).to_have_text("APPROVED_SYNTHETIC")
+                assert approval_replies == [(200, "APPROVED_SYNTHETIC")]
+                expect(page.locator("#notice")).to_contain_text(
+                    "요청 거부 또는 연결 오류")
+                expect(page.locator("#workflow-state")).to_contain_text(
+                    "결과 미확인")
+                expect(page.locator("#approve")).to_be_disabled()
+                expect(page.locator("#run")).to_be_disabled()
+                expect(page.locator("#refresh")).to_be_enabled()
+                expect(page.locator("#synthetic-consent")).not_to_be_checked()
+                # Explicit GET-only reconciliation recovers the committed
+                # state without issuing a second approval operation.
+                page.locator("#refresh").click()
+                expect(page.locator("#workflow-state")).to_have_text(
+                    "APPROVED_SYNTHETIC")
+                expect(page.locator("#run")).to_be_enabled()
+                assert approval_replies == [(200, "APPROVED_SYNTHETIC")]
 
                 # G282: an uncertain new Create reply must not retain a
                 # previously approved executable workflow in the browser.
