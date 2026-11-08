@@ -19,6 +19,7 @@ class G274ContractTests(unittest.TestCase):
                 unlinked=False, unknown_member=False):
         main = '\n'.join(mod.CHECKS[mod.MAIN])
         ref = '\n'.join(mod.CHECKS[mod.CONTRACT])
+        main += '\n' + mod.CONTRACT.removeprefix(mod.ROOT)
         if unbounded:
             main = main.replace('Never use unbounded ls', 'ls, find or stat in that folder')
         if low_limit:
