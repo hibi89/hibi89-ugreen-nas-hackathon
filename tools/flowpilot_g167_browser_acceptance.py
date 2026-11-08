@@ -115,6 +115,36 @@ def run_browser():
                 page.locator("#synthetic-consent").check()
                 page.locator("#approve").click()
                 expect(page.locator("#workflow-state")).to_have_text("APPROVED_SYNTHETIC")
+
+                # G282: an uncertain new Create reply must not retain a
+                # previously approved executable workflow in the browser.
+                approved_id=page.locator("#workflow-id").inner_text()
+                expect(page.locator("#run")).to_be_enabled()
+                page.route("**/v1/workflows",
+                           lambda route: route.fulfill(
+                               status=200, content_type="application/json", body="{"),
+                           times=1)
+                page.locator("#create").click()
+                expect(page.locator("#notice")).to_contain_text("요청 거부 또는 연결 오류")
+                expect(page.locator("#workflow-state")).to_have_text("미생성")
+                expect(page.locator("#run")).to_be_disabled()
+                expect(page.locator("#synthetic-consent")).not_to_be_checked()
+
+                # A failed Load must also keep old approval revoked, and a
+                # fresh GET to the SAME existing ID may safely reestablish it.
+                page.locator("#list").click()
+                page.locator("#existing").select_option(approved_id)
+                page.route("**/v1/workflows/" + approved_id,
+                           lambda route: route.fulfill(
+                               status=200, content_type="application/json", body="{"),
+                           times=1)
+                page.locator("#load").click()
+                expect(page.locator("#notice")).to_contain_text("요청 거부 또는 연결 오류")
+                expect(page.locator("#workflow-state")).to_have_text("미생성")
+                expect(page.locator("#run")).to_be_disabled()
+                page.locator("#load").click()
+                expect(page.locator("#workflow-state")).to_have_text("APPROVED_SYNTHETIC")
+                expect(page.locator("#run")).to_be_enabled()
                 page.locator("#run").click()
                 expect(page.locator("#workflow-state")).to_have_text("COMPLETE_LOCAL_SYNTHETIC")
                 page.locator("#guide").click()
