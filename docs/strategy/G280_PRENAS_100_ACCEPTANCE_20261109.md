@@ -1,3 +1,5 @@
+> **2026-11-09 VERIFIED:** `5fb9bb70` functional GitHub Actions 4/4 SUCCESS; Linux 1727 PASS / 0 FAIL / 16 SKIP, Windows full SUCCESS; this completes G280 ZIP guard regression but not the entire PRE-NAS 100%. First `39fc881e` synthetic fixture error was corrected.
+
 # FlowPilot 3.0 — NAS-excluded 100% acceptance baseline (2026-11-09 KST)
 
 **OWNER APPROVED:** Complete the full NAS-independent product by Nov 11, 2026; derive later contest submissions from the finished product rather than cutting features to fit a submission. Keep the already-submitted Round1 Devpost project unchanged unless independently authorized.

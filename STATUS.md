@@ -1,3 +1,11 @@
+## 2026-11-09 KST — G280 SOURCE REGRESSION VERIFIED, PRE-NAS 100% NOT YET CLAIMED
+
+- **Functional code SHA:** `5fb9bb7039fdbc21edd2403d0ee2b1366d7454ac`; parent implementation `39fc881ef4c4d23b2455f4be8ba0478addd3790d`. First CI on parent failed solely due to a missing mandatory owner-evidence link in synthetic *positive test fixture* (2 FAIL, 1 ERROR); corrected fixture only in `5fb9bb70`. No product source rollback or fake pass.
+- **Exact SHA Actions 4/4 SUCCESS:** [Linux/Windows function suite](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/42514408983) — Linux **1,727 PASS / 0 FAIL / 16 SKIP (1,743 total)**, Windows Python 3.11 full SUCCESS; [readiness](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/42514409009) SUCCESS, [master](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/42514408988) SUCCESS, [closeout](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/42514409051) SUCCESS.
+- **Real improvement:** all five current Skill ZIP references are now checked for CRC, encoding, type and direct links; five new negative test cases are included. Independently checked actual final Library ZIP CRC, all five UTF-8 docs, hashes, expected file set and main links; this is a local offline check, not vendor official Checker execution.
+- **New completion basis:** [G280 pre-NAS 100-point rubric](docs/strategy/G280_PRENAS_100_ACCEPTANCE_20261109.md); TARGET NOT YET 100. Historical whole-product **73/100** unchanged. Separate official vendor-checker permission, rights review, UI source-specific E2E and any remaining local feature gaps must still be addressed.
+- **No external operation:** Round1 remains submitted; no Devpost replacement, vendor JS execution, actual registered Expert/NAS run, payment or private binary upload. This note updates evidence only; full functional test evidence belongs to `5fb9bb70`.
+
 ## 2026-11-09 KST — NAS-EXCLUDED 100% TARGET / G280 ZIP REFERENCE QA (CI PENDING)
 
 - Owner redefined **pre-NAS** product goal to an evidence-gated independent 100-point scope by Nov11; historic 73/100 (includes NAS) is unchanged, no automatic percentage increment. [Rubric](docs/strategy/G280_PRENAS_100_ACCEPTANCE_20261109.md).

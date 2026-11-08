@@ -1,3 +1,16 @@
+## 2026-11-09 KST — G280 POST-CI ACCEPTANCE HANDOFF (functional SHA 5fb9bb70)
+
+1. **Goal/scope:** Nov11 pre-NAS technical 100% target (seven gates in G280 rubric), old genuine NAS-inclusive 73/100 remains separate.
+2. **Changes:** G274 public artifact verifier now covers all five linked Markdown members, full CRC/UTF-8, file types and ZIP limits. Five negative cases added. Original ZIP/PDF unchanged.
+3. **Tests:** First `39fc881e` CI had **2 failures / 1 error** from incomplete positive synthetic fixture, which omitted its required contract link. Fixture corrected in `5fb9bb70` without altering production logic. [Functional run 42514408983](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/42514408983) **Linux 1727 PASS/0 FAIL/16 SKIP (1743 tests)**, Windows full SUCCESS. [Readiness 42514409009](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/42514409009), [master 42514408988](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/42514408988), [closeout 42514409051](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/42514409051) SUCCESS (4/4).
+4. **Completion:** This is a validated artifact QA improvement, NOT full pre-NAS 100%. The historic 73/100 full-product score remains unchanged; native NAS and Expert NOT_RUN. Round1 Devpost SUBMITTED.
+5. **Error/recovery:** Previous G274 omitted unrelated reference integrity. G280 hardening is successful. Restore by normal revert of changes if necessary; never force push.
+6. **Repository:** hibi89/hibi89-ugreen-nas-hackathon `lead/ugreen`; exact verified functional code SHA `5fb9bb7039fdbc21edd2403d0ee2b1366d7454ac`. Documentation-only closeout SHA generated after this handoff, confirm final HEAD.
+7. **Runtime:** Python 3.11 Linux/Windows CI only; Vercel N/A; registered NAS/Expert NOT_RUN.
+8. **Originals:** Final private Library ZIP 18774 bytes, SHA256 d1d362f1d88507a97e04ce2b186040786aa3a6ec13b4840b7d436a8e45c45984; PDF SHA256 34ae9d7fecccac5bde10d977597b76f5fa7e43f3a6ecb737058314b4d8a17db7; retained unchanged, not posted to public GitHub.
+9. **Next:** first check the specific pre-NAS rubric for actual unearned gates. Test current local UI and recovery; with separate explicit entrant permission, execute pinned first-party Checker on same final private ZIP and record exit/JSON. Entrant personally reviews rights; Nov11 freeze only when evidence complete.
+10. **Timestamp:** checked Nov9 KST, GitHub Actions exact source run URLs and Library metadata. No automatic score increase merely because CI ran.
+
 ## 2026-11-09 KST — G280 PRE-NAS ACCEPTANCE / FIVE-REFERENCE ZIP QA
 
 1. **Goal:** Owner-approved NAS-excluded 100-point technical target by Nov11. Separate from historic 73/100 whole-product rubric. See [G280](docs/strategy/G280_PRENAS_100_ACCEPTANCE_20261109.md).
