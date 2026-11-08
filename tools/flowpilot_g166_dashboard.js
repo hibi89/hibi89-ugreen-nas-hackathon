@@ -348,10 +348,22 @@ el("test").addEventListener("click", () => act(async () => {
 el("approve").addEventListener("click", () => act(async () => {
   if (workflow?.status !== "TESTED" || verifiedPlan !== workflow.plan_sha256 ||
       !el("synthetic-consent").checked) throw Error("TESTED · 해시 확인 · 명시적 동의가 필요합니다.");
+  const id = workflow.workflow_id;
   const hash = verifiedPlan;
-  resetWorkflow(await json("/v1/workflows/" + workflow.workflow_id + "/approve", {
+  // The server may commit an approval even when its response is lost.
+  // Revoke the one-use consent and all executable authority BEFORE POST.
+  // Only explicit GET readback may restore the verified server state.
+  resetWorkflow({workflow_id:id, status:"UNKNOWN_REQUIRES_READBACK"});
+  const result = await json("/v1/workflows/" + id + "/approve", {
     plan_sha256: hash, acknowledgement: "APPROVE_SYNTHETIC_ONLY"
-  }));
+  });
+  if (result.workflow_id !== id || result.status !== "APPROVED_SYNTHETIC" ||
+      result.plan_sha256 !== hash || result.synthetic_only !== true ||
+      result.nas_verified !== false || result.registered_expert_invoked !== false ||
+      result.release_gate !== "HOLD" || !Number.isInteger(result.event_count) ||
+      result.event_count < 3)
+    throw Error("합성 승인 응답 미확정 · 읽기 전용 상태 조회가 필요합니다.");
+  resetWorkflow(result);
   status("합성 실행만 승인됨 · NAS 접근 미승인"); output(workflow);
 }));
 el("refresh").addEventListener("click", () => act(async () => {
