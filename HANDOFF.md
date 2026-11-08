@@ -1,3 +1,16 @@
+## 2026-11-09 KST — G294 QNAP FOLLOW-UP EVIDENCE / CLOSEOUT
+
+1. **Goal:** Preserve genuine QNAP synthetic NAS evidence while keeping UGREEN FlowPilot 3.0 Skill and release originals unchanged.
+2. **Observed:** Initial three-file directory expanded to four after adding `최종보고서.txt` (135 B). Existing three file sizes 123/127/120 B remained visible. QNAP filename search `계약서` returned both v1/v2. Properties and permission UI for v2 inspected.
+3. **Verification:** UI screenshots support file-list transition, filename search and metadata display; owner `qnap`, group `everyone`, DataVol1, pool 1; read/write checked for owner/group/public rows and execute unchecked. Text Editor not installed, raw browser viewer Korean garbled. No automated algorithm, content hashes, readback of correct Korean text, actual agent calls or HOLD-to-APPROVE observed.
+4. **Status:** NAS-excluded internal 100/100; overall 75/100 provisional; actual UGREEN NAS/Uliya Expert NOT_RUN. Round1 original submission untouched.
+5. **Limitations:** Third-party QNAP manual UI is not UGREEN compatibility evidence. UI public permission row is not proof of anonymous network access. Avoid installs, permissions edits, firmware changes or unnecessary repeated UI actions.
+6. **Repo:** `hibi89/hibi89-ugreen-nas-hackathon` `lead/ugreen`; pre-G294 HEAD `b0894989ae92608c1038654f96c0a4c47125a999` CI 2/2 SUCCESS; G294 SHA to verify after commit. Key paths `STATUS.md`, `HANDOFF.md`, official Skill under `skill/flowpilot-nas/`.
+7. **Deployment:** Vercel N/A. QNAP public 90-minute browser demo only; official UGREEN NAS/Expert environment not available in this test.
+8. **Originals:** No modifications to owner final ZIP/PDF or product code; previous artifact hashes in G293 preserved; no secrets or QNAP demo host committed.
+9. **Next:** Verify G294 SHA and CI, then HOLD for separately approved real UGREEN Expert/Skill runtime testing. Any further offline verification should be tied to a concrete untested feature, not artificial percentage gains.
+10. **Timestamp:** 2026-11-09 KST; evidence user screenshots in current conversation; docs-only closeout, no live UGREEN claims.
+
 ## 2026-11-09 KST — G293 QNAP MANUAL TEST CLOSEOUT / NEXT-CHAT HANDOFF
 
 1. **Goal/technology:** FlowPilot 3.0 official UGREEN Uliya Skill remains frozen; QNAP QuTScloud File Station 5 is a third-party manual file-management comparison only.
