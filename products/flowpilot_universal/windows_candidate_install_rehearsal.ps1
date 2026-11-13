@@ -42,7 +42,7 @@ function Expected-Names([object]$obj) {
   foreach ($name in $names) {
     $parts = $name.Split('/')
     if ($parts.Count -lt 2 -or $parts[0] -cne 'FlowPilotUniversal' -or
-        ($parts | Where-Object { $_ -in @('', '.', '..') -or $_ -match '[\\:<>"|?*\x00-\x1f]' }).Count -gt 0 -or
+        @($parts | Where-Object { $_ -in @('', '.', '..') -or $_ -match '[\\:<>"|?*\x00-\x1f]' }).Count -gt 0 -or
         -not $seen.Add($name)) { Stop-Hold 'duplicate or unsafe archive member' }
   }
   return $names
