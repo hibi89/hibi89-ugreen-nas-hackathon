@@ -10,6 +10,7 @@ from tkinter import filedialog, messagebox, ttk
 from pathlib import Path
 
 from .session import backup_history, recent_history, run_session, verify_history_entry
+from .manifest_editor import create_approved_manifest, render_manifest
 
 
 class App:
@@ -28,6 +29,10 @@ class App:
         self.stop = threading.Event()
         self.worker: threading.Thread | None = None
         self.history_rows: list[dict] = []
+        self.editor_window: tk.Toplevel | None = None
+        self.editor_title: tk.StringVar | None = None
+        self.editor_approval: tk.BooleanVar | None = None
+        self.editor_text: tk.Text | None = None
         main = ttk.Frame(master, padding=18)
         main.pack(fill="both", expand=True)
         ttk.Label(main, text="FlowPilot Universal", font=("", 20, "bold")).pack(anchor="w")
@@ -45,6 +50,7 @@ class App:
             action = (lambda v=var: v.set(filedialog.askdirectory() or v.get())) if kind == "folder" else (
                 lambda v=var: v.set(filedialog.askopenfilename(filetypes=[("JSON", "*.json"), ("All", "*")]) or v.get()))
             ttk.Button(bar, text="찾기", command=action).pack(side="left", padx=(8, 0))
+        ttk.Button(main, text="납품 요구사항 JSON 직접 작성", command=self.open_template_editor).pack(anchor="w", pady=(5, 0))
         ttk.Checkbutton(main, text="이 폴더에 대한 합법적 읽기 권한이 있으며 해당 범위의 검사를 승인합니다.",
                         variable=self.consent).pack(anchor="w", pady=(18, 6))
         ttk.Checkbutton(main, text="부분 이어하기 (이전 해시는 검토용으로만 재사용, READY 판정은 새 전체 검사 필요)",
@@ -72,6 +78,60 @@ class App:
         ttk.Label(main, text="이어하기는 완료 파일의 메타데이터·SHA를 검토용으로 재사용하므로 NEEDS_REVIEW입니다. 체크 해제 후 전체 재해시해야 READY입니다.",
                   wraplength=820).pack(anchor="w", pady=(10, 0))
         self.master.after(100, self.drain)
+
+    def open_template_editor(self):
+        """Independent checklist only; never derive requirements from scanned files."""
+        if self.editor_window is not None and self.editor_window.winfo_exists():
+            self.editor_window.lift()
+            return
+        child = tk.Toplevel(self.master)
+        child.title("납품 요구사항 작성 | 검증 전 사용자 승인 필수")
+        child.geometry("770x520")
+        self.editor_window = child
+        self.editor_title = tk.StringVar(master=child, value="납품 파일 검수")
+        self.editor_approval = tk.BooleanVar(master=child, value=False)
+        frame = ttk.Frame(child, padding=15)
+        frame.pack(fill="both", expand=True)
+        ttk.Label(frame, text="독립 계약·체크리스트에서 필수 파일을 입력하세요. 스캔된 폴더에서 요구사항을 자동 추출하지 않습니다.",
+                  wraplength=740).pack(anchor="w")
+        ttk.Label(frame, text="한 줄에 파일 상대경로 1개, 필요하면 TAB 뒤에 SHA-256 64자리. 예: docs/readme.pdf",
+                  wraplength=740).pack(anchor="w", pady=(7, 9))
+        ttk.Entry(frame, textvariable=self.editor_title).pack(fill="x", pady=(0, 10))
+        edit = tk.Text(frame, height=15, wrap="none", undo=True)
+        edit.pack(fill="both", expand=True)
+        self.editor_text = edit
+        ttk.Checkbutton(frame, variable=self.editor_approval,
+                        text="스캔 원본과 독립된 계약/납품조건 목록을 직접 확인했고, 이 요구사항을 승인합니다."
+                        ).pack(anchor="w", pady=(12, 9))
+        ttk.Button(frame, text="승인한 요구사항을 새 JSON으로 저장 (덮어쓰기 금지)",
+                   command=self.save_template_editor).pack(anchor="w")
+
+    def save_template_editor(self):
+        if (self.editor_window is None or not self.editor_window.winfo_exists()
+                or self.editor_text is None or self.editor_title is None
+                or self.editor_approval is None):
+            return
+        try:
+            raw_root = self.root.get().strip()
+            if not raw_root:
+                raise ValueError("먼저 검사할 권한이 있는 원본 폴더를 선택하세요.")
+            title = self.editor_title.get()
+            lines = self.editor_text.get("1.0", "end-1c")
+            approval = self.editor_approval.get()
+            # Validate and request explicit approval BEFORE showing any save dialog.
+            render_manifest(title, lines, approved=approval)
+            target = filedialog.asksaveasfilename(
+                parent=self.editor_window, title="새 납품 요구사항 JSON 저장",
+                defaultextension=".json", filetypes=[("JSON", "*.json")])
+            if not target:
+                return
+            created = create_approved_manifest(title, lines, Path(target), Path(raw_root), approved=approval)
+            self.manifest.set(str(created))
+            messagebox.showinfo("새 검수 요구사항 저장", "사용자 승인 JSON 저장 완료: " + str(created))
+            self.editor_window.destroy()
+            self.editor_window = None
+        except Exception as exc:
+            messagebox.showerror("검수 요구사항 저장 보류", str(exc))
 
     def start(self):
         if self.worker is not None and self.worker.is_alive():

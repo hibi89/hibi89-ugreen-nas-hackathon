@@ -7,6 +7,8 @@ on:
       - "products/flowpilot_universal/flowpilot_universal/pdf_report.py"
       - "products/flowpilot_universal/flowpilot_universal/session.py"
       - "products/flowpilot_universal/flowpilot_universal/gui.py"
+      - "products/flowpilot_universal/flowpilot_universal/manifest_editor.py"
+      - "products/flowpilot_universal/verify_delivery_archive.py"
       - ".github/workflows/flowpilot-universal-exe.yml"
   workflow_dispatch:
 permissions:
@@ -31,8 +33,17 @@ jobs:
       - name: Run bundled EXE with live Tk and synthetic source on runner
         run: |
           python -c "import subprocess,sys,pathlib; exe=pathlib.Path('dist/FlowPilotUniversal/FlowPilotUniversal.exe'); assert exe.is_file(); result=subprocess.run([str(exe.resolve()),'--self-test'],timeout=90,check=False); print('EXE_EXIT',result.returncode); sys.exit(result.returncode)"
-      - name: Report binary checksum without publication
+      - name: Package complete onedir folder and verify SHA index (CI-only)
+        run: |
+          python verify_delivery_archive.py --build dist/FlowPilotUniversal dist/flowpilot-internal-candidate.zip
+          python verify_delivery_archive.py --verify dist/flowpilot-internal-candidate.zip
+          python verify_delivery_archive.py --extract dist/flowpilot-internal-candidate.zip dist/relocated
+      - name: Run relocated EXE with developer Python removed from PATH
+        run: |
+          python -c "import subprocess,sys,pathlib,os; exe=pathlib.Path('dist/relocated/FlowPilotUniversal/FlowPilotUniversal.exe').resolve(); assert exe.is_file(); env=os.environ.copy(); env.pop('PYTHONPATH',None); env.pop('PYTHONHOME',None); win=env.get('SystemRoot','C:\Windows'); env['PATH']=win+'\System32;'+win; result=subprocess.run([str(exe),'--self-test'],env=env,timeout=90,check=False); print('RELOCATED_EXE_EXIT',result.returncode); sys.exit(result.returncode)"
+      - name: Report candidate and EXE SHA256 without publication
         shell: pwsh
         run: |
           Get-FileHash -Algorithm SHA256 -Path "dist/FlowPilotUniversal/FlowPilotUniversal.exe" | Format-List
+          Get-FileHash -Algorithm SHA256 -Path "dist/flowpilot-internal-candidate.zip" | Format-List
           Write-Host "UNSIGNED / LOCAL CI ONLY / NOT A CUSTOMER RELEASE"

@@ -61,6 +61,42 @@ class DesktopGUIAcceptance(unittest.TestCase):
         self.assertGreaterEqual(self.app.history.size(), 3)
         self.assertEqual((self.source / "납품원본.txt").read_bytes(), b"immutable-delivery")
 
+    def test_real_tk_create_approved_manifest_and_scan(self):
+        target = self.output / "고객 승인 체크리스트.json"
+        self.app.open_template_editor()
+        self.assertIsNotNone(self.app.editor_text)
+        self.app.editor_text.insert("1.0", "납품원본.txt\n")
+        with patch("flowpilot_universal.gui.messagebox.showerror") as errors, \
+             patch("flowpilot_universal.gui.filedialog.asksaveasfilename") as dialog:
+            self.app.save_template_editor()
+            errors.assert_called_once()
+            dialog.assert_not_called()
+        self.app.editor_approval.set(True)
+        with patch("flowpilot_universal.gui.filedialog.asksaveasfilename", return_value=str(target)), \
+             patch("flowpilot_universal.gui.messagebox.showinfo") as success:
+            self.app.save_template_editor()
+            success.assert_called_once()
+        self.assertEqual(self.app.manifest.get(), str(target))
+        self.assertEqual(json.loads(target.read_text(encoding="utf-8"))["expected_files"][0]["path"],
+                         "납품원본.txt")
+        self.assertEqual((self.source / "납품원본.txt").read_bytes(), b"immutable-delivery")
+        self.app.consent.set(True)
+        self.app.start()
+        self._drive()
+        self.assertTrue(self.app.status.get().startswith("READY"), self.app.status.get())
+
+    def test_gui_manifest_editor_refuses_source_write(self):
+        self.app.open_template_editor()
+        self.app.editor_text.insert("1.0", "납품원본.txt\n")
+        self.app.editor_approval.set(True)
+        target = self.source / "unsafe-manifest.json"
+        with patch("flowpilot_universal.gui.filedialog.asksaveasfilename", return_value=str(target)), \
+             patch("flowpilot_universal.gui.messagebox.showerror") as errors:
+            self.app.save_template_editor()
+            errors.assert_called_once()
+        self.assertFalse(target.exists())
+        self.assertEqual((self.source / "납품원본.txt").read_bytes(), b"immutable-delivery")
+
     def test_real_tk_pdf_report_history_verification(self):
         self.app.consent.set(True)
         self.app.pdf.set(True)
