@@ -1,4 +1,5 @@
-# FlowPilot Universal final-product design and P50/P70 traceability
+> **2026-11-13 KST P85 개발 증거:** functional SHA `b66ba07b1cef34f0dff7683a9edc5e44684ac852`; [Linux/Windows CI](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43383780676) 각 **55개 고유 테스트 PASS**, portable 8개 재실행/OS PASS, 실제 Tk GUI 1건/OS PASS; 2/2 jobs SUCCESS, 컴파일 검증 PASS. [최종설계 정책 검사](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43383781197) SUCCESS. **기술 P85 일부 구현**이나 EXE/설치·실 고객 Windows10/11·USB·SMB NAS·진정한 증분 재개·PDF·상업권·승인된 전체 100점 가중치 미충족. 따라서 **공식 최종완성률 UNASSESSED**, 사용자 목표 85% 미인정, **[작업중]·RELEASE HOLD 유지**. [P85 상세](P85_EVIDENCE.md).
+# FlowPilot Universal final-product design and P50/P70/P85 traceability
 
 Source: central approved product brief at hackathon-command-center-2026/kmong-productization/docs/commercial/KMONG_3_NEW_PRODUCTS_20261112.md. This separate product MUST NOT be conflated with the UGREEN NAS Skill or its contest progress.
 

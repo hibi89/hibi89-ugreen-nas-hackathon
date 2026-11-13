@@ -1,3 +1,17 @@
+# LATEST 2026-11-13 KST — FlowPilot Universal P85 progress (target 85% still unverified)
+
+- Owner target is **85% of original full F01-F10 final blueprint**, not P85 engineering scope. No approved 100-point weighting and independent customer acceptance: **official final completion UNASSESSED**, goal not certified. Central **[작업중]** remains, SALE/RELEASE HOLD.
+- New features: deterministic Python3.11+ zipapp (`.pyz`, NOT EXE); in-archive source manifest/SHA, create-only UTF-8 sidecar, SHA/tamper/traversal/duplicate ZIP validation, executable CLI on Windows and Linux; bounded file/manifest reads; duplicate JSON key and Windows-unsafe path refusal; input manifest bytes fixed to exact recorded audit SHA; JSON/HTML report integrity cross-check against local SQLite audit row; GUI select history and verify.
+- Exact source SHA: `b66ba07b1cef34f0dff7683a9edc5e44684ac852` at `hibi89/hibi89-ugreen-nas-hackathon@product/flowpilot-universal`.
+- CI [#43383780676](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43383780676): Linux and Windows Python3.11 each **55 PASS / 0 FAIL / 0 SKIP**; portable 8 PASS repeated separately each OS (not extra unique cases), real Tk widget event-loop 1 PASS each (Linux Xvfb/Windows hosted); Python compileall PASS; 2/2 jobs SUCCESS. [Policy check](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43383781197) SUCCESS, policy only.
+- Still missing: standalone Windows EXE/installer/signing, physical customer Windows10/11 and USB/authorized SMB NAS, true incremental checkpoint resume, native PDF, authenticated third-party provenance, commercial ownership/NOTICE/support and approved full-design weights; no production/Vercel (N/A).
+- Deployment/customer data: none. UGREEN lead/ugreen, main, official NAS Skill and submitted work untouched. History, reports and zipapp create-only and never auto deleted; rollback from pre-P85 commit `885f382e45246935aa9a34c840e5f5876fe57e1c`.
+- See `P85_EVIDENCE.md`; central hub `kmong-productization` FlowPilot row and STATUS/HANDOFF must be updated after this commit and re-read, preserving other products.
+
+---
+
+## Historical P70/P50 records (retained)
+
 ## [LATEST 2026-11-13 KST] Real Tk widget smoke / P70 technical QA improvement
 - Functional SHA `18273d2c7a9909a5d65bdba4aecc2a8097f9a157`, [CI #43380594623](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43380594623) Ubuntu 30/30 + Windows 30/30 PASS, 0 FAIL, Linux Xvfb actual Tk event-loop GUI consent/scan/history/backup/recheck 1/1 PASS. Prior GUI module-import-only statement below is historical.
 - Scope limitations: physical customer Windows Tk GUI click not run; real USB/UNC SMB/NAS and true incremental checkpoint resume unverified/unbuilt. **Official final product rate UNASSESSED**, owner target 70% not independently certified; central [작업중] and RELEASE HOLD persist.

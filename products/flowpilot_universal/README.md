@@ -1,3 +1,21 @@
+> **2026-11-13 KST P85 개발 증거:** functional SHA `b66ba07b1cef34f0dff7683a9edc5e44684ac852`; [Linux/Windows CI](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43383780676) 각 **55개 고유 테스트 PASS**, portable 8개 재실행/OS PASS, 실제 Tk GUI 1건/OS PASS; 2/2 jobs SUCCESS, 컴파일 검증 PASS. [최종설계 정책 검사](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43383781197) SUCCESS. **기술 P85 일부 구현**이나 EXE/설치·실 고객 Windows10/11·USB·SMB NAS·진정한 증분 재개·PDF·상업권·승인된 전체 100점 가중치 미충족. 따라서 **공식 최종완성률 UNASSESSED**, 사용자 목표 85% 미인정, **[작업중]·RELEASE HOLD 유지**. [P85 상세](P85_EVIDENCE.md).
+# FlowPilot Universal P85 technical package — Python 3.11+ required
+
+From `products/flowpilot_universal`, build the first-party create-only `.pyz` **outside the product source directory**:
+
+    python -m flowpilot_universal.portable --build /existing-external-folder/NEW-flowpilot.pyz
+    python -m flowpilot_universal.portable --verify /existing-external-folder/NEW-flowpilot.pyz
+    python /existing-external-folder/NEW-flowpilot.pyz --help
+    python /existing-external-folder/NEW-flowpilot.pyz --gui
+
+The example paths are placeholders. Output target and `.sha256` sidecar must be new. `.pyz` needs Python on customer's PC; it is **not a Windows EXE, code signature or installer**. After scanning in the Tk app, select an audit history row and click `선택 이력 검증`: check local JSON SHA and HTML against SQLite audit record; a coordinated editor of both DB and evidence is outside this protection.
+
+Core scan is read-only and offline. Cancel produces `INCOMPLETE`; restart rehashes, not a verified incremental checkpoint. Windows native Tk smoke was run on GitHub-hosted Windows, **not physical buyer Windows10/11**. Production/NAS customer release HOLD. [Evidence](P85_EVIDENCE.md).
+
+---
+
+## Historical P70/P50 instructions
+
 > **2026-11-13 KST additional live Tk proof:** Functional SHA `18273d2c7a9909a5d65bdba4aecc2a8097f9a157`, [GitHub Actions #43380594623](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43380594623) Linux30/30, Windows30/30 PASS and Linux Xvfb actual Tk widget/event-loop consent→scan→history→backup→repeat full scan **1/1 PASS**. This is a synthetic virtual-display desktop interaction, **not** a physical customer Windows10/11 or SMB NAS acceptance. Official rate remains **UNASSESSED**, 70% goal not certified, [작업중] and RELEASE HOLD unchanged.
 
 # FlowPilot Universal — Offline P70 workbench (technical subset; SALE HOLD)
