@@ -181,8 +181,14 @@ def scan(root: Path, manifest: dict[str, Any], *,
                 issues.append({"code": "UNSUPPORTED_FILE_TYPE", "path": rel})
         try:
             dir_after = directory.lstat()
+            # Directory mtimes are not reliable on Windows/SMB. Relist names as
+            # an additional fail-closed check; this is not an atomic snapshot.
+            with os.scandir(directory) as verify_iterator:
+                after_names = sorted(item.name for item in verify_iterator)
+            before_names = sorted(item.name for item in entries)
             if (_is_link(dir_after) or not stat.S_ISDIR(dir_after.st_mode)
                     or dir_before.st_mtime_ns != dir_after.st_mtime_ns
+                    or before_names != after_names
                     or (os.name != "nt" and (dir_before.st_dev, dir_before.st_ino) !=
                         (dir_after.st_dev, dir_after.st_ino))):
                 issues.append({"code": "DIRECTORY_CHANGED", "path": prefix or "."})

@@ -1,5 +1,6 @@
 """P70 synthetic-only desktop/session regressions, no real NAS or customer data."""
 import json
+from contextlib import closing
 import os
 import sqlite3
 import tempfile
@@ -44,7 +45,7 @@ class UniversalSessionTests(unittest.TestCase):
         records = recent_history(self.output)
         self.assertEqual(len(records), 1)
         self.assertEqual(records[0]["status"], "READY")
-        with sqlite3.connect(result.history_path) as db:
+        with closing(sqlite3.connect(result.history_path)) as db:
             self.assertEqual(db.execute("PRAGMA user_version").fetchone()[0], 1)
             self.assertEqual(db.execute("PRAGMA application_id").fetchone()[0], APP_ID)
 
@@ -103,7 +104,7 @@ class UniversalSessionTests(unittest.TestCase):
 
     def test_unknown_sqlite_history_refused(self):
         foreign = self.output / HISTORY_FILE
-        with sqlite3.connect(foreign) as db:
+        with closing(sqlite3.connect(foreign)) as db:
             db.execute("CREATE TABLE unrelated (id INTEGER)")
         with self.assertRaises(InputError):
             run_session(self.root, self.manifest, self.output, consent=True)
