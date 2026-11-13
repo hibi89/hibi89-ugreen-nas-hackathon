@@ -11,6 +11,7 @@ from typing import Any, Callable
 
 MANIFEST_LIMIT = 1_048_576
 MAX_FILES = 20_000
+MAX_DIRECTORIES = 25_000
 MAX_BYTES = 8 * 1024**3
 CHUNK_SIZE = 1024 * 1024
 VERSION_RE = re.compile(r"(?i)(?:[ ._-]*(?:ver(?:sion)?|rev|v|r)[ ._-]*\d+|[ ._-]*(?:final|copy|복사본)(?:[ ._-]*\d+)?)$")
@@ -129,6 +130,7 @@ def scan(root: Path, manifest: dict[str, Any], *,
     traversed = 0
     stack: list[tuple[Path, str]] = [(root, "")]
     stopped = False
+    directories_visited = 0
     max_files = manifest["limits"]["max_files"]
     max_bytes = manifest["limits"]["max_bytes"]
     while stack and not stopped:
@@ -137,6 +139,11 @@ def scan(root: Path, manifest: dict[str, Any], *,
             stopped = True
             break
         directory, prefix = stack.pop()
+        directories_visited += 1
+        if directories_visited > MAX_DIRECTORIES:
+            issues.append({"code": "SCAN_LIMIT", "path": prefix or "."})
+            stopped = True
+            break
         try:
             dir_before = directory.lstat()
             if _is_link(dir_before) or not stat.S_ISDIR(dir_before.st_mode):

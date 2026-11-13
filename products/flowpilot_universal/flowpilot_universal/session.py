@@ -4,6 +4,7 @@ No file under the scanned source root is written. Local history may contain file
 """
 from __future__ import annotations
 
+from contextlib import closing
 from dataclasses import dataclass
 from datetime import datetime, timezone
 import hashlib
@@ -86,7 +87,7 @@ def recent_history(output_dir: Path, limit: int = 50) -> list[dict]:
     if not 1 <= limit <= 200:
         raise InputError("history limit must be 1..200")
     path = output_dir / HISTORY_FILE
-    if not path.exists():
+    if not os.path.lexists(path):
         return []
     if path.is_symlink() or not stat.S_ISREG(path.lstat().st_mode):
         raise InputError("unsafe history file")
@@ -143,3 +144,33 @@ def run_session(
         db.close()
     return SessionResult(session_id, report["status"], report["files_scanned"],
                          len(report["issues"]), json_path, html_path, history_path)
+
+
+def backup_history(output_dir: Path) -> Path:
+    """User-triggered create-only online SQLite backup; never modifies prior backups.
+
+    A failed copy stays on disk for inspection rather than being silently deleted.
+    Restore is deliberately manual into a fresh location (no destructive restore).
+    """
+    if output_dir.is_symlink() or not output_dir.is_dir():
+        raise InputError("backup destination must be an existing local directory")
+    history = output_dir / HISTORY_FILE
+    if not os.path.lexists(history):
+        raise InputError("no audit history to back up")
+    source = _history_connection(history)
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S.%fZ")
+    backup = output_dir / ("flowpilot-history-backup-" + stamp + "-" + uuid4().hex[:8] + ".sqlite3")
+    try:
+        flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_BINARY", 0)
+        fd = os.open(backup, flags, 0o600)
+        os.close(fd)
+        with closing(sqlite3.connect(str(backup), timeout=5)) as target:
+            source.backup(target)
+            if target.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
+                raise InputError("backup integrity check failed")
+            if (int(target.execute("PRAGMA application_id").fetchone()[0]) != APP_ID
+                    or int(target.execute("PRAGMA user_version").fetchone()[0]) != 1):
+                raise InputError("backup format check failed")
+        return backup
+    finally:
+        source.close()

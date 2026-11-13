@@ -9,7 +9,7 @@ import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 from pathlib import Path
 
-from .session import recent_history, run_session
+from .session import backup_history, recent_history, run_session
 
 
 class App:
@@ -51,6 +51,7 @@ class App:
         self.cancel_button = ttk.Button(actions, text="취소 요청", command=self.stop.set, state="disabled")
         self.cancel_button.pack(side="left", padx=8)
         ttk.Button(actions, text="저장된 검수 이력", command=self.show_history).pack(side="left")
+        ttk.Button(actions, text="이력 백업", command=self.backup).pack(side="left", padx=(8, 0))
         ttk.Label(main, textvariable=self.status, wraplength=820).pack(anchor="w", pady=(16, 8))
         ttk.Label(main, text="검사 이력 (현재 PC의 선택한 저장 폴더에만 보관)").pack(anchor="w")
         frame = ttk.Frame(main)
@@ -110,6 +111,13 @@ class App:
         except queue.Empty:
             pass
         self.master.after(100, self.drain)
+
+    def backup(self):
+        try:
+            path = backup_history(Path(self.output.get().strip()))
+            messagebox.showinfo("백업 완료", "새 SQLite 백업 생성: " + str(path))
+        except Exception as exc:
+            messagebox.showerror("백업 보류", str(exc))
 
     def show_history(self, silent=False):
         try:

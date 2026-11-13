@@ -10,7 +10,7 @@ from unittest.mock import patch
 
 from flowpilot_universal.engine import InputError, load_manifest, scan
 from flowpilot_universal.session import (
-    APP_ID, HISTORY_FILE, recent_history, run_session
+    APP_ID, HISTORY_FILE, backup_history, recent_history, run_session
 )
 
 
@@ -127,6 +127,28 @@ class UniversalSessionTests(unittest.TestCase):
         self.assertEqual(calls[0], 2)
         self.assertEqual(report["status"], "INCOMPLETE")
         self.assertIn("DIRECTORY_CHANGED", [i["code"] for i in report["issues"]])
+
+    def test_history_backup_create_only(self):
+        run_session(self.root, self.manifest, self.output, consent=True)
+        first = backup_history(self.output)
+        original = first.read_bytes()
+        second = backup_history(self.output)
+        self.assertNotEqual(first, second)
+        self.assertEqual(first.read_bytes(), original)
+        with closing(sqlite3.connect(first)) as db:
+            self.assertEqual(db.execute("SELECT COUNT(*) FROM scans").fetchone()[0], 1)
+            self.assertEqual(db.execute("PRAGMA integrity_check").fetchone()[0], "ok")
+
+    def test_history_backup_requires_existing_history(self):
+        with self.assertRaises(InputError):
+            backup_history(self.output)
+        self.assertEqual(list(self.output.iterdir()), [])
+
+    def test_directory_count_bound(self):
+        (self.root / "sub").mkdir()
+        cfg = load_manifest(self.manifest)
+        with patch("flowpilot_universal.engine.MAX_DIRECTORIES", 1):
+            self.assertEqual(scan(self.root, cfg)["status"], "INCOMPLETE")
 
     def test_python_desktop_module_import_headless(self):
         from flowpilot_universal import gui
