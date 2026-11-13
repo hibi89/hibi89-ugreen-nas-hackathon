@@ -1,3 +1,11 @@
+# [2026-11-14 KST] Windows offline installation and safe-uninstall rehearsal, not a public installer
+
+- `windows_candidate_install_rehearsal.ps1` works **only in a direct child of GitHub Actions `RUNNER_TEMP`**, intentionally rejects buyer PCs/other folders. This is a no-admin/no-registry/offline synthetic test, not an installer artifact or user-facing setup script. [Actual Windows hosted CI #43504574468](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43504574468) pass: candidate ZIP checksum, extracted EXE runtime exit0, unexpected customer file blocks uninstall, clean uninstall verified. Candidate unsigned and not uploaded/distributed.
+- [Linux/Windows full regressions #43504574472](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43504574472): Windows102 PASS, Linux95 PASS+7 Windows-only SKIP, live Tk5 PASS/OS, portable8 repeated/OS.
+- [Owner-wide F01–F10 completion acceptance matrix](FINAL_BLUEPRINT_85_ACCEPTANCE_MATRIX.md) distinguishes verifiable CI functions from the unapproved whole-final-design weights, actual physical Windows10/11/USB/authorized SMB NAS, signed installer and rights/customer acceptance. **Official final rate UNASSESSED; target 85% NOT CERTIFIED, [작업중] and RELEASE HOLD**. Previous instructions retained below.
+
+---
+
 # LATEST 2026-11-14 KST — final source consistency recheck and NTFS evidence path guard
 
 - [Exact evidence](P85_FINAL_CONSISTENCY_EVIDENCE.md); [Linux/Windows CI](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43500327638) Windows 102 PASS, Linux 95 PASS and Windows-only NTFS 7 SKIP, Tk real GUI5/OS, portable8 repeated/OS; [private Windows EXE](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43500327639) unsigned bundled original/relocated runtime EXIT0. Source SHA `bd74a05fcacc426a101c070beaaad49e54283cbe`.
