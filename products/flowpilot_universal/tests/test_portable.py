@@ -28,7 +28,7 @@ class PortableTests(unittest.TestCase):
         pyz, digest = build_archive(SOURCE, self.output)
         self.assertEqual(digest, hashlib.sha256(pyz.read_bytes()).hexdigest())
         self.assertEqual(verify_archive(pyz), digest)
-        self.assertEqual((self.base / (pyz.name + ".sha256")).read_text(encoding="ascii"),
+        self.assertEqual((self.base / (pyz.name + ".sha256")).read_text(encoding="utf-8"),
                          f"{digest}  {pyz.name}\n")
         help_result = subprocess.run([sys.executable, str(pyz), "--help"],
                                      capture_output=True, text=True, timeout=15)

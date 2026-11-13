@@ -108,7 +108,7 @@ def build_archive(source: Path, target: Path) -> tuple[Path, str]:
         digest = verify_archive(output)
         fd = os.open(sidecar, flags, 0o600)
         with os.fdopen(fd, "wb") as stream:
-            stream.write(f"{digest}  {output.name}\n".encode("ascii"))
+            stream.write(f"{digest}  {output.name}\n".encode("utf-8"))
             stream.flush()
             os.fsync(stream.fileno())
         return output, digest
