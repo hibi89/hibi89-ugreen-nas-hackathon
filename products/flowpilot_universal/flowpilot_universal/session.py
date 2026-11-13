@@ -16,7 +16,7 @@ import stat
 from typing import Callable
 from uuid import uuid4
 
-from .engine import InputError, create_only, load_manifest, render_html, scan
+from .engine import InputError, _manifest_bytes, create_only, load_manifest, render_html, scan
 
 APP_ID = 1179669045
 HISTORY_FILE = ".flowpilot-history.sqlite3"
@@ -112,12 +112,11 @@ def run_session(
     if consent is not True:
         raise InputError("explicit operator scope/permission confirmation required")
     output = _safe_output(root, output_dir)
-    manifest = load_manifest(manifest_path)
-    original_manifest = manifest_path.read_bytes()
-    if len(original_manifest) > 1_048_576:
-        raise InputError("manifest too large")
+    manifest, original_manifest = load_manifest(manifest_path, include_bytes=True)
     manifest_sha = hashlib.sha256(original_manifest).hexdigest()
     report = scan(root, manifest, cancel=cancel, progress=progress)
+    if _manifest_bytes(manifest_path) != original_manifest:
+        raise InputError("requirements manifest changed during scan; no report published")
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S.%fZ")
     session_id = stamp + "-" + uuid4().hex[:12]
     json_path = output / ("flowpilot-" + session_id + ".json")

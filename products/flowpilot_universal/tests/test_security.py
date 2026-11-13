@@ -86,6 +86,34 @@ class SecurityRegressions(unittest.TestCase):
         self.assertEqual(result["status"], "INCOMPLETE")
         self.assertIn("FILE_UNREADABLE_OR_CHANGED", {r["code"] for r in result["issues"]})
 
+    def test_manifest_snapshot_and_change_fail_closed(self):
+        from flowpilot_universal.session import run_session
+        def change_after_scan(*args, **kwargs):
+            result = scan(*args, **kwargs)
+            self.manifest.write_text(
+                '{"schema_version":1,"expected_files":[{"path":"other"}]}',
+                encoding="utf-8")
+            return result
+        output = self.base / "reports"
+        output.mkdir()
+        with patch("flowpilot_universal.session.scan", side_effect=change_after_scan):
+            with self.assertRaises(InputError):
+                run_session(self.root, self.manifest, output, consent=True)
+        self.assertEqual(list(output.iterdir()), [])
+
+    def test_manifest_same_exact_bytes_report(self):
+        from flowpilot_universal.session import run_session, HISTORY_FILE
+        import sqlite3
+        from contextlib import closing
+        raw = self.manifest.read_bytes()
+        output = self.base / "reports"
+        output.mkdir()
+        run_session(self.root, self.manifest, output, consent=True)
+        with closing(sqlite3.connect(output / HISTORY_FILE)) as db:
+            expected = db.execute("SELECT manifest_sha256 FROM scans").fetchone()[0]
+        import hashlib
+        self.assertEqual(expected, hashlib.sha256(raw).hexdigest())
+
     def test_empty_file_digest_and_ready(self):
         (self.root / "납품.txt").write_bytes(b"")
         manifest = load_manifest(self.manifest)

@@ -66,9 +66,10 @@ def _manifest_bytes(path: Path) -> bytes:
         raise InputError("manifest file is missing or inaccessible") from exc
 
 
-def load_manifest(path: Path) -> dict[str, Any]:
+def load_manifest(path: Path, *, include_bytes: bool = False) -> dict[str, Any] | tuple[dict[str, Any], bytes]:
+    manifest_bytes = _manifest_bytes(path)
     try:
-        raw = json.loads(_manifest_bytes(path).decode("utf-8"),
+        raw = json.loads(manifest_bytes.decode("utf-8"),
                          object_pairs_hook=_manifest_object)
     except (UnicodeError, json.JSONDecodeError) as exc:
         raise InputError("invalid UTF-8 manifest JSON") from exc
@@ -99,9 +100,10 @@ def load_manifest(path: Path) -> dict[str, Any]:
     limits = raw.get("limits", {})
     if not isinstance(limits, dict) or set(limits) - {"max_files", "max_bytes"}:
         raise InputError("unknown scan limits")
-    return {"title": title, "schema_version": 1, "expected_files": normalized,
-            "limits": {"max_files": _positive_integer(limits.get("max_files", MAX_FILES), "max_files", MAX_FILES),
-                       "max_bytes": _positive_integer(limits.get("max_bytes", MAX_BYTES), "max_bytes", MAX_BYTES)}}
+    parsed = {"title": title, "schema_version": 1, "expected_files": normalized,
+              "limits": {"max_files": _positive_integer(limits.get("max_files", MAX_FILES), "max_files", MAX_FILES),
+                         "max_bytes": _positive_integer(limits.get("max_bytes", MAX_BYTES), "max_bytes", MAX_BYTES)}}
+    return (parsed, manifest_bytes) if include_bytes else parsed
 
 def _is_link(info: os.stat_result) -> bool:
     return stat.S_ISLNK(info.st_mode) or bool(getattr(info, "st_file_attributes", 0) & getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0))
