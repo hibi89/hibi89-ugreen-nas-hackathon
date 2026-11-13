@@ -1,3 +1,12 @@
+# [2026-11-14 KST] OWNER HOLD — final-design 85% cannot be demonstrated from remaining no-hardware work alone
+
+- **Owner decision:** "나머지작업으로 85퍼도달못할거면 그냥보류하게" — pause further FlowPilot Universal implementation/CI/release work instead of building more synthetic features when attaining **verified** ≥85% under the *unchanged* F01–F10 full blueprint is not currently demonstrable. This is **PAUSED / OWNER HOLD**, not abandoned or 85 achieved.
+- **Why:** Full-design owner-approved 100-point acceptance/weights and verified real physical Windows10/11·USB·authorized 2-NAS-vendor SMB/customer/legal F09/F10 evidence are still absent. Thus official whole-design **UNASSESSED; 85% NOT CERTIFIED**. Actual tests of prehold code `e8bc4f318087bd83634f9f177e73fbc87e43a95f`: Win111 PASS, Linux104 PASS+7 OS-specific SKIP, bundled Windows EXE self-test/install/removal PASS. This technical success does not close hardware/customer acceptance.
+- **Reopen trigger:** USB expected **2026-11-17 KST** per owner, arrival/testing subject to owner providing access and consent; authorized NAS 2 vendors and remaining full original acceptance may still be necessary. Do not automatically resume, schedule, purchase hardware, change Windows share/security configuration, run NAS trials, or send customer data. Owner can issue `ㄱ` after arrival/availability; then inspect latest HEAD and original F01–F10 rubric. **No further work before explicit resumption.**
+- **State preservation:** `[작업중]` remains as **target-not-achieved** per hub policy even during PAUSED (not active execution). RELEASE/SALE HOLD, no released binaries or sold product, no new costs. Preserve originals, Git history, earlier evidence and all other projects.
+
+---
+
 # [2026-11-14 KST] FlowPilot Universal F09 bundled EXE functional evidence + F10 zero-cash license preflight
 
 - **User target:** unchanged entire F01–F10 blueprint ≥85. No weighted 100-point owner acceptance yet; **official UNASSESSED / not 85-certified**. `[작업중]` and RELEASE/SALE HOLD remain.
