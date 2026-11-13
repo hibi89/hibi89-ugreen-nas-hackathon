@@ -29,17 +29,47 @@ def _relative(value: Any) -> str:
         raise InputError("requirement paths must be nonempty relative POSIX paths")
     parts = value.split("/")
     if (value.startswith("/") or any(p in ("", ".", "..") for p in parts)
-            or any(":" in p or p.rstrip(" .") != p for p in parts)):
-        raise InputError("unsafe requirement path")
+            or any(re.search(r'[\x00-\x1f<>:"|?*]', p) or p.rstrip(" .") != p for p in parts)
+            or any(re.fullmatch(r"(?i:CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])", p.split(".")[0]) for p in parts)):
+        raise InputError("unsafe or non-portable requirement path")
     return value
 
-def load_manifest(path: Path) -> dict[str, Any]:
-    if path.is_symlink() or not path.is_file():
-        raise InputError("manifest must be a regular local file")
-    if path.stat().st_size > MANIFEST_LIMIT:
-        raise InputError("manifest exceeds size limit")
+def _manifest_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    obj: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in obj:
+            raise InputError("duplicate manifest JSON key")
+        obj[key] = value
+    return obj
+
+
+def _manifest_bytes(path: Path) -> bytes:
     try:
-        raw = json.loads(path.read_text(encoding="utf-8"))
+        before = path.lstat()
+        if _is_link(before) or not stat.S_ISREG(before.st_mode) or before.st_size > MANIFEST_LIMIT:
+            raise InputError("manifest must be a bounded non-link regular file")
+        flags = os.O_RDONLY | getattr(os, "O_BINARY", 0) | getattr(os, "O_NOFOLLOW", 0)
+        fd = os.open(path, flags)
+        with os.fdopen(fd, "rb") as stream:
+            opened = os.fstat(stream.fileno())
+            if (_is_link(opened) or not stat.S_ISREG(opened.st_mode)
+                    or _signature(opened) != _signature(before)):
+                raise InputError("manifest replaced between stat and open")
+            content = stream.read(MANIFEST_LIMIT + 1)
+            if len(content) > MANIFEST_LIMIT:
+                raise InputError("manifest exceeds read limit")
+            if (_signature(os.fstat(stream.fileno())) != _signature(before)
+                    or _signature(path.lstat()) != _signature(before)):
+                raise InputError("manifest changed while reading")
+        return content
+    except (FileNotFoundError, PermissionError, IsADirectoryError) as exc:
+        raise InputError("manifest file is missing or inaccessible") from exc
+
+
+def load_manifest(path: Path) -> dict[str, Any]:
+    try:
+        raw = json.loads(_manifest_bytes(path).decode("utf-8"),
+                         object_pairs_hook=_manifest_object)
     except (UnicodeError, json.JSONDecodeError) as exc:
         raise InputError("invalid UTF-8 manifest JSON") from exc
     if not isinstance(raw, dict) or set(raw) - {"schema_version", "expected_files", "limits", "title"}:
@@ -92,10 +122,17 @@ def _hash_file(path: Path, before: os.stat_result, cancel: Callable[[], bool] | 
             raise OSError("file changed between stat and open")
         digest = hashlib.sha256()
         with os.fdopen(os.dup(handle), "rb", closefd=True) as stream:
-            while data := stream.read(CHUNK_SIZE):
+            remaining = before.st_size
+            while remaining:
                 if cancel is not None and cancel():
                     raise InterruptedError("scan cancelled during hash")
+                data = stream.read(min(CHUNK_SIZE, remaining))
+                if not data:
+                    raise OSError("file truncated during hash")
                 digest.update(data)
+                remaining -= len(data)
+            if stream.read(1):
+                raise OSError("file extended during hash")
         if (_signature(os.fstat(handle)) != _signature(before)
                 or _signature(path.lstat()) != _signature(before)):
             raise OSError("file changed during hashing")
