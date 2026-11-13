@@ -1,3 +1,5 @@
+> **2026-11-13 KST additional live Tk proof:** Functional SHA `18273d2c7a9909a5d65bdba4aecc2a8097f9a157`, [GitHub Actions #43380594623](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43380594623) Linux30/30, Windows30/30 PASS and Linux Xvfb actual Tk widget/event-loop consent→scan→history→backup→repeat full scan **1/1 PASS**. This is a synthetic virtual-display desktop interaction, **not** a physical customer Windows10/11 or SMB NAS acceptance. Official rate remains **UNASSESSED**, 70% goal not certified, [작업중] and RELEASE HOLD unchanged.
+
 # FlowPilot Universal P70 technical evidence & official completion boundary — 2026-11-13 KST
 
 ## 1. Source and isolated branch

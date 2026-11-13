@@ -1,3 +1,15 @@
+## [LATEST 2026-11-13 KST] P70 native GUI test follow-up (10-point supplement)
+1. Goal: same F01–F10 final blueprint, official target 70%, rate UNASSESSED pending owner weights and acceptance.
+2. Delta: added `tests/gui_click_smoke.py` and Xvfb GUI job to existing product CI without touching UGREEN lead/main or contest Skill.
+3. Evidence: functional SHA `18273d2c7a9909a5d65bdba4aecc2a8097f9a157`, [Actions #43380594623](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43380594623) Linux30 PASS Windows30 PASS + Linux actual Tk UI widget/event-loop E2E 1 PASS, 0 FAIL; [policy #43380595027](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43380595027) SUCCESS.
+4. Current gate: P70 technical subset improved but official 70% NOT verified; [작업중] stays; RELEASE HOLD.
+5. Fault history: prior Windows path/SQLite test failures resolved by exact CI; new smoke passed first run. Do not imply physical GUI/SMB pass.
+6. Repo: `hibi89/hibi89-ugreen-nas-hackathon@product/flowpilot-universal` functional SHA above; docs HEAD next commit; test file `products/flowpilot_universal/tests/gui_click_smoke.py`.
+7. Environment: Github Actions Xvfb virtual Linux + Windows Python3.11 CI; production/Vercel N/A, no external connectivity.
+8. Original/backup: previous source and history create-only unchanged; no customer data, remote network or release; git revert isolated product commit for rollback.
+9. Next: real physical Windows10/11 Tk user trial, operator-approved USB/SMB, safe incremental checkpoint resume, owner-approved final-design weights.
+10. Verified time/scope: 2026-11-13 KST; synthetic virtual desktop only; central hub sync should be re-read and checked after this docs commit.
+
 # LATEST FlowPilot Universal HANDOFF — P70 development, 2026-11-13 KST
 
 1. **Goal/final design/technology:** final blueprint F01–F10 from central approved Kmong brief, 70% target measured only against full owner-approved 100-point score. Local Windows/PC/USB/OS-mounted SMB delivery audit, Python3.11 stdlib (Tkinter, SQLite), offline no subscription. Unapproved weights => official rate UNASSESSED.

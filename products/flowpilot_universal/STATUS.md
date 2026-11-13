@@ -1,3 +1,7 @@
+## [LATEST 2026-11-13 KST] Real Tk widget smoke / P70 technical QA improvement
+- Functional SHA `18273d2c7a9909a5d65bdba4aecc2a8097f9a157`, [CI #43380594623](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43380594623) Ubuntu 30/30 + Windows 30/30 PASS, 0 FAIL, Linux Xvfb actual Tk event-loop GUI consent/scan/history/backup/recheck 1/1 PASS. Prior GUI module-import-only statement below is historical.
+- Scope limitations: physical customer Windows Tk GUI click not run; real USB/UNC SMB/NAS and true incremental checkpoint resume unverified/unbuilt. **Official final product rate UNASSESSED**, owner target 70% not independently certified; central [작업중] and RELEASE HOLD persist.
+
 # LATEST FlowPilot Universal STATUS — 2026-11-13 KST
 
 - **Current user target:** final-design 70%. **Official verified final completion UNASSESSED**, final-weight/acceptance contract not approved. Never claim 70% based on 30 tests or P70 scope name. Earlier 50% user target/engineering gate below is historical.
