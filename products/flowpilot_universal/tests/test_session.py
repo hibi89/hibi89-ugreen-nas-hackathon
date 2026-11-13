@@ -116,14 +116,15 @@ class UniversalSessionTests(unittest.TestCase):
         original = os.scandir
         calls = [0]
         def injected(path):
-            # A new file arrives AFTER the first listing, BEFORE validation.
-            if Path(path) == self.root:
-                calls[0] += 1
-                if calls[0] == 2:
-                    (self.root / "late.txt").write_text("late", encoding="utf-8")
+            # The synthetic fixture has only this one scanned directory.
+            # Windows resolve() may change 8.3 spelling, so count scandir calls.
+            calls[0] += 1
+            if calls[0] == 2:
+                (self.root / "late.txt").write_text("late", encoding="utf-8")
             return original(path)
         with patch("flowpilot_universal.engine.os.scandir", side_effect=injected):
             report = scan(self.root, cfg)
+        self.assertEqual(calls[0], 2)
         self.assertEqual(report["status"], "INCOMPLETE")
         self.assertIn("DIRECTORY_CHANGED", [i["code"] for i in report["issues"]])
 
