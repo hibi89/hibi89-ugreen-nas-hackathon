@@ -104,11 +104,15 @@ def main(argv=None) -> int:
     try:
         result = run_field_trial(args.root, args.manifest, args.output,
                                  consent=args.consent, medium=args.medium)
-        print(result["verdict"] + " rounds=" + str(len(result["rounds"]))
-               + " local_summary=" + result["summary_path"])
+        # PyInstaller --windowed executables may provide no stdio handles.
+        # Keep the persistent local summary as the authoritative result.
+        if sys.stdout is not None:
+            print(result["verdict"] + " rounds=" + str(len(result["rounds"]))
+                  + " local_summary=" + result["summary_path"])
         return 0 if result["verdict"] == "REPEATABILITY_PASS_NOT_FIELD_ACCEPTANCE" else 2
     except (InputError, OSError) as exc:
-        print("HOLD: " + str(exc), file=sys.stderr)
+        if sys.stderr is not None:
+            print("HOLD: " + str(exc), file=sys.stderr)
         return 2
 
 

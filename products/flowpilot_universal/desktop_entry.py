@@ -48,6 +48,25 @@ def self_test() -> int:
                     return 11
                 if (source / "document.dat").read_bytes() != content:
                     return 12
+                # F09 must also work inside the bundled *windowed* EXE, with
+                # no developer Python and possibly no stdout/stderr streams.
+                trial_args = ["--root", str(source), "--manifest", str(manifest),
+                              "--output", str(out), "--medium", "pc"]
+                if main(["--field-trial", *trial_args, "--consent"]) != 0:
+                    return 13
+                summaries = list(out.glob("flowpilot-field-trial-*.json"))
+                if len(summaries) != 1:
+                    return 14
+                trial = json.loads(summaries[0].read_text(encoding="utf-8"))
+                if (trial["verdict"] != "REPEATABILITY_PASS_NOT_FIELD_ACCEPTANCE"
+                        or len(trial["rounds"]) != 3
+                        or any(item["status"] != "READY" for item in trial["rounds"])
+                        or trial["customer_hardware_verified"] is not False):
+                    return 15
+                if main(["--field-trial", *trial_args]) != 2:
+                    return 16
+                if len(list(out.glob("flowpilot-field-trial-*.json"))) != 1:
+                    return 17
             finally:
                 window.destroy()
     except Exception as exc:
@@ -66,8 +85,13 @@ def main(argv: list[str]) -> int:
         return self_test()
     if argv == ["--help"]:
         if sys.stdout is not None:
-            print("FlowPilot Universal offline GUI. Use --self-test only for synthetic CI.")
+            print("FlowPilot Universal offline GUI. --field-trial runs three consented full local scans; --self-test uses synthetic CI.")
         return 0
+    if argv and argv[0] == "--field-trial":
+        # Explicit CLI entrypoint for already-authorized folders only.
+        # No runtime Python requirement after Windows PyInstaller packaging.
+        from flowpilot_universal.field_trial import main as trial_main
+        return trial_main(argv[1:])
     if argv:
         return 2
     from flowpilot_universal.gui import main as launch

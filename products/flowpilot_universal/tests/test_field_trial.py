@@ -40,6 +40,32 @@ class FieldTrialTests(unittest.TestCase):
         self.assertEqual(main(["--root", str(self.root), "--manifest", str(self.manifest),
                                "--output", str(self.out), "--medium", "pc", "--consent"]), 0)
 
+    def test_desktop_entry_field_trial_route_synthetic(self):
+        from desktop_entry import main as desktop_main
+        args = ["--field-trial", "--root", str(self.root),
+                "--manifest", str(self.manifest), "--output", str(self.out),
+                "--medium", "pc"]
+        self.assertEqual(desktop_main(args), 2)
+        self.assertEqual(list(self.out.iterdir()), [])
+        self.assertEqual(desktop_main(args + ["--consent"]), 0)
+        summaries = list(self.out.glob("flowpilot-field-trial-*.json"))
+        self.assertEqual(len(summaries), 1)
+        trial = json.loads(summaries[0].read_text(encoding="utf-8"))
+        self.assertEqual(trial["verdict"], "REPEATABILITY_PASS_NOT_FIELD_ACCEPTANCE")
+        self.assertEqual(len(trial["rounds"]), 3)
+        self.assertFalse(trial["customer_hardware_verified"])
+
+    def test_desktop_entry_handles_windowed_no_console(self):
+        from desktop_entry import main as desktop_main
+        args = ["--field-trial", "--root", str(self.root),
+                "--manifest", str(self.manifest), "--output", str(self.out),
+                "--medium", "pc"]
+        with patch("flowpilot_universal.field_trial.sys.stdout", None), \
+             patch("flowpilot_universal.field_trial.sys.stderr", None):
+            self.assertEqual(desktop_main(args), 2)
+            self.assertEqual(desktop_main(args + ["--consent"]), 0)
+        self.assertEqual(len(list(self.out.glob("flowpilot-field-trial-*.json"))), 1)
+
     def test_no_consent_no_outputs(self):
         with self.assertRaises(InputError):
             run_field_trial(self.root, self.manifest, self.out, medium="smb")

@@ -4,6 +4,8 @@ on:
     branches: ["product/flowpilot-universal"]
     paths:
       - "products/flowpilot_universal/desktop_entry.py"
+      - "products/flowpilot_universal/flowpilot_universal/field_trial.py"
+      - "products/flowpilot_universal/tests/test_field_trial.py"
       - "products/flowpilot_universal/flowpilot_universal/pdf_report.py"
       - "products/flowpilot_universal/flowpilot_universal/session.py"
       - "products/flowpilot_universal/flowpilot_universal/gui.py"
