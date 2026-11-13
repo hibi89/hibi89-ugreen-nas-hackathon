@@ -124,7 +124,8 @@ class UniversalSessionTests(unittest.TestCase):
             return original(path)
         with patch("flowpilot_universal.engine.os.scandir", side_effect=injected):
             report = scan(self.root, cfg)
-        self.assertEqual(calls[0], 2)
+        # Final post-scan verification may perform a third scandir on Windows.
+        self.assertGreaterEqual(calls[0], 2)
         self.assertEqual(report["status"], "INCOMPLETE")
         self.assertIn("DIRECTORY_CHANGED", [i["code"] for i in report["issues"]])
 
