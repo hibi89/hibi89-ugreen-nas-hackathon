@@ -35,6 +35,32 @@ class DesktopGUIAcceptance(unittest.TestCase):
         self.app.manifest.set(str(self.manifest))
         self.app.output.set(str(self.output))
 
+    def _drive(self):
+        deadline = time.monotonic() + 12
+        while time.monotonic() < deadline:
+            self.window.update()
+            if self.app.worker and not self.app.worker.is_alive() and self.app.events.empty():
+                self.window.update()
+                return
+            time.sleep(0.03)
+        self.fail("Tk worker did not finish")
+
+    def test_real_tk_resume_checkpoint_stays_review_until_full_rehash(self):
+        self.app.consent.set(True)
+        self.app.resume.set(True)
+        self.app.start()
+        self._drive()
+        self.assertTrue(self.app.status.get().startswith("READY"), self.app.status.get())
+        self.app.start()
+        self._drive()
+        self.assertTrue(self.app.status.get().startswith("NEEDS_REVIEW"), self.app.status.get())
+        self.app.resume.set(False)
+        self.app.start()
+        self._drive()
+        self.assertTrue(self.app.status.get().startswith("READY"), self.app.status.get())
+        self.assertGreaterEqual(self.app.history.size(), 3)
+        self.assertEqual((self.source / "납품원본.txt").read_bytes(), b"immutable-delivery")
+
     def test_real_tk_consent_scan_history_backup(self):
         with patch("flowpilot_universal.gui.messagebox.showerror") as show_error:
             self.app.start()
