@@ -1,3 +1,17 @@
+# LATEST 2026-11-13 KST — FlowPilot Universal P85 continuation, official UNASSESSED
+
+- **User target:** verified whole-final-design 85% across original F01–F10; approved fixed 100-point requirement weights/real customer end-to-end acceptance absent. **Official completion UNASSESSED, 85% NOT CERTIFIED**. Central [작업중] must remain; SALE/RELEASE HOLD.
+- **New code:** metadata-gated SQLite work checkpoint `.flowpilot-resume.sqlite3` in authorized output (not source). Resume only by explicit GUI checkbox; source+manifest mismatch/foreign/symlink/corrupt SHA HOLD; per-completed-file commit; changed metadata rehashed. Reused hashes are **NOT cryptographically verified**: report adds RESUME_CACHE_REVIEW and status NEEDS_REVIEW. Full uncached SHA verification is still mandatory for READY. This is provisional operational restart, not trusted incremental evidence.
+- **Tested function SHA:** `a96e727ba89bb87a4914e85c31da0898ce41c45d`; [Linux/Windows full CI](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43387548967) 63 distinct unit PASS/OS, portable rerun 8/OS, real hosted Tk GUI 2 scenarios/OS, compileall PASS, 2/2 jobs SUCCESS, 0 FAIL. [Blueprint policy](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43387549226) SUCCESS (policy only).
+- **Independent EXE candidate:** [CI https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43387249760](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43387249760) at `436d3b635f716d9e2da58a986680cef93edd5374` PyInstaller pinned 6.22.3, Windows hosted `--onedir --windowed` compiled EXE + Tcl/Tk/SQLite; actual executable `--self-test` synthetic root/GUI App/manifest scan/history/JSON-HTML verification exited 0. SHA256 of runner temp EXE `FEA326B7C73E104F08DDB9EAC13FDA0D09DFD2E785624973E3905A1E2559102E`. **No artifact uploaded/published**, unsigned, no installer, no physical buyer Win10/11, SmartScreen or Defender test; distribution requires legal/rights/NOTICE and approval.
+- **Blocked:** real SMB/USB vendor hardware/physical Windows10/11, P85 customer EXE release/signature/installer, native customer PDF, cryptographic provenance, true trusted resumption without full rehash, approved scoring weights/sale license/support. No hosted production or Vercel (N/A), no customer files/credentials/upload; original UGREEN lead/main/Skill unchanged.
+- **Recovery:** pre-continuation source/docs HEAD `6aee3e1d887502d32fd6303b9676a2f19d5215d2`; restore isolated product branch through git revert if necessary; do not auto-delete customer reports/history/checkpoints. Source scan remains read-only and separate output. See `P85_EVIDENCE.md`, `WINDOWS_EXE_CANDIDATE.md`.
+- **Next:** real native Windows 10/11 customer EXE/USB and explicitly owner-authorized SMB/NAS, license/signing/installer, full owner rubric and commercial acceptance; no unverified completion claim.
+
+---
+
+## Earlier P85/P70/P50 records (historical; latest above supersedes older TODO statements)
+
 # LATEST 2026-11-13 KST — FlowPilot Universal P85 progress (target 85% still unverified)
 
 - Owner target is **85% of original full F01-F10 final blueprint**, not P85 engineering scope. No approved 100-point weighting and independent customer acceptance: **official final completion UNASSESSED**, goal not certified. Central **[작업중]** remains, SALE/RELEASE HOLD.

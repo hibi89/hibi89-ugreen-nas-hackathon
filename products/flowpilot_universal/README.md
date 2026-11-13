@@ -1,3 +1,23 @@
+# FlowPilot Universal P85 continuation — private CI candidate, release HOLD
+
+- Verified source: `a96e727ba89bb87a4914e85c31da0898ce41c45d`, [Linux/Windows CI](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43387548967) 63 PASS/OS, portable 8 reruns/OS, real Tk widgets 2 PASS/OS; [Windows EXE CI](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43387249760) unsigned PyInstaller onedir GUI executable runtime synthetic `--self-test` EXIT 0 (built at SHA `436d3b635f716d9e2da58a986680cef93edd5374`). **Official final blueprint rate UNASSESSED**, target 85% NOT CERTIFIED, `[작업중]` remains.
+
+## Resume work with explicit caution
+
+In the Tk GUI, check **부분 이어하기** only after granting source scope and permission. Work checkpoint `.flowpilot-resume.sqlite3` stays in selected output (never source), stores completed SHA and source metadata. If stopped, restart with checkbox selected to process remaining files; reused SHA is **not independent proof of current bytes** and produces `NEEDS_REVIEW`. Uncheck resume and start full scan to hash everything for `READY`. Changed manifest/root/foreign DB causes HOLD; use a new output directory to start a different scope. Report backups and original data are preserved. Source directory files are never written.
+
+## Private Windows EXE candidate
+
+PyInstaller 6.22.3 private CI builds `dist/FlowPilotUniversal/FlowPilotUniversal.exe` **plus dependencies in that folder**; no separate Python installation needed for that bundled candidate. Tested Windows GitHub runner `--self-test` GUI+synthetic report flow. It is **unsigned, not uploaded/released, not yet tested on a physical buyer Windows 10/11 PC, not an installer and not approved for sale**. See [build/verification and rights](WINDOWS_EXE_CANDIDATE.md). The original pure-stdlib `.pyz` option still requires customer Python3.11+.
+
+## Official limits
+
+No real customer/SMB/USB NAS acceptance, hardware/model support, native PDF report, signed release, authenticated checkpoint hash, license/support approval or fixed full-100-point rubric. Existing UGREEN competition sources unmodified. Code/CI success is not product ship approval.
+
+---
+
+## Historical P85/P70/P50 reference (earlier TODO statements superseded)
+
 > **2026-11-13 KST P85 개발 증거:** functional SHA `b66ba07b1cef34f0dff7683a9edc5e44684ac852`; [Linux/Windows CI](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43383780676) 각 **55개 고유 테스트 PASS**, portable 8개 재실행/OS PASS, 실제 Tk GUI 1건/OS PASS; 2/2 jobs SUCCESS, 컴파일 검증 PASS. [최종설계 정책 검사](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43383781197) SUCCESS. **기술 P85 일부 구현**이나 EXE/설치·실 고객 Windows10/11·USB·SMB NAS·진정한 증분 재개·PDF·상업권·승인된 전체 100점 가중치 미충족. 따라서 **공식 최종완성률 UNASSESSED**, 사용자 목표 85% 미인정, **[작업중]·RELEASE HOLD 유지**. [P85 상세](P85_EVIDENCE.md).
 # FlowPilot Universal P85 technical package — Python 3.11+ required
 

@@ -1,3 +1,5 @@
+> **2026-11-13 KST candidate successfully built and run:** [CI #43387249760](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43387249760) at SHA `436d3b635f716d9e2da58a986680cef93edd5374` produced Windows onedir Tk `FlowPilotUniversal.exe` with PyInstaller 6.22.3. Actual generated EXE self-test exited **0**; SHA256 `FEA326B7C73E104F08DDB9EAC13FDA0D09DFD2E785624973E3905A1E2559102E` from runner log; full executable folder existed only during CI. Earlier malformed YAML #43387042833 yielded no jobs, corrected via literal-block pip command. **Not uploaded, signed, released or tested on physical Windows10/11**. Latest independent core source+Tk checkpoint tests [#43387548967](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43387548967) Linux/Windows 63+8 repeat+2 GUI pass. Official final rate UNASSESSED, 85% not certified, release HOLD.
+
 # FlowPilot Universal P85 Windows executable candidate (private CI-only)
 
 - Source: `products/flowpilot_universal/desktop_entry.py`; workflow `.github/workflows/flowpilot-universal-exe.yml` on the isolated product branch.
