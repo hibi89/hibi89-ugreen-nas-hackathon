@@ -40,11 +40,11 @@ def self_test() -> int:
                 app.output.set(str(out))
                 app.manifest.set(str(manifest))
                 window.update()
-                result = run_session(source, manifest, out, consent=True)
+                result = run_session(source, manifest, out, consent=True, pdf=True)
                 if result.status != "READY":
                     return 10
                 proof = verify_history_entry(out, result.session_id)
-                if proof["reports_verified"] != 2:
+                if proof["reports_verified"] != 3 or not result.pdf_path or not result.pdf_path.is_file():
                     return 11
                 if (source / "document.dat").read_bytes() != content:
                     return 12

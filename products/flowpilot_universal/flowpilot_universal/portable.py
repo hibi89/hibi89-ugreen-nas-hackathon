@@ -17,7 +17,7 @@ import zipfile
 
 from .engine import InputError
 
-MODULES = ("__init__.py", "__main__.py", "engine.py", "session.py", "gui.py", "portable.py", "checkpoint.py")
+MODULES = ("__init__.py", "__main__.py", "engine.py", "session.py", "gui.py", "portable.py", "checkpoint.py", "pdf_report.py")
 PACKAGE = "flowpilot_universal"
 MANIFEST = "FLOWPILOT_SOURCE_MANIFEST.json"
 ROOT_MAIN = "__main__.py"

@@ -61,6 +61,22 @@ class DesktopGUIAcceptance(unittest.TestCase):
         self.assertGreaterEqual(self.app.history.size(), 3)
         self.assertEqual((self.source / "납품원본.txt").read_bytes(), b"immutable-delivery")
 
+    def test_real_tk_pdf_report_history_verification(self):
+        self.app.consent.set(True)
+        self.app.pdf.set(True)
+        self.app.start()
+        self._drive()
+        self.assertTrue(self.app.status.get().startswith("READY"), self.app.status.get())
+        pdfs = list(self.output.glob("flowpilot-*.pdf"))
+        self.assertEqual(len(pdfs), 1)
+        self.assertTrue(pdfs[0].read_bytes().startswith(b"%PDF-"))
+        self.app.history.selection_set(0)
+        with patch("flowpilot_universal.gui.messagebox.showinfo") as show:
+            self.app.verify_selected_history()
+            show.assert_called_once()
+            self.assertIn("3개", show.call_args.args[1])
+        self.assertEqual((self.source / "납품원본.txt").read_bytes(), b"immutable-delivery")
+
     def test_real_tk_consent_scan_history_backup(self):
         with patch("flowpilot_universal.gui.messagebox.showerror") as show_error:
             self.app.start()

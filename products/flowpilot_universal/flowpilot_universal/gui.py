@@ -22,6 +22,7 @@ class App:
         self.output = tk.StringVar()
         self.consent = tk.BooleanVar(value=False)
         self.resume = tk.BooleanVar(value=False)
+        self.pdf = tk.BooleanVar(value=False)
         self.status = tk.StringVar(value="대기 · 읽기 전용 / 외부 전송 없음")
         self.events: queue.Queue = queue.Queue()
         self.stop = threading.Event()
@@ -47,7 +48,9 @@ class App:
         ttk.Checkbutton(main, text="이 폴더에 대한 합법적 읽기 권한이 있으며 해당 범위의 검사를 승인합니다.",
                         variable=self.consent).pack(anchor="w", pady=(18, 6))
         ttk.Checkbutton(main, text="부분 이어하기 (이전 해시는 검토용으로만 재사용, READY 판정은 새 전체 검사 필요)",
-                        variable=self.resume).pack(anchor="w", pady=(0, 12))
+                        variable=self.resume).pack(anchor="w", pady=(0, 4))
+        ttk.Checkbutton(main, text="한국어 PDF 보고서 추가 생성 (ReportLab 및 OS 한국어 TTF 필요)",
+                        variable=self.pdf).pack(anchor="w", pady=(0, 12))
         actions = ttk.Frame(main)
         actions.pack(fill="x")
         self.start_button = ttk.Button(actions, text="새 검수 시작 / 안전한 처음부터 재검사", command=self.start)
@@ -85,12 +88,12 @@ class App:
         self.cancel_button.configure(state="normal")
         self.status.set("검사 중 · 원본 읽기 전용")
         self.worker = threading.Thread(target=self.work,
-                                       args=(*tuple(map(Path, values)), self.resume.get()), daemon=True)
+                                       args=(*tuple(map(Path, values)), self.resume.get(), self.pdf.get()), daemon=True)
         self.worker.start()
 
-    def work(self, root, manifest, output, resume=False):
+    def work(self, root, manifest, output, resume=False, pdf=False):
         try:
-            result = run_session(root, manifest, output, consent=True, resume=resume,
+            result = run_session(root, manifest, output, consent=True, resume=resume, pdf=pdf,
                                  cancel=self.stop.is_set,
                                  progress=lambda count, bytes_seen: self.events.put(("progress", count, bytes_seen)))
             self.events.put(("done", result))
@@ -108,7 +111,8 @@ class App:
                     result = data[0]
                     self.start_button.configure(state="normal")
                     self.cancel_button.configure(state="disabled")
-                    self.status.set(f"{result.status} · {result.scanned}개 · 이슈 {result.issues}개 · {result.json_path}")
+                    extra = f" · PDF {result.pdf_path}" if result.pdf_path else ""
+                    self.status.set(f"{result.status} · {result.scanned}개 · 이슈 {result.issues}개 · {result.json_path}{extra}")
                     self.show_history(silent=True)
                 elif kind == "error":
                     self.start_button.configure(state="normal")
@@ -133,7 +137,7 @@ class App:
                 raise ValueError("먼저 검증할 이력 한 건을 선택해 주세요.")
             session_id = self.history_rows[selected[0]]["session_id"]
             verified = verify_history_entry(Path(self.output.get().strip()), session_id)
-            messagebox.showinfo("로컬 보고서 무결성", "JSON·HTML 검증 통과: " + verified["sha256"])
+            messagebox.showinfo("로컬 보고서 무결성", f"검증된 보고서 {verified['reports_verified']}개 (JSON/HTML/PDF 선택): " + verified["sha256"])
         except Exception as exc:
             messagebox.showerror("이력 검증 보류", str(exc))
 

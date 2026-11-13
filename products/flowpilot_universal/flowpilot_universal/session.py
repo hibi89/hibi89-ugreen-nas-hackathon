@@ -19,6 +19,7 @@ from uuid import uuid4
 
 from .engine import InputError, _manifest_bytes, create_only, load_manifest, render_html, scan
 from .checkpoint import ResumeCheckpoint
+from .pdf_report import ensure_pdf_support, render_pdf, create_pdf_only
 
 APP_ID = 1179669045
 HISTORY_FILE = ".flowpilot-history.sqlite3"
@@ -33,6 +34,7 @@ class SessionResult:
     json_path: Path
     html_path: Path
     history_path: Path
+    pdf_path: Path | None = None
 
 
 def _safe_output(root: Path, directory: Path) -> Path:
@@ -110,11 +112,13 @@ def run_session(
     root: Path, manifest_path: Path, output_dir: Path, *,
     consent: bool = False, cancel: Callable[[], bool] | None = None,
     progress: Callable[[int, int], None] | None = None,
-    resume: bool = False,
+    resume: bool = False, pdf: bool = False,
 ) -> SessionResult:
     if consent is not True:
         raise InputError("explicit operator scope/permission confirmation required")
     output = _safe_output(root, output_dir)
+    if pdf:
+        ensure_pdf_support()  # Refuse before reading source or creating reports when PDF is unavailable.
     manifest, original_manifest = load_manifest(manifest_path, include_bytes=True)
     manifest_sha = hashlib.sha256(original_manifest).hexdigest()
     if resume:
@@ -129,6 +133,8 @@ def run_session(
     session_id = stamp + "-" + uuid4().hex[:12]
     json_path = output / ("flowpilot-" + session_id + ".json")
     html_path = output / ("flowpilot-" + session_id + ".html")
+    pdf_path = output / ("flowpilot-" + session_id + ".pdf") if pdf else None
+    pdf_bytes = render_pdf(report) if pdf else None
     report_text = json.dumps(report, sort_keys=True, ensure_ascii=False, indent=2) + "\n"
     report_digest = hashlib.sha256(report_text.encode("utf-8")).hexdigest()
 
@@ -137,6 +143,8 @@ def run_session(
     create_only(json_path, report_text, root)
     # If the second write fails, retain the first evidence file for manual review.
     create_only(html_path, render_html(report), root)
+    if pdf_path is not None and pdf_bytes is not None:
+        create_pdf_only(pdf_path, pdf_bytes, root)
     history_path = output / HISTORY_FILE
     db = _history_connection(history_path)
     try:
@@ -146,11 +154,18 @@ def run_session(
              report["status"], report["files_scanned"], len(report["issues"]),
              str(json_path), str(html_path), report_digest)
         )
+        if pdf_path is not None and pdf_bytes is not None:
+            db.execute("""CREATE TABLE IF NOT EXISTS pdf_evidence (
+                session_id TEXT PRIMARY KEY, pdf_path TEXT NOT NULL,
+                pdf_sha256 TEXT NOT NULL
+            )""")
+            db.execute("INSERT INTO pdf_evidence VALUES (?,?,?)",
+                       (session_id, str(pdf_path), hashlib.sha256(pdf_bytes).hexdigest()))
         db.commit()
     finally:
         db.close()
     return SessionResult(session_id, report["status"], report["files_scanned"],
-                         len(report["issues"]), json_path, html_path, history_path)
+                         len(report["issues"]), json_path, html_path, history_path, pdf_path)
 
 
 def backup_history(output_dir: Path) -> Path:
@@ -229,6 +244,10 @@ def verify_history_entry(output_dir: Path, session_id: str) -> dict:
                       html_path, report_sha256 FROM scans WHERE session_id=?""",
             (session_id,)
         ).fetchone()
+        pdf_row = None
+        if db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='pdf_evidence'").fetchone():
+            pdf_row = db.execute("SELECT pdf_path, pdf_sha256 FROM pdf_evidence WHERE session_id=?",
+                                 (session_id,)).fetchone()
     finally:
         db.close()
     if row is None:
@@ -248,5 +267,15 @@ def verify_history_entry(output_dir: Path, session_id: str) -> dict:
     html = _evidence_bytes(Path(html_path), output_dir)
     if html != render_html(report).encode("utf-8"):
         raise InputError("historical HTML differs from its JSON evidence")
+    verified = 2
+    if pdf_row is not None:
+        pdf_path, expected_pdf_sha = pdf_row
+        if not isinstance(pdf_path, str) or not isinstance(expected_pdf_sha, str):
+            raise InputError("invalid PDF ledger fields")
+        raw_pdf = _evidence_bytes(Path(pdf_path), output_dir)
+        if (not raw_pdf.startswith(b"%PDF-") or b"%%EOF" not in raw_pdf[-128:]
+                or hashlib.sha256(raw_pdf).hexdigest() != expected_pdf_sha):
+            raise InputError("PDF evidence checksum or structure mismatch")
+        verified += 1
     return {"session_id": session_id, "status": status,
-            "sha256": stored_sha, "reports_verified": 2}
+            "sha256": stored_sha, "reports_verified": verified}
