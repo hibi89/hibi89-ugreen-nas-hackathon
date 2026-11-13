@@ -1,3 +1,5 @@
+> **2026-11-14 F09 보강 (수용 미인증):** 3회 무캐시 전체 SHA 재검사/보고서 JSON·HTML·SQLite 대조·계약서 변경 검출 및 로컬 create-only 요약 CLI 구현, [Win/Linux CI #43506736478](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43506736478) Win109 PASS/Linux102 PASS+7 SKIP. 이는 모의 기반 F09 **실기기 시험 준비**일 뿐 실제 USB/고객 Windows10/11·허가 NAS 두 제조사/ACL 권한/물리 사용자 수락을 충족하지 않는다. 가중치 미확정, **공식률 UNASSESSED·[작업중]·RELEASE HOLD** 유지. [근거](F09_REPEATABILITY_EVIDENCE.md).
+
 # FlowPilot Universal — F01–F10 최종설계 85% 수용조건·증거 매트릭스
 
 **기준일:** 2026-11-14 KST. **목표:** 사용자 확정 최종설계 F01–F10 전체의 최소 85%, 상용 출시 100%와 별개. 본 문서는 **평가용 제안·증거 추적표**이지 확정 가중치·제품 검수 승인·공식 85% 인정이 아니다. 검증 전까지 공식률 `UNASSESSED`, `[작업중]`, RELEASE HOLD.

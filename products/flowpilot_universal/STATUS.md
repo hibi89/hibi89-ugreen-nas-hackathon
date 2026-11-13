@@ -1,3 +1,12 @@
+# 2026-11-14 KST — F09 local repeatability acceptance preparation, not final 85% certification
+
+- **Verified code:** `b723544735cffcf2d05c19773e5ed04336d26e7a`, product `hibi89/hibi89-ugreen-nas-hackathon@product/flowpilot-universal`. Added consent-only `flowpilot_universal.field_trial` three full repeat scans, cross-round file SHA parity, checked local JSON+HTML/SQLite evidence, create-only summary, failure HOLD, no network operations. Existing GUI/engine/installer behavior unchanged.
+- **Actual hosted CI:** [#43506736478](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43506736478), Windows **109/109 PASS**; Ubuntu **102 PASS +7 Windows-only SKIP**; portable8 and real Tk5 rerun on both OS; compileall PASS; **2/2 jobs SUCCESS**. [Policy #43506737121](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43506737121) SUCCESS does not calculate completion. Seven new tests check consent, full 3 rounds, mid-trial file/manifest mutation, corrupt evidence, missing contract and unsafe output. [F09 evidence](F09_REPEATABILITY_EVIDENCE.md).
+- **Unverified:** no physical buyer Windows10/11/USB, NAS two manufacturers or true SMB authorization/ACL and load measurements; media type label is self-attested. Windows unsigned ZIP/CI install rehearsal from prior SHA remains tested, not released. Customer contract, commercial NOTICE/licensing/signing/SmartScreen, seller approvals, F01–F10 approved 100-point weights absent. **Official final rate UNASSESSED, 85% NOT CERTIFIED, [작업중], SALE/RELEASE HOLD; no customer data uploaded or paid API.**
+- **Recovery:** original untouched UGREEN lead/main and submissions; pre-task product HEAD `4aaffbd700a249f130660fb9b3e4d35d1c48537d` and code SHA `b723544735cffcf2d05c19773e5ed04336d26e7a` are safe Git history reference points; selective revert of only added F09 files/docs if needed. Next physical owner-approved F09+F10 acceptance and final rubric; do not fabricate product percentage.
+
+---
+
 # [2026-11-14 KST latest] FlowPilot Universal P85 F08 offline installation rehearsal verified; official UNASSESSED
 
 - **Goal:** unchanged whole-final-design F01–F10 verified ≥85% based only on owner-approved weighted acceptance. No approved 100-point weights/real customer field acceptance yet. **Official completion UNASSESSED / goal 85% NOT CERTIFIED; [작업중] and RELEASE HOLD remain.** [Owner-facing proof/approval matrix](FINAL_BLUEPRINT_85_ACCEPTANCE_MATRIX.md) documents all F01–F10 with missing evidence; no invented percentages.

@@ -1,3 +1,12 @@
+# 2026-11-14 KST — F09 three-pass offline field-readiness CLI (not hardware acceptance)
+
+- Run only against an **already accessible and authorized** local/USB/OS-mounted SMB folder with an independently approved manifest, using a separate existing output folder: `python -m flowpilot_universal.field_trial --root <approved-folder> --manifest <requirements.json> --output <existing-outside-source-folder> --medium pc --consent` (choose `pc`, `usb`, or `smb`; media labels are operator claims, not device proofs).
+- Performs up to **three full uncached SHA rehash scans**, SQLite-backed JSON+HTML verification, manifest immutability check, cross-round file/size/SHA parity, and a create-only local JSON summary. Non-READY, changed contents or invalid evidence => **INCOMPLETE**; no file write inside source, NAS discovery, mount or external upload.
+- [Full Linux/Windows source CI #43506736478](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43506736478) at code `b723544735cffcf2d05c19773e5ed04336d26e7a`: Windows **109 PASS**, Ubuntu **102 PASS + 7 Windows-only SKIP**, real Tk5 + portable8 rerun/OS, 2/2 SUCCESS. Seven new field-trial regression tests. [Policy](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43506737121) SUCCESS, policy only. [Limits and recovery](F09_REPEATABILITY_EVIDENCE.md).
+- No physical customer Windows10/11, real USB, authorized multi-vendor SMB NAS, code signing, licensing, buyer sign-off, or approved full F01–F10 100-point weights. **Official UNASSESSED, final 85% NOT CERTIFIED, [작업중], RELEASE HOLD.**
+
+---
+
 # [2026-11-14 KST] Windows offline installation and safe-uninstall rehearsal, not a public installer
 
 - `windows_candidate_install_rehearsal.ps1` works **only in a direct child of GitHub Actions `RUNNER_TEMP`**, intentionally rejects buyer PCs/other folders. This is a no-admin/no-registry/offline synthetic test, not an installer artifact or user-facing setup script. [Actual Windows hosted CI #43504574468](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43504574468) pass: candidate ZIP checksum, extracted EXE runtime exit0, unexpected customer file blocks uninstall, clean uninstall verified. Candidate unsigned and not uploaded/distributed.
