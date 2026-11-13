@@ -11,7 +11,7 @@ import json
 from pathlib import Path
 import re
 
-from .engine import InputError, MAX_FILES, MANIFEST_LIMIT, _relative, create_only
+from .engine import InputError, MAX_FILES, MANIFEST_LIMIT, _is_link, _relative, create_only
 
 MAX_INPUT = 750_000
 
@@ -67,8 +67,8 @@ def create_approved_manifest(title: str, checklist: str, destination: Path,
 
     The original root is never read beyond resolving its directory path.
     """
-    if root.is_symlink() or not root.is_dir():
-        raise InputError("select a real authorized source directory first")
+    if not root.is_dir() or _is_link(root.lstat()):
+        raise InputError("select a real authorized non-reparse source directory first")
     if destination.suffix.lower() != ".json":
         raise InputError("requirements manifest destination must end in .json")
     body = render_manifest(title, checklist, approved=approved)

@@ -17,7 +17,7 @@ import stat
 from typing import Callable
 from uuid import uuid4
 
-from .engine import InputError, _manifest_bytes, create_only, load_manifest, render_html, scan
+from .engine import InputError, _is_link, _manifest_bytes, create_only, load_manifest, render_html, scan
 from .checkpoint import ResumeCheckpoint
 from .pdf_report import ensure_pdf_support, render_pdf, create_pdf_only
 
@@ -38,10 +38,10 @@ class SessionResult:
 
 
 def _safe_output(root: Path, directory: Path) -> Path:
-    if root.is_symlink() or not root.is_dir():
-        raise InputError("source must be a non-symlink authorized directory")
-    if directory.is_symlink() or not directory.is_dir():
-        raise InputError("output must be an existing non-symlink directory")
+    if not root.is_dir() or _is_link(root.lstat()):
+        raise InputError("source must be an authorized real non-reparse directory")
+    if not directory.is_dir() or _is_link(directory.lstat()):
+        raise InputError("output must be an existing real non-reparse directory")
     source = root.resolve(strict=True)
     output = directory.resolve(strict=True)
     if output == source or source in output.parents:

@@ -162,8 +162,8 @@ def scan(root: Path, manifest: dict[str, Any], *,
          progress: Callable[[int, int], None] | None = None,
          resume_lookup: Callable[[str, os.stat_result], str | None] | None = None,
          checkpoint_save: Callable[[str, os.stat_result, str], None] | None = None) -> dict[str, Any]:
-    if root.is_symlink() or not root.is_dir():
-        raise InputError("root must be an existing non-symlink directory explicitly approved by the operator")
+    if not root.is_dir() or _is_link(root.lstat()):
+        raise InputError("root must be an existing non-reparse directory explicitly approved by the operator")
     root = root.resolve(strict=True)
     files: list[dict[str, Any]] = []
     issues: list[dict[str, Any]] = []
