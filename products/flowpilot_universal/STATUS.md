@@ -1,3 +1,12 @@
+# [2026-11-14 KST] 사용자 추가 확정 — 최종설계 고정·추가 현금 지출 0원 상용화 준비 승인
+
+- **평가 분모:** 사용자 확인대로 기존 최종설계 F01–F10 전체 고정, 요구·수용기준·가중치를 85% 달성 목적으로 삭제·추가·임의 재가중하지 않음. 현재 승인된 세부 100점 가중치 없는 경우 공식 완성률은 여전히 **UNASSESSED**. 목표 85% 미인증, `[작업중]` 유지.
+- **상용화 권한 범위:** 사용자는 **추가 현금 지출이 없는 경우** 상용화 진행을 승인. 이를 무료 라이선스/NOTICE 확인, 무료 배포 준비/테스트·지원 문서 작성 승인으로 기록한다. **유료 지출·원본/권한/보안 변경·실고객 데이터 접근·외부 공개 배포·판매 시작·서명 비용·고객 수락을 자동 승인으로 확대하지 않음**. 상용 GO는 법무/보안/고객 검수 후 별도 완료 판정; RELEASE/SALE HOLD 그대로.
+- **NAS F09:** 신규 NAS 구매 불필요. 접근이 허가된 Windows 로컬/USB 검수와 무료 LAN SMB 공유를 우선 시험 가능하지만 **Windows 공유 설정은 사용자 소유 PC에서 사용자가 승인 후만 변경**, `--medium smb` 표기는 실장비/제조사/권한 검증이 아님. 과거 QNAP File Station 웹 체험은 시간 제한 데모이며 Windows UNC SMB 실증 대체 불가. 실제 제조사별 NAS는 장비를 무료로 대여/허가받아야만 실증하며, 현재 실증 미완. [F09 수용 근거](F09_REPEATABILITY_EVIDENCE.md).
+- **이전 검증 유지:** 기능 SHA `b723544735cffcf2d05c19773e5ed04336d26e7a`, GitHub Windows109 PASS/Linux102 PASS+7 NTFS 전용 SKIP, [CI](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43507295782) docs HEAD 검증 SUCCESS. 이번은 권한·방침 기록만, 신규 기능/장비 검증 없음.
+
+---
+
 # 2026-11-14 KST — F09 local repeatability acceptance preparation, not final 85% certification
 
 - **Verified code:** `b723544735cffcf2d05c19773e5ed04336d26e7a`, product `hibi89/hibi89-ugreen-nas-hackathon@product/flowpilot-universal`. Added consent-only `flowpilot_universal.field_trial` three full repeat scans, cross-round file SHA parity, checked local JSON+HTML/SQLite evidence, create-only summary, failure HOLD, no network operations. Existing GUI/engine/installer behavior unchanged.

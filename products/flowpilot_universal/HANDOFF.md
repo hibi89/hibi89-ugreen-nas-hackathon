@@ -1,3 +1,18 @@
+# [2026-11-14 KST] 사용자 최신 결정 — 고정 최종설계·0원 상용화 준비·NAS 경로 / 인수인계 10항
+
+1. **목표/확정 기준:** F01–F10 최종설계 전체 고정, 목표 >=85. 85를 만들기 위한 임의 분모/가중치/범위 조작 금지. 사전 승인된 상세 100점 rubric 부재 시 공식 `UNASSESSED` 유지.
+2. **결정/설계:** 사용자가 추가 현금 지출 없는 상용화 진행 승인. 무상 라이선스/NOTICE·설치/검증/문서 준비 가능, 법적·보안 수용 전 실제 외부 배포·판매는 HOLD. NAS는 구입 대신 기존 PC/USB → 무료 권한 있는 LAN SMB → 허가된 실 NAS 장비 순 검증 추천.
+3. **증거/테스트:** 기존 기능 코드 SHA `b723544735cffcf2d05c19773e5ed04336d26e7a`, Actions #43506736478 Win109PASS/Ubuntu102PASS+7SKIP, 후속 docs HEAD #43507295782 success. 이번 권한·정책 기록만: 추가 제품 테스트 0, 실제 NAS 0.
+4. **완료/대기:** F09 3회 SHA·보고/원장 무결성 CLI 구현은 합성 CI PASS; 실 물리 Win10/11·USB·NAS 2벤더/ACL, F10 라이선스·코드서명·고객 수용/상용 GO 미검증. `[작업중]`/RELEASE HOLD.
+5. **위험/오류/대안:** 과거 QNAP 브라우저 90분 데모는 UNC SMB가 아님. SMB share 설정/계정 변경을 사용자 승인 없이 하지 않음; 장비 부재 시 실제 NAS는 NOT_VERIFIED로 유지. Windows 공유 폴더는 프로토콜만 부분 검증.
+6. **저장소/브랜치/SHA:** `hibi89/hibi89-ugreen-nas-hackathon@product/flowpilot-universal`; 제품 기능 `b723544735cffcf2d05c19773e5ed04336d26e7a`, 기존 문서 `b1fc54ad64acc70bbde2fb48791d354dbad39b15`; 본 문서 새 SHA commit 후 재조회. `products/flowpilot_universal/{STATUS.md,HANDOFF.md,F09_REPEATABILITY_EVIDENCE.md}`.
+7. **Production/환경:** 로컬 오프라인 Windows 데스크톱, Vercel 미적용; Python3.11 Windows/Ubuntu CI, 미서명 EXE runner만. 비용 발생/릴리스/실 SMB 연결 없음.
+8. **원본·백업/권한:** 소유자 원본·UGREEN lead/main·대회 제출/Skill, 타 크몽 상품 기록 불변. 판매/외부송신/파일 공유 권한 변경 승인 범위 밖; 기존 `b1fc54ad...` Git 복구점.
+9. **다음/완료기준:** 무료 상용 의존성·NOTICE 선행 체크, 사용자 권한 있는 PC/USB/SMB만 별도 동의 후 F09 측정, 실제 NAS 실증 가능하면 제조사별 수락 기록, 기존 F01–F10 고정 기준의 사전 승인 점수/수용 증거로 공식 85 판정. F10 고객·권리·배포 승인 전 판매 HOLD.
+10. **최신 확인:** 2026-11-14 KST 사용자 결정 기록. 신규 테스트/실 NAS 실증 없음, 기존 Win109/Linux102+7SKIP 유지. 최종완성률 **UNASSESSED**, [작업중]/SALE HOLD.
+
+---
+
 # [2026-11-14 KST] FlowPilot Universal F09 three-pass readiness evidence — 10-point handoff
 
 1. **Goal/requirements/stack:** user wants >=85% of unchanged owner F01–F10 final product. Offline read-only PC/USB/authorized SMB evidence, Python3.11 Tk/SQLite/reportlab Windows unsigned onedir candidate. Owner weights/real customer evidence absent, official final completion **UNASSESSED**.
