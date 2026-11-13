@@ -1,3 +1,8 @@
+## [2026-11-14 KST latest] Final HEAD CI regression corrected without security rollback
+- Exact latest tested HEAD `62aa06416d5906f514eacf05a9260eab55cfc4a7`: [full CI #43501501318](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43501501318) **Windows 102 PASS/0 FAIL/0 SKIP, Linux 95 PASS/7 Windows-only SKIP**, portable8 repeated PASS per OS, real Tk5 PASS per OS, compileall PASS, 2/2 jobs SUCCESS; [policy #43501501718](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43501501718) SUCCESS. Implemented security code at `bd74a05fcacc426a101c070beaaad49e54283cbe` unchanged.
+- Earlier docs-only HEAD `a068c7c105d01419c50c4b7e5e2c7d8d4417e162` [CI #43501017921](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43501017921) Linux SUCCESS but Windows **1 test failure**: `test_directory_change_detection` asserted exactly 2 `scandir` invocations; the new independent final-pass may run a third on Windows. Corrected only the test count expectation to >=2; the directory-change issue and INCOMPLETE assertions remain. No product functionality removed.
+- Original final design 85% remains **NOT CERTIFIED / official UNASSESSED** absent approved F01–F10 100-point weights and physical buyer Win10/11/USB/authorized SMB/rights. **[작업중]** and RELEASE HOLD unchanged.
+
 # LATEST 2026-11-14 KST — FlowPilot Universal final-change recheck + NTFS report-path guard, P85 owner target
 
 - **Owner 85% target applies to unchanged full F01–F10 final design**. Owner-approved 100-point requirement weights and physical buyer/SMB customer acceptance still missing: **official completion UNASSESSED; 85% NOT CERTIFIED, central [작업중], RELEASE HOLD/SALE NO-GO**. Internal engineering P85 is not the official score.

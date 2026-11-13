@@ -1,3 +1,8 @@
+## [2026-11-14 KST latest] Post-doc CI correction — source/test SHA and failure evidence
+- Tested HEAD `62aa06416d5906f514eacf05a9260eab55cfc4a7`; [Linux/Windows 2/2 success](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43501501318) Windows 102/102 pass, Linux 95 pass/7 Windows-specific skip, portable8 and actual GUI5 per OS pass, compileall. [Policy](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43501501718) SUCCESS. Source functionality from SHA `bd74a05fcacc426a101c070beaaad49e54283cbe` retained unchanged.
+- Earlier docs HEAD `a068c7c105d01419c50c4b7e5e2c7d8d4417e162` [Windows CI failure #43501017921](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43501017921): test fixture asserted exact `scandir` count 2; Windows sometimes runs a third final consistency pass. Changed only assertion to >=2, kept mutation detection and INCOMPLETE verdict; no bypass. Retry #43501501318 verified success. Avoid reinstating exact scan-count expectation.
+- Final target whole design 85% **UNASSESSED** due real buyer Windows/USB/owner-authorized SMB/rights/signed distribution/approved weights; no sale, no release, keep `[작업중]`. Earlier complete 10-point HANDOFF below remains current for source/production/recovery details.
+
 # LATEST 2026-11-14 KST — FlowPilot Universal P85 F03/F05 final-scan and NTFS guard HANDOFF
 
 1. **Goal/confirmed design/technology:** customer product offline PC/USB/approved SMB delivery verification, original final F01–F10; Python3.11/Tk/SQLite, optional Korean PDF, PyInstaller Windows portable. User target entire design 85% but approved 100-point weights/buyer acceptance unavailable: **official UNASSESSED**, never claim completed.
