@@ -7,7 +7,7 @@ import os
 import re
 import stat
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 MANIFEST_LIMIT = 1_048_576
 MAX_FILES = 20_000
@@ -82,7 +82,7 @@ def _signature(info: os.stat_result) -> tuple[int, int, int, int]:
         return (0, 0, info.st_size, info.st_mtime_ns)
     return (info.st_dev, info.st_ino, info.st_size, info.st_mtime_ns)
 
-def _hash_file(path: Path, before: os.stat_result) -> str:
+def _hash_file(path: Path, before: os.stat_result, cancel: Callable[[], bool] | None = None) -> str:
     flags = os.O_RDONLY | getattr(os, "O_BINARY", 0) | getattr(os, "O_NOFOLLOW", 0)
     handle = os.open(path, flags)
     try:
@@ -92,6 +92,8 @@ def _hash_file(path: Path, before: os.stat_result) -> str:
         digest = hashlib.sha256()
         with os.fdopen(os.dup(handle), "rb", closefd=True) as stream:
             while data := stream.read(CHUNK_SIZE):
+                if cancel is not None and cancel():
+                    raise InterruptedError("scan cancelled during hash")
                 digest.update(data)
         if (_signature(os.fstat(handle)) != _signature(before)
                 or _signature(path.lstat()) != _signature(before)):
@@ -115,7 +117,9 @@ def _version_key(rel: str) -> str | None:
         return f"{parent.casefold()}/{reduced.casefold()}.{suffix.casefold()}"
     return None
 
-def scan(root: Path, manifest: dict[str, Any]) -> dict[str, Any]:
+def scan(root: Path, manifest: dict[str, Any], *,
+         cancel: Callable[[], bool] | None = None,
+         progress: Callable[[int, int], None] | None = None) -> dict[str, Any]:
     if root.is_symlink() or not root.is_dir():
         raise InputError("root must be an existing non-symlink directory explicitly approved by the operator")
     root = root.resolve(strict=True)
@@ -128,14 +132,26 @@ def scan(root: Path, manifest: dict[str, Any]) -> dict[str, Any]:
     max_files = manifest["limits"]["max_files"]
     max_bytes = manifest["limits"]["max_bytes"]
     while stack and not stopped:
+        if cancel is not None and cancel():
+            issues.append({"code": "SCAN_INTERRUPTED", "path": "."})
+            stopped = True
+            break
         directory, prefix = stack.pop()
         try:
+            dir_before = directory.lstat()
+            if _is_link(dir_before) or not stat.S_ISDIR(dir_before.st_mode):
+                issues.append({"code": "DIRECTORY_UNSAFE", "path": prefix or "."})
+                continue
             with os.scandir(directory) as iterator:
                 entries = sorted(iterator, key=lambda e: (e.name.casefold(), e.name))
         except OSError:
             issues.append({"code": "DIRECTORY_UNREADABLE", "path": prefix or "."})
             continue
         for entry in entries:
+            if cancel is not None and cancel():
+                issues.append({"code": "SCAN_INTERRUPTED", "path": prefix or "."})
+                stopped = True
+                break
             rel = prefix + entry.name
             try:
                 info = entry.stat(follow_symlinks=False)
@@ -155,12 +171,23 @@ def scan(root: Path, manifest: dict[str, Any]) -> dict[str, Any]:
                     break
                 record: dict[str, Any] = {"path": rel, "size": info.st_size, "sha256": None}
                 try:
-                    record["sha256"] = _hash_file(Path(entry.path), info)
+                    record["sha256"] = _hash_file(Path(entry.path), info, cancel)
                 except OSError:
                     issues.append({"code": "FILE_UNREADABLE_OR_CHANGED", "path": rel})
                 files.append(record)
+                if progress is not None:
+                    progress(len(files), byte_count)
             else:
                 issues.append({"code": "UNSUPPORTED_FILE_TYPE", "path": rel})
+        try:
+            dir_after = directory.lstat()
+            if (_is_link(dir_after) or not stat.S_ISDIR(dir_after.st_mode)
+                    or dir_before.st_mtime_ns != dir_after.st_mtime_ns
+                    or (os.name != "nt" and (dir_before.st_dev, dir_before.st_ino) !=
+                        (dir_after.st_dev, dir_after.st_ino))):
+                issues.append({"code": "DIRECTORY_CHANGED", "path": prefix or "."})
+        except OSError:
+            issues.append({"code": "DIRECTORY_CHANGED", "path": prefix or "."})
     files.sort(key=lambda rec: (rec["path"].casefold(), rec["path"]))
     indexed: dict[str, dict[str, Any]] = {}
     for rec in files:
@@ -190,7 +217,9 @@ def scan(root: Path, manifest: dict[str, Any]) -> dict[str, Any]:
         if len(paths) > 1:
             issues.append({"code": "VERSION_CANDIDATES_REVIEW", "paths": sorted(paths)})
     codes = {issue["code"] for issue in issues}
-    incomplete_codes = {"DIRECTORY_UNREADABLE", "ENTRY_UNREADABLE", "UNSAFE_LINK", "SCAN_LIMIT", "FILE_UNREADABLE_OR_CHANGED", "UNSUPPORTED_FILE_TYPE", "CASE_COLLISION"}
+    incomplete_codes = {"DIRECTORY_UNREADABLE", "DIRECTORY_UNSAFE", "DIRECTORY_CHANGED",
+                        "ENTRY_UNREADABLE", "UNSAFE_LINK", "SCAN_LIMIT", "SCAN_INTERRUPTED",
+                        "FILE_UNREADABLE_OR_CHANGED", "UNSUPPORTED_FILE_TYPE", "CASE_COLLISION"}
     status = ("INCOMPLETE" if codes & incomplete_codes else
               "BLOCKED" if codes & {"MISSING_REQUIRED", "HASH_MISMATCH"} else
               "NEEDS_REVIEW" if issues else "READY")
