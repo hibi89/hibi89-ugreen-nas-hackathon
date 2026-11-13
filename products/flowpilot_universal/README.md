@@ -1,3 +1,12 @@
+# LATEST 2026-11-14 KST — final source consistency recheck and NTFS evidence path guard
+
+- [Exact evidence](P85_FINAL_CONSISTENCY_EVIDENCE.md); [Linux/Windows CI](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43500327638) Windows 102 PASS, Linux 95 PASS and Windows-only NTFS 7 SKIP, Tk real GUI5/OS, portable8 repeated/OS; [private Windows EXE](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43500327639) unsigned bundled original/relocated runtime EXIT0. Source SHA `bd74a05fcacc426a101c070beaaad49e54283cbe`.
+- Before a **READY** verdict, the scanner now re-lists observed directories and rechecks previously hashed file metadata so detectable late edits/deletions/additions produce **INCOMPLETE**. This is best-effort, not an atomic filesystem snapshot; concurrent metadata-preserving edits and later source changes remain possible.
+- Windows NTFS junctions are refused by source/output report generators, SQLite history/backup/verification, checkpoint and PDF creation; seven actual hosted Windows junction test cases PASS. This is not evidence of production NAS ACL or network share access.
+- This is a local offline **unsigned** application candidate; physical buyer Windows10/11/USB and authorized multi-vendor UNC SMB, license/signing/customer acceptance and owner approved full 100-point weights still missing. **Official final completion UNASSESSED, 85% NOT CERTIFIED, [작업중] + RELEASE HOLD**. Old setup instructions below remain historical.
+
+---
+
 # LATEST 2026-11-13 KST — owner-approved checklist editor, NTFS junction proof, relocated Windows EXE
 
 - [Evidence](P85_GUI_NTFS_RELOCATED_EVIDENCE.md) / [Linux+Windows CI](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43395109341) Windows **94 PASS**, Linux **91 PASS + 3 Windows-only SKIP**, real Tk 5 PASS/OS, portable 8 repeated PASS/OS; [Windows EXE+ZIP](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43395109335) `EXE_EXIT 0` + `RELOCATED_EXE_EXIT 0`; user target full design 85% still **UNASSESSED**, RELEASE HOLD, [작업중] remains.

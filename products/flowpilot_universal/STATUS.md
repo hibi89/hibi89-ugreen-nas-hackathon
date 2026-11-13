@@ -1,3 +1,16 @@
+# LATEST 2026-11-14 KST — FlowPilot Universal final-change recheck + NTFS report-path guard, P85 owner target
+
+- **Owner 85% target applies to unchanged full F01–F10 final design**. Owner-approved 100-point requirement weights and physical buyer/SMB customer acceptance still missing: **official completion UNASSESSED; 85% NOT CERTIFIED, central [작업중], RELEASE HOLD/SALE NO-GO**. Internal engineering P85 is not the official score.
+- **Implemented F03/F05 security:** after scanning, shallow-first recheck of directory metadata/name listing and previously hashed file size/mtime/type; detectable late edits yield `FILE_CHANGED_AFTER_SCAN` or `DIRECTORY_CHANGED_FINAL` and **INCOMPLETE**, not READY. This is a bounded best-effort check, **not** an immutable source snapshot. Reparse protection also added to `create_only`, SQLite history open/backup/verify, resume checkpoint and PDF output parent; no source writes.
+- **CI exact functional SHA** `bd74a05fcacc426a101c070beaaad49e54283cbe`: [Ubuntu/Windows full regression](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43500327638) Windows Python3.11 **102 PASS /0FAIL/0SKIP**, Ubuntu **95 PASS /0FAIL/7 SKIP** (all seven actual NTFS junction only); portable8 rerun PASS/OS (not new unique tests), real Tk widget 5 PASS/OS, compileall both, **2/2 jobs SUCCESS**; [policy](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43500328207) SUCCESS, policy only.
+- **Windows unsigned EXE check:** [Windows private candidate CI](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43500327639) pinned PyInstaller6.22.3 onedir GUI+PDF, actual executable `--self-test` EXIT0 at original and relocated unzip folder with developer Python PATH removed, ZIP embedded SHA index verifies. Temporary candidate ZIP SHA `b2000468b97a3d445cf2f1de69f735699398881041dd59894037a47c56d2fde4`; EXE SHA `0789659E776E15357A5B86A9B1AE55EAB308C3F1A42A64C141D851B695563349`. Neither published nor signed; physical Win10/11 and user NAS not run.
+- **Open blockers:** real buyer Win10/11, USB, explicitly authorized multi-vendor UNC SMB, high-volume/ACL/TOCTOU, signed installer/AV/SmartScreen, commercial font/third-party license/NOTICE, customer acceptance and owner-approved final F01–F10 weighted 100-point rubric. No Vercel/Production for desktop (N/A). No paid API, customer data uploaded, external NAS, deployment; UGREEN lead/main/official Skill and other products untouched. Pre-change product HEAD `44301fd666fd89bff4339b36b3bf30641dea977e` for selective git revert, no deletion of reports/history. [Detailed evidence](P85_FINAL_CONSISTENCY_EVIDENCE.md).
+- **Next:** real approved Windows/USB/SMB buyer field verification and product licensing/signing acceptance, then exact weighted whole-design audit. Central sync required with `[작업중]` and RELEASE HOLD preserved.
+
+---
+
+## Older P85/P70/P50 status (historical)
+
 # [LATEST 2026-11-13 KST] FlowPilot Universal P85 F02/F05/F08 milestone, official UNASSESSED
 
 - Owner target **85% of entire unchanged F01–F10 final design**. Approved whole-design 100-point weights, real consumer/SMB hardware and independent end-to-end customer acceptance absent; **official rate UNASSESSED, 85% NOT CERTIFIED, [작업중] and RELEASE HOLD preserved**.
