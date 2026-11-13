@@ -10,6 +10,7 @@ from datetime import datetime, timezone
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import sqlite3
 import stat
@@ -173,3 +174,72 @@ def backup_history(output_dir: Path) -> Path:
         return backup
     finally:
         source.close()
+
+
+
+def _evidence_bytes(path: Path, output_dir: Path) -> bytes:
+    """Read bounded local evidence with no symlink/hardlink or path escape."""
+    if path.parent.resolve(strict=True) != output_dir.resolve(strict=True):
+        raise InputError("historical report path escapes output directory")
+    try:
+        info = path.lstat()
+        if (not stat.S_ISREG(info.st_mode) or info.st_nlink != 1
+                or bool(getattr(info, "st_file_attributes", 0) &
+                        getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0))
+                or info.st_size > 20 * 1024 * 1024):
+            raise InputError("unsafe historical report")
+        flags = os.O_RDONLY | getattr(os, "O_BINARY", 0) | getattr(os, "O_NOFOLLOW", 0)
+        fd = os.open(path, flags)
+        with os.fdopen(fd, "rb") as stream:
+            opened = os.fstat(stream.fileno())
+            if not stat.S_ISREG(opened.st_mode) or opened.st_size != info.st_size:
+                raise InputError("historical report changed before read")
+            payload = stream.read(20 * 1024 * 1024 + 1)
+            if (len(payload) != info.st_size or
+                    os.fstat(stream.fileno()).st_size != info.st_size):
+                raise InputError("historical report changed during read")
+        return payload
+    except OSError as exc:
+        raise InputError("historical report is missing or inaccessible") from exc
+
+
+def verify_history_entry(output_dir: Path, session_id: str) -> dict:
+    """Recheck saved JSON SHA and HTML parity without touching source files.
+
+    This is local report integrity, NOT source authenticity or signed evidence.
+    """
+    if not re.fullmatch(r"\d{8}T\d{6}\.\d{6}Z-[0-9a-f]{12}", session_id):
+        raise InputError("invalid session identifier")
+    if output_dir.is_symlink() or not output_dir.is_dir():
+        raise InputError("invalid history destination")
+    path = output_dir / HISTORY_FILE
+    if not os.path.lexists(path):
+        raise InputError("no audit history found")
+    db = _history_connection(path)
+    try:
+        row = db.execute(
+            """SELECT status, scanned_files, issue_count, json_path,
+                      html_path, report_sha256 FROM scans WHERE session_id=?""",
+            (session_id,)
+        ).fetchone()
+    finally:
+        db.close()
+    if row is None:
+        raise InputError("audit session was not found")
+    status, count, issue_count, json_path, html_path, stored_sha = row
+    raw = _evidence_bytes(Path(json_path), output_dir)
+    if not isinstance(stored_sha, str) or hashlib.sha256(raw).hexdigest() != stored_sha:
+        raise InputError("historical JSON evidence SHA mismatch")
+    try:
+        report = json.loads(raw.decode("utf-8"))
+    except (UnicodeError, json.JSONDecodeError) as exc:
+        raise InputError("historical JSON evidence invalid") from exc
+    if (not isinstance(report, dict) or report.get("status") != status
+            or report.get("files_scanned") != count
+            or len(report.get("issues", [])) != issue_count):
+        raise InputError("historical JSON and audit row disagree")
+    html = _evidence_bytes(Path(html_path), output_dir)
+    if html != render_html(report).encode("utf-8"):
+        raise InputError("historical HTML differs from its JSON evidence")
+    return {"session_id": session_id, "status": status,
+            "sha256": stored_sha, "reports_verified": 2}

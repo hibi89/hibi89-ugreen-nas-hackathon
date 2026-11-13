@@ -51,6 +51,10 @@ class DesktopGUIAcceptance(unittest.TestCase):
             time.sleep(0.03)
         self.assertTrue(self.app.status.get().startswith("READY"), self.app.status.get())
         self.assertGreaterEqual(self.app.history.size(), 1)
+        self.app.history.selection_set(0)
+        with patch("flowpilot_universal.gui.messagebox.showinfo") as verified_dialog:
+            self.app.verify_selected_history()
+            verified_dialog.assert_called_once()
         self.assertTrue((self.output / HISTORY_FILE).is_file())
         self.assertEqual((self.source / "납품원본.txt").read_bytes(), b"immutable-delivery")
         with closing(sqlite3.connect(self.output / HISTORY_FILE)) as db:

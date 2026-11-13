@@ -9,7 +9,7 @@ import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 from pathlib import Path
 
-from .session import backup_history, recent_history, run_session
+from .session import backup_history, recent_history, run_session, verify_history_entry
 
 
 class App:
@@ -25,6 +25,7 @@ class App:
         self.events: queue.Queue = queue.Queue()
         self.stop = threading.Event()
         self.worker: threading.Thread | None = None
+        self.history_rows: list[dict] = []
         main = ttk.Frame(master, padding=18)
         main.pack(fill="both", expand=True)
         ttk.Label(main, text="FlowPilot Universal", font=("", 20, "bold")).pack(anchor="w")
@@ -52,6 +53,7 @@ class App:
         self.cancel_button.pack(side="left", padx=8)
         ttk.Button(actions, text="저장된 검수 이력", command=self.show_history).pack(side="left")
         ttk.Button(actions, text="이력 백업", command=self.backup).pack(side="left", padx=(8, 0))
+        ttk.Button(actions, text="선택 이력 검증", command=self.verify_selected_history).pack(side="left", padx=(8, 0))
         ttk.Label(main, textvariable=self.status, wraplength=820).pack(anchor="w", pady=(16, 8))
         ttk.Label(main, text="검사 이력 (현재 PC의 선택한 저장 폴더에만 보관)").pack(anchor="w")
         frame = ttk.Frame(main)
@@ -119,10 +121,22 @@ class App:
         except Exception as exc:
             messagebox.showerror("백업 보류", str(exc))
 
+    def verify_selected_history(self):
+        try:
+            selected = self.history.curselection()
+            if not selected or selected[0] >= len(self.history_rows):
+                raise ValueError("먼저 검증할 이력 한 건을 선택해 주세요.")
+            session_id = self.history_rows[selected[0]]["session_id"]
+            verified = verify_history_entry(Path(self.output.get().strip()), session_id)
+            messagebox.showinfo("로컬 보고서 무결성", "JSON·HTML 검증 통과: " + verified["sha256"])
+        except Exception as exc:
+            messagebox.showerror("이력 검증 보류", str(exc))
+
     def show_history(self, silent=False):
         try:
             output = Path(self.output.get().strip())
             rows = recent_history(output)
+            self.history_rows = rows
             self.history.delete(0, tk.END)
             for item in rows:
                 self.history.insert(tk.END, f"{item['created_utc']} | {item['status']} | "
