@@ -54,8 +54,8 @@ def _history_connection(path: Path) -> sqlite3.Connection:
     existed = os.path.lexists(path)
     if existed:
         info = path.lstat()
-        if not stat.S_ISREG(info.st_mode) or info.st_nlink != 1:
-            raise InputError("history path must be an unlinked regular file")
+        if _is_link(info) or not stat.S_ISREG(info.st_mode) or info.st_nlink != 1:
+            raise InputError("history path must be an unlinked non-reparse regular file")
     else:
         flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_BINARY", 0)
         fd = os.open(path, flags, 0o600)
@@ -174,8 +174,8 @@ def backup_history(output_dir: Path) -> Path:
     A failed copy stays on disk for inspection rather than being silently deleted.
     Restore is deliberately manual into a fresh location (no destructive restore).
     """
-    if output_dir.is_symlink() or not output_dir.is_dir():
-        raise InputError("backup destination must be an existing local directory")
+    if not output_dir.is_dir() or _is_link(output_dir.lstat()):
+        raise InputError("backup destination must be an existing non-reparse local directory")
     history = output_dir / HISTORY_FILE
     if not os.path.lexists(history):
         raise InputError("no audit history to back up")
@@ -232,7 +232,7 @@ def verify_history_entry(output_dir: Path, session_id: str) -> dict:
     """
     if not re.fullmatch(r"\d{8}T\d{6}\.\d{6}Z-[0-9a-f]{12}", session_id):
         raise InputError("invalid session identifier")
-    if output_dir.is_symlink() or not output_dir.is_dir():
+    if not output_dir.is_dir() or _is_link(output_dir.lstat()):
         raise InputError("invalid history destination")
     path = output_dir / HISTORY_FILE
     if not os.path.lexists(path):

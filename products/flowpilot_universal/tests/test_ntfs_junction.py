@@ -14,9 +14,11 @@ import subprocess
 import tempfile
 import unittest
 
-from flowpilot_universal.engine import InputError, load_manifest, scan
+from flowpilot_universal.engine import InputError, create_only, load_manifest, scan
+from flowpilot_universal.checkpoint import ResumeCheckpoint
+from flowpilot_universal.pdf_report import create_pdf_only
 from flowpilot_universal.manifest_editor import create_approved_manifest
-from flowpilot_universal.session import run_session
+from flowpilot_universal.session import backup_history, run_session, verify_history_entry
 
 
 @unittest.skipUnless(os.name == "nt", "NTFS reparse/junction test requires hosted Windows")
@@ -73,6 +75,39 @@ class WindowsRealJunctionTests(unittest.TestCase):
             create_approved_manifest("Authorized", "required.txt", destination,
                                      link, approved=True)
         self.assertFalse(destination.exists())
+
+    def test_junction_rejected_by_create_only_utility(self):
+        link = self.create_junction("report_write_link", self.report)
+        output = link / "unexpected.json"
+        with self.assertRaises(InputError):
+            create_only(output, '{"safe": true}', self.source)
+        self.assertFalse((self.report / "unexpected.json").exists())
+
+    def test_junction_rejected_by_pdf_direct_output_utility(self):
+        link = self.create_junction("pdf_report_link", self.report)
+        target = link / "unsigned.pdf"
+        with self.assertRaises(InputError):
+            create_pdf_only(target, b"%PDF-1.4\n%%EOF", self.source)
+        self.assertFalse((self.report / "unsigned.pdf").exists())
+
+    def test_junction_rejected_by_resume_checkpoint(self):
+        root_link = self.create_junction("checkpoint_source_link", self.source)
+        output_link = self.create_junction("checkpoint_report_link", self.report)
+        fingerprint = "e" * 64
+        with self.assertRaises(InputError):
+            ResumeCheckpoint(self.report, root_link, fingerprint)
+        with self.assertRaises(InputError):
+            ResumeCheckpoint(output_link, self.source, fingerprint)
+        self.assertEqual(list(self.report.iterdir()), [])
+
+    def test_junction_rejected_by_history_backup_and_verify(self):
+        result = run_session(self.source, self.manifest_file, self.report, consent=True)
+        link = self.create_junction("history_report_link", self.report)
+        with self.assertRaises(InputError):
+            backup_history(link)
+        with self.assertRaises(InputError):
+            verify_history_entry(link, result.session_id)
+        self.assertEqual(verify_history_entry(self.report, result.session_id)["reports_verified"], 2)
 
     def test_output_junction_rejected_before_history_creation(self):
         link = self.create_junction("report_link", self.report)

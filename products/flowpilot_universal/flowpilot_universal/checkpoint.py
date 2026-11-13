@@ -13,7 +13,7 @@ import re
 import sqlite3
 import stat
 
-from .engine import InputError
+from .engine import InputError, _is_link
 
 CHECKPOINT_FILE = ".flowpilot-resume.sqlite3"
 CHECKPOINT_APP = 1179669046
@@ -34,10 +34,10 @@ class ResumeCheckpoint:
     def __init__(self, directory: Path, source: Path, manifest_sha256: str):
         if not re.fullmatch(r"[0-9a-f]{64}", manifest_sha256):
             raise InputError("invalid checkpoint manifest fingerprint")
-        if directory.is_symlink() or not directory.is_dir():
-            raise InputError("checkpoint output must be an existing real directory")
-        if source.is_symlink() or not source.is_dir():
-            raise InputError("checkpoint source must be an existing non-link directory")
+        if not directory.is_dir() or _is_link(directory.lstat()):
+            raise InputError("checkpoint output must be an existing non-reparse directory")
+        if not source.is_dir() or _is_link(source.lstat()):
+            raise InputError("checkpoint source must be an existing non-reparse directory")
         dest = directory.resolve(strict=True)
         root = source.resolve(strict=True)
         if dest == root or root in dest.parents:

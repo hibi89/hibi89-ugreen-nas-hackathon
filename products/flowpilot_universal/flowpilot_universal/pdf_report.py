@@ -11,7 +11,7 @@ import re
 import stat
 from typing import Any
 from xml.sax.saxutils import escape
-from .engine import InputError
+from .engine import InputError, _is_link
 
 MAX_PDF_BYTES = 20 * 1024 * 1024
 FONT_NAME = "FlowPilotLocalKorean"
@@ -149,8 +149,8 @@ def create_pdf_only(path: Path, raw: bytes, root: Path) -> None:
     if os.path.lexists(target):
         raise InputError("PDF destination exists; create-only")
     parent = target.parent
-    if parent.is_symlink() or not parent.is_dir():
-        raise InputError("PDF parent must be an existing real directory")
+    if not parent.is_dir() or _is_link(parent.lstat()):
+        raise InputError("PDF parent must be an existing non-reparse directory")
     resolved, source = parent.resolve(strict=True), root.resolve(strict=True)
     if resolved == source or source in resolved.parents:
         raise InputError("PDF cannot be written inside source")

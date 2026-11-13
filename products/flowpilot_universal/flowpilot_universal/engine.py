@@ -173,6 +173,10 @@ def scan(root: Path, manifest: dict[str, Any], *,
     stopped = False
     directories_visited = 0
     cache_reused = 0
+    # Recheck previously scanned entries before reporting READY. Metadata is
+    # best-effort, not an immutable source snapshot or provenance guarantee.
+    observed_files: dict[str, tuple[int, int, int, int]] = {}
+    observed_directories: dict[str, tuple[tuple[int, int, int, int], tuple[str, ...]]] = {}
     max_files = manifest["limits"]["max_files"]
     max_bytes = manifest["limits"]["max_bytes"]
     while stack and not stopped:
@@ -193,6 +197,7 @@ def scan(root: Path, manifest: dict[str, Any], *,
                 continue
             with os.scandir(directory) as iterator:
                 entries = sorted(iterator, key=lambda e: (e.name.casefold(), e.name))
+            observed_directories[prefix] = (_signature(dir_before), tuple(sorted(e.name for e in entries)))
         except OSError:
             issues.append({"code": "DIRECTORY_UNREADABLE", "path": prefix or "."})
             continue
@@ -232,6 +237,8 @@ def scan(root: Path, manifest: dict[str, Any], *,
                             checkpoint_save(rel, info, record["sha256"])
                 except OSError:
                     issues.append({"code": "FILE_UNREADABLE_OR_CHANGED", "path": rel})
+                if record["sha256"] is not None:
+                    observed_files[rel] = _signature(info)
                 files.append(record)
                 if progress is not None:
                     progress(len(files), byte_count)
@@ -252,6 +259,42 @@ def scan(root: Path, manifest: dict[str, Any], *,
                 issues.append({"code": "DIRECTORY_CHANGED", "path": prefix or "."})
         except OSError:
             issues.append({"code": "DIRECTORY_CHANGED", "path": prefix or "."})
+    if not stopped:
+        # Examine directories shallow-first; never descend into a directory
+        # known to have changed into a junction or symlink.
+        directories_safe = True
+        for prefix in sorted(observed_directories, key=lambda p: (p.count("/"), p)):
+            if cancel is not None and cancel():
+                issues.append({"code": "SCAN_INTERRUPTED", "path": prefix or "."})
+                directories_safe = False
+                break
+            directory = root / prefix
+            signature, expected_names = observed_directories[prefix]
+            try:
+                now = directory.lstat()
+                if (_is_link(now) or not stat.S_ISDIR(now.st_mode)
+                        or _signature(now) != signature):
+                    raise OSError("directory changed or became unsafe")
+                with os.scandir(directory) as iterator:
+                    actual_names = tuple(sorted(entry.name for entry in iterator))
+                if actual_names != expected_names:
+                    raise OSError("directory entries changed after scanning")
+            except OSError:
+                issues.append({"code": "DIRECTORY_CHANGED_FINAL", "path": prefix or "."})
+                directories_safe = False
+                break
+        if directories_safe:
+            for rel, expected in sorted(observed_files.items()):
+                if cancel is not None and cancel():
+                    issues.append({"code": "SCAN_INTERRUPTED", "path": rel})
+                    break
+                try:
+                    now = (root / rel).lstat()
+                    if (_is_link(now) or not stat.S_ISREG(now.st_mode)
+                            or _signature(now) != expected):
+                        raise OSError("file changed after hashing")
+                except OSError:
+                    issues.append({"code": "FILE_CHANGED_AFTER_SCAN", "path": rel})
     if cache_reused:
         # Metadata checks are NOT sufficient to authenticate cached file bytes.
         # Require independent complete rehash before promoting to READY.
@@ -286,6 +329,7 @@ def scan(root: Path, manifest: dict[str, Any], *,
             issues.append({"code": "VERSION_CANDIDATES_REVIEW", "paths": sorted(paths)})
     codes = {issue["code"] for issue in issues}
     incomplete_codes = {"DIRECTORY_UNREADABLE", "DIRECTORY_UNSAFE", "DIRECTORY_CHANGED",
+                        "DIRECTORY_CHANGED_FINAL", "FILE_CHANGED_AFTER_SCAN",
                         "ENTRY_UNREADABLE", "UNSAFE_LINK", "SCAN_LIMIT", "SCAN_INTERRUPTED",
                         "FILE_UNREADABLE_OR_CHANGED", "UNSUPPORTED_FILE_TYPE", "CASE_COLLISION"}
     status = ("INCOMPLETE" if codes & incomplete_codes else
@@ -314,11 +358,13 @@ def render_html(report: dict[str, Any]) -> str:
 
 def create_only(path: Path, content: str, root: Path) -> None:
     target = path.absolute()
+    if _is_link(root.lstat()) or _is_link(target.parent.lstat()):
+        raise InputError("source or output folder is a symlink/reparse point")
     parent = target.parent.resolve(strict=True)
     canonical_root = root.resolve(strict=True)
     if parent == canonical_root or canonical_root in parent.parents:
         raise InputError("refusing to write evidence inside inspected root")
-    if not parent.is_dir() or path.exists() or path.is_symlink():
+    if not parent.is_dir() or os.path.lexists(path):
         raise InputError("output must be a new path in an existing directory")
     flags = os.O_CREAT | os.O_EXCL | os.O_WRONLY | getattr(os, "O_BINARY", 0)
     fd = os.open(target, flags, 0o600)
