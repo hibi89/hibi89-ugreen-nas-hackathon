@@ -95,7 +95,7 @@ class PdfReportTests(unittest.TestCase):
         text = "".join(p.extract_text() for p in doc.pages)
         self.assertIn("NEEDS_REVIEW", text)
         self.assertIn("한글 문서", text)
-        self.assertNotIn("<script>", text)
+        self.assertIn("<script>한글 문서</script>", text)  # Literal text, not executable ReportLab markup
 
     def test_missing_pdf_dependency_refuses_before_scan(self):
         with patch("flowpilot_universal.session.ensure_pdf_support", side_effect=InputError("font absent")):
