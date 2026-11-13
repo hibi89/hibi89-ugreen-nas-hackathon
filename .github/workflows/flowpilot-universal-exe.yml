@@ -9,6 +9,7 @@ on:
       - "products/flowpilot_universal/flowpilot_universal/gui.py"
       - "products/flowpilot_universal/flowpilot_universal/manifest_editor.py"
       - "products/flowpilot_universal/verify_delivery_archive.py"
+      - "products/flowpilot_universal/windows_candidate_install_rehearsal.ps1"
       - ".github/workflows/flowpilot-universal-exe.yml"
   workflow_dispatch:
 permissions:
@@ -41,6 +42,38 @@ jobs:
       - name: Run relocated EXE with developer Python removed from PATH
         run: |
           python -c "import subprocess,sys,pathlib,os; exe=pathlib.Path('dist/relocated/FlowPilotUniversal/FlowPilotUniversal.exe').resolve(); assert exe.is_file(); env=os.environ.copy(); env.pop('PYTHONPATH',None); env.pop('PYTHONHOME',None); win=env.get('SystemRoot','C:\Windows'); env['PATH']=win+'\System32;'+win; result=subprocess.run([str(exe),'--self-test'],env=env,timeout=90,check=False); print('RELOCATED_EXE_EXIT',result.returncode); sys.exit(result.returncode)"
+      - name: Install, verify, execute and remove ZIP in runner temp only
+        shell: pwsh
+        run: |
+          $root = Join-Path $env:RUNNER_TEMP 'flowpilot-ci-install-rehearsal'
+          $zip = (Resolve-Path 'dist/flowpilot-internal-candidate.zip').Path
+          & ./windows_candidate_install_rehearsal.ps1 -Mode Install -WorkDir $root -ZipPath $zip
+          & ./windows_candidate_install_rehearsal.ps1 -Mode Verify -WorkDir $root
+          $exe = Join-Path $root 'FlowPilotUniversal/FlowPilotUniversal.exe'
+          $originalPath = $env:PATH
+          try {
+            $env:PATH = "$env:SystemRoot\System32;$env:SystemRoot"
+            $proc = Start-Process -FilePath $exe -ArgumentList '--self-test' -Wait -PassThru
+            if ($proc.ExitCode -ne 0) { throw "INSTALLED_EXE_FAILED $($proc.ExitCode)" }
+            Write-Host 'INSTALLED_EXE_EXIT 0'
+          } finally { $env:PATH = $originalPath }
+          # This deliberately checks customer-data preservation on uninstall.
+          $unrelated = Join-Path $root 'customer-private-notes.txt'
+          Set-Content -LiteralPath $unrelated -Encoding UTF8 -Value 'do not delete private files'
+          $blocked = $false
+          try {
+            & ./windows_candidate_install_rehearsal.ps1 -Mode Remove -WorkDir $root
+          } catch { $blocked = $true; Write-Host "UNINSTALL_SAFETY_BLOCKED" }
+          if (-not $blocked -or -not (Test-Path -LiteralPath $unrelated)) {
+            throw 'unsafe uninstaller modified unrelated customer data'
+          }
+          if ((Get-Content -LiteralPath $unrelated -Raw) -notmatch 'do not delete') {
+            throw 'unrelated user data altered'
+          }
+          Remove-Item -LiteralPath $unrelated -Force
+          & ./windows_candidate_install_rehearsal.ps1 -Mode Remove -WorkDir $root
+          if (Test-Path -LiteralPath $root) { throw 'installed folder not removed after clean verify' }
+          Write-Host 'INSTALL_REMOVE_CYCLE_PASS'
       - name: Report candidate and EXE SHA256 without publication
         shell: pwsh
         run: |
