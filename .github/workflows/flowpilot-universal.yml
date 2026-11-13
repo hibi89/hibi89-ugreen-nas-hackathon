@@ -1,0 +1,37 @@
+name: FlowPilot Universal isolated offline P50
+on:
+  push:
+    branches: ["product/flowpilot-universal"]
+    paths:
+      - "products/flowpilot_universal/**"
+      - ".github/workflows/flowpilot-universal.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  offline-linux:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: products/flowpilot_universal
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m unittest discover -s tests -p 'test_*.py' -v
+      - run: python -m compileall -q flowpilot_universal
+  offline-windows:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: products/flowpilot_universal
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m unittest discover -s tests -p 'test_*.py' -v
+      - run: python -m compileall -q flowpilot_universal
