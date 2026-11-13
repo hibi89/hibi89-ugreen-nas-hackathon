@@ -1,3 +1,7 @@
+> **2026-11-13 KST P85 PDF latest (supersedes historical 'PDF unbuilt' statements):** [source code/test `e87f5a2debe`](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/commit/e87f5a2debe445bf749b3466b6a6f19b2febee7d) [Linux/Windows CI #43391290337](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43391290337) **71 unique PASS + 8 portable reruns + 3 real Tk GUI PASS per OS**, compileall and 2/2 SUCCESS. Optional Korean multipage PDF, local create-only, SHA256 SQLite audit check (legacy 2-report records preserved); [Windows packaged onedir EXE with actual PDF self-test #43391157492](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43391157492) EXIT0, unsigned/unpublished. [Detailed P85 PDF evidence](P85_PDF_EVIDENCE.md). **Physical customer Win10/11, owner-authorized real USB/SMB/NAS, signed installer/anti-virus, OS Korean font embedding rights, approved 100-point owner acceptance missing => official completion UNASSESSED, goal 85% NOT CERTIFIED, [작업중] + RELEASE HOLD.**
+
+---
+
 # FlowPilot Universal P85 continuation evidence — 2026-11-13 KST
 
 ## Two new verified workstreams

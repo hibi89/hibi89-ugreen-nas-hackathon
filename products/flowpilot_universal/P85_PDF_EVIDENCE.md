@@ -1,0 +1,28 @@
+# FlowPilot Universal — P85 Korean PDF and Windows EXE evidence (2026-11-13 KST)
+
+## Goal and exact tested commits
+
+- **Original whole-final-design F01–F10 denominator remains unchanged.** User requests final verified 85%. The approved 100-point acceptance weights and independent physical buyer acceptance are unavailable; **official rate UNASSESSED, target 85% NOT CERTIFIED, central [작업중] retained, SALE RELEASE HOLD.**
+- PDF functionality first code SHA `6f9a15d85507fd3df4b1baceb42e8684a9cb8203`; one test-oracle-only fix at **tested code SHA `e87f5a2debe445bf749b3466b6a6f19b2febee7d`**. No product implementation logic changed in the fix.
+- [Linux+Windows source CI #43391290337](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43391290337), exact tested SHA above: Python3.11 Linux **71/71 unique tests PASS, 0 FAIL**, Windows **71/71 PASS, 0 FAIL**; separate repeated portable suite **8 PASS per OS**, native Tk GUI consent/scan/resume/PDF/ledger **3 PASS per OS** (Ubuntu Xvfb and GitHub-hosted Windows), compileall PASS, **2/2 jobs SUCCESS**.
+- [Final blueprint policy #43391290707](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43391290707) SUCCESS at the same tested SHA; a policy check, not a completion certification.
+- [Windows unsigned onedir EXE #43391157492](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43391157492), built at implementation SHA `6f9a15d85507fd3df4b1baceb42e8684a9cb8203`: PyInstaller **6.22.3** + ReportLab **4.4.9**, actual bundled `FlowPilotUniversal.exe --self-test` **EXIT 0** after creating Tk App, synthetic local scan, create-only Korean PDF, JSON/HTML/PDF SQLite ledger validation. EXE SHA256 from job log `988BC1CE7F7AAA1068B74194C83BC6FA384DD3B5CFE9724C7943BD4D56660E69`. **No artifact upload, download/release, certificate, signer, customer NAS or external file access.** CI binary is temporary and not a customer-distributed release.
+
+## Implementation and safety
+
+- `flowpilot_universal/pdf_report.py`: optional locally generated Korean multipage PDF using the operator machine's installed Korean TTF (Windows Malgun Gothic, Ubuntu CI's distro Nanum). No font file is redistributed in the GitHub source or EXE project. ReportLab installed only when PDF requested for Python source use; existing offline HTML/JSON and `.pyz` without ReportLab remain supported.
+- In GUI, check **한국어 PDF 보고서 추가 생성**. If unavailable dependency/font, **HOLD before any source scan/write**. PDF is created in an already approved external output directory with O_EXCL; original source remains read-only. Existing outputs never overwritten. PDF and SHA are logged in a separate `pdf_evidence` SQLite table keyed to original session, without modifying the pre-existing scans table/schema version.
+- `verify_history_entry()` checks original JSON SHA and HTML renderer bytes, plus PDF SHA and `%PDF-/%%EOF` structure where PDF exists. Older 2-report sessions remain compatible and validate as 2; new PDF runs validate as 3. Report hash comparison is **not** a digital signature or protection against coordinated ledger+evidence tampering.
+- PDF uses XML-escaped user-controlled filenames/titles, Korean Unicode TTF, repeating table headers, multipage layouts, 900 file/200 issue display caps with clear JSON complete-evidence reference. Full hashes remain in JSON; PDF shows digest prefixes for readability. All files are local, no API/network/NAS management.
+- Test validates Korean extraction with pinned `pypdf==6.1.3`, multipage output, safe literal `<script>` text, missing/altered PDF rejection, create-only source/root boundaries and old SQLite rows. The first [CI #43391157600](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43391157600) had a **test expectation error only**: escaped angle brackets visibly remain harmless literal text in PDF and should not be prohibited. Corrected assertion, final #43391290337 PASS on both OS. No source code security guard removed. **No pixel-level PDF visual inspection on buyer hardware; Korean content extraction verified.**
+
+## Dependencies/rights/security/release
+
+- Runtime for optional PDF: `reportlab==4.4.9` (BSD license); test-only `pypdf==6.1.3` (BSD-3-Clause). ReportLab's transitive bundled dependencies and Windows Malgun Gothic font embedding rights require independent release/legal review; no customer font files copied to repository. Windows EXE build uses `pyinstaller==6.22.3` on hosted CI. CI apt `fonts-nanum` is a test environment setup, not a shipped font.
+- Windows candidate is **unsigned, onedir with adjacent dependencies, not installer, no SmartScreen/Defender test or physical consumer Windows 10/11 proof**. Real Windows10/11 hardware, USB, owner-authorized UNC SMB NAS and multiple vendor environments, source TOCTOU/snapshot guarantee, true trusted incremental READY, real customer acceptance, final legal/license/distribution/support and F01–F10 weighting remain unverified.
+- **No Vercel/Production URL** (desktop product N/A); no customer data, AI API, network transfer or release changes. UGREEN contest `lead/ugreen`, `main`, Skill/submit and all unrelated Kmong SKUs/registrations unchanged.
+
+## Recovery and next work
+
+- Pre-PDF code/docs product HEAD `9436fce4146cd0c3f38208d0e5812b9bf0c7d8d4` retained in Git history. Only product branch modified; avoid deleting local reports/history. Existing JSON/HTML reports can be independently verified without ReportLab.
+- Next independent acceptance: physical Win10/11 with legally usable Korean fonts and optional PDF, installer/signing and AV policies, owner-permissioned actual USB/UNC SMB, final F01–F10 100-point rubric and buyer acceptance. Official **UNASSESSED** and [작업중] until proven.

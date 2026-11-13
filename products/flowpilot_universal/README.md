@@ -1,3 +1,12 @@
+# Latest 2026-11-13 KST — Korean PDF evidence and Windows GUI candidate
+
+- **Evidence:** [full Linux+Windows CI #43391290337](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43391290337) at code `e87f5a2debe445bf749b3466b6a6f19b2febee7d`: **71 unique PASS per OS, 8 portable repeated per OS, 3 live Tk widget PASS per OS**. [Windows EXE PDF runtime #43391157492](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43391157492) EXIT 0; **unsigned / unpublished**. [PDF scope and issues](P85_PDF_EVIDENCE.md).
+- **GUI optional PDF:** `python -m flowpilot_universal.gui`, choose authorized source, manifest and separate output, confirm permission, optionally check **한국어 PDF 보고서 추가 생성**. Requires `reportlab==4.4.9` installed in the Python runtime and a locally installed Korean TTF (Windows Malgun Gothic or Linux Nanum). No font included in the repo. Python default scans and `.pyz` without PDF continue with stdlib only. PDF is generated only on explicit checkbox and keeps original source files read-only.
+- PDF lists up to 900 files/200 issues with clear truncation warning; complete SHA-256/paths remain JSON. Saved reports can be checked in GUI: optional PDF SHA alongside original JSON/HTML SQLite ledger, 3/3 reports verified; original no-PDF sessions remain 2/2. **Local SHA not a trusted third-party signature.**
+- **Limits:** no physical buyer Win10/11/USB/authorized SMB NAS or release/license/font embedding/legal acceptance, installer/signing/SmartScreen. User target 85% **UNASSESSED**, [작업중] + SALE HOLD. Older notes below are historical.
+
+---
+
 # FlowPilot Universal P85 continuation — private CI candidate, release HOLD
 
 - Verified source: `a96e727ba89bb87a4914e85c31da0898ce41c45d`, [Linux/Windows CI](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43387548967) 63 PASS/OS, portable 8 reruns/OS, real Tk widgets 2 PASS/OS; [Windows EXE CI](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43387249760) unsigned PyInstaller onedir GUI executable runtime synthetic `--self-test` EXIT 0 (built at SHA `436d3b635f716d9e2da58a986680cef93edd5374`). **Official final blueprint rate UNASSESSED**, target 85% NOT CERTIFIED, `[작업중]` remains.
