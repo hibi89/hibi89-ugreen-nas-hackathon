@@ -76,6 +76,10 @@ def _is_link(info: os.stat_result) -> bool:
     return stat.S_ISLNK(info.st_mode) or bool(getattr(info, "st_file_attributes", 0) & getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0))
 
 def _signature(info: os.stat_result) -> tuple[int, int, int, int]:
+    # CPython on Windows may report differing path/FD volume or file IDs.
+    # Compare size and mtime there; full identity/race hardening remains a P70 gate.
+    if os.name == "nt":
+        return (0, 0, info.st_size, info.st_mtime_ns)
     return (info.st_dev, info.st_ino, info.st_size, info.st_mtime_ns)
 
 def _hash_file(path: Path, before: os.stat_result) -> str:
