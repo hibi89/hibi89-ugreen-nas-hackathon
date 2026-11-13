@@ -1,6 +1,7 @@
 """Real Tk smoke using synthetic files. Run via xvfb-run on Ubuntu CI."""
 from contextlib import closing
 import json
+import gc
 import sqlite3
 import tempfile
 import time
@@ -29,11 +30,23 @@ class DesktopGUIAcceptance(unittest.TestCase):
         }, ensure_ascii=False), encoding="utf-8")
         self.window = tk.Tk()
         self.window.withdraw()
-        self.addCleanup(self.window.destroy)
+        # Test's tearDown must release Tcl objects on the UI thread.
         self.app = App(self.window)
         self.app.root.set(str(self.source))
         self.app.manifest.set(str(self.manifest))
         self.app.output.set(str(self.output))
+
+    def tearDown(self):
+        self.app.stop.set()
+        worker = self.app.worker
+        if worker is not None and worker.is_alive():
+            worker.join(timeout=12)
+        self.app.close_template_editor()
+        self.window.destroy()
+        self.app = None
+        # Prevent Tk variables surviving until background worker GC; run the
+        # collection while still on the main UI-owner thread.
+        gc.collect()
 
     def _drive(self):
         deadline = time.monotonic() + 12

@@ -100,11 +100,21 @@ class App:
         edit = tk.Text(frame, height=15, wrap="none", undo=True)
         edit.pack(fill="both", expand=True)
         self.editor_text = edit
+        child.protocol("WM_DELETE_WINDOW", self.close_template_editor)
         ttk.Checkbutton(frame, variable=self.editor_approval,
                         text="스캔 원본과 독립된 계약/납품조건 목록을 직접 확인했고, 이 요구사항을 승인합니다."
                         ).pack(anchor="w", pady=(12, 9))
         ttk.Button(frame, text="승인한 요구사항을 새 JSON으로 저장 (덮어쓰기 금지)",
                    command=self.save_template_editor).pack(anchor="w")
+
+    def close_template_editor(self):
+        """Drop all Tk child/widget/variable references on Tk's owning thread."""
+        if self.editor_window is not None and self.editor_window.winfo_exists():
+            self.editor_window.destroy()
+        self.editor_window = None
+        self.editor_title = None
+        self.editor_approval = None
+        self.editor_text = None
 
     def save_template_editor(self):
         if (self.editor_window is None or not self.editor_window.winfo_exists()
@@ -128,8 +138,7 @@ class App:
             created = create_approved_manifest(title, lines, Path(target), Path(raw_root), approved=approval)
             self.manifest.set(str(created))
             messagebox.showinfo("새 검수 요구사항 저장", "사용자 승인 JSON 저장 완료: " + str(created))
-            self.editor_window.destroy()
-            self.editor_window = None
+            self.close_template_editor()
         except Exception as exc:
             messagebox.showerror("검수 요구사항 저장 보류", str(exc))
 
