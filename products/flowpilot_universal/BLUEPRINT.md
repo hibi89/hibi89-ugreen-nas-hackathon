@@ -1,4 +1,4 @@
-# FlowPilot Universal final-product design and P50 traceability
+# FlowPilot Universal final-product design and P50/P70 traceability
 
 Source: central approved product brief at hackathon-command-center-2026/kmong-productization/docs/commercial/KMONG_3_NEW_PRODUCTS_20261112.md. This separate product MUST NOT be conflated with the UGREEN NAS Skill or its contest progress.
 
@@ -14,9 +14,9 @@ B. Independent Python 3.11 local scanner of operator-authorized PC/USB/OS-mounte
 | F02 | Template-based required delivery file matching | Schema v1 requirements manifest with strict relative paths | tests missing, traversal, collision PASS; GUI template library NOT_BUILT |
 | F03 | Byte-level SHA-256 integrity check | fd-bound hashing with best-effort before/after metadata check | tests ready/mismatch PASS; cross-device race/immutable snapshots NOT_PROVEN |
 | F04 | Duplicate/version conflict review | Exact-content duplicates, filename version candidates | tests duplicate/version PASS; semantic versions/collaboration NOT_BUILT |
-| F05 | Source safe/no unauthorized mutations | read-only filesystem operations; links/reparse/special entries -> INCOMPLETE; scan cap | tests link, limits, unreadable PASS; Win junction/race hardening NOT_DONE |
-| F06 | Delivery evidence | Local create-only JSON + escaped static HTML, no network | tests report/CLI/escaping PASS; customer-facing PDF and consented history NOT_BUILT |
-| F07 | General user workflow and error recovery | Deterministic CLI statuses READY/BLOCKED/NEEDS_REVIEW/INCOMPLETE | customer GUI, scan resume, selective re-check NOT_BUILT |
+| F05 | Source safe/no unauthorized mutations | read-only filesystem operations; links/reparse/special entries -> INCOMPLETE; file/byte/directory caps and directory re-list checks | synthetic Linux/Windows CI; Windows junction/directory TOCTOU hardening and real SMB NOT_DONE |
+| F06 | Delivery evidence | Local create-only JSON + escaped HTML, consented SQLite history + create-only online SQLite backups, no network | synthetic CI and DB readback PASS; customer PDF, privacy/retention policy and real audit workflows NOT_DONE |
+| F07 | General user workflow and error recovery | Tkinter GUI, explicit consent, progress, cancel->INCOMPLETE, history listing, full recheck | headless UI-import and synthetic session CI PASS; real Tk window/customer UX and incremental checkpoint resume NOT_TESTED/NOT_BUILT |
 | F08 | Production Windows portable delivery | Python standard-library source prototype only | EXE, packaging, signing, Win10/11 customer device NOT_RUN |
 | F09 | Authorized actual PC/USB/SMB hardware acceptance | No physical hardware touched | real Windows UNC share, NAS models and high-volume test NOT_RUN |
 | F10 | Commercial user acceptance and legal delivery | no sale and no permission external transfer | EULA, copyright/3rd-party reviews, support, customer pilots, seller GO NOT_DONE |
@@ -25,9 +25,16 @@ B. Independent Python 3.11 local scanner of operator-authorized PC/USB/OS-mounte
 
 ## Planned stage gates (not retroactive credits)
 - P50: contract, independent offline core, fail-closed output, focused deterministic tests (implemented, synthetic only).
-- P70: actual user GUI, guarded local report history/backup, large folder interruption and resume, scan stabilization.
+- P70: user GUI, guarded local report history/backup, bounded interruption and scan stabilization; true checkpoint resume remains OPEN. Synthetic technical coverage is substantial but full P70 acceptance is **PARTIAL**.
 - P85: Windows EXE installer/portable signature, full negative security regression and user documentation.
 - P95: real Windows10/11 local USB+permissioned SMB NAS from multiple vendors, independently checked report parity, business customer use cases.
 - P100: verified consent/rights/contract, complete final blueprint owner-approved scoring, support/refund/license and real user acceptance, explicit commercial release GO.
 
 Nothing here authorizes remote SMB credentials, external uploads, NAS scripts, paid subscriptions, production deployment or customer data access. Customer filenames in HTML/JSON are sensitive; output stays local only.
+
+## P70 implementation snapshot (2026-11-13 KST)
+- Implementation evidence: `product/flowpilot-universal@e6d4d450cf2014d985f9cf97be1d91d5ab4d63ec`; Actions [#43379604599](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43379604599) Linux30/30 + Windows30/30 PASS, compileall both. Final-blueprint policy gate [#43379605082](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43379605082) SUCCESS (policy only).
+- Desktop GUI: `python -m flowpilot_universal.gui` selects root, manifest, separate output and requires explicit checkbox approval. Real interactive customer GUI NOT_RUN.
+- Workflow: SQLite `.flowpilot-history.sqlite3` in selected output folder, create-only JSON/HTML with unique IDs, offline list and explicitly requested create-only SQLite online backup. A cancelled run records `INCOMPLETE` evidence and next scan rehashes all files; **not incremental checkpoint resumption**.
+- Safer scans: directory names re-list and platform metadata check; file/byte limits and 25,000 directory hard cap; best-effort only, never immutable snapshot guarantee, no authorized physical SMB/USB evidence.
+- **Official final-design completion is UNASSESSED.** OWNER-FINAL-BLUEPRINT-100 weights/independent acceptance are unapproved, so neither '70%' nor '50%' is an official completed product rate. Central [작업중] stays until actual user target achieved; RELEASE HOLD.

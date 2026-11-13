@@ -1,20 +1,45 @@
-# FlowPilot Universal — isolated offline P50 candidate
+# FlowPilot Universal — Offline P70 workbench (technical subset; SALE HOLD)
 
-This is a separate local-only product: NOT the UGREEN competition Skill. There is no Uliya/NAS Expert invocation, network code, or original source import. The original lead/ugreen branch and official submission are untouched.
+Standalone, local-only delivery QA. This is **not** the UGREEN hackathon Skill, a NAS management agent, or a released Windows executable. It never contacts a service or writes into scanned source folders. Customer filenames, manifest paths and SHA evidence remain sensitive **local** data.
 
-## Input contract (schema v1)
+## 1. Native desktop GUI (Python 3.11, standard library)
 
-The operator explicitly selects an authorized PC/USB/OS-mounted SMB directory. A UTF-8 manifest has schema_version 1 and non-empty expected_files list: [{"path":"contracts/agreement.pdf"},{"path":"release/source.zip","sha256":"<replace with actual 64-char hex>"}]. Optional limits are max_files up to 20,000 and max_bytes up to 8 GiB. Paths use forward slashes; no wildcards or parent traversal. Manifest can be produced with any text editor; the user must approve scope.
+From `products/flowpilot_universal` on a Windows PC with Python and Tk support:
 
-## Run: Python 3.11+, standard library only
+```powershell
+python -m flowpilot_universal.gui
+```
 
-From products/flowpilot_universal:
+Select the authorized PC/USB/OS-mounted SMB directory, select a manifest JSON, choose an **existing output directory outside scanned source**, confirm you have permission via checkbox, then start. Status and local history are shown. Cancel records `INCOMPLETE`. Clicking **새 검수 시작 / 안전한 처음부터 재검사** starts an entirely new SHA scan. **No incremental resume/checkpoint** yet. **이력 백업** creates a new SQLite backup without overwriting prior files; no automatic destructive restore.
 
-    python -m flowpilot_universal --root /path/to/authorized-folder --manifest requirements.json --json ../new-report.json --html ../new-report.html
-    python -m unittest discover -s tests -p 'test_*.py' -v
+## 2. Manifest v1
 
-Report parent directory must already exist OUTSIDE scanned folder, and both report paths must be new (no overwrite). READY exit 0 only for complete best-effort scans satisfying all specified requirements with no issue; BLOCKED, NEEDS_REVIEW, INCOMPLETE, invalid input/output all exit 2. Reports list local filenames/hashes and may contain sensitive customer metadata: do not upload without authorization.
+```json
+{
+  "schema_version": 1,
+  "title": "영상 프로젝트 납품 검사",
+  "expected_files": [
+    {"path": "계약서.txt"},
+    {"path": "deliverables/final.mp4", "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}
+  ],
+  "limits": {"max_files": 20000, "max_bytes": 8589934592}
+}
+```
 
-P50 engineering scope: strict JSON input, bounded read-only recursive scan, SHA-256 per regular file with stat-before/open/after checks, required missing/hash mismatch, duplicate contents, version candidate signals, symlink/reparse/special entry fail-closed, case-collision detection, escaped HTML and JSON create-only reports, CLI, synthetic regression. No source mutation or network calls.
+Replace the example digest with the actual expected SHA256. Strict relative slash-separated paths only; no parent traversal, duplicate casing, colon, trailing spaces/dots, wildcard expansion or automatic NAS discovery. Every file in selected root is hashed read-only up to configured limits; additionally 25,000 directories max. A missing required file or mismatched hash blocks READY; unreadable, links, interrupted, changed directory or exceeded scan limits yield INCOMPLETE, and duplicate/version candidates yield NEEDS_REVIEW.
 
-NOT VERIFIED or implemented: physical Win10/11 USB/UNC/SMB, Windows junction and directory-race hardening, interrupt/resume, high-volume benchmarks/SQLite histories, GUI, polished PDF, EXE/package/signature, customer trials, license review, commercial sale. READY does NOT mean customer acceptance, an immutable filesystem snapshot or guaranteed universal NAS support. Official final-blueprint completion remains UNASSESSED until all user-approved weights and independent evidence are checked; P50 is only an engineering gate. RELEASE HOLD.
+## 3. Legacy CLI, tests and report evidence
+
+```bash
+python -m flowpilot_universal --root ./authorized --manifest ./requirements.json --json ./new.json --html ./new.html
+python -m unittest discover -s tests -p 'test_*.py' -v
+python -m compileall -q flowpilot_universal
+```
+
+CLI report paths must be fresh and **outside** root. GUI creates unique JSON/HTML report pairs and SQLite audit database `.flowpilot-history.sqlite3` in the chosen output directory; old rows/old reports are preserved. The SQLite backup operation is user-triggered. No user files or report files are silently deleted. In case of a failed second report, a first partial artifact is retained for manual inspection (do not mistake for completed report).
+
+## 4. Validation and limits
+
+Code SHA `e6d4d450cf2014d985f9cf97be1d91d5ab4d63ec`, GitHub Actions [#43379604599](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43379604599): Linux30/30 and Windows30/30 tests PASS, compileall PASS. Tests use synthetic folders and headless GUI import only. Real desktop window interactions and customer Windows10/11/USB/SMB NAS are **NOT RUN**. Directory re-list is best-effort only; races, reparse/junction and immutable-snapshot claims are unverified. No EXE installer, PDF output, actual customer rights, legal license package or sale approval. True incremental resumption remains absent.
+
+**Official final-design completion UNASSESSED**, not 70%. User goal of 70% remains in progress until whole locked blueprint F01–F10 owner-approved weighting and independent acceptance. Do not remove central [작업중] or RELEASE HOLD. See `BLUEPRINT.md` and `P70_EVIDENCE.md`.

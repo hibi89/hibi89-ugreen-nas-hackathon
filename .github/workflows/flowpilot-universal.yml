@@ -1,4 +1,4 @@
-name: FlowPilot Universal isolated offline P50
+name: FlowPilot Universal isolated offline P70
 on:
   push:
     branches: ["product/flowpilot-universal"]

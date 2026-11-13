@@ -1,3 +1,17 @@
+# LATEST FlowPilot Universal STATUS — 2026-11-13 KST
+
+- **Current user target:** final-design 70%. **Official verified final completion UNASSESSED**, final-weight/acceptance contract not approved. Never claim 70% based on 30 tests or P70 scope name. Earlier 50% user target/engineering gate below is historical.
+- **P70 technical development:** Tkinter offline GUI + explicit operator consent; separate destination, SQLite audit history, create-only JSON/HTML and on-demand create-only online SQLite history backup; scan progress, cancellation -> INCOMPLETE, safe full recheck (no digest reuse); directory re-list stability and 25k directory upper bound.
+- **Exact functional SHA:** `e6d4d450cf2014d985f9cf97be1d91d5ab4d63ec`. [Actions #43379604599](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43379604599) Linux/Windows Python3.11 each 30 PASS / 0 FAIL / 0 SKIP, 2/2 jobs SUCCESS, compileall PASS. [Final-blueprint rule #43379605082](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43379605082) SUCCESS; only policy check, not 70% attestation.
+- **Partial P70 acceptance:** NO true incremental checkpoint resume; GUI import tested headless only, no physical Tk click or customer Windows10/11, USB, UNC/SMB, Windows junction red team, Windows EXE/package, PDF, independent proof of immutable snapshot, customer rights/release/owner rubric. GUI and SQLite are not production guarantees.
+- **State:** central Kmong FlowPilot Universal **[작업중]** must remain until official 70% target certified; SALE NO-GO / RELEASE HOLD; no Vercel/Production endpoint (N/A). UGREEN Skill/lead/main untouched.
+- **Next:** owner-approved fixed F01–F10 weighting, verified incremental resume or explicit acceptance revision, real native GUI and Windows/USB/consented SMB acceptance, evidence-based product scoring and commercial review. No automatic NAS action, customer upload, payment, service deployment or credential changes.
+- **Recovery:** revert isolated product commits; prior P50 functional SHA b041870d9f04709ddc592f7e2b7c1250c43668a3. Existing reports and original source never auto-deleted/overwritten. See `P70_EVIDENCE.md` and current HANDOFF.
+
+---
+
+## Historical P50 snapshot (previous status retained)
+
 # FlowPilot Universal — CURRENT STATUS (2026-11-13 KST)
 
 - **Owner target:** final-product completion 50%; must score against locked entire final blueprint, not contest MVP or test counts.
