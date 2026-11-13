@@ -108,16 +108,19 @@ class UniversalSessionTests(unittest.TestCase):
             db.execute("CREATE TABLE unrelated (id INTEGER)")
         with self.assertRaises(InputError):
             run_session(self.root, self.manifest, self.output, consent=True)
-        with sqlite3.connect(foreign) as db:
+        with closing(sqlite3.connect(foreign)) as db:
             self.assertEqual(db.execute("SELECT count(*) FROM unrelated").fetchone()[0], 0)
 
     def test_directory_change_detection(self):
         cfg = load_manifest(self.manifest)
         original = os.scandir
+        calls = [0]
         def injected(path):
-            # Simulate a directory entry arriving during a scan.
+            # A new file arrives AFTER the first listing, BEFORE validation.
             if Path(path) == self.root:
-                (self.root / "late.txt").write_text("late", encoding="utf-8")
+                calls[0] += 1
+                if calls[0] == 2:
+                    (self.root / "late.txt").write_text("late", encoding="utf-8")
             return original(path)
         with patch("flowpilot_universal.engine.os.scandir", side_effect=injected):
             report = scan(self.root, cfg)
