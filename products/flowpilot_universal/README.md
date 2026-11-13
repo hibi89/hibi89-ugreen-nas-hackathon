@@ -1,3 +1,11 @@
+# LATEST 2026-11-13 KST — owner-approved checklist editor, NTFS junction proof, relocated Windows EXE
+
+- [Evidence](P85_GUI_NTFS_RELOCATED_EVIDENCE.md) / [Linux+Windows CI](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43395109341) Windows **94 PASS**, Linux **91 PASS + 3 Windows-only SKIP**, real Tk 5 PASS/OS, portable 8 repeated PASS/OS; [Windows EXE+ZIP](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43395109335) `EXE_EXIT 0` + `RELOCATED_EXE_EXIT 0`; user target full design 85% still **UNASSESSED**, RELEASE HOLD, [작업중] remains.
+- **GUI → 납품 요구사항 JSON 직접 작성**: select authorized source directory first; type independent delivery paths (one `folder/file.txt` per line) and optional TAB + 64-char SHA-256. Confirm you have independently approved the contract/checklist, then save to a **NEW .json OUTSIDE source**. Existing file will not be overwritten; no scan is used to auto-generate its own requirements. GUI sets new JSON as selected manifest; separately confirm source scan permission before scanning. This editor is not a pre-approved real customer template library.
+- **Security and packaging**: original source still read-only; Windows hosted NTFS junction source/root/output rejection tested; Windows unsigned onedir candidate ZIP verified and re-executed after relocation with Python removed from PATH. **No signed installer, ZIP download artifact, actual customer PC/USB/NAS, commercial rights or deployment.**
+
+---
+
 # Latest 2026-11-13 KST — Korean PDF evidence and Windows GUI candidate
 
 - **Evidence:** [full Linux+Windows CI #43391290337](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43391290337) at code `e87f5a2debe445bf749b3466b6a6f19b2febee7d`: **71 unique PASS per OS, 8 portable repeated per OS, 3 live Tk widget PASS per OS**. [Windows EXE PDF runtime #43391157492](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43391157492) EXIT 0; **unsigned / unpublished**. [PDF scope and issues](P85_PDF_EVIDENCE.md).

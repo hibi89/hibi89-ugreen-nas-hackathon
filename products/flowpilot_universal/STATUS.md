@@ -1,3 +1,16 @@
+# [LATEST 2026-11-13 KST] FlowPilot Universal P85 F02/F05/F08 milestone, official UNASSESSED
+
+- Owner target **85% of entire unchanged F01–F10 final design**. Approved whole-design 100-point weights, real consumer/SMB hardware and independent end-to-end customer acceptance absent; **official rate UNASSESSED, 85% NOT CERTIFIED, [작업중] and RELEASE HOLD preserved**.
+- New feature: independently sourced delivery checklist editor in Tk, type relative paths and optional 64-hex SHA; explicit operator approval before create-only JSON, strict invalid path/duplicate/oversize/source-write refusal, no self-derived requirements. New source-root, output-folder and editor-root preflight rejects NTFS reparse junctions, nested junction remains UNSAFE_LINK/INCOMPLETE.
+- Code SHA `458673ddbec8102dadc04c45ffe1a03f646c119a`; [Linux/Windows source CI](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43395109341) Windows **94 unique PASS / 0 FAIL / 0 SKIP** including **3 actual Windows `mklink /J` junction tests**, Linux **91 PASS + 3 Windows-only SKIP**, separate portable8 rerun per OS and real Tk GUI5 PASS/OS, compileall PASS, 2/2 jobs SUCCESS. [Final policy](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43395109927) SUCCESS (does not certify product rate).
+- [Windows EXE onedir #43395109335](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43395109335) built private unsigned candidate PyInstaller6.22.3, synthetic Tk/scan/PDF/ledger self-test **EXIT0**; candidate ZIP SHA256 `a13ba67da7bc911f3395522ddfb7027134f930e8198166bd82ae0a1b752b79cf` verified and extracted into new folder; `FlowPilotUniversal.exe --self-test` **RELOCATED_EXE_EXIT0** with developer Python PATH removed. No release/archive uploads or signing. Real Win10/11/USB/SMB/SmartScreen/AV and third-party font licensing not tested.
+- Earlier [#43394045445](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43394045445) GUI `Tcl_AsyncDelete` aborted despite 91 unit PASS due Tcl objects left to garbage collection outside owning Tk thread. Editor closes and releases variables on UI thread, Tk tests join worker and collect UI thread; [repaired #43394490099](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43394490099) all Linux/Windows 91+Tk5 PASS. No repeat of failed lifecycle pattern.
+- F09 physical buyer Windows10/11, real USB and authorized multi-vendor UNC SMB NAS, hostile race/immutability; F10 legal/NOTICE/license/real customer and approved 100-point rubric missing. Existing UGREEN lead/main/Skill/contest and other products, user customer data preserved. Before this batch product HEAD `d2db1d70d95a6733cd83a9bf80acf68a7b5cecfc`; Git rollback only product branch, no delete report/history. [Full details](P85_GUI_NTFS_RELOCATED_EVIDENCE.md). Vercel/Production N/A.
+
+---
+
+## Earlier P85/P70/P50 records (historical; do not overwrite latest)
+
 # [LATEST 2026-11-13 KST] FlowPilot Universal P85 PDF + unsigned Windows EXE tested
 
 - **Current owner target:** at least 85% of unchanged full F01–F10 owner final product. Whole-design approved 100-point rubric and independent customer acceptance **still not available**; **official completion UNASSESSED, 85% NOT CERTIFIED, [작업중] remains, RELEASE HOLD/SALE NO-GO**. This P85 feature gate does not replace final acceptance.
