@@ -1,3 +1,11 @@
+# [2026-11-14] Windowed Windows EXE now supports F09 three-pass offline trial (still not buyer-accepted)
+
+- `FlowPilotUniversal.exe --field-trial --root <authorized> --manifest <approved.json> --output <separate-existing-folder> --medium pc --consent` invokes 3 complete no-cache SHA scans, verifies local JSON/HTML/SQLite and saves a new local trial summary; CLI is bundled in the existing unsigned onedir EXE (no developer Python). With a `--windowed` executable **no terminal output is expected**; read the created `flowpilot-field-trial-*.json` and process exit code. Do not scan any folder without legal access and explicit scope approval.
+- Source `e8bc4f318087bd83634f9f177e73fbc87e43a95f`: [full Windows/Linux CI](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43511163767) Win111 PASS/Linux104 PASS+7 Win-only SKIP, GUI5 and portable8/OS. [Actual bundled Windows EXE CI](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43511163790) initial, ZIP-relocated, installed `--self-test` EXIT0; new self-test includes F09 path+no-consent check. No public binary/upload/customer hardware. [Technical evidence and zero-cost F10 rights preflight](F08_F09_EXE_AND_F10_RIGHTS_20261114.md).
+- Original final F01–F10 scope fixed. Actual Win10/11·USB·2-vendor NAS, license/NOTICE/signing/customer legal acceptance and owner-approved total-100 weights missing: **official UNASSESSED, target 85 NOT CERTIFIED, [작업중], RELEASE HOLD.**
+
+---
+
 # 2026-11-14 KST — F09 three-pass offline field-readiness CLI (not hardware acceptance)
 
 - Run only against an **already accessible and authorized** local/USB/OS-mounted SMB folder with an independently approved manifest, using a separate existing output folder: `python -m flowpilot_universal.field_trial --root <approved-folder> --manifest <requirements.json> --output <existing-outside-source-folder> --medium pc --consent` (choose `pc`, `usb`, or `smb`; media labels are operator claims, not device proofs).

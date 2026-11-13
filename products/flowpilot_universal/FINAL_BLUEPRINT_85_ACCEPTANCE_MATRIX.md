@@ -1,3 +1,5 @@
+> **2026-11-14 F08/F09 기능 보강 (기존 설계·가중치 불변):** 사용자 동의 3회 전체 SHA 재검사 기능을 기존 Windows `--onedir --windowed` EXE에 포함. [실 EXE CI #43511163790](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43511163790) 최초/ZIP 재배치/설치 자체검증 EXIT0 및 사용자 파일 보호형 제거 PASS, [양쪽 OS #43511163767](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43511163767) Win111/Linux104+7SKIP. F10 무료 상용화 준비: PyInstaller 상용 예외, ReportLab BSD, Nanum OFL 공식 확인하되 상세 타사 NOTICE·Windows 글꼴 및 실제 고객 수용 불완전. [증거](F08_F09_EXE_AND_F10_RIGHTS_20261114.md). 실 고객 Win10/11, USB, 허가 NAS 2제조사, 판매/권리 승인은 미검증. **공식률 UNASSESSED·85% 미인증·[작업중]·RELEASE HOLD**.
+
 > **2026-11-14 F09 보강 (수용 미인증):** 3회 무캐시 전체 SHA 재검사/보고서 JSON·HTML·SQLite 대조·계약서 변경 검출 및 로컬 create-only 요약 CLI 구현, [Win/Linux CI #43506736478](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43506736478) Win109 PASS/Linux102 PASS+7 SKIP. 이는 모의 기반 F09 **실기기 시험 준비**일 뿐 실제 USB/고객 Windows10/11·허가 NAS 두 제조사/ACL 권한/물리 사용자 수락을 충족하지 않는다. 가중치 미확정, **공식률 UNASSESSED·[작업중]·RELEASE HOLD** 유지. [근거](F09_REPEATABILITY_EVIDENCE.md).
 
 # FlowPilot Universal — F01–F10 최종설계 85% 수용조건·증거 매트릭스

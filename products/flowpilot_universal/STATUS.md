@@ -1,3 +1,12 @@
+# [2026-11-14 KST] FlowPilot Universal F09 bundled EXE functional evidence + F10 zero-cash license preflight
+
+- **User target:** unchanged entire F01–F10 blueprint ≥85. No weighted 100-point owner acceptance yet; **official UNASSESSED / not 85-certified**. `[작업중]` and RELEASE/SALE HOLD remain.
+- **Code SHA `e8bc4f318087bd83634f9f177e73fbc87e43a95f`:** Windows `--onedir --windowed` EXE now includes the consent-only full 3-pass F09 trial, no Python needed for exe execution, and treats null stdout/stderr safely. Original GUI/engine/refusal policies unchanged. Added two focused tests for no-consent and windowed no-console. [Full source CI #43511163767](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43511163767): Win **111PASS/0FAIL/0SKIP**, Linux **104PASS/0FAIL/7 Win-only SKIP**, Tk5/OS, portable8 rerun/OS, compileall 2/2 SUCCESS. [Windows EXE #43511163790](https://github.com/hibi89/hibi89-ugreen-nas-hackathon/actions/runs/43511163790) build/initial F09-inclusive selftest EXIT0, ZIP SHA checked relocation EXIT0, temp installed EXIT0, unrelated customer file blocks uninstall and clean remove PASS. **Unsigned candidate only, not released/real consumer tested.**
+- **Free F10 license research:** official PyInstaller commercial bundle exception, ReportLab OSS BSD, Nanum OFL commercial use checked; actual transitive package NOTICE, Malgun Gothic embedded font license, product ownership/EULA/support/SmartScreen, real customer approval **NOT VERIFIED**. [Evidence](F08_F09_EXE_AND_F10_RIGHTS_20261114.md).
+- F09 physical owner Windows10/11/USB & authorized SMB 2 NAS vendors, original 100-point rubric and F10 still blocked. No purchases, permissions/secret/customer source changes, external transfer or public release. Pretask SHA `6fbb0163c891dbe25f8408fc6a724688018a1224` selectively revertible; UGREEN lead/main unchanged.
+
+---
+
 # [2026-11-14 KST] 사용자 추가 확정 — 최종설계 고정·추가 현금 지출 0원 상용화 준비 승인
 
 - **평가 분모:** 사용자 확인대로 기존 최종설계 F01–F10 전체 고정, 요구·수용기준·가중치를 85% 달성 목적으로 삭제·추가·임의 재가중하지 않음. 현재 승인된 세부 100점 가중치 없는 경우 공식 완성률은 여전히 **UNASSESSED**. 목표 85% 미인증, `[작업중]` 유지.
