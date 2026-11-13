@@ -1,4 +1,4 @@
-name: FlowPilot Universal isolated offline P70
+name: FlowPilot Universal isolated P85 security and portable
 on:
   push:
     branches: ["product/flowpilot-universal"]
@@ -22,6 +22,8 @@ jobs:
           python-version: "3.11"
       - run: python -m unittest discover -s tests -p 'test_*.py' -v
       - run: python -m compileall -q flowpilot_universal
+      - name: Verify portable zipapp executable on same host
+        run: python -m unittest discover -s tests -p 'test_portable.py' -v
       - name: Actual Tk desktop smoke (Linux Xvfb, synthetic only)
         run: |
           command -v xvfb-run
@@ -39,3 +41,5 @@ jobs:
           python-version: "3.11"
       - run: python -m unittest discover -s tests -p 'test_*.py' -v
       - run: python -m compileall -q flowpilot_universal
+      - name: Verify portable zipapp executable on same host
+        run: python -m unittest discover -s tests -p 'test_portable.py' -v
