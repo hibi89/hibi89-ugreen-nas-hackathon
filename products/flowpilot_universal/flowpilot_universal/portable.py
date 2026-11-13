@@ -25,6 +25,9 @@ MAX_ARCHIVE = 2_000_000
 MAX_MEMBER = 350_000
 ENTRY = (
     "import sys\n"
+    "if hasattr(sys.stdout, 'reconfigure'):\n"
+    "    sys.stdout.reconfigure(encoding='utf-8', errors='replace')\n"
+    "    sys.stderr.reconfigure(encoding='utf-8', errors='replace')\n"
     "if '--gui' in sys.argv[1:]:\n"
     "    if sys.argv[1:] != ['--gui']:\n"
     "        raise SystemExit('GUI mode accepts no other options')\n"
