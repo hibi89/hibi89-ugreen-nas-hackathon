@@ -97,8 +97,10 @@ class UniversalTests(unittest.TestCase):
         with self.assertRaises(InputError):
             self.config(["a"], title=42)
     def test_html_escaped(self):
-        (self.root / "<script>.txt").write_bytes(b"x")
-        r = scan(self.root, self.config(["<script>.txt"], title="<img src=x>"))
+        # Windows forbids angle brackets in real filenames; inject into render input only.
+        (self.root / "safe.txt").write_bytes(b"x")
+        r = scan(self.root, self.config(["safe.txt"], title="<img src=x>"))
+        r["files"][0]["path"] = "<script>.txt"
         page = render_html(r)
         self.assertNotIn("<script>.txt", page)
         self.assertNotIn("<img src=x>", page)
