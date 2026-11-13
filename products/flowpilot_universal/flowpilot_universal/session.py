@@ -18,6 +18,7 @@ from typing import Callable
 from uuid import uuid4
 
 from .engine import InputError, _manifest_bytes, create_only, load_manifest, render_html, scan
+from .checkpoint import ResumeCheckpoint
 
 APP_ID = 1179669045
 HISTORY_FILE = ".flowpilot-history.sqlite3"
@@ -109,13 +110,19 @@ def run_session(
     root: Path, manifest_path: Path, output_dir: Path, *,
     consent: bool = False, cancel: Callable[[], bool] | None = None,
     progress: Callable[[int, int], None] | None = None,
+    resume: bool = False,
 ) -> SessionResult:
     if consent is not True:
         raise InputError("explicit operator scope/permission confirmation required")
     output = _safe_output(root, output_dir)
     manifest, original_manifest = load_manifest(manifest_path, include_bytes=True)
     manifest_sha = hashlib.sha256(original_manifest).hexdigest()
-    report = scan(root, manifest, cancel=cancel, progress=progress)
+    if resume:
+        with ResumeCheckpoint(output, root, manifest_sha) as checkpoint:
+            report = scan(root, manifest, cancel=cancel, progress=progress,
+                          resume_lookup=checkpoint.lookup, checkpoint_save=checkpoint.save)
+    else:
+        report = scan(root, manifest, cancel=cancel, progress=progress)
     if _manifest_bytes(manifest_path) != original_manifest:
         raise InputError("requirements manifest changed during scan; no report published")
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S.%fZ")

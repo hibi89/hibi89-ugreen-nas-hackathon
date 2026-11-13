@@ -21,6 +21,7 @@ class App:
         self.manifest = tk.StringVar()
         self.output = tk.StringVar()
         self.consent = tk.BooleanVar(value=False)
+        self.resume = tk.BooleanVar(value=False)
         self.status = tk.StringVar(value="대기 · 읽기 전용 / 외부 전송 없음")
         self.events: queue.Queue = queue.Queue()
         self.stop = threading.Event()
@@ -44,7 +45,9 @@ class App:
                 lambda v=var: v.set(filedialog.askopenfilename(filetypes=[("JSON", "*.json"), ("All", "*")]) or v.get()))
             ttk.Button(bar, text="찾기", command=action).pack(side="left", padx=(8, 0))
         ttk.Checkbutton(main, text="이 폴더에 대한 합법적 읽기 권한이 있으며 해당 범위의 검사를 승인합니다.",
-                        variable=self.consent).pack(anchor="w", pady=(18, 12))
+                        variable=self.consent).pack(anchor="w", pady=(18, 6))
+        ttk.Checkbutton(main, text="부분 이어하기 (이전 해시는 검토용으로만 재사용, READY 판정은 새 전체 검사 필요)",
+                        variable=self.resume).pack(anchor="w", pady=(0, 12))
         actions = ttk.Frame(main)
         actions.pack(fill="x")
         self.start_button = ttk.Button(actions, text="새 검수 시작 / 안전한 처음부터 재검사", command=self.start)
@@ -63,7 +66,7 @@ class App:
         scrollbar = ttk.Scrollbar(frame, command=self.history.yview)
         scrollbar.pack(side="right", fill="y")
         self.history.configure(yscrollcommand=scrollbar.set)
-        ttk.Label(main, text="취소는 현재 파일 읽기 완료 후 처리될 수 있습니다. '재검사'는 기존 해시를 재사용하지 않는 완전 새 검사입니다.",
+        ttk.Label(main, text="이어하기는 완료 파일의 메타데이터·SHA를 검토용으로 재사용하므로 NEEDS_REVIEW입니다. 체크 해제 후 전체 재해시해야 READY입니다.",
                   wraplength=820).pack(anchor="w", pady=(10, 0))
         self.master.after(100, self.drain)
 
@@ -81,12 +84,14 @@ class App:
         self.start_button.configure(state="disabled")
         self.cancel_button.configure(state="normal")
         self.status.set("검사 중 · 원본 읽기 전용")
-        self.worker = threading.Thread(target=self.work, args=tuple(map(Path, values)), daemon=True)
+        self.worker = threading.Thread(target=self.work,
+                                       args=(*tuple(map(Path, values)), self.resume.get()), daemon=True)
         self.worker.start()
 
-    def work(self, root, manifest, output):
+    def work(self, root, manifest, output, resume=False):
         try:
-            result = run_session(root, manifest, output, consent=True, cancel=self.stop.is_set,
+            result = run_session(root, manifest, output, consent=True, resume=resume,
+                                 cancel=self.stop.is_set,
                                  progress=lambda count, bytes_seen: self.events.put(("progress", count, bytes_seen)))
             self.events.put(("done", result))
         except Exception as exc:

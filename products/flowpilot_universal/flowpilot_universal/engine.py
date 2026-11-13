@@ -159,7 +159,9 @@ def _version_key(rel: str) -> str | None:
 
 def scan(root: Path, manifest: dict[str, Any], *,
          cancel: Callable[[], bool] | None = None,
-         progress: Callable[[int, int], None] | None = None) -> dict[str, Any]:
+         progress: Callable[[int, int], None] | None = None,
+         resume_lookup: Callable[[str, os.stat_result], str | None] | None = None,
+         checkpoint_save: Callable[[str, os.stat_result, str], None] | None = None) -> dict[str, Any]:
     if root.is_symlink() or not root.is_dir():
         raise InputError("root must be an existing non-symlink directory explicitly approved by the operator")
     root = root.resolve(strict=True)
@@ -170,6 +172,7 @@ def scan(root: Path, manifest: dict[str, Any], *,
     stack: list[tuple[Path, str]] = [(root, "")]
     stopped = False
     directories_visited = 0
+    cache_reused = 0
     max_files = manifest["limits"]["max_files"]
     max_bytes = manifest["limits"]["max_bytes"]
     while stack and not stopped:
@@ -217,7 +220,16 @@ def scan(root: Path, manifest: dict[str, Any], *,
                     break
                 record: dict[str, Any] = {"path": rel, "size": info.st_size, "sha256": None}
                 try:
-                    record["sha256"] = _hash_file(Path(entry.path), info, cancel)
+                    reused_digest = resume_lookup(rel, info) if resume_lookup is not None else None
+                    if reused_digest is not None:
+                        if not isinstance(reused_digest, str) or re.fullmatch(r"[0-9a-f]{64}", reused_digest) is None:
+                            raise InputError("invalid stored resume SHA256")
+                        record["sha256"] = reused_digest
+                        cache_reused += 1
+                    else:
+                        record["sha256"] = _hash_file(Path(entry.path), info, cancel)
+                        if checkpoint_save is not None and record["sha256"] is not None:
+                            checkpoint_save(rel, info, record["sha256"])
                 except OSError:
                     issues.append({"code": "FILE_UNREADABLE_OR_CHANGED", "path": rel})
                 files.append(record)
@@ -240,6 +252,10 @@ def scan(root: Path, manifest: dict[str, Any], *,
                 issues.append({"code": "DIRECTORY_CHANGED", "path": prefix or "."})
         except OSError:
             issues.append({"code": "DIRECTORY_CHANGED", "path": prefix or "."})
+    if cache_reused:
+        # Metadata checks are NOT sufficient to authenticate cached file bytes.
+        # Require independent complete rehash before promoting to READY.
+        issues.append({"code": "RESUME_CACHE_REVIEW", "path": ".", "cached_files": cache_reused})
     files.sort(key=lambda rec: (rec["path"].casefold(), rec["path"]))
     indexed: dict[str, dict[str, Any]] = {}
     for rec in files:
@@ -279,7 +295,7 @@ def scan(root: Path, manifest: dict[str, Any], *,
             "root": str(root), "expected_count": len(manifest["expected_files"]),
             "files_scanned": len(files), "bytes_seen": byte_count, "files": files, "issues": issues,
             "safety": {"read_only": True, "network_used": False, "nas_actions": False,
-                       "ready_requires_complete_scan": True}}
+                       "ready_requires_complete_scan": True, "cached_files_unverified": cache_reused}}
 
 def render_html(report: dict[str, Any]) -> str:
     esc = lambda obj: html.escape(str(obj), quote=True)
