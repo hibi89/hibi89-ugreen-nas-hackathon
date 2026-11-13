@@ -22,6 +22,10 @@ jobs:
           python-version: "3.11"
       - run: python -m unittest discover -s tests -p 'test_*.py' -v
       - run: python -m compileall -q flowpilot_universal
+      - name: Actual Tk desktop smoke (Linux Xvfb, synthetic only)
+        run: |
+          command -v xvfb-run
+          xvfb-run -a python -m unittest discover -s tests -p 'gui_click_smoke.py' -v
   offline-windows:
     runs-on: windows-latest
     timeout-minutes: 10
